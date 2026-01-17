@@ -1,5 +1,5 @@
 @import 'tailwindcss';
-@import "tw-animate-css";
+@import 'tw-animate-css';
 
 @custom-variant dark (&:is(.dark *));
 
@@ -38,6 +38,7 @@
   --color-chart-3: var(--chart-3);
   --color-chart-4: var(--chart-4);
   --color-chart-5: var(--chart-5);
+  --color-chart-6: var(--chart-6);
   --color-sidebar: var(--sidebar);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar-primary: var(--sidebar-primary);
@@ -46,6 +47,21 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+
+  --color-brand-3: var(--brand-3);
+  --color-brand-6: var(--brand-6);
+  --color-brand-9: var(--brand-9);
+  --color-brand-11: var(--brand-11);
+  --color-brand-12: var(--brand-12);
+
+  --color-error: var(--error);
+  --color-error-light: var(--error-light);
+  --color-warning: var(--warning);
+  --color-warning-light: var(--warning-light);
+  --color-success: var(--success);
+  --color-success-light: var(--success-light);
+  --color-info: var(--info);
+  --color-info-light: var(--info-light);
 }
 
 :root {
@@ -68,11 +84,12 @@
   --border: oklch(0.923 0.003 48.717);
   --input: oklch(0.923 0.003 48.717);
   --ring: oklch(0.709 0.01 56.259);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
+  --chart-1: #fbbf24;
+  --chart-2: #84cc16;
+  --chart-3: #10b981;
+  --chart-4: #38bdf8;
+  --chart-5: #4f46e5;
+  --chart-6: #a855f7;
   --sidebar: oklch(0.985 0.001 106.423);
   --sidebar-foreground: oklch(0.147 0.004 49.25);
   --sidebar-primary: oklch(0.216 0.006 56.043);
@@ -81,9 +98,56 @@
   --sidebar-accent-foreground: oklch(0.216 0.006 56.043);
   --sidebar-border: oklch(0.923 0.003 48.717);
   --sidebar-ring: oklch(0.709 0.01 56.259);
+
+  --brand-3: #FCEAEF;
+  --brand-6: #EEC2CF;
+  --brand-9: #DE5C8E;
+  --brand-11: #B9386C;
+  --brand-12: #5B2037;
+
+  --error: #DC2626;
+  --error-light: #FFE2E2;
+  --warning: #FBBF24;
+  --warning-light: #FEF3C7;
+  --success: #14B8A6;
+  --success-light: #CCFBF1;
+  --info: #1d4ed8;
+  --info-light: #eff6ff;
+
+  /* Text Styles */
+  --font-family-h1-topic: 'Noto Sans Thai';
+  --font-size-h1-topic: 32px;
+  --font-weight-h1-topic: 600;
+  --font-family-h2-topic: 'Noto Sans Thai';
+  --font-size-h2-topic: 24px;
+  --font-weight-h2-topic: 600;
+  --font-family-h2-sub: 'Noto Sans Thai';
+  --font-size-h2-sub: 20px;
+  --font-weight-h2-sub: 500;
+  --font-family-h3-topic: 'Noto Sans Thai';
+  --font-size-h3-topic: 20px;
+  --font-weight-h3-topic: 600;
+  --font-family-h3-sub: 'Noto Sans Thai';
+  --font-size-h3-sub: 18px;
+  --font-weight-h3-sub: 400;
+  --font-family-h4-topic: 'Noto Sans Thai';
+  --font-size-h4-topic: 18px;
+  --font-weight-h4-topic: 500;
+  --font-family-h4-sub: 'Noto Sans Thai';
+  --font-size-h4-sub: 16px;
+  --font-weight-h4-sub: 400;
+  --font-family-normal-normal: 'Noto Sans Thai';
+  --font-size-normal-normal: 16px;
+  --font-weight-normal-normal: 400;
+  --font-family-normal-bold: 'Noto Sans Thai';
+  --font-size-normal-bold: 16px;
+  --font-weight-normal-bold: 600;
+  --font-family-normal-light: 'Noto Sans Thai';
+  --font-size-normal-light: 16px;
+  --font-weight-normal-light: 300;
 }
 
-.dark {
+/* .dark {
   --background: oklch(0.147 0.004 49.25);
   --foreground: oklch(0.985 0.001 106.423);
   --card: oklch(0.216 0.006 56.043);
@@ -115,7 +179,7 @@
   --sidebar-accent-foreground: oklch(0.985 0.001 106.423);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.553 0.013 58.071);
-}
+} */
 
 @layer base {
   * {
@@ -123,5 +187,67 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+@layer utilities {
+  .text-h1-topic {
+    font-family: var(--font-family-h1-topic);
+    font-size: var(--font-size-h1-topic);
+    font-weight: var(--font-weight-h1-topic);
+  }
+
+  .text-h2-topic {
+    font-family: var(--font-family-h2-topic);
+    font-size: var(--font-size-h2-topic);
+    font-weight: var(--font-weight-h2-topic);
+  }
+
+  .text-h2-sub {
+    font-family: var(--font-family-h2-sub);
+    font-size: var(--font-size-h2-sub);
+    font-weight: var(--font-weight-h2-sub);
+  }
+
+  .text-h3-topic {
+    font-family: var(--font-family-h3-topic);
+    font-size: var(--font-size-h3-topic);
+    font-weight: var(--font-weight-h3-topic);
+  }
+
+  .text-h3-sub {
+    font-family: var(--font-family-h3-sub);
+    font-size: var(--font-size-h3-sub);
+    font-weight: var(--font-weight-h3-sub);
+  }
+
+  .text-h4-topic {
+    font-family: var(--font-family-h4-topic);
+    font-size: var(--font-size-h4-topic);
+    font-weight: var(--font-weight-h4-topic);
+  }
+
+  .text-h4-sub {
+    font-family: var(--font-family-h4-sub);
+    font-size: var(--font-size-h4-sub);
+    font-weight: var(--font-weight-h4-sub);
+  }
+
+  .text-normal-normal {
+    font-family: var(--font-family-normal-normal);
+    font-size: var(--font-size-normal-normal);
+    font-weight: var(--font-weight-normal-normal);
+  }
+
+  .text-normal-bold {
+    font-family: var(--font-family-normal-bold);
+    font-size: var(--font-size-normal-bold);
+    font-weight: var(--font-weight-normal-bold);
+  }
+
+  .text-normal-light {
+    font-family: var(--font-family-normal-light);
+    font-size: var(--font-size-normal-light);
+    font-weight: var(--font-weight-normal-light);
   }
 }

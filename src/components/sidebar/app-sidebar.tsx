@@ -1,13 +1,15 @@
 import {
   LayoutDashboard,
-  ListTodo,
-  UserCog,
   FolderOpen,
   FileInput,
   Users,
   Building2,
   LogOut,
   Package,
+  TrendingUp,
+  ClipboardList,
+  ShoppingCart,
+  PieChart,
 } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 
@@ -25,49 +27,85 @@ import {
   SidebarRail,
 } from '@/components/ui/sidebar';
 
-// 1. Operation Group (Daily Tasks)
-const operationItems = [
+export const sidebarGroups = [
+  // Group 1: The "Home" Base - Where users start their day
   {
-    title: 'Todo List',
-    url: '/app/tasks',
-    icon: ListTodo,
+    groupLabel: 'Overview',
+    items: [
+      {
+        title: 'My Dashboard',
+        url: '/app/user/dashboard',
+        icon: LayoutDashboard,
+      },
+      {
+        title: 'Personal KPI',
+        url: '/app/user/kpi',
+        icon: TrendingUp,
+      },
+    ],
   },
-  {
-    title: 'Job Assignment',
-    url: '/app/dispatch',
-    icon: UserCog,
-  },
-];
 
-// 2. Monitoring Group
-const monitoringItems = [
+  // Group 2: Action Center - The actual work queues
   {
-    title: 'Dashboard & KPI',
-    url: '/app/dashboard',
-    icon: LayoutDashboard,
+    groupLabel: 'Work Queues',
+    items: [
+      {
+        title: 'Procurement Jobs',
+        url: '/app/dispatch/procurement',
+        icon: ShoppingCart,
+      },
+      {
+        title: 'Contract Jobs',
+        url: '/app/dispatch/contract',
+        icon: ClipboardList,
+      },
+    ],
   },
-];
 
-// 3. Project Management Group
-const projectItems = [
+  // Group 3: Data Repository - Searching and Creating
   {
-    title: 'All Projects',
-    url: '/app/projects',
-    icon: FolderOpen,
+    groupLabel: 'Project Management',
+    items: [
+      {
+        title: 'All Projects',
+        url: '/app/projects',
+        icon: FolderOpen,
+      },
+      {
+        title: 'Import Projects',
+        url: '/app/projects/import',
+        icon: FileInput,
+      },
+    ],
   },
-];
 
-// 4. Admin Group
-const adminItems = [
+  // Group 4: Analytics - For Heads/Managers (Separated from personal dashboard)
   {
-    title: 'Internal Groups',
-    url: '/app/admin/groups',
-    icon: Users,
+    groupLabel: 'Analytics',
+    items: [
+      {
+        title: 'Department View',
+        url: '/app/dashboard/department',
+        icon: Building2,
+      },
+      {
+        title: 'Overall Performance',
+        url: '/app/dashboard/overall',
+        icon: PieChart,
+      },
+    ],
   },
+
+  // Group 5: Settings
   {
-    title: 'Unit Mapping',
-    url: '/app/admin/units',
-    icon: Building2,
+    groupLabel: 'Administration',
+    items: [
+      {
+        title: 'Organization',
+        url: '/app/admin/organization',
+        icon: Users,
+      },
+    ],
   },
 ];
 
@@ -89,93 +127,28 @@ export function AppSidebar() {
       </SidebarHeader>
 
       <SidebarContent>
-        {/* Group 1: Operation */}
-        <SidebarGroup>
-          <SidebarGroupLabel>Operation</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {operationItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton
-                    asChild
-                    isActive={location.pathname === item.url}
-                  >
-                    <Link to={item.url}>
-                      <item.icon />
-                      <span>{item.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-
-        {/* Group 2: Monitoring */}
-        <SidebarGroup>
-          <SidebarGroupLabel>Monitoring</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {monitoringItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton
-                    asChild
-                    isActive={location.pathname === item.url}
-                  >
-                    <Link to={item.url}>
-                      <item.icon />
-                      <span>{item.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-
-        {/* Group 3: Projects */}
-        <SidebarGroup>
-          <SidebarGroupLabel>Projects</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {projectItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton
-                    asChild
-                    isActive={location.pathname === item.url}
-                  >
-                    <Link to={item.url}>
-                      <item.icon />
-                      <span>{item.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-
-        {/* Group 4: Administration */}
-        <SidebarGroup>
-          <SidebarGroupLabel>System Admin</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {adminItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton
-                    asChild
-                    isActive={location.pathname === item.url}
-                  >
-                    <Link to={item.url}>
-                      <item.icon />
-                      <span>{item.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+        {sidebarGroups.map((group) => (
+          <SidebarGroup key={group.groupLabel}>
+            <SidebarGroupLabel>{group.groupLabel}</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {group.items.map((item) => (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton
+                      asChild
+                      isActive={location.pathname.startsWith(item.url)}
+                    >
+                      <Link to={item.url}>
+                        <item.icon />
+                        <span>{item.title}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        ))}
       </SidebarContent>
 
       <SidebarFooter>

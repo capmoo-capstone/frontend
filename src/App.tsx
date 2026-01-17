@@ -9,19 +9,23 @@ import PublicLayout from './layouts/PublicLayout';
 
 // Auth Pages
 import Login from './pages/auth/Login';
+import PageNotFound from './pages/auth/PageNotFound';
 
 // Vendor Pages
+import VendorForm from './pages/vendor/VendorForm';
 import VendorSubmission from './pages/vendor/VendorSubmission';
 
 // App Pages
-import Dashboard from './pages/dashboard/Dashboard';
-import TodoList from './pages/tasks/TodoList';
-import JobAssignment from './pages/dispatch/JobAssignment';
+import DepartmentDashboard from './pages/dashboard/DepartmentDashboard';
+import OverallDashboard from './pages/dashboard/OverallDashboard';
+import ContractJobs from './pages/dispatch/ContractJobs';
+import ProcumentJobs from './pages/dispatch/ProcumentJobs';
 import ProjectList from './pages/projects/ProjectList';
 import ProjectImport from './pages/projects/ProjectImport';
 import ProjectDetail from './pages/projects/ProjectDetail';
-import GroupManagement from './pages/admin/GroupManagement';
-import UnitManagement from './pages/admin/UnitManagement';
+import MyDashboard from './pages/user/MyDashboard';
+import PersonalKPI from './pages/user/PersonalKPI';
+import OrganizationManagement from './pages/admin/OrganizationManagement';
 
 function App() {
   return (
@@ -52,37 +56,69 @@ function App() {
             </PublicLayout>
           }
         />
+        <Route
+          path="/vendor/form"
+          element={
+            <PublicLayout>
+              <VendorForm />
+            </PublicLayout>
+          }
+        />
 
         {/* Protected Routes (With Sidebar) */}
         <Route
           path="/app"
           element={
             <AppLayout>
-              <Dashboard />
+              <DepartmentDashboard />
             </AppLayout>
           }
         />
         <Route
-          path="/app/dashboard"
+          path="/app/dashboard/department"
           element={
             <AppLayout>
-              <Dashboard />
+              <DepartmentDashboard />
             </AppLayout>
           }
         />
         <Route
-          path="/app/tasks"
+          path="/app/dashboard/overall"
           element={
             <AppLayout>
-              <TodoList />
+              <OverallDashboard />
             </AppLayout>
           }
         />
         <Route
-          path="/app/dispatch"
+          path="/app/user/dashboard"
           element={
             <AppLayout>
-              <JobAssignment />
+              <MyDashboard />
+            </AppLayout>
+          }
+        />
+        <Route
+          path="/app/user/kpi"
+          element={
+            <AppLayout>
+              <PersonalKPI />
+            </AppLayout>
+          }
+        />
+        <Route
+          path="/app/dispatch/procurement"
+          element={
+            <AppLayout>
+              <ProcumentJobs />
+            </AppLayout>
+          }
+        />
+        <Route
+          path="/app/dispatch/contract"
+          element={
+            <AppLayout>
+              <ContractJobs />
             </AppLayout>
           }
         />
@@ -111,24 +147,23 @@ function App() {
           }
         />
         <Route
-          path="/app/admin/groups"
+          path="/app/admin/organization"
           element={
             <AppLayout>
-              <GroupManagement />
-            </AppLayout>
-          }
-        />
-        <Route
-          path="/app/admin/units"
-          element={
-            <AppLayout>
-              <UnitManagement />
+              <OrganizationManagement />
             </AppLayout>
           }
         />
 
-        {/* Redirect any unknown routes to login */}
-        <Route path="*" element={<Navigate to="/login" replace />} />
+        {/* Redirect any unknown routes to 404 */}
+        <Route
+          path="*"
+          element={
+            <PublicLayout>
+              <PageNotFound />
+            </PublicLayout>
+          }
+        />
       </Routes>
     </Router>
   );

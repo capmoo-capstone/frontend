@@ -55,7 +55,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                   <>
                     <BreadcrumbItem className="hidden md:block">
                       <BreadcrumbLink asChild>
-                        <Link to="/app/dashboard">Home</Link>
+                        <Link to="/app/user/dashboard">Home</Link>
                       </BreadcrumbLink>
                     </BreadcrumbItem>
                     {pathnames.map((segment, index) => {
@@ -89,6 +89,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           </div>
         </header>
         <main className="flex flex-1 flex-col gap-4 p-4">{children}</main>
+        <div className="absolute top-0 right-0 w-96 h-96 bg-linear-to-bl from-[#DE5C8E]/5 to-transparent blur-3xl z-10 pointer-events-none" />
       </SidebarInset>
     </SidebarProvider>
   );

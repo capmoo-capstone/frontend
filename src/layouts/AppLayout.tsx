@@ -16,80 +16,101 @@ import {
 import { AppSidebar } from '@/components/sidebar/app-sidebar';
 import { useLocation, Link } from 'react-router-dom';
 
-export default function Layout({ children }: { children: React.ReactNode }) {
+export default function AppLayout({ children }: { children: React.ReactNode }) {
   const location = useLocation();
 
   // Generate breadcrumb items from pathname
   const pathnames = location.pathname.split('/').filter((x) => x);
 
-  // Map route segments to readable names
+  // Map specific route segments to readable names
   const getPageName = (segment: string) => {
+    // 1. Check for known static mappings
     const nameMap: Record<string, string> = {
       app: 'Home',
-      dashboard: 'Dashboard',
-      tasks: 'Todo List',
-      dispatch: 'Job Assignment',
+      me: 'My Workspace',
+      management: 'Management',
+      dashboards: 'Dashboards',
+      dispatch: 'Dispatch',
+      vendors: 'Vendors',
       projects: 'Projects',
-      import: 'Import Project',
       admin: 'Administration',
-      users: 'User Management',
-      groups: 'Internal Groups',
-      units: 'Unit Mapping',
+
+      // Specific pages
+      'my-dashboard': 'Dashboard',
+      department: 'Department',
+      overview: 'Overview',
+      kpi: 'KPI',
+      procurements: 'Procurements',
+      contracts: 'Contracts',
+      import: 'Import',
+      submission: 'Submission',
+      organization: 'Organization',
     };
-    return (
-      nameMap[segment] || segment.charAt(0).toUpperCase() + segment.slice(1)
-    );
+
+    if (nameMap[segment]) return nameMap[segment];
+
+    // 2. Check if it looks like an ID (numeric or long mixed string)
+    // If it's an ID, show "Details" instead of the confusing number
+    if (/^\d+$/.test(segment) || segment.length > 20) {
+      return 'Details';
+    }
+
+    // 3. Fallback: Convert "kebab-case" to "Title Case"
+    // e.g., "user-profile" -> "User Profile"
+    return segment
+      .replace(/-/g, ' ')
+      .replace(/\b\w/g, (char) => char.toUpperCase());
   };
 
   return (
     <SidebarProvider>
       <AppSidebar />
       <SidebarInset>
-        <header className="flex h-16 shrink-0 items-center gap-2 border-b">
-          <div className="flex items-center gap-2 px-3">
-            <SidebarTrigger />
+        <header className="flex h-16 shrink-0 items-center gap-2 border-b transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
+          <div className="flex items-center gap-2 px-4">
+            <SidebarTrigger className="-ml-1" />
             <Separator orientation="vertical" className="mr-2 h-4" />
             <Breadcrumb>
               <BreadcrumbList>
-                {pathnames.length > 0 && (
-                  <>
-                    <BreadcrumbItem className="hidden md:block">
-                      <BreadcrumbLink asChild>
-                        <Link to="/app/user/dashboard">Home</Link>
-                      </BreadcrumbLink>
-                    </BreadcrumbItem>
-                    {pathnames.map((segment, index) => {
-                      // Skip 'app' segment as we use it for Home
-                      if (segment === 'app') return null;
+                {/* Always show Home as the first item */}
+                <BreadcrumbItem className="hidden md:block">
+                  <BreadcrumbLink asChild>
+                    <Link to="/app/dashboards/department">Home</Link>
+                  </BreadcrumbLink>
+                </BreadcrumbItem>
 
-                      const routeTo = `/${pathnames.slice(0, index + 1).join('/')}`;
-                      const isLast = index === pathnames.length - 1;
+                {pathnames.map((segment, index) => {
+                  // Skip 'app' segment as we manually added "Home" above
+                  if (segment === 'app') return null;
 
-                      return (
-                        <React.Fragment key={routeTo}>
-                          <BreadcrumbSeparator className="hidden md:block" />
-                          <BreadcrumbItem>
-                            {isLast ? (
-                              <BreadcrumbPage>
-                                {getPageName(segment)}
-                              </BreadcrumbPage>
-                            ) : (
-                              <BreadcrumbLink asChild>
-                                <Link to={routeTo}>{getPageName(segment)}</Link>
-                              </BreadcrumbLink>
-                            )}
-                          </BreadcrumbItem>
-                        </React.Fragment>
-                      );
-                    })}
-                  </>
-                )}
+                  const routeTo = `/${pathnames.slice(0, index + 1).join('/')}`;
+                  const isLast = index === pathnames.length - 1;
+                  const pageName = getPageName(segment);
+
+                  return (
+                    <React.Fragment key={routeTo}>
+                      <BreadcrumbSeparator className="hidden md:block" />
+                      <BreadcrumbItem>
+                        {isLast ? (
+                          <BreadcrumbPage>{pageName}</BreadcrumbPage>
+                        ) : (
+                          <BreadcrumbLink asChild>
+                            <Link to={routeTo}>{pageName}</Link>
+                          </BreadcrumbLink>
+                        )}
+                      </BreadcrumbItem>
+                    </React.Fragment>
+                  );
+                })}
               </BreadcrumbList>
             </Breadcrumb>
           </div>
         </header>
+
         <main className="flex flex-1 flex-col gap-4 p-4">{children}</main>
-        <div className="absolute top-0 right-0 w-96 h-96 bg-linear-to-bl from-[#DE5C8E]/5 to-transparent blur-3xl z-10 pointer-events-none" />
+
+        {/* Background Decorative Element */}
+        <div className="absolute top-0 right-0 w-96 h-96 bg-linear-to-bl from-[#DE5C8E]/5 to-transparent blur-3xl z-0 pointer-events-none" />
       </SidebarInset>
     </SidebarProvider>
   );

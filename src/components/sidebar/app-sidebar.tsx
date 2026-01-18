@@ -10,6 +10,7 @@ import {
   ClipboardList,
   ShoppingCart,
   PieChart,
+  UserCog, // Added for Employee Management
 } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 
@@ -28,43 +29,40 @@ import {
 } from '@/components/ui/sidebar';
 
 export const sidebarGroups = [
-  // Group 1: The "Home" Base - Where users start their day
   {
-    groupLabel: 'Overview',
+    groupLabel: 'My Workspace',
     items: [
       {
         title: 'My Dashboard',
-        url: '/app/user/dashboard',
+        url: '/app/me/dashboard',
         icon: LayoutDashboard,
       },
       {
-        title: 'Personal KPI',
-        url: '/app/user/kpi',
+        title: 'My KPI',
+        url: '/app/me/kpi',
         icon: TrendingUp,
       },
     ],
   },
 
-  // Group 2: Action Center - The actual work queues
   {
     groupLabel: 'Work Queues',
     items: [
       {
         title: 'Procurement Jobs',
-        url: '/app/dispatch/procurement',
+        url: '/app/dispatch/procurements',
         icon: ShoppingCart,
       },
       {
         title: 'Contract Jobs',
-        url: '/app/dispatch/contract',
+        url: '/app/dispatch/contracts',
         icon: ClipboardList,
       },
     ],
   },
 
-  // Group 3: Data Repository - Searching and Creating
   {
-    groupLabel: 'Project Management',
+    groupLabel: 'Projects',
     items: [
       {
         title: 'All Projects',
@@ -79,30 +77,33 @@ export const sidebarGroups = [
     ],
   },
 
-  // Group 4: Analytics - For Heads/Managers (Separated from personal dashboard)
   {
     groupLabel: 'Analytics',
     items: [
       {
         title: 'Department View',
-        url: '/app/dashboard/department',
+        url: '/app/dashboards/department',
         icon: Building2,
       },
       {
         title: 'Overall Performance',
-        url: '/app/dashboard/overall',
+        url: '/app/dashboards/overview',
         icon: PieChart,
       },
     ],
   },
 
-  // Group 5: Settings
   {
-    groupLabel: 'Administration',
+    groupLabel: 'Management',
     items: [
       {
+        title: 'Employee KPIs',
+        url: '/app/management/employees/kpi',
+        icon: UserCog,
+      },
+      {
         title: 'Organization',
-        url: '/app/admin/organization',
+        url: '/app/management/organization',
         icon: Users,
       },
     ],
@@ -136,7 +137,13 @@ export function AppSidebar() {
                   <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton
                       asChild
-                      isActive={location.pathname.startsWith(item.url)}
+                      // Checks if the current path starts with the item URL
+                      // We added specific check to avoid highlighting "All Projects" when inside "Import"
+                      isActive={
+                        item.url === '/app/projects'
+                          ? location.pathname === '/app/projects'
+                          : location.pathname.startsWith(item.url)
+                      }
                     >
                       <Link to={item.url}>
                         <item.icon />
@@ -156,8 +163,6 @@ export function AppSidebar() {
           <SidebarMenuItem>
             <SidebarMenuButton asChild>
               <Link to="/login">
-                {' '}
-                {/* Or your logout logic */}
                 <LogOut />
                 <span>Sign Out</span>
               </Link>

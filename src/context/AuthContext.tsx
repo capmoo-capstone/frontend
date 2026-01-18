@@ -9,14 +9,9 @@ import { type User, UserSchema, type AuthContextType } from '../types/auth';
 
 const MOCK_ADMIN: User = {
   id: '999999',
-  unit_id: null,
-  username: 'admin',
+  name: 'System Administrator',
   email: 'admin@nexus-procure.com',
-  full_name: 'System Administrator',
   role: 'admin',
-  is_delegate: false,
-  delegate_user_id: null,
-  created_at: new Date().toISOString(),
 };
 
 const AuthContext = createContext<AuthContextType | null>(null);

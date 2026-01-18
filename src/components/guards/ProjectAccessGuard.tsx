@@ -27,7 +27,7 @@ const ProjectAccessGuard = () => {
 
         const isAssignee = mockProject.assigneeId === user.id;
         const isHeadOfUnit =
-          user.role === 'head' && user.unit_id === mockProject.unitId;
+          user.role === 'head' && user.unitId === mockProject.unitId;
 
         if (isAssignee || isHeadOfUnit) {
           setIsAllowed(true);

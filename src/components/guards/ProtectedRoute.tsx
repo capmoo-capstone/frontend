@@ -1,10 +1,10 @@
 import React from 'react';
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
-import { type User } from '../../types/auth';
+import { useAuth } from '@/context/AuthContext';
+import { type Role } from '@/types/auth';
 
 type ProtectedRouteProps = {
-  allowedRoles?: User['role'][];
+  allowedRoles?: Role[];
 };
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ allowedRoles }) => {
@@ -12,16 +12,22 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ allowedRoles }) => {
   const location = useLocation();
 
   if (isLoading) {
-    // todo: Replace with a proper loading component
-    return <div>Loading access permissions...</div>;
+    return <div className="p-4">Loading access...</div>;
   }
 
   if (!user) {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  if (allowedRoles && !allowedRoles.includes(user.role)) {
-    return <Navigate to="/unauthorized" replace />;
+  if (
+    allowedRoles &&
+    !allowedRoles.includes(user.role) &&
+    user.role !== 'admin'
+  ) {
+    if (user.role === 'unit') {
+      return <Navigate to="/app/dashboards/department" replace />;
+    }
+    return <Navigate to="/app/me/dashboard" replace />;
   }
 
   return <Outlet />;

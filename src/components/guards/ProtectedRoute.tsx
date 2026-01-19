@@ -1,5 +1,6 @@
 import React from 'react';
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
+
 import { useAuth } from '@/context/AuthContext';
 import { type Role } from '@/types/auth';
 
@@ -19,11 +20,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ allowedRoles }) => {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  if (
-    allowedRoles &&
-    !allowedRoles.includes(user.role) &&
-    user.role !== 'admin'
-  ) {
+  if (allowedRoles && !allowedRoles.includes(user.role) && user.role !== 'admin') {
     if (user.role === 'unit') {
       return <Navigate to="/app/dashboards/department" replace />;
     }

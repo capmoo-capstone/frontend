@@ -1,11 +1,6 @@
-import React, {
-  createContext,
-  useContext,
-  useState,
-  useEffect,
-  type ReactNode,
-} from 'react';
-import { type User, UserSchema, type AuthContextType } from '../types/auth';
+import React, { type ReactNode, createContext, useContext, useEffect, useState } from 'react';
+
+import { type AuthContextType, type User, UserSchema } from '../types/auth';
 
 const MOCK_ADMIN: User = {
   id: '999999',
@@ -16,9 +11,9 @@ const MOCK_ADMIN: User = {
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
-export const AuthProvider: React.FC<{ children: ReactNode }> = ({
-  children,
-}) => {
+export const AuthProvider: React.FC<{
+  children: ReactNode;
+}> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -58,7 +53,13 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
   return (
     <AuthContext.Provider
-      value={{ user, isAuthenticated: !!user, isLoading, login, logout }}
+      value={{
+        user,
+        isAuthenticated: !!user,
+        isLoading,
+        login,
+        logout,
+      }}
     >
       {children}
     </AuthContext.Provider>

@@ -1,10 +1,10 @@
-import { Routes, Route, Navigate } from 'react-router-dom';
-import PublicLayout from '../layouts/PublicLayout';
+import { Navigate, Route, Routes } from 'react-router-dom';
 
+import PublicLayout from '../layouts/PublicLayout';
 // Public Pages
 import Login from '../pages/auth/Login';
-import VendorForm from '../pages/vendor/VendorForm';
 import PageNotFound from '../pages/auth/PageNotFound';
+import VendorForm from '../pages/vendor/VendorForm';
 
 export const PublicRoutes = () => {
   return (

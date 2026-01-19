@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Navigate, Outlet, useParams } from 'react-router-dom';
+
 import { useAuth } from '@/context/AuthContext';
 
 const ProjectAccessGuard = () => {
@@ -26,8 +27,7 @@ const ProjectAccessGuard = () => {
         };
 
         const isAssignee = mockProject.assigneeId === user.id;
-        const isHeadOfUnit =
-          user.role === 'head' && user.unitId === mockProject.unitId;
+        const isHeadOfUnit = user.role === 'head' && user.unitId === mockProject.unitId;
 
         if (isAssignee || isHeadOfUnit) {
           setIsAllowed(true);

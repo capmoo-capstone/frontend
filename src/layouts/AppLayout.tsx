@@ -1,20 +1,20 @@
+// ai generated code file
+import React from 'react';
+import { Link, useLocation } from 'react-router-dom';
+
+import { Toaster } from 'sonner';
+
+import { AppSidebar } from '@/components/sidebar/app-sidebar';
 import {
   Breadcrumb,
-  BreadcrumbList,
   BreadcrumbItem,
   BreadcrumbLink,
-  BreadcrumbSeparator,
+  BreadcrumbList,
   BreadcrumbPage,
+  BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
 import { Separator } from '@/components/ui/separator';
-import React from 'react';
-import {
-  SidebarProvider,
-  SidebarTrigger,
-  SidebarInset,
-} from '@/components/ui/sidebar';
-import { AppSidebar } from '@/components/sidebar/app-sidebar';
-import { useLocation, Link } from 'react-router-dom';
+import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const location = useLocation();
@@ -22,15 +22,13 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   // Generate breadcrumb items from pathname
   const pathnames = location.pathname.split('/').filter((x) => x);
 
-  // Map specific route segments to readable names
   const getPageName = (segment: string) => {
-    // 1. Check for known static mappings
     const nameMap: Record<string, string> = {
       app: 'Home',
       me: 'My Workspace',
       management: 'Management',
       dashboards: 'Dashboards',
-      dispatch: 'Dispatch',
+      assign: 'Assign',
       vendors: 'Vendors',
       projects: 'Projects',
       admin: 'Administration',
@@ -49,17 +47,11 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
     if (nameMap[segment]) return nameMap[segment];
 
-    // 2. Check if it looks like an ID (numeric or long mixed string)
-    // If it's an ID, show "Details" instead of the confusing number
     if (/^\d+$/.test(segment) || segment.length > 20) {
       return 'Details';
     }
 
-    // 3. Fallback: Convert "kebab-case" to "Title Case"
-    // e.g., "user-profile" -> "User Profile"
-    return segment
-      .replace(/-/g, ' ')
-      .replace(/\b\w/g, (char) => char.toUpperCase());
+    return segment.replace(/-/g, ' ').replace(/\b\w/g, (char) => char.toUpperCase());
   };
 
   return (
@@ -108,9 +100,10 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         </header>
 
         <main className="flex flex-1 flex-col gap-4 p-4">{children}</main>
+        <Toaster position="bottom-right" />
 
         {/* Background Decorative Element */}
-        <div className="absolute top-0 right-0 w-96 h-96 bg-linear-to-bl from-[#DE5C8E]/5 to-transparent blur-3xl z-0 pointer-events-none" />
+        <div className="pointer-events-none absolute top-0 right-0 z-0 h-96 w-96 bg-linear-to-bl from-[#DE5C8E]/5 to-transparent blur-3xl" />
       </SidebarInset>
     </SidebarProvider>
   );

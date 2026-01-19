@@ -1,18 +1,20 @@
+import { Link, useLocation } from 'react-router-dom';
+
 import {
-  LayoutDashboard,
-  FolderOpen,
-  FileInput,
-  Users,
   Building2,
+  ClipboardList,
+  FileInput,
+  FolderOpen,
+  LayoutDashboard,
   LogOut,
   Package,
-  TrendingUp,
-  ClipboardList,
-  ShoppingCart,
   PieChart,
-  UserCog, // Added for Employee Management
+  ShoppingCart,
+  TrendingUp,
+  UserCog,
+  // Added for Employee Management
+  Users,
 } from 'lucide-react';
-import { Link, useLocation } from 'react-router-dom';
 
 import {
   Sidebar,
@@ -21,10 +23,10 @@ import {
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
+  SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarHeader,
   SidebarRail,
 } from '@/components/ui/sidebar';
 
@@ -50,12 +52,12 @@ export const sidebarGroups = [
     items: [
       {
         title: 'Procurement Jobs',
-        url: '/app/dispatch/procurements',
+        url: '/app/assign/procurements',
         icon: ShoppingCart,
       },
       {
         title: 'Contract Jobs',
-        url: '/app/dispatch/contracts',
+        url: '/app/assign/contracts',
         icon: ClipboardList,
       },
     ],
@@ -120,9 +122,7 @@ export function AppSidebar() {
           <Package className="h-6 w-6 shrink-0" />
           <div className="flex flex-col group-data-[collapsible=icon]:hidden">
             <h2 className="text-xl font-bold tracking-tight">Nexus Procure</h2>
-            <p className="text-xs text-muted-foreground">
-              Procurement Tracking
-            </p>
+            <p className="text-muted-foreground text-xs">Procurement Tracking</p>
           </div>
         </div>
       </SidebarHeader>

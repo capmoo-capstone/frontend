@@ -26,7 +26,8 @@ export default function PageNotFound() {
           }
         }}
       >
-        <HomeIcon></HomeIcon>กลับไปที่หน้าหลัก
+        <HomeIcon />
+        กลับไปที่หน้าหลัก
       </Button>
     </div>
   );

@@ -95,8 +95,9 @@ export function AssignTable({ unitId }: { unitId?: string }) {
             onClick={handleSave}
             disabled={Object.keys(pendingChanges).length === 0}
           >
-            <Save className="mr-2 h-4 w-4" />
-            บันทึก ({Object.keys(pendingChanges).length})
+            <Save className="h-4 w-4" />
+            บันทึก
+            <span className="text-xs">({Object.keys(pendingChanges).length})</span>
           </Button>
         </div>
       }

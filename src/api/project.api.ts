@@ -76,3 +76,19 @@ export const assignProject = async (
 
   return data;
 };
+
+export const changeProjectAssignee = async (
+  projectId: string,
+  newUserId: string,
+) => {
+  // Mock response
+  return {
+    success: true,
+    projectId,
+    newUserId,
+  };
+
+  const { data } = await api.patch(`/project/${projectId}/change-assignee/${newUserId}`);
+
+  return data;
+}

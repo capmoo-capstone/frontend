@@ -2,21 +2,17 @@ import { type ColumnDef } from '@tanstack/react-table';
 import { ArrowUpDown } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
-import { type UnassignedProjectItem } from '@/types/project';
+import { type AssignedProjectItem } from '@/types/project';
 
 import { AssigneeCell } from './assignee-cell';
 
 interface GetColumnsProps {
-  pendingChanges: Record<string, string>;
-  setPendingChanges: React.Dispatch<React.SetStateAction<Record<string, string>>>;
   unitId?: string;
 }
 
 export const getColumns = ({
-  pendingChanges,
-  setPendingChanges,
   unitId,
-}: GetColumnsProps): ColumnDef<UnassignedProjectItem>[] => [
+}: GetColumnsProps): ColumnDef<AssignedProjectItem>[] => [
   {
     accessorKey: 'receive_no',
     header: ({ column }) => (
@@ -71,7 +67,17 @@ export const getColumns = ({
   },
   {
     accessorKey: 'status',
-    header: 'สถานะ',
+    header: ({ column }) => (
+      <div
+        className="flex cursor-pointer items-center"
+        onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+      >
+        สถานะ
+        <ArrowUpDown
+          className={`ml-2 h-4 w-4 ${column.getIsSorted() ? 'text-primary' : 'text-ring'}`}
+        />
+      </div>
+    ),
     cell: ({ row }) => {
       const status = row.getValue('status') as string;
       let variant: 'secondary' | 'destructive' | 'warning' | 'info' = 'secondary';
@@ -101,10 +107,10 @@ export const getColumns = ({
     cell: ({ row }) => (
       <AssigneeCell
         rowId={row.original.id}
+        full_name={row.original.assignee_fullname}
         originalValue={row.getValue('assignee_id')}
-        pendingChanges={pendingChanges}
-        setPendingChanges={setPendingChanges}
         unitId={unitId}
+        status={row.original.status}
       />
     ),
   },

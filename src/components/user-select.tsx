@@ -25,6 +25,7 @@ interface UserSelectProps {
   placeholder?: string;
   className?: string;
   disabled?: boolean;
+  hasClearButton?: boolean;
 }
 
 export function UserSelect({
@@ -34,6 +35,7 @@ export function UserSelect({
   departmentId,
   placeholder = 'Select user...',
   className,
+  hasClearButton = true,
   disabled = false,
 }: UserSelectProps) {
   const [open, setOpen] = React.useState(false);
@@ -71,7 +73,7 @@ export function UserSelect({
           )}
 
           <div className="ml-2 flex items-center gap-1">
-            {value && !isLoading && !disabled && (
+            {value && !isLoading && !disabled && hasClearButton && (
               <div
                 role="button"
                 onClick={handleClear}

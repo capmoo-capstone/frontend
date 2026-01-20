@@ -12,6 +12,7 @@ import { AlertTriangle, Loader2, Save } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
+import { TitleBar } from '@/components/ui/title-bar';
 import { useAssignProject, useUnassignedProjects } from '@/hooks/useProjects';
 
 import { ProjectDataTable } from '../data-table';
@@ -86,16 +87,18 @@ export function AssignTable({ unitId }: { unitId?: string }) {
     <ProjectDataTable
       table={table}
       columnsLength={columns.length}
-      title="งานที่ยังไม่ได้มอบหมาย"
       toolbar={
-        <Button
-          variant="brand"
-          onClick={handleSave}
-          disabled={Object.keys(pendingChanges).length === 0}
-        >
-          <Save className="mr-2 h-4 w-4" />
-          บันทึก ({Object.keys(pendingChanges).length})
-        </Button>
+        <div className="flex w-full items-center justify-between space-x-4">
+          <TitleBar title="งานที่ยังไม่ได้มอบหมาย" />
+          <Button
+            variant="brand"
+            onClick={handleSave}
+            disabled={Object.keys(pendingChanges).length === 0}
+          >
+            <Save className="mr-2 h-4 w-4" />
+            บันทึก ({Object.keys(pendingChanges).length})
+          </Button>
+        </div>
       }
     />
   );

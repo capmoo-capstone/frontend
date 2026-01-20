@@ -8,25 +8,21 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { TitleBar } from '@/components/ui/title-bar';
 
 interface ProjectDataTableProps<TData> {
   table: ReactTable<TData>;
   columnsLength: number;
-  title: string;
   toolbar?: React.ReactNode;
 }
 
 export function ProjectDataTable<TData>({
   table,
   columnsLength,
-  title,
   toolbar,
 }: ProjectDataTableProps<TData>) {
   return (
     <div className="w-full">
-      <div className="mb-4 flex items-center justify-between space-x-4">
-        <TitleBar title={title} />
+      <div className="mb-4 w-full">
         <div className="flex items-center gap-2">{toolbar}</div>
       </div>
 

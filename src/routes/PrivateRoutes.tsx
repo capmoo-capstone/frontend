@@ -25,14 +25,18 @@ export const PrivateRoutes = () => {
     if (user?.role === 'GUEST' || user?.role === 'REPRESENTATIVE') {
       return '/app/dashboards/department';
     }
-    if (user?.role === 'HEAD_OF_DEPARTMENT' || user?.role === 'ADMIN') {
+    if (
+      user?.role === 'HEAD_OF_DEPARTMENT' ||
+      user?.role === 'ADMIN' ||
+      user?.role === 'SUPER_ADMIN'
+    ) {
       return '/app/dashboards/overview';
     }
     if (
-      user?.role == 'HEAD_OF_UNIT' ||
-      user?.role == 'GENERAL_STAFF' ||
-      user?.role == 'FINANCE_STAFF' ||
-      user?.role == 'DOCUMENT_STAFF'
+      user?.role === 'HEAD_OF_UNIT' ||
+      user?.role === 'GENERAL_STAFF' ||
+      user?.role === 'FINANCE_STAFF' ||
+      user?.role === 'DOCUMENT_STAFF'
     ) {
       return '/app/me/dashboard';
     }
@@ -104,7 +108,7 @@ export const PrivateRoutes = () => {
             path="app/management/employees/:id/kpi"
             element={
               <PersonalKPI
-                viewAsManager={user?.role == 'HEAD_OF_DEPARTMENT' || user?.role == 'HEAD_OF_UNIT'}
+                viewAsManager={user?.role === 'HEAD_OF_DEPARTMENT' || user?.role === 'HEAD_OF_UNIT'}
               />
             }
           />

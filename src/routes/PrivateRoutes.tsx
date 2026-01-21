@@ -22,13 +22,21 @@ export const PrivateRoutes = () => {
   const { user } = useAuth();
 
   const getHomeRedirect = () => {
-    if (user?.role === 'unit') {
+    if (user?.role === 'GUEST' || user?.role === 'REPRESENTATIVE') {
       return '/app/dashboards/department';
     }
-    if (user?.role === 'head' || user?.role === 'admin') {
+    if (user?.role === 'HEAD_OF_DEPARTMENT' || user?.role === 'ADMIN') {
       return '/app/dashboards/overview';
     }
-    return '/app/me/dashboard';
+    if (
+      user?.role == 'HEAD_OF_UNIT' ||
+      user?.role == 'GENERAL_STAFF' ||
+      user?.role == 'FINANCE_STAFF' ||
+      user?.role == 'DOCUMENT_STAFF'
+    ) {
+      return '/app/me/dashboard';
+    }
+    return '/login';
   };
 
   return (
@@ -37,49 +45,72 @@ export const PrivateRoutes = () => {
         <Route path="app" element={<Navigate to={getHomeRedirect()} replace />} />
 
         {/* === DASHBOARDS === */}
-        <Route element={<ProtectedRoute allowedRoles={['unit']} />}>
-          <Route path="app/dashboards/department" element={<DepartmentDashboard />} />
-        </Route>
+        <Route path="app/dashboards/department" element={<DepartmentDashboard />} />
 
-        <Route element={<ProtectedRoute allowedRoles={['head', 'admin']} />}>
+        <Route
+          element={
+            <ProtectedRoute
+              allowedRoles={[
+                'HEAD_OF_DEPARTMENT',
+                'HEAD_OF_UNIT',
+                'DOCUMENT_STAFF',
+                'FINANCE_STAFF',
+                'GENERAL_STAFF',
+                'ADMIN',
+              ]}
+            />
+          }
+        >
           <Route path="app/dashboards/overview" element={<OverallDashboard />} />
-        </Route>
 
-        {/* === MY SPACE  === */}
-        <Route element={<ProtectedRoute allowedRoles={['staff', 'head']} />}>
+          {/* === MY SPACE  === */}
           <Route path="app/me/dashboard" element={<MyDashboard />} />
           <Route path="app/me/kpi" element={<PersonalKPI />} />
-        </Route>
 
-        {/* === OPERATIONAL WORKFLOWS === */}
-        <Route element={<ProtectedRoute allowedRoles={['staff', 'head']} />}>
+          {/* === OPERATIONAL WORKFLOWS === */}
           <Route path="app/assign/:id" element={<ProcumentJobs />} />
-          <Route path="app/vendors/submission" element={<VendorSubmission />} />
-        </Route>
 
-        {/* === PROJECTS === */}
-        <Route element={<ProtectedRoute />}>
+          {/* === PROJECTS === */}
           <Route path="app/projects" element={<ProjectList />} />
-
-          <Route element={<ProtectedRoute allowedRoles={['unit']} />}>
-            <Route path="app/projects/import" element={<ProjectImport />} />
-          </Route>
 
           <Route element={<ProjectAccessGuard />}>
             <Route path="app/projects/:id" element={<ProjectDetail />} />
           </Route>
         </Route>
 
-        {/* === MANAGEMENT (Head/Admin Views) === */}
-        <Route element={<ProtectedRoute allowedRoles={['admin', 'head']} />}>
+        <Route element={<ProtectedRoute allowedRoles={['DOCUMENT_STAFF']} />}>
+          <Route path="app/projects/import" element={<ProjectImport />} />
+        </Route>
+
+        <Route
+          element={
+            <ProtectedRoute
+              allowedRoles={[
+                'HEAD_OF_DEPARTMENT',
+                'HEAD_OF_UNIT',
+                'FINANCE_STAFF',
+                'GENERAL_STAFF',
+              ]}
+            />
+          }
+        >
+          <Route path="app/vendors/submission" element={<VendorSubmission />} />
+        </Route>
+
+        {/* === MANAGEMENT (Head) === */}
+        <Route element={<ProtectedRoute allowedRoles={['HEAD_OF_DEPARTMENT', 'HEAD_OF_UNIT']} />}>
           <Route path="app/management/employees/kpi" element={<EmployeesDashboard />} />
           <Route
             path="app/management/employees/:id/kpi"
-            element={<PersonalKPI viewAsManager={true} />}
+            element={
+              <PersonalKPI
+                viewAsManager={user?.role == 'HEAD_OF_DEPARTMENT' || user?.role == 'HEAD_OF_UNIT'}
+              />
+            }
           />
         </Route>
 
-        <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
+        <Route element={<ProtectedRoute allowedRoles={['ADMIN']} />}>
           <Route path="app/management/organization" element={<OrganizationManagement />} />
         </Route>
 

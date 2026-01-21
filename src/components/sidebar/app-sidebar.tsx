@@ -29,6 +29,7 @@ import {
   SidebarMenuItem,
   SidebarRail,
 } from '@/components/ui/sidebar';
+import { useAuth } from '@/context/AuthContext';
 
 export const sidebarGroups = [
   {
@@ -114,6 +115,7 @@ export const sidebarGroups = [
 
 export function AppSidebar() {
   const location = useLocation();
+  const { logout } = useAuth();
 
   return (
     <Sidebar collapsible="icon">
@@ -162,7 +164,7 @@ export function AppSidebar() {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton asChild>
-              <Link to="/login">
+              <Link to="/login" onClick={logout}>
                 <LogOut />
                 <span>Sign Out</span>
               </Link>

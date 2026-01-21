@@ -13,7 +13,7 @@ const ProjectAccessGuard = () => {
       if (!user || !id) return;
 
       // Super User Bypass
-      if (user.role === 'admin') {
+      if (user.role === 'SUPER_ADMIN') {
         setIsAllowed(true);
         return;
       }
@@ -27,7 +27,7 @@ const ProjectAccessGuard = () => {
         };
 
         const isAssignee = mockProject.assigneeId === user.id;
-        const isHeadOfUnit = user.role === 'head' && user.unitId === mockProject.unitId;
+        const isHeadOfUnit = user.role === 'HEAD_OF_UNIT' && user.unit?.id === mockProject.unitId;
 
         if (isAssignee || isHeadOfUnit) {
           setIsAllowed(true);

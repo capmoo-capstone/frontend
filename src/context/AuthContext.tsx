@@ -1,13 +1,7 @@
 import React, { type ReactNode, createContext, useContext, useEffect, useState } from 'react';
 
+import { login as loginUser } from '../api/user.api';
 import { type AuthContextType, type User, UserSchema } from '../types/auth';
-
-const MOCK_ADMIN: User = {
-  id: '999999',
-  name: 'System Administrator',
-  email: 'admin@nexus-procure.com',
-  role: 'admin',
-};
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
@@ -29,21 +23,15 @@ export const AuthProvider: React.FC<{
         console.error('Invalid user data in storage', error);
         localStorage.removeItem('nexus_user');
       }
-    } else {
-      // -----------------------------------------------------------
-      // [DEV ONLY] AUTO-LOGIN AS ADMIN
-      // If no user is found, force the Mock Admin
-      // -----------------------------------------------------------
-      console.log('🚧 DEV MODE: Auto-logging in as Admin');
-      setUser(MOCK_ADMIN);
-      localStorage.setItem('nexus_user', JSON.stringify(MOCK_ADMIN));
     }
     setIsLoading(false);
   }, []);
 
-  const login = (userData: User) => {
+  const login = async (credentials: { cunet: string; password: string }): Promise<User> => {
+    const userData = await loginUser(credentials.cunet, credentials.password);
     setUser(userData);
     localStorage.setItem('nexus_user', JSON.stringify(userData));
+    return userData;
   };
 
   const logout = () => {

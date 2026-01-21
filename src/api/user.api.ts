@@ -1,8 +1,9 @@
 import api from '@/lib/axios';
+import type { User } from '@/types/auth';
 import { type UserListResponse, UserListResponseSchema } from '@/types/user';
 import { type UserSelectionResponse, UserSelectionResponseSchema } from '@/types/user';
 
-import { MOCK_USER_SELECTION } from './mock-data';
+import { MOCK_USER, MOCK_USER_SELECTION } from './mock-data';
 
 interface GetUsersParams {
   page?: number;
@@ -38,4 +39,11 @@ export const getUsersForSelection = async (
   });
 
   return UserSelectionResponseSchema.parse(data);
+};
+
+export const login = async (cunet: string, password: string): Promise<User> => {
+  return MOCK_USER;
+
+  const { data } = await api.post('/auth/login', { cunet, password });
+  return data;
 };

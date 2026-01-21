@@ -1,3 +1,4 @@
+import type { User } from '@/types/auth';
 import {
   type AssignedProjectItem,
   type Project,
@@ -733,12 +734,12 @@ export const MOCK_USER_SELECTION: UserSelectionResponse = {
     {
       id: 'u-101',
       full_name: 'นายสมชาย ใจดี',
-      role: 'เจ้าหน้าที่พัสดุอาวุโส',
+      role: 'STAFF',
     },
     {
       id: 'u-102',
       full_name: 'นางสาวสมหญิง รักงาน',
-      role: 'เจ้าหน้าที่พัสดุ',
+      role: 'STAFF',
     },
     {
       id: 'u-103',
@@ -781,4 +782,22 @@ export const MOCK_USER_SELECTION: UserSelectionResponse = {
       role: 'ผู้ช่วยเจ้าหน้าที่',
     },
   ],
+};
+
+export const MOCK_USER: User = {
+  id: 'user-01',
+  username: 'user',
+  name: 'user',
+  email: 'user@gmail.com',
+  role: 'GENERAL_STAFF',
+  isStaff: true,
+  department: {
+    id: 'dept-01',
+    name: 'procurement',
+  },
+  unit: {
+    id: 'unit-01',
+    name: 'procurement-1',
+  },
+  token: 'mock-token-123',
 };

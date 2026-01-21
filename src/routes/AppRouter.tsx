@@ -1,21 +1,20 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 
+import { useAuth } from '@/context/AuthContext';
+
 import { PrivateRoutes } from './PrivateRoutes';
 import { PublicRoutes } from './PublicRoutes';
 
-// You will likely replace this with a real auth hook later (e.g., useAuth())
-type Status = 'checking' | 'authenticated' | 'no-authenticated';
-const status: Status = 'authenticated'; // Change this to test the logic
-
 export const AppRouter = () => {
-  if (status === ('checking' as Status)) {
+  const { isAuthenticated, isLoading } = useAuth();
+  if (isLoading) {
     return <div className="loading">Checking credentials...</div>;
   }
 
   return (
     <BrowserRouter>
       <Routes>
-        {status === 'authenticated' ? (
+        {isAuthenticated ? (
           <Route path="/*" element={<PrivateRoutes />} />
         ) : (
           <Route path="/*" element={<PublicRoutes />} />

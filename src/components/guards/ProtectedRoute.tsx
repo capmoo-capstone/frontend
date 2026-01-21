@@ -20,8 +20,8 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ allowedRoles }) => {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  if (allowedRoles && !allowedRoles.includes(user.role) && user.role !== 'admin') {
-    if (user.role === 'unit') {
+  if (allowedRoles && !allowedRoles.includes(user.role) && user.role !== 'SUPER_ADMIN') {
+    if (user.role === 'GUEST' || user.role === 'REPRESENTATIVE') {
       return <Navigate to="/app/dashboards/department" replace />;
     }
     return <Navigate to="/app/me/dashboard" replace />;

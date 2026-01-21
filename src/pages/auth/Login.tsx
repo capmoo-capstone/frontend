@@ -13,14 +13,24 @@ export default function LoginPage() {
   const [cunet, setCunet] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleLogin = async () => {
-    const user = await login({ cunet, password });
-
-    if (user?.department?.name === 'procurement') {
-      navigate('/app/me/dashboard');
-    } else {
-      navigate('/app/dashboards/department');
+    setIsLoading(true);
+    setErrorMsg(null);
+    try {
+      const user = await login({ cunet, password });
+      if (user?.department?.name === 'procurement') {
+        navigate('/app/me/dashboard');
+      } else {
+        navigate('/app/dashboards/department');
+      }
+    } catch (error: any) {
+      console.error('Login Error:', error);
+      setErrorMsg(error.message || 'CU NET หรือรหัสผ่านไม่ถูกต้อง กรุณาลองใหม่');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -54,17 +64,20 @@ export default function LoginPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="กรุณากรอกรหัสผ่าน"
               />
+              {errorMsg && (
+                <div className="text-destructive mt-2 text-center text-sm">{errorMsg}</div>
+              )}
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
                 className="text-muted-foreground absolute top-1/2 right-4 -translate-y-1/2"
               >
-                {showPassword ? <Eye size={20} /> : <EyeOff size={20} />}
+                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
               </button>
             </div>
           </div>
         </div>
-        <Button variant="brand" className="mt-10" onClick={handleLogin}>
+        <Button variant="brand" className="mt-10" onClick={handleLogin} disabled={isLoading}>
           เข้าสู่ระบบ
         </Button>
       </div>

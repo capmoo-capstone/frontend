@@ -19,10 +19,14 @@ export default function PageNotFound() {
         variant="brand"
         className="mt-9"
         onClick={() => {
-          if (user?.department?.name === 'procurement') {
-            navigate(`/app/me/dashboard`);
+          if (user) {
+            if (user?.department?.name === 'procurement') {
+              navigate(`/app/me/dashboard`);
+            } else {
+              navigate(`/app/dashboards/department`);
+            }
           } else {
-            navigate(`/app/dashboards/department`);
+            navigate('/login');
           }
         }}
       >

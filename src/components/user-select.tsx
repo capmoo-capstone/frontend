@@ -20,6 +20,7 @@ import { cn } from '@/lib/utils';
 interface UserSelectProps {
   value?: string | null;
   onChange: (value: string) => void;
+  onReset?: () => void;
   unitId?: string;
   departmentId?: string;
   placeholder?: string;
@@ -31,6 +32,7 @@ interface UserSelectProps {
 export function UserSelect({
   value,
   onChange,
+  onReset,
   unitId,
   departmentId,
   placeholder = 'Select user...',
@@ -50,7 +52,12 @@ export function UserSelect({
   const handleClear = (e: React.MouseEvent) => {
     e.stopPropagation();
     onChange('');
+    if (onReset) {
+      onReset();
+    }
   };
+
+  const showClear = value && !isLoading && !disabled && hasClearButton;
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -73,7 +80,7 @@ export function UserSelect({
           )}
 
           <div className="ml-2 flex items-center gap-1">
-            {value && !isLoading && !disabled && hasClearButton && (
+            {showClear ? (
               <div
                 role="button"
                 onClick={handleClear}
@@ -82,8 +89,9 @@ export function UserSelect({
               >
                 <X className="h-4 w-4 opacity-50 hover:opacity-100" />
               </div>
+            ) : (
+              <ChevronDown className="h-4 w-4 shrink-0 opacity-50 transition-transform duration-200 group-data-[state=open]:rotate-180" />
             )}
-            <ChevronDown className="h-4 w-4 shrink-0 opacity-50 group-data-[state=open]:rotate-180" />
           </div>
         </Button>
       </PopoverTrigger>

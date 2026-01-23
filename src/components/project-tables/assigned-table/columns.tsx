@@ -1,17 +1,24 @@
 import { type ColumnDef } from '@tanstack/react-table';
-import { ArrowUpDown } from 'lucide-react';
+import { ArrowUpDown, MoreVertical, Trash2, UserCog } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { type AssignedProjectItem } from '@/types/project';
 
-import { AssigneeCell } from './assignee-cell';
-
 interface GetColumnsProps {
-  unitId?: string;
+  onCancelProject: (project: AssignedProjectItem) => void;
+  onChangeAssignee: (project: AssignedProjectItem) => void;
 }
 
 export const getColumns = ({
-  unitId,
+  onCancelProject,
+  onChangeAssignee,
 }: GetColumnsProps): ColumnDef<AssignedProjectItem>[] => [
   {
     accessorKey: 'receive_no',
@@ -83,7 +90,6 @@ export const getColumns = ({
       let variant: 'secondary' | 'destructive' | 'warning' | 'info' = 'secondary';
       let label = status;
 
-      // Status Logic
       if (status === 'UNASSIGNED') {
         variant = 'secondary';
         label = 'ยังไม่ได้มอบหมาย';
@@ -101,17 +107,47 @@ export const getColumns = ({
       return <Badge variant={variant}>{label}</Badge>;
     },
   },
+  // 1. Simplified Assignee Column (Just Text)
   {
     accessorKey: 'assignee_id',
     header: 'มอบหมายให้',
     cell: ({ row }) => (
-      <AssigneeCell
-        rowId={row.original.id}
-        full_name={row.original.assignee_fullname}
-        originalValue={row.getValue('assignee_id')}
-        unitId={unitId}
-        status={row.original.status}
-      />
+      <div className="text-sm font-medium">{row.original.assignee_fullname || '-'}</div>
     ),
+  },
+  // 2. New Actions Column with Dropdown
+  {
+    id: 'actions',
+    enableHiding: false,
+    cell: ({ row }) => {
+      const project = row.original;
+
+      const canEdit = project.status === 'WAITING_FOR_ACCEPTANCE';
+
+      return (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" className="h-8 w-8 p-0">
+              <span className="sr-only">Open menu</span>
+              <MoreVertical className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={() => onChangeAssignee(project)} disabled={!canEdit}>
+              <UserCog className="h-4 w-4" />
+              เปลี่ยนผู้รับผิดชอบ
+            </DropdownMenuItem>
+
+            <DropdownMenuItem
+              onClick={() => onCancelProject(project)}
+              variant='destructive'
+            >
+              <Trash2 className="h-4 w-4" />
+              ยกเลิกโครงการ
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      );
+    },
   },
 ];

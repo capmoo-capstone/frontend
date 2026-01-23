@@ -21,7 +21,7 @@ export default function LoginPage() {
     setErrorMsg(null);
     try {
       const user = await login({ cunet, password });
-      if (user?.department?.name === 'procurement') {
+      if (user.department?.name === 'procurement') {
         navigate('/app/me/dashboard');
       } else {
         navigate('/app/dashboards/department');
@@ -38,7 +38,7 @@ export default function LoginPage() {
     <div className="flex h-screen flex-row items-center justify-center">
       <img src="/loginBg.png" alt="Login Background" className="w-1/2" />
 
-      <div className="flex h-full w-full flex-col items-center justify-center px-50">
+      <div className="flex h-screen flex-col items-center justify-center px-50">
         <div className="mb-30 flex flex-col">
           <div className="flex flex-row items-end">
             <img src="/chula.svg" alt="Chula Logo" className="mr-4" />

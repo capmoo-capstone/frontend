@@ -21,7 +21,7 @@ export default function LoginPage() {
     setErrorMsg(null);
     try {
       const user = await login({ cunet, password });
-      if (user?.department?.name === 'procurement') {
+      if (user.department?.name === 'procurement') {
         navigate('/app/me/dashboard');
       } else {
         navigate('/app/dashboards/department');

@@ -9,6 +9,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { type Role } from '@/types/auth';
 import { type UnassignedProjectItem } from '@/types/project';
 
 import { AssigneeCell } from './assignee-cell';
@@ -18,6 +19,8 @@ interface GetColumnsProps {
   setPendingChanges: React.Dispatch<React.SetStateAction<Record<string, string>>>;
   unitId?: string;
   onOpenCancelDialog: (project: UnassignedProjectItem) => void;
+  onClaimProject: (project: UnassignedProjectItem) => void;
+  viewAsRole?: Role;
 }
 
 export const getColumns = ({
@@ -25,6 +28,8 @@ export const getColumns = ({
   setPendingChanges,
   unitId,
   onOpenCancelDialog,
+  onClaimProject,
+  viewAsRole,
 }: GetColumnsProps): ColumnDef<UnassignedProjectItem>[] => [
   {
     accessorKey: 'receive_no',
@@ -106,16 +111,22 @@ export const getColumns = ({
   },
   {
     accessorKey: 'assignee_id',
-    header: 'มอบหมายให้',
-    cell: ({ row }) => (
-      <AssigneeCell
-        rowId={row.original.id}
-        originalValue={row.getValue('assignee_id')}
-        pendingChanges={pendingChanges}
-        setPendingChanges={setPendingChanges}
-        unitId={unitId}
-      />
-    ),
+    header: viewAsRole === 'HEAD_OF_UNIT' ? 'มอบหมายให้' : undefined,
+    cell: ({ row }) => {
+      return viewAsRole === 'HEAD_OF_UNIT' ? (
+        <AssigneeCell
+          rowId={row.original.id}
+          originalValue={row.getValue('assignee_id')}
+          pendingChanges={pendingChanges}
+          setPendingChanges={setPendingChanges}
+          unitId={unitId}
+        />
+      ) : viewAsRole === 'GENERAL_STAFF' ? (
+        <Button variant="outline" size="sm" onClick={() => onClaimProject(row.original)}>
+          เลือกงาน
+        </Button>
+      ) : null;
+    },
   },
   {
     id: 'actions',
@@ -134,7 +145,9 @@ export const getColumns = ({
           <DropdownMenuContent align="end">
             <DropdownMenuItem onClick={() => onOpenCancelDialog(project)} variant="destructive">
               <Trash2 className="h-4 w-4" />
-              ยกเลิกโครงการ
+              {viewAsRole === 'HEAD_OF_DEPARTMENT' || viewAsRole === 'HEAD_OF_UNIT'
+                ? 'ยกเลิกโครงการ'
+                : 'ขอยกเลิกโครงการ'}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

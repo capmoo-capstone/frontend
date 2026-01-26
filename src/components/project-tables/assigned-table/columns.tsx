@@ -9,16 +9,21 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import type { Role } from '@/types/auth';
 import { type AssignedProjectItem } from '@/types/project';
 
 interface GetColumnsProps {
   onCancelProject: (project: AssignedProjectItem) => void;
   onChangeAssignee: (project: AssignedProjectItem) => void;
+  onAcceptProject: (project: AssignedProjectItem) => void;
+  viewAsRole?: Role;
 }
 
 export const getColumns = ({
   onCancelProject,
   onChangeAssignee,
+  onAcceptProject,
+  viewAsRole,
 }: GetColumnsProps): ColumnDef<AssignedProjectItem>[] => [
   {
     accessorKey: 'receive_no',
@@ -107,15 +112,19 @@ export const getColumns = ({
       return <Badge variant={variant}>{label}</Badge>;
     },
   },
-  // 1. Simplified Assignee Column (Just Text)
   {
     accessorKey: 'assignee_id',
     header: 'มอบหมายให้',
-    cell: ({ row }) => (
-      <div className="text-sm font-medium">{row.original.assignee_fullname || '-'}</div>
-    ),
+    cell: ({ row }) => {
+      return viewAsRole === 'HEAD_OF_UNIT' ? (
+        <div className="text-sm font-medium">{row.original.assignee_fullname || '-'}</div>
+      ) : viewAsRole === 'GENERAL_STAFF' && row.original.status === 'WAITING_FOR_ACCEPTANCE' ? (
+        <Button variant="outline" size="sm" onClick={() => onAcceptProject(row.original)}>
+          รับทราบ
+        </Button>
+      ) : null;
+    },
   },
-  // 2. New Actions Column with Dropdown
   {
     id: 'actions',
     enableHiding: false,
@@ -123,6 +132,10 @@ export const getColumns = ({
       const project = row.original;
 
       const canEdit = project.status === 'WAITING_FOR_ACCEPTANCE';
+
+      if (row.original.status === 'CANCEL') {
+        return null;
+      }
 
       return (
         <DropdownMenu>
@@ -133,17 +146,18 @@ export const getColumns = ({
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={() => onChangeAssignee(project)} disabled={!canEdit}>
-              <UserCog className="h-4 w-4" />
-              เปลี่ยนผู้รับผิดชอบ
-            </DropdownMenuItem>
+            {viewAsRole === 'HEAD_OF_UNIT' && (
+              <DropdownMenuItem onClick={() => onChangeAssignee(project)} disabled={!canEdit}>
+                <UserCog className="h-4 w-4" />
+                เปลี่ยนผู้รับผิดชอบ
+              </DropdownMenuItem>
+            )}
 
-            <DropdownMenuItem
-              onClick={() => onCancelProject(project)}
-              variant='destructive'
-            >
+            <DropdownMenuItem onClick={() => onCancelProject(project)} variant="destructive">
               <Trash2 className="h-4 w-4" />
-              ยกเลิกโครงการ
+              {viewAsRole === 'HEAD_OF_DEPARTMENT' || viewAsRole === 'HEAD_OF_UNIT'
+                ? 'ยกเลิกโครงการ'
+                : 'ขอยกเลิกโครงการ'}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

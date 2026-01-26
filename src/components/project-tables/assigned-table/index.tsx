@@ -13,10 +13,10 @@ import { toast } from 'sonner';
 
 import { CancelProjectDialog } from '@/components/project-dialog/cancel-project-dialog';
 import { ChangeAssigneeDialog } from '@/components/project-dialog/change-assignee-dialog';
-// Import this!
 import { Button } from '@/components/ui/button';
 import { DatePicker } from '@/components/ui/date-picker';
 import { TitleBar } from '@/components/ui/title-bar';
+import { useAuth } from '@/context/AuthContext';
 import { useAssignedProjects } from '@/hooks/useProjects';
 import type { AssignedProjectItem } from '@/types/project';
 
@@ -24,6 +24,7 @@ import { ProjectDataTable } from '../data-table';
 import { getColumns } from './columns';
 
 export function AssignedTable({ unitId }: { unitId?: string }) {
+  const { user } = useAuth();
   const [date, setDate] = useState<Date | undefined>(new Date());
   const { data: projects, isLoading, isError } = useAssignedProjects(unitId, date);
   const [sorting, setSorting] = useState<SortingState>([{ id: 'status', desc: true }]);
@@ -38,6 +39,8 @@ export function AssignedTable({ unitId }: { unitId?: string }) {
       getColumns({
         onCancelProject: (project) => setProjectToCancel(project),
         onChangeAssignee: (project) => setProjectToChangeAssignee(project),
+        onAcceptProject: (project) => console.log('Accept Project', project), // todo: implement
+        viewAsRole: user?.role,
       }),
     [unitId]
   );
@@ -60,6 +63,10 @@ export function AssignedTable({ unitId }: { unitId?: string }) {
 
   const handlePrint = async () => {
     toast.info('สมมตว่ากำลังส่งออกรายงาน...');
+  };
+
+  const handleAcceptAll = async () => {
+    toast.info('สมมติกำลังรับทราบโครงการทั้งหมด...');
   };
 
   if (isLoading) {
@@ -86,13 +93,19 @@ export function AssignedTable({ unitId }: { unitId?: string }) {
         columnsLength={columns.length}
         toolbar={
           <div className="flex w-full items-center justify-between space-x-4">
-            <TitleBar title="งานที่มอบหมายแล้ว" variant="grey" />
+            <TitleBar title="งานที่ถูกมอบหมายแล้ว" variant="grey" />
             <div className="flex items-center gap-2">
               <DatePicker date={date} setDate={setDate} />
-              <Button variant="outline" onClick={handlePrint} disabled={false}>
-                <Upload className="mr-2 h-4 w-4" />
-                ส่งออกรายงาน
-              </Button>
+              {user?.role === 'GENERAL_STAFF' ? (
+                <Button variant="outline" onClick={handleAcceptAll} disabled={false}>
+                  รับทราบทั้งหมด
+                </Button>
+              ) : (
+                <Button variant="outline" onClick={handlePrint} disabled={false}>
+                  <Upload className="mr-2 h-4 w-4" />
+                  ส่งออกรายงาน
+                </Button>
+              )}
             </div>
           </div>
         }
@@ -103,6 +116,7 @@ export function AssignedTable({ unitId }: { unitId?: string }) {
         onClose={() => setProjectToCancel(null)}
         onConfirm={handleConfirmCancel}
         projectTitle={projectToCancel?.title}
+        isAuthorized={user?.role === 'HEAD_OF_DEPARTMENT' || user?.role === 'HEAD_OF_UNIT'}
       />
 
       {projectToChangeAssignee && (

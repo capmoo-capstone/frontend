@@ -14,6 +14,7 @@ import { toast } from 'sonner';
 import { CancelProjectDialog } from '@/components/project-dialog/cancel-project-dialog';
 import { Button } from '@/components/ui/button';
 import { TitleBar } from '@/components/ui/title-bar';
+import { useAuth } from '@/context/AuthContext';
 import { useAssignProject, useUnassignedProjects } from '@/hooks/useProjects';
 import { type UnassignedProjectItem } from '@/types/project';
 
@@ -21,6 +22,7 @@ import { ProjectDataTable } from '../data-table';
 import { getColumns } from './columns';
 
 export function AssignTable({ unitId }: { unitId?: string }) {
+  const { user } = useAuth();
   const { data: projects, isLoading, isError } = useUnassignedProjects(unitId);
   const { mutateAsync } = useAssignProject();
 
@@ -36,8 +38,10 @@ export function AssignTable({ unitId }: { unitId?: string }) {
         setPendingChanges,
         unitId,
         onOpenCancelDialog: (project) => setProjectToCancel(project),
+        onClaimProject: (project) => console.log('Claim Project', project), // todo: implement
+        viewAsRole: user?.role,
       }),
-    [pendingChanges, unitId]
+    [pendingChanges, unitId, user?.role]
   );
 
   const table = useReactTable({
@@ -124,6 +128,7 @@ export function AssignTable({ unitId }: { unitId?: string }) {
         onClose={() => setProjectToCancel(null)}
         onConfirm={handleConfirmCancel}
         projectTitle={projectToCancel?.title}
+        isAuthorized={user?.role === 'HEAD_OF_DEPARTMENT' || user?.role === 'HEAD_OF_UNIT'}
       />
     </>
   );

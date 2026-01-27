@@ -65,7 +65,14 @@ export const getColumns = ({
         />
       </div>
     ),
-    cell: ({ row }) => <div>{row.getValue('title')}</div>,
+    cell: ({ row }) => (
+      <div>
+        {row.original.is_urgent && (
+          <span className="text-destructive mr-2 font-semibold">ด่วน</span>
+        )}
+        {row.getValue('title')}
+      </div>
+    ),
   },
   {
     id: 'procurement_type',

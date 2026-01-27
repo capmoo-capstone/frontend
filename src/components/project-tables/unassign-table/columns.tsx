@@ -22,8 +22,12 @@ interface GetColumnsProps {
   unitId?: string;
   onOpenCancelDialog: (project: UnassignedProjectItem) => void;
   onClaimProject: (project: UnassignedProjectItem) => void;
-  viewAsRole?: Role;
+  viewAsRole: Role;
 }
+
+const SupervisorRoles: Role[] = ['HEAD_OF_DEPARTMENT'];
+const ManageUnitRoles: Role[] = ['HEAD_OF_UNIT', 'SUPER_ADMIN'];
+const ManageSelfRoles: Role[] = ['GENERAL_STAFF'];
 
 export const getColumns = ({
   pendingChanges,
@@ -126,9 +130,9 @@ export const getColumns = ({
   },
   {
     id: 'assignee',
-    header: viewAsRole === 'HEAD_OF_UNIT' ? 'มอบหมายให้' : undefined,
+    header: ManageUnitRoles.includes(viewAsRole) ? 'มอบหมายให้' : undefined,
     cell: ({ row }) => {
-      return viewAsRole === 'HEAD_OF_UNIT' ? (
+      return ManageUnitRoles.includes(viewAsRole) ? (
         <AssigneeCell
           rowId={row.original.id}
           originalValue={null}
@@ -136,7 +140,7 @@ export const getColumns = ({
           setPendingChanges={setPendingChanges}
           unitId={unitId}
         />
-      ) : viewAsRole === 'GENERAL_STAFF' ? (
+      ) : ManageSelfRoles.includes(viewAsRole) ? (
         <Button variant="outline" size="sm" onClick={() => onClaimProject(row.original)}>
           เลือกงาน
         </Button>
@@ -160,7 +164,7 @@ export const getColumns = ({
           <DropdownMenuContent align="end">
             <DropdownMenuItem onClick={() => onOpenCancelDialog(project)} variant="destructive">
               <Trash2 className="h-4 w-4" />
-              {viewAsRole === 'HEAD_OF_DEPARTMENT' || viewAsRole === 'HEAD_OF_UNIT'
+              {ManageUnitRoles.includes(viewAsRole) || SupervisorRoles.includes(viewAsRole)
                 ? 'ยกเลิกโครงการ'
                 : 'ขอยกเลิกโครงการ'}
             </DropdownMenuItem>

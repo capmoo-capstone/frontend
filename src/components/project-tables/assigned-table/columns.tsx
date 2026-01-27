@@ -1,5 +1,4 @@
 import { type ColumnDef } from '@tanstack/react-table';
-import { ro } from 'date-fns/locale';
 import { ArrowUpDown, MoreVertical, Trash2, UserCog } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
@@ -19,8 +18,13 @@ interface GetColumnsProps {
   onCancelProject: (project: AssignedProjectItem) => void;
   onChangeAssignee: (project: AssignedProjectItem) => void;
   onAcceptProject: (project: AssignedProjectItem) => void;
-  viewAsRole?: Role;
+  viewAsRole: Role;
 }
+
+const SupervisorRoles: Role[] = ['HEAD_OF_DEPARTMENT'];
+const ManageUnitRoles: Role[] = ['HEAD_OF_UNIT', 'SUPER_ADMIN'];
+const ViewUnitRoles: Role[] = ['ADMIN', 'DOCUMENT_STAFF', 'FINANCE_STAFF'];
+const ManageSelfRoles: Role[] = ['GENERAL_STAFF'];
 
 export const getColumns = ({
   onCancelProject,
@@ -151,9 +155,11 @@ export const getColumns = ({
     id: 'assignee',
     header: 'มอบหมายให้',
     cell: ({ row }) => {
-      return viewAsRole === 'HEAD_OF_UNIT' ? (
+      return SupervisorRoles.includes(viewAsRole) ||
+        ManageUnitRoles.includes(viewAsRole) ||
+        ViewUnitRoles.includes(viewAsRole) ? (
         <div className="text-sm font-medium">{row.original.assignee_full_name ?? '-'}</div>
-      ) : viewAsRole === 'GENERAL_STAFF' && row.original.status === 'WAITING_ACCEPTANCE' ? (
+      ) : ManageSelfRoles.includes(viewAsRole) && row.original.status === 'WAITING_ACCEPTANCE' ? (
         <Button variant="outline" size="sm" onClick={() => onAcceptProject(row.original)}>
           รับทราบ
         </Button>
@@ -181,7 +187,7 @@ export const getColumns = ({
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            {viewAsRole === 'HEAD_OF_UNIT' && (
+            {ManageUnitRoles.includes(viewAsRole) && (
               <DropdownMenuItem onClick={() => onChangeAssignee(project)} disabled={!canEdit}>
                 <UserCog className="h-4 w-4" />
                 เปลี่ยนผู้รับผิดชอบ
@@ -190,7 +196,7 @@ export const getColumns = ({
 
             <DropdownMenuItem onClick={() => onCancelProject(project)} variant="destructive">
               <Trash2 className="h-4 w-4" />
-              {viewAsRole === 'HEAD_OF_DEPARTMENT' || viewAsRole === 'HEAD_OF_UNIT'
+              {ManageUnitRoles.includes(viewAsRole) || SupervisorRoles.includes(viewAsRole)
                 ? 'ยกเลิกโครงการ'
                 : 'ขอยกเลิกโครงการ'}
             </DropdownMenuItem>

@@ -16,6 +16,7 @@ import { Button } from '@/components/ui/button';
 import { TitleBar } from '@/components/ui/title-bar';
 import { useAuth } from '@/context/AuthContext';
 import { useAssignProject, useUnassignedProjects } from '@/hooks/useProjects';
+import type { Role } from '@/types/auth';
 import { type UnassignedProjectItem } from '@/types/project';
 
 import { ProjectDataTable } from '../data-table';
@@ -23,6 +24,8 @@ import { getColumns } from './columns';
 
 export function AssignTable({ unitId }: { unitId?: string }) {
   const { user } = useAuth();
+  if (!user) return null;
+
   const { data: projects, isLoading, isError } = useUnassignedProjects(unitId);
   const { mutateAsync } = useAssignProject();
 
@@ -30,6 +33,9 @@ export function AssignTable({ unitId }: { unitId?: string }) {
 
   const [pendingChanges, setPendingChanges] = useState<Record<string, string>>({});
   const [sorting, setSorting] = useState<SortingState>([]);
+
+  const SupervisorRoles: Role[] = ['HEAD_OF_DEPARTMENT'];
+  const ManageUnitRoles: Role[] = ['HEAD_OF_UNIT', 'SUPER_ADMIN'];
 
   const columns = useMemo(
     () =>
@@ -39,9 +45,9 @@ export function AssignTable({ unitId }: { unitId?: string }) {
         unitId,
         onOpenCancelDialog: (project) => setProjectToCancel(project),
         onClaimProject: (project) => console.log('Claim Project', project), // todo: implement
-        viewAsRole: user?.role,
+        viewAsRole: user.role,
       }),
-    [pendingChanges, unitId, user?.role]
+    [pendingChanges, unitId, user.role]
   );
 
   const table = useReactTable({
@@ -111,7 +117,7 @@ export function AssignTable({ unitId }: { unitId?: string }) {
         toolbar={
           <div className="flex w-full items-center justify-between space-x-4">
             <TitleBar title="งานที่ยังไม่ได้มอบหมาย" />
-            {user?.role === 'HEAD_OF_UNIT' && (
+            {ManageUnitRoles.includes(user.role) && (
               <Button
                 variant="brand"
                 onClick={handleSave}
@@ -130,7 +136,7 @@ export function AssignTable({ unitId }: { unitId?: string }) {
         onClose={() => setProjectToCancel(null)}
         onConfirm={handleConfirmCancel}
         projectTitle={projectToCancel?.title}
-        isAuthorized={user?.role === 'HEAD_OF_DEPARTMENT' || user?.role === 'HEAD_OF_UNIT'}
+        isAuthorized={ManageUnitRoles.includes(user.role) || SupervisorRoles.includes(user.role)}
       />
     </>
   );

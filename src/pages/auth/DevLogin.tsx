@@ -1,10 +1,8 @@
-import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { devLogin } from '@/api/user.api';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/AuthContext';
-import { UserSchema } from '@/types/auth';
+import { useDevLogin, useLogout } from '@/hooks/useAuth';
 
 const ROLES = [
   { value: 'SUPER_ADMIN', label: 'Super Admin', description: 'Full system access' },
@@ -20,27 +18,16 @@ const ROLES = [
 
 const DevLogin = () => {
   const navigate = useNavigate();
-  const [loading, setLoading] = useState<string | null>(null);
   const { user, isAuthenticated } = useAuth();
+  const { mutate: devLogin, isPending } = useDevLogin();
+  const { mutate: logout } = useLogout();
 
-  const handleDevLogin = async (role: string) => {
-    setLoading(role);
-    try {
-      const userData = await devLogin(role);
-      const validatedUser = UserSchema.parse(userData);
-      localStorage.setItem('nexus_user', JSON.stringify(validatedUser));
-      // Reload to trigger auth context update
-      window.location.href = '/';
-    } catch (error) {
-      console.error('Dev login failed:', error);
-    } finally {
-      setLoading(null);
-    }
+  const handleDevLogin = (role: string) => {
+    devLogin(role);
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('nexus_user');
-    window.location.reload();
+    logout();
   };
 
   return (
@@ -76,10 +63,10 @@ const DevLogin = () => {
               <p className="mb-3 text-sm text-gray-600 dark:text-gray-400">{role.description}</p>
               <Button
                 className="w-full"
-                disabled={loading !== null}
+                disabled={isPending}
                 onClick={() => handleDevLogin(role.value)}
               >
-                {loading === role.value ? 'Logging in...' : 'Login'}
+                {isPending ? 'Logging in...' : 'Login'}
               </Button>
             </div>
           ))}

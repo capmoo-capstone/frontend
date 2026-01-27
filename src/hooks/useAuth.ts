@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom';
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
-import { login as loginApi } from '@/api/user.api';
+import { devLogin as devLoginApi, login as loginApi } from '@/api/user.api';
 import { useAuth } from '@/context/AuthContext';
 
 export const useLogin = () => {
@@ -40,6 +40,19 @@ export const useLogout = () => {
       queryClient.clear();
 
       navigate('/login', { replace: true });
+    },
+  });
+};
+
+export const useDevLogin = () => {
+  const { setSession } = useAuth();
+  const navigate = useNavigate();
+
+  return useMutation({
+    mutationFn: (role: string) => devLoginApi(role),
+    onSuccess: (user) => {
+      setSession(user);
+      navigate('/app', { replace: true });
     },
   });
 };

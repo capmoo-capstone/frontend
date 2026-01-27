@@ -35,7 +35,8 @@ const DevLogin = () => {
   };
 
   const handleLogout = () => {
-    logout();
+    localStorage.removeItem('nexus_user');
+    window.location.href = '/';
   };
 
   return (

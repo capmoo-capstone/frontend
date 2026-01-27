@@ -3,13 +3,15 @@ import { z } from 'zod';
 import { UserSchema } from './auth';
 
 export const ProjectStatusEnum = z.enum([
-  'DRAFT',
   'UNASSIGNED',
-  'WAITING_FOR_ACCEPTANCE',
-  'IN_PROGRESS_OF_PROCUREMENT',
-  'IN_PROGRESS_OF_CONTRACT',
-  'APPROVED',
-  'REJECTED',
+  'WAITING_ACCEPT',
+  'IN_PROGRESS',
+  'WAITING_CANCEL',
+  'CANCELLED',
+  'NOT_EXPORT',
+  'EXPORTED',
+  'CLOSED',
+  'REQUEST_EDIT',
 ]);
 
 export const ProcurementTypeEnum = z.enum(['LT100K', 'LT500K', 'MT500K', 'SELECTION', 'EBIDDING']);
@@ -66,7 +68,7 @@ export const UnitResponsibleTypeEnum = z.enum([
   'CONTRACT',
 ]);
 
-export const AssignedProjectStatusEnum = z.enum(['WAITING_ACCEPTANCE', 'IN_PROGRESS', 'CANCELLED']);
+export const AssignedProjectStatusEnum = z.enum(['WAITING_ACCEPT', 'IN_PROGRESS', 'CANCELLED']);
 
 const RequestUnitSchema = z.object({
   name: z.string(),

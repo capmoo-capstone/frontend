@@ -40,7 +40,7 @@ const DevLogin = () => {
 
   const handleLogout = () => {
     localStorage.removeItem('nexus_user');
-    window.location.reload();
+    window.location.href = '/';
   };
 
   return (

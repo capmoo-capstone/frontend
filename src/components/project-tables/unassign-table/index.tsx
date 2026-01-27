@@ -111,15 +111,17 @@ export function AssignTable({ unitId }: { unitId?: string }) {
         toolbar={
           <div className="flex w-full items-center justify-between space-x-4">
             <TitleBar title="งานที่ยังไม่ได้มอบหมาย" />
-            <Button
-              variant="brand"
-              onClick={handleSave}
-              disabled={Object.keys(pendingChanges).length === 0}
-            >
-              <Save className="h-4 w-4" />
-              บันทึก
-              <span className="text-xs">({Object.keys(pendingChanges).length})</span>
-            </Button>
+            {user?.role === 'HEAD_OF_UNIT' && (
+              <Button
+                variant="brand"
+                onClick={handleSave}
+                disabled={Object.keys(pendingChanges).length === 0}
+              >
+                <Save className="h-4 w-4" />
+                บันทึก
+                <span className="text-xs">({Object.keys(pendingChanges).length})</span>
+              </Button>
+            )}
           </div>
         }
       />

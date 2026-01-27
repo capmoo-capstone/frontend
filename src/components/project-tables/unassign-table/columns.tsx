@@ -9,6 +9,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { formatDateThaiShort } from '@/lib/date-utils';
+import { getResponsibleTypeFormat } from '@/lib/responsible-type-format';
 import { type Role } from '@/types/auth';
 import { type UnassignedProjectItem } from '@/types/project';
 
@@ -62,7 +64,45 @@ export const getColumns = ({
     cell: ({ row }) => <div>{row.getValue('title')}</div>,
   },
   {
-    accessorKey: 'req_department_name',
+    id: 'procurement_type',
+    header: ({ column }) => (
+      <div
+        className="flex cursor-pointer items-center"
+        onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+      >
+        ประเภทงาน
+        <ArrowUpDown
+          className={`ml-2 h-4 w-4 ${column.getIsSorted() ? 'text-primary' : 'text-ring'}`}
+        />
+      </div>
+    ),
+    cell: ({ row }) => <div>{getResponsibleTypeFormat(row.original.procurement_type)}</div>,
+    accessorFn: (row) => row.procurement_type,
+  },
+  {
+    id: 'expected_approval_date',
+    header: ({ column }) => (
+      <div
+        className="flex cursor-pointer items-center"
+        onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+      >
+        กำหนดส่งงาน
+        <ArrowUpDown
+          className={`ml-2 h-4 w-4 ${column.getIsSorted() ? 'text-primary' : 'text-ring'}`}
+        />
+      </div>
+    ),
+    cell: ({ row }) => (
+      <div>
+        {row.original.expected_approval_date
+          ? formatDateThaiShort(row.original.expected_approval_date)
+          : '-'}
+      </div>
+    ),
+    accessorFn: (row) => row.expected_approval_date,
+  },
+  {
+    id: 'request_unit',
     header: ({ column }) => (
       <div
         className="flex cursor-pointer items-center"
@@ -74,49 +114,24 @@ export const getColumns = ({
         />
       </div>
     ),
-    cell: ({ row }) => <div>{row.getValue('req_department_name')}</div>,
-  },
-  {
-    accessorKey: 'description',
-    header: 'รายละเอียด',
-    cell: ({ row }) => (
-      <div className="text-muted-foreground lowercase">{row.getValue('description')}</div>
-    ),
+    cell: ({ row }) => <div>{row.original.request_unit.department.name}</div>,
+    accessorFn: (row) => row.request_unit.department.name,
   },
   {
     accessorKey: 'status',
     header: 'สถานะ',
-    cell: ({ row }) => {
-      const status = row.getValue('status') as string;
-      let variant: 'secondary' | 'destructive' | 'warning' | 'info' = 'secondary';
-      let label = status;
-
-      // Status Logic
-      if (status === 'UNASSIGNED') {
-        variant = 'secondary';
-        label = 'ยังไม่ได้มอบหมาย';
-      } else if (status === 'WAITING_FOR_ACCEPTANCE') {
-        variant = 'warning';
-        label = 'รอการตอบรับ';
-      } else if (status === 'IN_PROGRESS') {
-        variant = 'info';
-        label = 'มอบหมายแล้ว';
-      } else if (status === 'CANCEL') {
-        variant = 'destructive';
-        label = 'ยกเลิก';
-      }
-
-      return <Badge variant={variant}>{label}</Badge>;
+    cell: ({}) => {
+      return <Badge variant={'secondary'}>{'รอการมอบหมาย'}</Badge>;
     },
   },
   {
-    accessorKey: 'assignee_id',
+    id: 'assignee',
     header: viewAsRole === 'HEAD_OF_UNIT' ? 'มอบหมายให้' : undefined,
     cell: ({ row }) => {
       return viewAsRole === 'HEAD_OF_UNIT' ? (
         <AssigneeCell
           rowId={row.original.id}
-          originalValue={row.getValue('assignee_id')}
+          originalValue={null}
           pendingChanges={pendingChanges}
           setPendingChanges={setPendingChanges}
           unitId={unitId}

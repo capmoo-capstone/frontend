@@ -29,7 +29,6 @@ export function AssignedTable({ unitId }: { unitId?: string }) {
   const { data: projects, isLoading, isError } = useAssignedProjects(unitId, date);
   const [sorting, setSorting] = useState<SortingState>([{ id: 'status', desc: true }]);
 
-  // State for Dialogs
   const [projectToCancel, setProjectToCancel] = useState<AssignedProjectItem | null>(null);
   const [projectToChangeAssignee, setProjectToChangeAssignee] =
     useState<AssignedProjectItem | null>(null);

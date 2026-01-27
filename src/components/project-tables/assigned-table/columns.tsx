@@ -1,4 +1,5 @@
 import { type ColumnDef } from '@tanstack/react-table';
+import { ro } from 'date-fns/locale';
 import { ArrowUpDown, MoreVertical, Trash2, UserCog } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
@@ -9,6 +10,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { formatDateThaiShort } from '@/lib/date-utils';
+import { getResponsibleTypeFormat } from '@/lib/responsible-type-format';
 import type { Role } from '@/types/auth';
 import { type AssignedProjectItem } from '@/types/project';
 
@@ -56,7 +59,45 @@ export const getColumns = ({
     cell: ({ row }) => <div>{row.getValue('title')}</div>,
   },
   {
-    accessorKey: 'req_department_name',
+    id: 'procurement_type',
+    header: ({ column }) => (
+      <div
+        className="flex cursor-pointer items-center"
+        onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+      >
+        ประเภทงาน
+        <ArrowUpDown
+          className={`ml-2 h-4 w-4 ${column.getIsSorted() ? 'text-primary' : 'text-ring'}`}
+        />
+      </div>
+    ),
+    cell: ({ row }) => <div>{getResponsibleTypeFormat(row.original.procurement_type)}</div>,
+    accessorFn: (row) => row.procurement_type,
+  },
+  {
+    id: 'expected_approval_date',
+    header: ({ column }) => (
+      <div
+        className="flex cursor-pointer items-center"
+        onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+      >
+        กำหนดส่งงาน
+        <ArrowUpDown
+          className={`ml-2 h-4 w-4 ${column.getIsSorted() ? 'text-primary' : 'text-ring'}`}
+        />
+      </div>
+    ),
+    cell: ({ row }) => (
+      <div>
+        {row.original.expected_approval_date
+          ? formatDateThaiShort(row.original.expected_approval_date)
+          : '-'}
+      </div>
+    ),
+    accessorFn: (row) => row.expected_approval_date,
+  },
+  {
+    id: 'request_unit',
     header: ({ column }) => (
       <div
         className="flex cursor-pointer items-center"
@@ -68,14 +109,8 @@ export const getColumns = ({
         />
       </div>
     ),
-    cell: ({ row }) => <div>{row.getValue('req_department_name')}</div>,
-  },
-  {
-    accessorKey: 'description',
-    header: 'รายละเอียด',
-    cell: ({ row }) => (
-      <div className="text-muted-foreground lowercase">{row.getValue('description')}</div>
-    ),
+    cell: ({ row }) => <div>{row.original.request_unit.department.name}</div>,
+    accessorFn: (row) => row.request_unit.department.name,
   },
   {
     accessorKey: 'status',
@@ -98,13 +133,13 @@ export const getColumns = ({
       if (status === 'UNASSIGNED') {
         variant = 'secondary';
         label = 'ยังไม่ได้มอบหมาย';
-      } else if (status === 'WAITING_FOR_ACCEPTANCE') {
+      } else if (status === 'WAITING_ACCEPTANCE') {
         variant = 'warning';
         label = 'รอการตอบรับ';
       } else if (status === 'IN_PROGRESS') {
         variant = 'info';
         label = 'มอบหมายแล้ว';
-      } else if (status === 'CANCEL') {
+      } else if (status === 'CANCELLED') {
         variant = 'destructive';
         label = 'ยกเลิก';
       }
@@ -113,12 +148,12 @@ export const getColumns = ({
     },
   },
   {
-    accessorKey: 'assignee_id',
+    id: 'assignee',
     header: 'มอบหมายให้',
     cell: ({ row }) => {
       return viewAsRole === 'HEAD_OF_UNIT' ? (
-        <div className="text-sm font-medium">{row.original.assignee_fullname || '-'}</div>
-      ) : viewAsRole === 'GENERAL_STAFF' && row.original.status === 'WAITING_FOR_ACCEPTANCE' ? (
+        <div className="text-sm font-medium">{row.original.assignee_full_name ?? '-'}</div>
+      ) : viewAsRole === 'GENERAL_STAFF' && row.original.status === 'WAITING_ACCEPTANCE' ? (
         <Button variant="outline" size="sm" onClick={() => onAcceptProject(row.original)}>
           รับทราบ
         </Button>
@@ -131,9 +166,9 @@ export const getColumns = ({
     cell: ({ row }) => {
       const project = row.original;
 
-      const canEdit = project.status === 'WAITING_FOR_ACCEPTANCE';
+      const canEdit = project.status === 'WAITING_ACCEPTANCE';
 
-      if (row.original.status === 'CANCEL') {
+      if (row.original.status === 'CANCELLED') {
         return null;
       }
 

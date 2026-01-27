@@ -3,7 +3,7 @@ import type { User } from '@/types/auth';
 import { type UserListResponse, UserListResponseSchema } from '@/types/user';
 import { type UserSelectionResponse, UserSelectionResponseSchema } from '@/types/user';
 
-import { MOCK_USER, MOCK_USER_SELECTION } from './mock-data';
+import { MOCK_USER, MOCK_USERS_BY_ROLE, MOCK_USER_SELECTION } from './mock-data';
 
 interface GetUsersParams {
   page?: number;
@@ -46,4 +46,8 @@ export const login = async (cunet: string, password: string): Promise<User> => {
 
   const { data } = await api.post('/auth/login', { cunet, password });
   return data;
+};
+
+export const devLogin = async (role: string): Promise<User> => {
+  return MOCK_USERS_BY_ROLE[role] || MOCK_USER;
 };

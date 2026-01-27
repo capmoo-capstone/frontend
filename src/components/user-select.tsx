@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 
-import { Check, ChevronsUpDown, Loader2 } from 'lucide-react';
+import { Check, ChevronDown, Loader2, X } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -20,20 +20,24 @@ import { cn } from '@/lib/utils';
 interface UserSelectProps {
   value?: string | null;
   onChange: (value: string) => void;
+  onReset?: () => void;
   unitId?: string;
   departmentId?: string;
   placeholder?: string;
   className?: string;
   disabled?: boolean;
+  hasClearButton?: boolean;
 }
 
 export function UserSelect({
   value,
   onChange,
+  onReset,
   unitId,
   departmentId,
   placeholder = 'Select user...',
   className,
+  hasClearButton = true,
   disabled = false,
 }: UserSelectProps) {
   const [open, setOpen] = React.useState(false);
@@ -43,8 +47,17 @@ export function UserSelect({
   );
 
   const users = data?.data || [];
-
   const selectedUser = users.find((user) => user.id === value);
+
+  const handleClear = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onChange('');
+    if (onReset) {
+      onReset();
+    }
+  };
+
+  const showClear = value && !isLoading && !disabled && hasClearButton;
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -53,19 +66,33 @@ export function UserSelect({
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className={cn('w-55 justify-between', className)}
+          className={cn('group w-55 justify-between px-3', className)}
           disabled={disabled || isLoading}
         >
           {isLoading ? (
-            <span className="flex items-center gap-2">
+            <span className="text-muted-foreground flex items-center gap-2">
               <Loader2 className="h-4 w-4 animate-spin" /> Loading...
             </span>
           ) : selectedUser ? (
-            selectedUser.full_name
+            <span className="truncate">{selectedUser.full_name}</span>
           ) : (
             <span className="text-muted-foreground">{placeholder}</span>
           )}
-          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+
+          <div className="ml-2 flex items-center gap-1">
+            {showClear ? (
+              <div
+                role="button"
+                onClick={handleClear}
+                className="hover:bg-muted rounded-sm p-0.5 transition-colors"
+                title="Clear selection"
+              >
+                <X className="h-4 w-4 opacity-50 hover:opacity-100" />
+              </div>
+            ) : (
+              <ChevronDown className="h-4 w-4 shrink-0 opacity-50 transition-transform duration-200 group-data-[state=open]:rotate-180" />
+            )}
+          </div>
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-60 p-0" align="start">
@@ -84,7 +111,7 @@ export function UserSelect({
                   }}
                 >
                   <Check
-                    className={cn('mr-1 h-4 w-4', value === user.id ? 'opacity-100' : 'opacity-0')}
+                    className={cn('mr-2 h-4 w-4', value === user.id ? 'opacity-100' : 'opacity-0')}
                   />
                   <div className="flex flex-col">
                     <span>{user.full_name}</span>

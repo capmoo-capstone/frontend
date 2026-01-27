@@ -11,15 +11,25 @@ import {
 import { AlertTriangle, Loader2, Save } from 'lucide-react';
 import { toast } from 'sonner';
 
+import { CancelProjectDialog } from '@/components/project-dialog/cancel-project-dialog';
 import { Button } from '@/components/ui/button';
+import { TitleBar } from '@/components/ui/title-bar';
+import { useAuth } from '@/context/AuthContext';
 import { useAssignProject, useUnassignedProjects } from '@/hooks/useProjects';
+import { ManageUnitRoles, SupervisorRoles } from '@/lib/role-permissions';
+import { type UnassignedProjectItem } from '@/types/project';
 
 import { ProjectDataTable } from '../data-table';
 import { getColumns } from './columns';
 
 export function AssignTable({ unitId }: { unitId?: string }) {
+  const { user } = useAuth();
+  if (!user) return null;
+
   const { data: projects, isLoading, isError } = useUnassignedProjects(unitId);
   const { mutateAsync } = useAssignProject();
+
+  const [projectToCancel, setProjectToCancel] = useState<UnassignedProjectItem | null>(null);
 
   const [pendingChanges, setPendingChanges] = useState<Record<string, string>>({});
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -30,8 +40,11 @@ export function AssignTable({ unitId }: { unitId?: string }) {
         pendingChanges,
         setPendingChanges,
         unitId,
+        onOpenCancelDialog: (project) => setProjectToCancel(project),
+        onClaimProject: (project) => console.log('Claim Project', project), // todo: implement
+        viewAsRole: user.role,
       }),
-    [pendingChanges, unitId]
+    [pendingChanges, unitId, user.role]
   );
 
   const table = useReactTable({
@@ -42,6 +55,17 @@ export function AssignTable({ unitId }: { unitId?: string }) {
     getSortedRowModel: getSortedRowModel(),
     state: { sorting },
   });
+
+  const handleConfirmCancel = async (reason: string) => {
+    if (!projectToCancel) return;
+
+    // Simulate API Call (Replace with mutateAsync)
+    console.log(`Cancelling Project ${projectToCancel.id} because: ${reason}`);
+
+    // await cancelMutation.mutateAsync({ id: projectToCancel.id, reason });
+
+    toast.success('ยกเลิกโครงการเรียบร้อยแล้ว');
+  };
 
   const handleSave = async () => {
     if (Object.keys(pendingChanges).length === 0) return;
@@ -83,20 +107,34 @@ export function AssignTable({ unitId }: { unitId?: string }) {
     );
 
   return (
-    <ProjectDataTable
-      table={table}
-      columnsLength={columns.length}
-      title="งานที่ยังไม่ได้มอบหมาย"
-      toolbar={
-        <Button
-          variant="brand"
-          onClick={handleSave}
-          disabled={Object.keys(pendingChanges).length === 0}
-        >
-          <Save className="mr-2 h-4 w-4" />
-          บันทึก ({Object.keys(pendingChanges).length})
-        </Button>
-      }
-    />
+    <>
+      <ProjectDataTable
+        table={table}
+        columnsLength={columns.length}
+        toolbar={
+          <div className="flex w-full items-center justify-between space-x-4">
+            <TitleBar title="งานที่ยังไม่ได้มอบหมาย" />
+            {ManageUnitRoles.includes(user.role) && (
+              <Button
+                variant="brand"
+                onClick={handleSave}
+                disabled={Object.keys(pendingChanges).length === 0}
+              >
+                <Save className="h-4 w-4" />
+                บันทึก
+                <span className="text-xs">({Object.keys(pendingChanges).length})</span>
+              </Button>
+            )}
+          </div>
+        }
+      />
+      <CancelProjectDialog
+        isOpen={!!projectToCancel}
+        onClose={() => setProjectToCancel(null)}
+        onConfirm={handleConfirmCancel}
+        projectTitle={projectToCancel?.title}
+        isAuthorized={ManageUnitRoles.includes(user.role) || SupervisorRoles.includes(user.role)}
+      />
+    </>
   );
 }

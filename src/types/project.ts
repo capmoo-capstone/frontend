@@ -3,13 +3,15 @@ import { z } from 'zod';
 import { UserSchema } from './auth';
 
 export const ProjectStatusEnum = z.enum([
-  'DRAFT',
   'UNASSIGNED',
-  'WAITING_FOR_ACCEPTANCE',
-  'IN_PROGRESS_OF_PROCUREMENT',
-  'IN_PROGRESS_OF_CONTRACT',
-  'APPROVED',
-  'REJECTED',
+  'WAITING_ACCEPT',
+  'IN_PROGRESS',
+  'WAITING_CANCEL',
+  'CANCELLED',
+  'NOT_EXPORT',
+  'EXPORTED',
+  'CLOSED',
+  'REQUEST_EDIT',
 ]);
 
 export const ProcurementTypeEnum = z.enum(['LT100K', 'LT500K', 'MT500K', 'SELECTION', 'EBIDDING']);
@@ -57,36 +59,61 @@ export type ProcurementType = z.infer<typeof ProcurementTypeEnum>;
 
 export const ProjectListSchema = z.array(ProjectSchema);
 
-export const AssignedProjectStatusEnum = z.enum([
-  'WAITING_FOR_ACCEPTANCE',
-  'IN_PROGRESS',
-  'CANCEL',
+export const UnitResponsibleTypeEnum = z.enum([
+  'LT100K',
+  'LT500K',
+  'MT500K',
+  'SELECTION',
+  'EBIDDING',
+  'CONTRACT',
 ]);
+
+export const AssignedProjectStatusEnum = z.enum(['WAITING_ACCEPT', 'IN_PROGRESS', 'CANCELLED']);
+
+const RequestUnitSchema = z.object({
+  name: z.string(),
+  department: z.object({
+    name: z.string(),
+  }),
+});
 
 export const AssignedProjectItemSchema = z.object({
   id: z.string(),
-  title: z.string(),
   receive_no: z.string(),
-  req_department_name: z.string(),
+  title: z.string(),
   status: AssignedProjectStatusEnum,
-  description: z.string(),
-  assignee_id: z.string().nullable(),
-  assignee_fullname: z.string().nullable(),
-  created_at: z.iso.datetime(),
+  request_unit: RequestUnitSchema,
+  procurement_type: ProcurementTypeEnum,
+  template_type: UnitResponsibleTypeEnum,
+  current_step_name: z.string(),
+  current_step_order: z.number(),
+  assignee_id: z.string(),
+  assignee_full_name: z.string(),
+  is_urgent: z.boolean(),
+  expected_approval_date: z.string().datetime().nullable(),
+  created_at: z.string().datetime(),
 });
 
 export type AssignedProjectItem = z.infer<typeof AssignedProjectItemSchema>;
 
 export const UnassignedProjectItemSchema = z.object({
   id: z.string(),
-  title: z.string(),
   receive_no: z.string(),
-  req_department_name: z.string(),
-  status: 'UNASSIGNED',
-  description: z.string(),
-  assignee_id: z.string().nullable(),
-  assignee_fullname: z.string().nullable(),
-  created_at: z.iso.datetime(),
+  title: z.string(),
+  status: z.literal('UNASSIGNED'),
+  request_unit: RequestUnitSchema,
+  procurement_type: ProcurementTypeEnum,
+  template_type: UnitResponsibleTypeEnum,
+  is_urgent: z.boolean(),
+  expected_approval_date: z.string().datetime().nullable(),
+  created_at: z.string().datetime(),
 });
 
 export type UnassignedProjectItem = z.infer<typeof UnassignedProjectItemSchema>;
+
+export const ProjectListResponseSchema = z.object({
+  total: z.number(),
+  data: z.array(z.union([AssignedProjectItemSchema, UnassignedProjectItemSchema])),
+});
+
+export type ProjectListResponse = z.infer<typeof ProjectListResponseSchema>;

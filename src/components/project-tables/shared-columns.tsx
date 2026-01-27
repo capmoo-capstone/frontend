@@ -1,10 +1,7 @@
-// components/project-tables/shared-columns.tsx
 import { type ColumnDef } from '@tanstack/react-table';
 
 import { Badge } from '@/components/ui/badge';
 import { type Project } from '@/types/project';
-
-// Or your base type
 
 export const baseColumns: ColumnDef<Project>[] = [
   {

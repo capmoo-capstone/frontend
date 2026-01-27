@@ -1,9 +1,13 @@
+'use client';
+
 import * as React from 'react';
 import { type DayButton, DayPicker, getDefaultClassNames } from 'react-day-picker';
 
+import { th } from 'date-fns/locale';
 import { ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
 
 import { Button, buttonVariants } from '@/components/ui/button';
+import { formatDateThai } from '@/lib/date-utils';
 import { cn } from '@/lib/utils';
 
 function Calendar({
@@ -22,6 +26,7 @@ function Calendar({
 
   return (
     <DayPicker
+      locale={th}
       showOutsideDays={showOutsideDays}
       className={cn(
         'bg-background group/calendar p-3 [--cell-size:--spacing(8)] in-data-[slot=card-content]:bg-transparent in-data-[slot=popover-content]:bg-transparent',
@@ -31,10 +36,15 @@ function Calendar({
       )}
       captionLayout={captionLayout}
       formatters={{
-        formatMonthDropdown: (date) =>
-          date.toLocaleString('default', {
-            month: 'short',
-          }),
+        // Main Header (e.g., "มกราคม 2569")
+        formatCaption: (date) => formatDateThai(date, 'MMMM yyyy'),
+
+        // Dropdown Year (e.g., "2569")
+        formatYearCaption: (date) => formatDateThai(date, 'yyyy'),
+
+        // Dropdown Month (e.g., "ม.ค.")
+        formatMonthDropdown: (date) => formatDateThai(date, 'MMM'),
+
         ...formatters,
       }}
       classNames={{

@@ -1,8 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { toast } from 'sonner';
 
 import {
   assignProject,
+  changeProjectAssignee,
   getAssignedProjects,
   getProjects,
   getUnassignedProjects,
@@ -51,6 +51,24 @@ export const useAssignProject = () => {
       });
       queryClient.invalidateQueries({
         queryKey: ['projects', 'unassigned'],
+      });
+    },
+  });
+};
+
+export const useChangeProjectAssignee = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ projectId, userId }: { projectId: string; userId: string }) =>
+      changeProjectAssignee(projectId, userId),
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['projects'],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ['projects', 'assigned'],
       });
     },
   });

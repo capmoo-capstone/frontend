@@ -19,9 +19,6 @@ export const AppRouter = () => {
         ) : (
           <Route path="/*" element={<PublicRoutes />} />
         )}
-
-        {/* Fallback redirect */}
-        <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </BrowserRouter>
   );

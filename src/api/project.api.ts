@@ -43,7 +43,12 @@ export const getAssignedProjects = async (
     },
   });
 
-  return z.array(AssignedProjectItemSchema).parse(data.data);
+  return z
+    .object({
+      total: z.number(),
+      data: z.array(AssignedProjectItemSchema),
+    })
+    .parse(data).data;
 };
 
 export const getUnassignedProjects = async (unitId: string): Promise<UnassignedProjectItem[]> => {
@@ -54,7 +59,12 @@ export const getUnassignedProjects = async (unitId: string): Promise<UnassignedP
     params: { unit_id: unitId },
   });
 
-  return z.array(UnassignedProjectItemSchema).parse(data.data);
+  return z
+    .object({
+      total: z.number(),
+      data: z.array(UnassignedProjectItemSchema),
+    })
+    .parse(data).data;
 };
 
 export const assignProject = async (
@@ -73,6 +83,19 @@ export const assignProject = async (
   const { data } = await api.patch(`/projects/${projectId}/assign/${userId}`, {
     project_type: projectType,
   });
+
+  return data;
+};
+
+export const changeProjectAssignee = async (projectId: string, newUserId: string) => {
+  // Mock response
+  return {
+    success: true,
+    projectId,
+    newUserId,
+  };
+
+  const { data } = await api.patch(`/project/${projectId}/change-assignee/${newUserId}`);
 
   return data;
 };

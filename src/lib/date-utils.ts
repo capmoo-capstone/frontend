@@ -4,7 +4,7 @@ import { th } from 'date-fns/locale';
 /**
  * Formats a date to Thai Buddhist Era string.
  * Example: 19 มกราคม 2569
- * * @param date - Date object or ISO date string
+ * @param date - Date object or ISO date string
  * @param formatStr - Optional format string (default: 'd MMMM yyyy')
  */
 export const formatDateThai = (

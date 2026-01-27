@@ -15,6 +15,12 @@ export const formatDateThai = (
 
   const dateObj = typeof date === 'string' ? new Date(date) : date;
 
+  // Validate that the date is valid
+  if (isNaN(dateObj.getTime())) {
+    console.warn('Invalid date provided to formatDateThai:', date);
+    return '-';
+  }
+
   // 1. Format the date using Thai locale
   // This gives AD year (e.g., 2026)
   const formatted = format(dateObj, formatStr, { locale: th });

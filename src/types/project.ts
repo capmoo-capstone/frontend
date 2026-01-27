@@ -98,8 +98,8 @@ export const AssignedProjectItemSchema = z.object({
   assignee_id: z.string(),
   assignee_full_name: z.string(),
   is_urgent: z.boolean(),
-  expected_approval_date: z.string().nullable(),
-  created_at: z.string(),
+  expected_approval_date: z.string().datetime().nullable(),
+  created_at: z.string().datetime(),
 });
 
 export type AssignedProjectItem = z.infer<typeof AssignedProjectItemSchema>;
@@ -113,8 +113,8 @@ export const UnassignedProjectItemSchema = z.object({
   procurement_type: ProcurementTypeEnum,
   template_type: UnitResponsibleTypeEnum,
   is_urgent: z.boolean(),
-  expected_approval_date: z.string().nullable(),
-  created_at: z.string(),
+  expected_approval_date: z.string().datetime().nullable(),
+  created_at: z.string().datetime(),
 });
 
 export type UnassignedProjectItem = z.infer<typeof UnassignedProjectItemSchema>;

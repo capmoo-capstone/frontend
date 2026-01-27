@@ -16,6 +16,7 @@ import { Button } from '@/components/ui/button';
 import { TitleBar } from '@/components/ui/title-bar';
 import { useAuth } from '@/context/AuthContext';
 import { useAssignProject, useUnassignedProjects } from '@/hooks/useProjects';
+import { ManageUnitRoles, SupervisorRoles } from '@/lib/role-permissions';
 import type { Role } from '@/types/auth';
 import { type UnassignedProjectItem } from '@/types/project';
 
@@ -33,9 +34,6 @@ export function AssignTable({ unitId }: { unitId?: string }) {
 
   const [pendingChanges, setPendingChanges] = useState<Record<string, string>>({});
   const [sorting, setSorting] = useState<SortingState>([]);
-
-  const SupervisorRoles: Role[] = ['HEAD_OF_DEPARTMENT'];
-  const ManageUnitRoles: Role[] = ['HEAD_OF_UNIT', 'SUPER_ADMIN'];
 
   const columns = useMemo(
     () =>

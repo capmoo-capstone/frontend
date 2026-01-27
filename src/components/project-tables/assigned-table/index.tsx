@@ -2,13 +2,14 @@
 
 import { useMemo, useState } from 'react';
 
-
-
-import { type SortingState, getCoreRowModel, getSortedRowModel, useReactTable } from '@tanstack/react-table';
+import {
+  type SortingState,
+  getCoreRowModel,
+  getSortedRowModel,
+  useReactTable,
+} from '@tanstack/react-table';
 import { AlertTriangle, Loader2, Upload } from 'lucide-react';
 import { toast } from 'sonner';
-
-
 
 import { CancelProjectDialog } from '@/components/project-dialog/cancel-project-dialog';
 import { ChangeAssigneeDialog } from '@/components/project-dialog/change-assignee-dialog';
@@ -17,36 +18,12 @@ import { DatePicker } from '@/components/ui/date-picker';
 import { TitleBar } from '@/components/ui/title-bar';
 import { useAuth } from '@/context/AuthContext';
 import { useAssignedProjects } from '@/hooks/useProjects';
+import { ManageSelfRoles, ManageUnitRoles, SupervisorRoles } from '@/lib/role-permissions';
 import { type Role } from '@/types/auth';
 import type { AssignedProjectItem } from '@/types/project';
 
-
-
 import { ProjectDataTable } from '../data-table';
 import { getColumns } from './columns';
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 export function AssignedTable({ unitId }: { unitId?: string }) {
   const { user } = useAuth();
@@ -59,10 +36,6 @@ export function AssignedTable({ unitId }: { unitId?: string }) {
   const [projectToCancel, setProjectToCancel] = useState<AssignedProjectItem | null>(null);
   const [projectToChangeAssignee, setProjectToChangeAssignee] =
     useState<AssignedProjectItem | null>(null);
-
-  const SupervisorRoles: Role[] = ['HEAD_OF_DEPARTMENT'];
-  const ManageUnitRoles: Role[] = ['HEAD_OF_UNIT', 'SUPER_ADMIN'];
-  const ManageSelfRoles: Role[] = ['GENERAL_STAFF'];
 
   const columns = useMemo(
     () =>

@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { formatDateThaiShort } from '@/lib/date-utils';
 import { getResponsibleTypeFormat } from '@/lib/responsible-type-format';
+import { ManageSelfRoles, ManageUnitRoles, SupervisorRoles } from '@/lib/role-permissions';
 import { type Role } from '@/types/auth';
 import { type UnassignedProjectItem } from '@/types/project';
 
@@ -24,10 +25,6 @@ interface GetColumnsProps {
   onClaimProject: (project: UnassignedProjectItem) => void;
   viewAsRole: Role;
 }
-
-const SupervisorRoles: Role[] = ['HEAD_OF_DEPARTMENT'];
-const ManageUnitRoles: Role[] = ['HEAD_OF_UNIT', 'SUPER_ADMIN'];
-const ManageSelfRoles: Role[] = ['GENERAL_STAFF'];
 
 export const getColumns = ({
   pendingChanges,

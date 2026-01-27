@@ -36,28 +36,30 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             <SidebarTrigger className="-ml-1" />
             <Separator orientation="vertical" className="mr-2 h-4" />
 
-            {/* Dev Role Switcher */}
-            <div className="flex items-center gap-3">
-              <Select value={user?.role} onValueChange={handleRoleChange}>
-                <SelectTrigger className="w-[200px]">
-                  <SelectValue placeholder="Select role" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="SUPER_ADMIN">Super Admin</SelectItem>
-                  <SelectItem value="ADMIN">Admin</SelectItem>
-                  <SelectItem value="HEAD_OF_DEPARTMENT">Head of Department</SelectItem>
-                  <SelectItem value="HEAD_OF_UNIT">Head of Unit</SelectItem>
-                  <SelectItem value="REPRESENTATIVE">Representative</SelectItem>
-                  <SelectItem value="DOCUMENT_STAFF">Document Staff</SelectItem>
-                  <SelectItem value="FINANCE_STAFF">Finance Staff</SelectItem>
-                  <SelectItem value="GENERAL_STAFF">General Staff</SelectItem>
-                  <SelectItem value="GUEST">Guest</SelectItem>
-                </SelectContent>
-              </Select>
-              <span className="text-muted-foreground text-sm">
-                {user?.name} ({user?.email})
-              </span>
-            </div>
+            {/* Dev Role Switcher - Development Only */}
+            {import.meta.env.MODE === 'development' && (
+              <div className="flex items-center gap-3">
+                <Select value={user?.role} onValueChange={handleRoleChange}>
+                  <SelectTrigger className="w-[200px]">
+                    <SelectValue placeholder="Select role" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="SUPER_ADMIN">Super Admin</SelectItem>
+                    <SelectItem value="ADMIN">Admin</SelectItem>
+                    <SelectItem value="HEAD_OF_DEPARTMENT">Head of Department</SelectItem>
+                    <SelectItem value="HEAD_OF_UNIT">Head of Unit</SelectItem>
+                    <SelectItem value="REPRESENTATIVE">Representative</SelectItem>
+                    <SelectItem value="DOCUMENT_STAFF">Document Staff</SelectItem>
+                    <SelectItem value="FINANCE_STAFF">Finance Staff</SelectItem>
+                    <SelectItem value="GENERAL_STAFF">General Staff</SelectItem>
+                    <SelectItem value="GUEST">Guest</SelectItem>
+                  </SelectContent>
+                </Select>
+                <span className="text-muted-foreground text-sm">
+                  {user?.name} ({user?.email})
+                </span>
+              </div>
+            )}
           </div>
         </header>
 

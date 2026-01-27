@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { Button } from '@/components/ui/button';
@@ -21,6 +22,13 @@ const DevLogin = () => {
   const { user, isAuthenticated } = useAuth();
   const { mutate: devLogin, isPending } = useDevLogin();
   const { mutate: logout } = useLogout();
+
+  // Redirect to login if not in development mode
+  useEffect(() => {
+    if (import.meta.env.MODE !== 'development') {
+      navigate('/login', { replace: true });
+    }
+  }, [navigate]);
 
   const handleDevLogin = (role: string) => {
     devLogin(role);

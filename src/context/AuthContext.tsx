@@ -37,6 +37,12 @@ export const AuthProvider: React.FC<{
   };
 
   const switchUser = (newUser: User) => {
+    // switchUser is intended only for development (e.g., testing/impersonation).
+    // In non-development environments, do not allow changing the user directly.
+    if (import.meta.env.MODE !== 'development') {
+      console.warn('switchUser is disabled outside of development environments.');
+      return;
+    }
     setUser(newUser);
     localStorage.setItem('nexus_user', JSON.stringify(newUser));
   };

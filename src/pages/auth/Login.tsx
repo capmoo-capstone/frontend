@@ -1,37 +1,20 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 
-import { Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff, Loader2 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { useAuth } from '@/context/AuthContext';
+import { useLogin } from '@/hooks/useAuth';
 
 export default function LoginPage() {
-  const { login } = useAuth();
-  const navigate = useNavigate();
+  const { mutate, isPending, isError, error } = useLogin();
+
   const [cunet, setCunet] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
 
-  const handleLogin = async () => {
-    setIsLoading(true);
-    setErrorMsg(null);
-    try {
-      const user = await login({ cunet, password });
-      if (user.department?.name === 'procurement') {
-        navigate('/app/me/dashboard');
-      } else {
-        navigate('/app/dashboards/department');
-      }
-    } catch (error: any) {
-      console.error('Login Error:', error);
-      setErrorMsg(error.message || 'CU NET หรือรหัสผ่านไม่ถูกต้อง กรุณาลองใหม่');
-    } finally {
-      setIsLoading(false);
-    }
+  const handleLogin = () => {
+    mutate({ cunet, password });
   };
 
   return (
@@ -53,6 +36,7 @@ export default function LoginPage() {
               value={cunet}
               onChange={(e) => setCunet(e.target.value)}
               placeholder="กรุณากรอก CU NET"
+              disabled={isPending}
             />
           </div>
           <div>
@@ -63,9 +47,12 @@ export default function LoginPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="กรุณากรอกรหัสผ่าน"
+                disabled={isPending}
               />
-              {errorMsg && (
-                <div className="text-destructive mt-2 text-center text-sm">{errorMsg}</div>
+              {isError && (
+                <div className="text-destructive mt-2 text-center text-sm">
+                  {(error as Error)?.message || 'CU NET หรือรหัสผ่านไม่ถูกต้อง'}
+                </div>
               )}
               <button
                 type="button"
@@ -77,8 +64,14 @@ export default function LoginPage() {
             </div>
           </div>
         </div>
-        <Button variant="brand" className="mt-10" onClick={handleLogin} disabled={isLoading}>
-          เข้าสู่ระบบ
+        <Button variant="brand" className="mt-10" onClick={handleLogin} disabled={isPending}>
+          {isPending ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" /> กำลังเข้าสู่ระบบ...
+            </>
+          ) : (
+            'เข้าสู่ระบบ'
+          )}
         </Button>
       </div>
     </div>

@@ -12,7 +12,6 @@ import {
   ShoppingCart,
   TrendingUp,
   UserCog,
-  // Added for Employee Management
   Users,
 } from 'lucide-react';
 
@@ -29,7 +28,7 @@ import {
   SidebarMenuItem,
   SidebarRail,
 } from '@/components/ui/sidebar';
-import { useAuth } from '@/context/AuthContext';
+import { useLogout } from '@/hooks/useAuth';
 
 export const sidebarGroups = [
   {
@@ -115,7 +114,7 @@ export const sidebarGroups = [
 
 export function AppSidebar() {
   const location = useLocation();
-  const { logout } = useAuth();
+  const { mutate: logout, isPending } = useLogout();
 
   return (
     <Sidebar collapsible="icon">
@@ -163,11 +162,9 @@ export function AppSidebar() {
       <SidebarFooter>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton asChild>
-              <Link to="/login" onClick={logout}>
-                <LogOut />
-                <span>Sign Out</span>
-              </Link>
+            <SidebarMenuButton onClick={() => logout()} disabled={isPending}>
+              <LogOut />
+              <span>{isPending ? 'Signing out...' : 'Sign Out'}</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>

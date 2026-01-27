@@ -46,7 +46,8 @@ export const PrivateRoutes = () => {
   return (
     <AppLayout>
       <Routes>
-        <Route path="app" element={<Navigate to={getHomeRedirect()} replace />} />
+        <Route path="/" element={<Navigate to={getHomeRedirect()} replace />} />
+        <Route path="/app" element={<Navigate to={getHomeRedirect()} replace />} />
 
         {/* === DASHBOARDS === */}
         <Route path="app/dashboards/department" element={<DepartmentDashboard />} />

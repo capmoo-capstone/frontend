@@ -41,6 +41,7 @@ export type AuthContextType = {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: (credentials: { cunet: string; password: string }) => Promise<User>;
+  setSession: (user: User) => void;
   logout: () => void;
+  switchUser: (user: User) => void;
 };

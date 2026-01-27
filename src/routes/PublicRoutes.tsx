@@ -11,13 +11,11 @@ export const PublicRoutes = () => {
   return (
     <PublicLayout>
       <Routes>
-        <Route path="login" element={<Login />} />
-        <Route path="dev-login" element={<DevLogin />} />
-        <Route path="vendor/form" element={<VendorForm />} />
-
         <Route path="/" element={<Navigate to="/login" replace />} />
-
-        <Route path="*" element={<PageNotFound />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/dev-login" element={<DevLogin />} />
+        <Route path="/vendor/form" element={<VendorForm />} />
+        <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </PublicLayout>
   );

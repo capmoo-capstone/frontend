@@ -1,6 +1,5 @@
 import React, { type ReactNode, createContext, useContext, useEffect, useState } from 'react';
 
-import { login as loginUser } from '../api/user.api';
 import { type AuthContextType, type User, UserSchema } from '../types/auth';
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -27,16 +26,19 @@ export const AuthProvider: React.FC<{
     setIsLoading(false);
   }, []);
 
-  const login = async (credentials: { cunet: string; password: string }): Promise<User> => {
-    const userData = await loginUser(credentials.cunet, credentials.password);
+  const setSession = (userData: User) => {
     setUser(userData);
     localStorage.setItem('nexus_user', JSON.stringify(userData));
-    return userData;
   };
 
   const logout = () => {
     setUser(null);
     localStorage.removeItem('nexus_user');
+  };
+
+  const switchUser = (newUser: User) => {
+    setUser(newUser);
+    localStorage.setItem('nexus_user', JSON.stringify(newUser));
   };
 
   return (
@@ -45,8 +47,9 @@ export const AuthProvider: React.FC<{
         user,
         isAuthenticated: !!user,
         isLoading,
-        login,
+        setSession,
         logout,
+        switchUser,
       }}
     >
       {children}

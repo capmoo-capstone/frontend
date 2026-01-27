@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 
-import { type Table as ReactTable, flexRender } from '@tanstack/react-table';
+import { type Cell, type Table as ReactTable, type Row, flexRender } from '@tanstack/react-table';
 
 import {
   Table,
@@ -31,7 +31,7 @@ export function ProjectDataTable<TData>({
     }
   };
 
-  const handleRowDoubleClick = (row: any, event: React.MouseEvent) => {
+  const handleRowDoubleClick = (row: Row<TData>, event: React.MouseEvent) => {
     const target = event.target as HTMLElement;
     const isInteractiveElement = target.closest('button, a, [role="button"]');
 
@@ -42,7 +42,11 @@ export function ProjectDataTable<TData>({
     handleNavigate(row);
   };
 
-  const handleCellClick = (row: any, cell: any, event: React.MouseEvent) => {
+  const handleCellClick = (
+    row: Row<TData>,
+    cell: Cell<TData, unknown>,
+    event: React.MouseEvent
+  ) => {
     if (cell.column.id === 'title') {
       const target = event.target as HTMLElement;
       const isInteractiveElement = target.closest('button, a, [role="button"]');

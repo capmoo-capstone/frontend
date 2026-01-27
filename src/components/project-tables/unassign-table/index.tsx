@@ -17,7 +17,6 @@ import { TitleBar } from '@/components/ui/title-bar';
 import { useAuth } from '@/context/AuthContext';
 import { useAssignProject, useUnassignedProjects } from '@/hooks/useProjects';
 import { ManageUnitRoles, SupervisorRoles } from '@/lib/role-permissions';
-import type { Role } from '@/types/auth';
 import { type UnassignedProjectItem } from '@/types/project';
 
 import { ProjectDataTable } from '../data-table';

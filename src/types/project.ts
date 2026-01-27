@@ -75,16 +75,6 @@ const RequestUnitSchema = z.object({
   }),
 });
 
-const TemplateSchema = z.object({
-  id: z.string(),
-  type: UnitResponsibleTypeEnum,
-});
-
-const AssigneeSchema = z.object({
-  id: z.string(),
-  full_name: z.string(),
-});
-
 export const AssignedProjectItemSchema = z.object({
   id: z.string(),
   receive_no: z.string(),

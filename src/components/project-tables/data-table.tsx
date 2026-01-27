@@ -1,3 +1,5 @@
+import { useNavigate } from 'react-router-dom';
+
 import { type Table as ReactTable, flexRender } from '@tanstack/react-table';
 
 import {
@@ -20,6 +22,37 @@ export function ProjectDataTable<TData>({
   columnsLength,
   toolbar,
 }: ProjectDataTableProps<TData>) {
+  const navigate = useNavigate();
+
+  const handleNavigate = (row: any) => {
+    const projectId = row.original.id;
+    if (projectId) {
+      navigate(`/app/projects/${projectId}`);
+    }
+  };
+
+  const handleRowDoubleClick = (row: any, event: React.MouseEvent) => {
+    const target = event.target as HTMLElement;
+    const isInteractiveElement = target.closest('button, a, [role="button"]');
+
+    if (isInteractiveElement) {
+      return;
+    }
+
+    handleNavigate(row);
+  };
+
+  const handleCellClick = (row: any, cell: any, event: React.MouseEvent) => {
+    if (cell.column.id === 'title') {
+      const target = event.target as HTMLElement;
+      const isInteractiveElement = target.closest('button, a, [role="button"]');
+
+      if (!isInteractiveElement) {
+        handleNavigate(row);
+      }
+    }
+  };
+
   return (
     <div className="w-full">
       <div className="mb-4 w-full">
@@ -44,9 +77,18 @@ export function ProjectDataTable<TData>({
           <TableBody>
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
+                <TableRow
+                  key={row.id}
+                  data-state={row.getIsSelected() && 'selected'}
+                  onDoubleClick={(e) => handleRowDoubleClick(row, e)}
+                  className="hover:bg-muted/50 cursor-pointer transition-colors"
+                >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
+                    <TableCell
+                      key={cell.id}
+                      onClick={(e) => handleCellClick(row, cell, e)}
+                      className={cell.column.id === 'title' ? 'cursor-pointer hover:underline' : ''}
+                    >
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </TableCell>
                   ))}

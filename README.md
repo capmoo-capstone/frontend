@@ -1,73 +1,190 @@
-# React + TypeScript + Vite
+# ระบบจัดการโครงการจัดซื้อจัดจ้าง (Procurement Management System)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+ระบบบริหารจัดการโครงการจัดซื้อจัดจ้างแบบครบวงจร สำหรับติดตามและบริหารจัดการโครงการตั้งแต่ขั้นตอนการรับเรื่อง การมอบหมายงาน ไปจนถึงการปิดโครงการ
 
-Currently, two official plugins are available:
+## 🚀 Tech Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **React 18** - UI Library
+- **TypeScript** - Type Safety
+- **Vite** - Build Tool & Dev Server
+- **TanStack Query (React Query)** - Server State Management
+- **TanStack Table** - Data Table Component
+- **React Router** - Client-side Routing
+- **Recharts** - Data Visualization
+- **shadcn/ui** - UI Component Library
+- **Tailwind CSS** - Styling
+- **Zod** - Schema Validation
+- **Axios** - HTTP Client
+- **Sonner** - Toast Notifications
+- **date-fns** - Date Utilities
 
-## React Compiler
+## 📦 Installation
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+```bash
+# Install dependencies
+npm install
 
-## Expanding the ESLint configuration
+# Start development server
+npm run dev
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+# Build for production
+npm run build
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+# Preview production build
+npm run preview
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+# Run linter
+npm run lint
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+# Format code
+npm run format
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## 🏗️ Project Structure
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
 ```
+src/
+├── api/              # API functions and mock data
+├── assets/           # Static assets
+├── components/       # Reusable UI components
+│   ├── guards/       # Route guards
+│   ├── project-dialog/  # Project-related dialogs
+│   ├── project-tables/  # Project table components
+│   ├── sidebar/      # Sidebar navigation
+│   └── ui/           # Base UI components (shadcn/ui)
+├── context/          # React Context providers
+├── hooks/            # Custom React hooks
+├── layouts/          # Layout components
+├── lib/              # Utility functions
+├── pages/            # Page components
+├── routes/           # Route configuration
+└── types/            # TypeScript type definitions
+```
+
+## 🎯 Key Features
+
+### Project Management
+
+- **งานที่ยังไม่ได้มอบหมาย** - View and assign unassigned projects
+- **งานที่ถูกมอบหมายแล้ว** - Track assigned projects with status filtering
+- **ภาระงานของเจ้าหน้าที่** - Workload visualization with stacked bar charts
+
+### Actions
+
+- ✅ มอบหมายงาน (Assign Projects) - Batch assignment support
+- ✅ รับทราบโครงการ (Accept Projects) - Single and batch acceptance
+- ✅ เลือกงาน (Claim Project) - Self-assignment
+- ✅ ยกเลิก/ขอยกเลิก (Cancel Project) - Role-based cancellation
+- ✅ เปลี่ยนผู้รับผิดชอบ (Change Assignee) - Reassign projects
+
+### Role-Based Access Control
+
+- **ManageUnitRoles** - Full unit management permissions
+- **SupervisorRoles** - Supervisory permissions
+- **ManageSelfRoles** - Self-management permissions
+
+### Data Features
+
+- Real-time filtering and sorting
+- Date range selection
+- Status-based filtering
+- Urgent project highlighting
+- Workload distribution charts
+
+## 🔑 Environment Variables
+
+Create a `.env` file in the root directory:
+
+```env
+VITE_API_BASE_URL=http://localhost:3000/api
+```
+
+## 📊 API Integration
+
+The application uses a mock data layer (`src/api/mock-data.ts`) for development. To connect to a real backend:
+
+1. Update API functions in `src/api/` files
+2. Uncomment axios calls and remove mock returns
+3. Configure `VITE_API_BASE_URL` in `.env`
+
+## 🎨 Styling
+
+This project uses **Tailwind CSS v4** with custom design tokens:
+
+- Custom color palette (brand colors, semantic colors)
+- Thai font support (Noto Sans Thai)
+- Dark mode ready (commented out)
+- Custom radius utilities
+- Typography utilities (h1-h4 variants)
+
+## 🧪 Development Guidelines
+
+### Adding New Components
+
+```bash
+# Add shadcn/ui components
+npx shadcn@latest add [component-name]
+```
+
+### Date Handling
+
+Use `formatDateThai()` from `src/lib/date-utils.ts` for consistent Thai Buddhist Era date formatting.
+
+### State Management
+
+- Use **TanStack Query** for server state
+- Use **React Context** for global UI state
+- Use **useState/useReducer** for local component state
+
+### Type Safety
+
+- All API responses validated with Zod schemas
+- Strict TypeScript configuration
+- No `any` types in production code
+
+## 📝 Available Scripts
+
+| Script            | Description                                               |
+| ----------------- | --------------------------------------------------------- |
+| `npm run dev`     | Start development server (default: http://localhost:5173) |
+| `npm run build`   | Build for production                                      |
+| `npm run preview` | Preview production build locally                          |
+| `npm run lint`    | Run ESLint                                                |
+| `npm run format`  | Format code with Prettier                                 |
+
+## 🔐 Authentication
+
+Authentication context available via `useAuth()` hook:
+
+```tsx
+const { user, login, logout } = useAuth();
+
+// Access user role
+if (ManageUnitRoles.includes(user.role)) {
+  // Show admin actions
+}
+```
+
+## 📈 Charts
+
+Workload charts use Recharts with custom theming:
+
+- Stacked bar charts for workload visualization
+- Responsive design with proper margins
+- Brand color integration
+- Interactive tooltips and legends
+
+## 🌐 Browser Support
+
+- Chrome (latest)
+- Firefox (latest)
+- Safari (latest)
+- Edge (latest)
+
+## 📄 License
+
+[Add your license here]
+
+## 👥 Team
+
+[Add your team information here]

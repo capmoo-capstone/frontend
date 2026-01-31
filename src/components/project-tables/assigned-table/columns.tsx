@@ -145,7 +145,7 @@ export const getColumns = ({
       if (status === 'UNASSIGNED') {
         variant = 'secondary';
         label = 'ยังไม่ได้มอบหมาย';
-      } else if (status === 'WAITING_ACCEPTANCE') {
+      } else if (status === 'WAITING_ACCEPT') {
         variant = 'warning';
         label = 'รอการตอบรับ';
       } else if (status === 'IN_PROGRESS') {

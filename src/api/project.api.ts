@@ -67,21 +67,15 @@ export const getUnassignedProjects = async (unitId: string): Promise<UnassignedP
     .parse(data).data;
 };
 
-export const assignProject = async (
-  projectId: string,
-  userId: string,
-  projectType: 'procurement' | 'contract'
-) => {
+export const assignProject = async (assignments: Array<{ projectId: string; userId: string }>) => {
   // Mock response
   return {
     success: true,
-    projectId,
-    userId,
-    projectType,
+    data: assignments,
   };
 
-  const { data } = await api.patch(`/projects/${projectId}/assign/${userId}`, {
-    project_type: projectType,
+  const { data } = await api.patch(`/projects/assign`, {
+    data: assignments,
   });
 
   return data;
@@ -97,5 +91,88 @@ export const changeProjectAssignee = async (projectId: string, newUserId: string
 
   const { data } = await api.patch(`/project/${projectId}/change-assignee/${newUserId}`);
 
-  return data;
+  return z
+    .object({
+      success: z.boolean(),
+      projectId: z.string(),
+      newUserId: z.string(),
+    })
+    .parse(data);
+};
+
+export const cancelProject = async (projectId: string, reason: string) => {
+  // Mock response
+  return {
+    data: {
+      id: projectId,
+      status: 'WAITING_CANCEL' as const,
+      reason,
+    },
+  };
+
+  const { data } = await api.patch(`/project/${projectId}/cancel`, {
+    reason,
+  });
+
+  return z
+    .object({
+      data: z.object({
+        id: z.string(),
+        status: z.literal('WAITING_CANCEL'),
+        reason: z.string(),
+      }),
+    })
+    .parse(data);
+};
+
+export const acceptProjects = async (projectIds: string[]) => {
+  // Mock response
+  return {
+    total: projectIds.length,
+    data: projectIds.map((projectId) => ({
+      projectId,
+      status: 'IN_PROGRESS' as const,
+      userId: 'current-user-id',
+    })),
+  };
+
+  const { data } = await api.patch(`/project/accept`, {
+    data: projectIds,
+  });
+
+  return z
+    .object({
+      total: z.number(),
+      data: z.array(
+        z.object({
+          projectId: z.string(),
+          status: z.literal('IN_PROGRESS'),
+          userId: z.string(),
+        })
+      ),
+    })
+    .parse(data);
+};
+
+export const claimProject = async (projectId: string) => {
+  // Mock response
+  return {
+    data: {
+      projectId,
+      status: 'IN_PROGRESS' as const,
+      assignee_procurement_id: 'current-user-id',
+    },
+  };
+
+  const { data } = await api.patch(`/project/${projectId}/claim`);
+
+  return z
+    .object({
+      data: z.object({
+        projectId: z.string(),
+        status: z.literal('IN_PROGRESS'),
+        assignee_procurement_id: z.string(),
+      }),
+    })
+    .parse(data);
 };

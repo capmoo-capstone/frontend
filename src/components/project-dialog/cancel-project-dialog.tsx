@@ -60,15 +60,14 @@ export function CancelProjectDialog({
           <DialogDescription>
             {isAuthorized ? (
               <>
-                คุณแน่ใจหรือไม่ที่จะยกเลิกโครงการ{' '}
-                <span className="text-foreground font-medium">"{projectTitle}"</span>?
-                การกระทำนี้ไม่สามารถย้อนกลับได้
+                คุณกำลังจะยกเลิกโครงการ <span className="font-medium">"{projectTitle}"</span>?
+                โปรดระบุเหตุผล ในการยกเลิกโครงการนี้
               </>
             ) : (
               <>
-                คุณกำลังจะส่งคำขอยกเลิกโครงการ{' '}
-                <span className="text-foreground font-medium">"{projectTitle}"</span> โปรดระบุเหตุผล
-                ในการยกเลิกโครงการนี้ เจ้าหน้าที่จะทำการพิจารณาคำขอยกเลิกของคุณ
+                คุณกำลังจะส่งคำขอเพื่อยกเลิกโครงการ{' '}
+                <span className="font-medium">"{projectTitle}"</span> โปรดระบุเหตุผล
+                ในการยกเลิกโครงการนี้ หัวหน้ากลุ่มงานจะทำการพิจารณาคำขอยกเลิกของคุณ
               </>
             )}
           </DialogDescription>
@@ -97,7 +96,7 @@ export function CancelProjectDialog({
             disabled={!reason.trim() || isLoading}
           >
             {isLoading && <Loader2 className="h-4 w-4 animate-spin" />}
-            {isAuthorized ? 'ยืนยันการยกเลิกโครงการ' : 'ส่งคำขอยกเลิกโครงการ'}
+            {isAuthorized ? 'ยกเลิกโครงการ' : 'ส่งคำขอยกเลิกโครงการ'}
           </Button>
         </DialogFooter>
       </DialogContent>

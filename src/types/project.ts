@@ -68,6 +68,8 @@ export const UnitResponsibleTypeEnum = z.enum([
   'CONTRACT',
 ]);
 
+export type UnitResponsibleType = z.infer<typeof UnitResponsibleTypeEnum>;
+
 export const AssignedProjectStatusEnum = z.enum(['WAITING_ACCEPT', 'IN_PROGRESS', 'CANCELLED']);
 
 const RequestUnitSchema = z.object({

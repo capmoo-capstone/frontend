@@ -21,7 +21,6 @@ const DevLogin = () => {
   const navigate = useNavigate();
   const { user, isAuthenticated } = useAuth();
   const { mutate: devLogin, isPending } = useDevLogin();
-  const { mutate: logout } = useLogout();
 
   // Redirect to login if not in development mode
   useEffect(() => {

@@ -60,8 +60,7 @@ export function CancelProjectDialog({
           <DialogDescription>
             {isAuthorized ? (
               <>
-                คุณกำลังจะยกเลิกโครงการ{' '}
-                <span className="font-medium">"{projectTitle}"</span>?
+                คุณกำลังจะยกเลิกโครงการ <span className="font-medium">"{projectTitle}"</span>?
                 โปรดระบุเหตุผล ในการยกเลิกโครงการนี้
               </>
             ) : (

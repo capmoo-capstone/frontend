@@ -5,7 +5,6 @@ import {
   type UnassignedProjectItem,
 } from '@/types/project';
 import { type UserSelectionResponse } from '@/types/user';
-import { id } from 'date-fns/locale';
 
 export const MOCK_PROJECTS: Project[] = [
   {

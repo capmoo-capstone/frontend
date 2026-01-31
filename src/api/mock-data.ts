@@ -5,6 +5,7 @@ import {
   type UnassignedProjectItem,
 } from '@/types/project';
 import { type UserSelectionResponse } from '@/types/user';
+import { id } from 'date-fns/locale';
 
 export const MOCK_PROJECTS: Project[] = [
   {
@@ -1069,4 +1070,84 @@ export const MOCK_USERS_BY_ROLE: Record<string, User> = {
     isStaff: false,
     token: 'mock-token-guest',
   },
+};
+
+export const MOCK_USER_PROJECT_STATS = {
+  data: [
+    {
+      id: 'u-101',
+      full_name: 'นายสมชาย ใจดี',
+      project_count: 12,
+    },
+    {
+      id: 'u-102',
+      full_name: 'นางสาวสมหญิง รักงาน',
+      project_count: 8,
+    },
+    {
+      id: 'u-103',
+      full_name: 'นายวิชัย เก่งวิทย์',
+      project_count: 15,
+    },
+    {
+      id: 'u-104',
+      full_name: 'นางมาลี สีสวย',
+      project_count: 6,
+    },
+    {
+      id: 'u-105',
+      full_name: 'นายกล้าหาญ ชาญชัย',
+      project_count: 10,
+    },
+    {
+      id: 'u-106',
+      full_name: 'นางสาวปิติ ยินดี',
+      project_count: 4,
+    },
+    {
+      id: 'u-107',
+      full_name: 'นายมานะ อดทน',
+      project_count: 9,
+    },
+    {
+      id: 'u-108',
+      full_name: 'นางสาวชูใจ ใฝ่เรียน',
+      project_count: 7,
+    },
+    {
+      id: 'u-109',
+      full_name: 'นายปัญญา รอบรู้',
+      project_count: 11,
+    },
+    {
+      id: 'u-110',
+      full_name: 'นางแก้วตา ดวงใจ',
+      project_count: 5,
+    },
+    {
+      id: 'u-111',
+      full_name: 'นายธนา มั่นคง',
+      project_count: 13,
+    },
+    {
+      id: 'u-112',
+      full_name: 'นางสาวสุดา เพียร',
+      project_count: 8,
+    },
+    {
+      id: 'u-113',
+      full_name: 'นายประสิทธิ์ ขยัน',
+      project_count: 14,
+    },
+    {
+      id: 'u-114',
+      full_name: 'นางจิตรา สุขใจ',
+      project_count: 6,
+    },
+    {
+      id: 'u-115',
+      full_name: 'นายอนุชา รุ่งเรือง',
+      project_count: 10,
+    },
+  ],
 };

@@ -26,8 +26,9 @@ import { type UnassignedProjectItem } from '@/types/project';
 
 import { ProjectDataTable } from '../data-table';
 import { getColumns } from './columns';
+import { WorkloadChart } from './workload-chart';
 
-export function AssignTable({ unitId }: { unitId?: string }) {
+export function UnassignTable({ unitId }: { unitId?: string }) {
   const { user } = useAuth();
   if (!user) return null;
 
@@ -134,6 +135,7 @@ export function AssignTable({ unitId }: { unitId?: string }) {
 
   return (
     <>
+      {ManageUnitRoles.includes(user.role) && <WorkloadChart pendingChanges={pendingChanges} />}
       <ProjectDataTable
         table={table}
         columnsLength={columns.length}

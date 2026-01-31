@@ -33,12 +33,18 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
-  --color-chart-1: var(--chart-1);
-  --color-chart-2: var(--chart-2);
-  --color-chart-3: var(--chart-3);
-  --color-chart-4: var(--chart-4);
-  --color-chart-5: var(--chart-5);
-  --color-chart-6: var(--chart-6);
+  --color-chart-1-dark: var(--chart-1-dark);
+  --color-chart-1-light: var(--chart-1-light);
+  --color-chart-2-dark: var(--chart-2-dark);
+  --color-chart-2-light: var(--chart-2-light);
+  --color-chart-3-dark: var(--chart-3-dark);
+  --color-chart-3-light: var(--chart-3-light);
+  --color-chart-4-dark: var(--chart-4-dark);
+  --color-chart-4-light: var(--chart-4-light);
+  --color-chart-5-dark: var(--chart-5-dark);
+  --color-chart-5-light: var(--chart-5-light);
+  --color-chart-6-dark: var(--chart-6-dark);
+  --color-chart-6-light: var(--chart-6-light);
   --color-sidebar: var(--sidebar);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar-primary: var(--sidebar-primary);
@@ -56,12 +62,16 @@
 
   --color-error: var(--error);
   --color-error-light: var(--error-light);
+  --color-error-dark: var(--error-dark);
   --color-warning: var(--warning);
   --color-warning-light: var(--warning-light);
+  --color-warning-dark: var(--warning-dark);
   --color-success: var(--success);
   --color-success-light: var(--success-light);
+  --color-success-dark: var(--success-dark);
   --color-info: var(--info);
   --color-info-light: var(--info-light);
+  --color-info-dark: var(--info-dark);
 }
 
 :root {
@@ -84,12 +94,18 @@
   --border: oklch(0.923 0.003 48.717);
   --input: oklch(0.923 0.003 48.717);
   --ring: oklch(0.709 0.01 56.259);
-  --chart-1: #fbbf24;
-  --chart-2: #84cc16;
-  --chart-3: #10b981;
-  --chart-4: #38bdf8;
-  --chart-5: #4f46e5;
-  --chart-6: #a855f7;
+  --chart-1-light: #fefbee;
+  --chart-1-dark: #ecd24f;
+  --chart-2-light: #fdf4ec;
+  --chart-2-dark: #e68d3f;
+  --chart-3-light: #effafd;
+  --chart-3-dark: #5cc4e5;
+  --chart-4-light: #ebf3fd;
+  --chart-4-dark: #2e81e5;
+  --chart-5-light: #e7ebf1;
+  --chart-5-dark: #063773;
+  --chart-6-light: #f9f3fc;
+  --chart-6-dark: #be83dd;
   --sidebar: oklch(0.985 0.001 106.423);
   --sidebar-foreground: oklch(0.147 0.004 49.25);
   --sidebar-primary: oklch(0.216 0.006 56.043);
@@ -107,12 +123,16 @@
 
   --error: #dc2626;
   --error-light: #ffe2e2;
-  --warning: #fbbf24;
-  --warning-light: #fef3c7;
-  --success: #14b8a6;
-  --success-light: #ccfbf1;
-  --info: #1d4ed8;
-  --info-light: #eff6ff;
+  --error-dark: #991b1b;
+  --warning: #FBBF24;
+  --warning-light: #FEF3C7;
+  --warning-dark: #D97706;
+  --success: #14B8A6;
+  --success-light: #CCFBF1;
+  --success-dark: #115E59;
+  --info: #3B82F6;
+  --info-light: #EFF6FF;
+  --info-dark: #1E3A8A;
 
   /* Text Styles */
   --font-family-h1-topic: 'Noto Sans Thai';

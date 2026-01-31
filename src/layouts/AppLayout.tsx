@@ -1,4 +1,3 @@
-// ai generated code file
 import React from 'react';
 
 import { Toaster } from 'sonner';
@@ -29,8 +28,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     <SidebarProvider>
       <AppSidebar />
-      <SidebarInset>
-        <header className="flex h-16 shrink-0 items-center gap-2 border-b transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
+      <SidebarInset className="relative overflow-hidden">
+        <header className="relative z-10 bg-background flex h-16 shrink-0 items-center gap-2 border-b transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
           <div className="flex items-center gap-2 px-4">
             <SidebarTrigger className="-ml-1" />
             <Separator orientation="vertical" className="mr-2 h-4" />
@@ -62,11 +61,13 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           </div>
         </header>
 
-        <main className="flex flex-1 flex-col gap-4 p-4">{children}</main>
+        <main className="relative z-10 flex flex-1 flex-col gap-4 bg-transparent p-4">
+          {children}
+        </main>
+
         <Toaster position="bottom-right" />
 
-        {/* Background Decorative Element */}
-        <div className="pointer-events-none absolute top-0 right-0 z-0 h-96 w-96 bg-linear-to-bl from-[#DE5C8E]/10 to-transparent blur-3xl" />
+        <div className="pointer-events-none absolute top-0 right-0 h-128 w-xl bg-linear-to-bl from-[#DE5C8E]/10 to-transparent blur-3xl" />
       </SidebarInset>
     </SidebarProvider>
   );

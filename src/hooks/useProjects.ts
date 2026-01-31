@@ -1,8 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import {
+  acceptProjects,
   assignProject,
+  cancelProject,
   changeProjectAssignee,
+  claimProject,
   getAssignedProjects,
   getProjects,
   getUnassignedProjects,
@@ -31,26 +34,16 @@ export const useUnassignedProjects = (unitId: string | undefined) => {
   });
 };
 
-export const useAssignProject = () => {
+export const useAssignProjects = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({
-      projectId,
-      userId,
-      projectType,
-    }: {
-      projectId: string;
-      userId: string;
-      projectType: 'procurement' | 'contract';
-    }) => assignProject(projectId, userId, projectType),
+    mutationFn: (assignments: Array<{ projectId: string; userId: string }>) =>
+      assignProject(assignments),
 
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ['projects'],
-      });
-      queryClient.invalidateQueries({
-        queryKey: ['projects', 'unassigned'],
       });
     },
   });
@@ -69,6 +62,55 @@ export const useChangeProjectAssignee = () => {
       });
       queryClient.invalidateQueries({
         queryKey: ['projects', 'assigned'],
+      });
+    },
+  });
+};
+
+export const useCancelProject = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ projectId, reason }: { projectId: string; reason: string }) =>
+      cancelProject(projectId, reason),
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['projects'],
+      });
+    },
+  });
+};
+
+export const useAcceptProjects = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (projectIds: string[]) => acceptProjects(projectIds),
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['projects'],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ['projects', 'assigned'],
+      });
+    },
+  });
+};
+
+export const useClaimProject = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (projectId: string) => claimProject(projectId),
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['projects'],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ['projects', 'unassigned'],
       });
     },
   });

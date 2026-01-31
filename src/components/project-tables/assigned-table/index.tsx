@@ -17,7 +17,7 @@ import { Button } from '@/components/ui/button';
 import { DatePicker } from '@/components/ui/date-picker';
 import { TitleBar } from '@/components/ui/title-bar';
 import { useAuth } from '@/context/AuthContext';
-import { useAssignedProjects } from '@/hooks/useProjects';
+import { useAcceptProjects, useAssignedProjects, useCancelProject } from '@/hooks/useProjects';
 import { ManageSelfRoles, ManageUnitRoles, SupervisorRoles } from '@/lib/role-permissions';
 import type { AssignedProjectItem } from '@/types/project';
 
@@ -29,9 +29,12 @@ export function AssignedTable({ unitId }: { unitId?: string }) {
   if (!user) return null;
 
   const [date, setDate] = useState<Date | undefined>(new Date());
-  const { data: projects, isLoading, isError } = useAssignedProjects(unitId, date);
-  const [sorting, setSorting] = useState<SortingState>([{ id: 'status', desc: true }]);
 
+  const { data: projects, isLoading, isError } = useAssignedProjects(unitId, date);
+  const { mutateAsync: cancelProjectMutation } = useCancelProject();
+  const { mutateAsync: acceptProjectsMutation } = useAcceptProjects();
+
+  const [sorting, setSorting] = useState<SortingState>([{ id: 'status', desc: true }]);
   const [projectToCancel, setProjectToCancel] = useState<AssignedProjectItem | null>(null);
   const [projectToChangeAssignee, setProjectToChangeAssignee] =
     useState<AssignedProjectItem | null>(null);
@@ -41,10 +44,10 @@ export function AssignedTable({ unitId }: { unitId?: string }) {
       getColumns({
         onCancelProject: (project) => setProjectToCancel(project),
         onChangeAssignee: (project) => setProjectToChangeAssignee(project),
-        onAcceptProject: (project) => console.log('Accept Project', project), // todo: implement
+        onAcceptProject: (project) => handleAcceptProject(project),
         viewAsRole: user.role,
       }),
-    [unitId, user.role]
+    [unitId, user.role, date]
   );
 
   const table = useReactTable({
@@ -58,9 +61,25 @@ export function AssignedTable({ unitId }: { unitId?: string }) {
 
   const handleConfirmCancel = async (reason: string) => {
     if (!projectToCancel) return;
-    // Simulate API Call (Replace with mutateAsync from your hook)
-    console.log(`Cancelling Project ${projectToCancel.id} because: ${reason}`);
-    toast.success('ยกเลิกโครงการเรียบร้อยแล้ว');
+
+    const cancelPromise = cancelProjectMutation({
+      projectId: projectToCancel.id,
+      reason,
+    });
+
+    const actionLabel =
+      ManageUnitRoles.includes(user.role) || SupervisorRoles.includes(user.role)
+        ? 'ยกเลิก'
+        : 'ขอยกเลิก';
+
+    toast.promise(cancelPromise, {
+      loading: `กำลัง${actionLabel}โครงการ...`,
+      success: () => {
+        setProjectToCancel(null);
+        return `${actionLabel}โครงการเรียบร้อยแล้ว`;
+      },
+      error: 'ไม่สามารถยกเลิกโครงการได้',
+    });
   };
 
   const handlePrint = async () => {
@@ -68,7 +87,32 @@ export function AssignedTable({ unitId }: { unitId?: string }) {
   };
 
   const handleAcceptAll = async () => {
-    toast.info('สมมติกำลังรับทราบโครงการทั้งหมด...');
+    if (!projects || projects.length === 0) return;
+
+    const waitingProjects = projects.filter((p) => p.status === 'WAITING_ACCEPT').map((p) => p.id);
+
+    if (waitingProjects.length === 0) {
+      toast.info('ไม่มีโครงการที่รอรับทราบ');
+      return;
+    }
+
+    const acceptPromise = acceptProjectsMutation(waitingProjects);
+
+    toast.promise(acceptPromise, {
+      loading: `กำลังรับทราบ ${waitingProjects.length} โครงการ...`,
+      success: 'รับทราบทั้งหมดสำเร็จ',
+      error: 'ไม่สามารถรับทราบโครงการได้',
+    });
+  };
+
+  const handleAcceptProject = async (project: AssignedProjectItem) => {
+    const acceptPromise = acceptProjectsMutation([project.id]);
+
+    toast.promise(acceptPromise, {
+      loading: `กำลังรับทราบโครงการ: ${project.title}...`,
+      success: 'รับทราบโครงการสำเร็จ',
+      error: 'ไม่สามารถรับทราบโครงการได้',
+    });
   };
 
   if (isLoading) {

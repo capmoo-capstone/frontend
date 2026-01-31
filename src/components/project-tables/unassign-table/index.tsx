@@ -15,7 +15,12 @@ import { CancelProjectDialog } from '@/components/project-dialog/cancel-project-
 import { Button } from '@/components/ui/button';
 import { TitleBar } from '@/components/ui/title-bar';
 import { useAuth } from '@/context/AuthContext';
-import { useAssignProject, useUnassignedProjects } from '@/hooks/useProjects';
+import {
+  useAssignProjects,
+  useCancelProject,
+  useClaimProject,
+  useUnassignedProjects,
+} from '@/hooks/useProjects';
 import { ManageUnitRoles, SupervisorRoles } from '@/lib/role-permissions';
 import { type UnassignedProjectItem } from '@/types/project';
 
@@ -27,7 +32,9 @@ export function AssignTable({ unitId }: { unitId?: string }) {
   if (!user) return null;
 
   const { data: projects, isLoading, isError } = useUnassignedProjects(unitId);
-  const { mutateAsync } = useAssignProject();
+  const { mutateAsync: assignProjectsMutation } = useAssignProjects();
+  const { mutateAsync: cancelProjectMutation } = useCancelProject();
+  const { mutateAsync: claimProjectMutation } = useClaimProject();
 
   const [projectToCancel, setProjectToCancel] = useState<UnassignedProjectItem | null>(null);
 
@@ -41,7 +48,7 @@ export function AssignTable({ unitId }: { unitId?: string }) {
         setPendingChanges,
         unitId,
         onOpenCancelDialog: (project) => setProjectToCancel(project),
-        onClaimProject: (project) => console.log('Claim Project', project), // todo: implement
+        onClaimProject: (project) => handleClaimProject(project),
         viewAsRole: user.role,
       }),
     [pendingChanges, unitId, user.role]
@@ -59,26 +66,35 @@ export function AssignTable({ unitId }: { unitId?: string }) {
   const handleConfirmCancel = async (reason: string) => {
     if (!projectToCancel) return;
 
-    // Simulate API Call (Replace with mutateAsync)
-    console.log(`Cancelling Project ${projectToCancel.id} because: ${reason}`);
+    const cancelPromise = cancelProjectMutation({
+      projectId: projectToCancel.id,
+      reason,
+    });
 
-    // await cancelMutation.mutateAsync({ id: projectToCancel.id, reason });
+    const actionLabel =
+      ManageUnitRoles.includes(user.role) || SupervisorRoles.includes(user.role)
+        ? 'ยกเลิก'
+        : 'ขอยกเลิก';
 
-    toast.success('ยกเลิกโครงการเรียบร้อยแล้ว');
+    toast.promise(cancelPromise, {
+      loading: `กำลัง${actionLabel}โครงการ...`,
+      success: () => {
+        setProjectToCancel(null);
+        return `${actionLabel}โครงการเรียบร้อยแล้ว`;
+      },
+      error: 'ไม่สามารถยกเลิกโครงการได้',
+    });
   };
 
   const handleSave = async () => {
     if (Object.keys(pendingChanges).length === 0) return;
 
-    const savePromise = Promise.all(
-      Object.entries(pendingChanges).map(([projectId, userId]) =>
-        mutateAsync({
-          projectId,
-          userId,
-          projectType: 'procurement',
-        })
-      )
-    );
+    const assignments = Object.entries(pendingChanges).map(([projectId, userId]) => ({
+      projectId,
+      userId,
+    }));
+
+    const savePromise = assignProjectsMutation(assignments);
 
     toast.promise(savePromise, {
       loading: 'กำลังมอบหมายโครงการ...',
@@ -87,6 +103,16 @@ export function AssignTable({ unitId }: { unitId?: string }) {
         return 'มอบหมายโครงการสำเร็จ';
       },
       error: 'ไม่สามารถมอบหมายโครงการได้',
+    });
+  };
+
+  const handleClaimProject = async (project: UnassignedProjectItem) => {
+    const claimPromise = claimProjectMutation(project.id);
+
+    toast.promise(claimPromise, {
+      loading: `กำลังเลือกงาน: ${project.title}...`,
+      success: 'เลือกงานสำเร็จ',
+      error: 'ไม่สามารถเลือกงานได้',
     });
   };
 

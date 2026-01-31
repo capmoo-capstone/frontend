@@ -61,7 +61,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           </div>
         </header>
 
-        <main className="relative z-10 flex flex-1 flex-col gap-4 bg-transparent p-4">
+        <main className="relative z-10 flex flex-1 flex-col gap-4 bg-transparent p-9">
           {children}
         </main>
 

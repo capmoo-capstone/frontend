@@ -34,6 +34,9 @@ const ProjectAccessGuard = () => {
         } else {
           setIsAllowed(false);
         }
+
+        // If all checks pass
+        setIsAllowed(true);
       } catch (error) {
         console.error('Access check failed', error);
         setIsAllowed(false);

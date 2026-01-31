@@ -1,5 +1,5 @@
-import { AssignTable } from '@/components/project-tables/unassign-table';
 import { AssignedTable } from '@/components/project-tables/assigned-table';
+import { AssignTable } from '@/components/project-tables/unassign-table';
 
 export default function ProcumentJobs() {
   return (

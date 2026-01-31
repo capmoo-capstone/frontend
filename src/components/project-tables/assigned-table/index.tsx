@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 import {
   type SortingState,
@@ -39,15 +39,28 @@ export function AssignedTable({ unitId }: { unitId?: string }) {
   const [projectToChangeAssignee, setProjectToChangeAssignee] =
     useState<AssignedProjectItem | null>(null);
 
+  const handleAcceptProject = useCallback(
+    async (project: AssignedProjectItem) => {
+      const acceptPromise = acceptProjectsMutation([project.id]);
+
+      toast.promise(acceptPromise, {
+        loading: `กำลังรับทราบโครงการ: ${project.title}...`,
+        success: 'รับทราบโครงการสำเร็จ',
+        error: 'ไม่สามารถรับทราบโครงการได้',
+      });
+    },
+    [acceptProjectsMutation]
+  );
+
   const columns = useMemo(
     () =>
       getColumns({
         onCancelProject: (project) => setProjectToCancel(project),
         onChangeAssignee: (project) => setProjectToChangeAssignee(project),
-        onAcceptProject: (project) => handleAcceptProject(project),
+        onAcceptProject: handleAcceptProject,
         viewAsRole: user.role,
       }),
-    [unitId, user.role, date]
+    [unitId, user.role, date, handleAcceptProject]
   );
 
   const table = useReactTable({
@@ -92,27 +105,9 @@ export function AssignedTable({ unitId }: { unitId?: string }) {
     const waitingProjects = projects.filter((p) => p.status === 'WAITING_ACCEPT').map((p) => p.id);
 
     if (waitingProjects.length === 0) {
-      toast.info('ไม่มีโครงการที่รอรับทราบ');
+      toast.info('ไม่มีโครงการที่ต้องรับทราบ');
       return;
     }
-
-    const acceptPromise = acceptProjectsMutation(waitingProjects);
-
-    toast.promise(acceptPromise, {
-      loading: `กำลังรับทราบ ${waitingProjects.length} โครงการ...`,
-      success: 'รับทราบทั้งหมดสำเร็จ',
-      error: 'ไม่สามารถรับทราบโครงการได้',
-    });
-  };
-
-  const handleAcceptProject = async (project: AssignedProjectItem) => {
-    const acceptPromise = acceptProjectsMutation([project.id]);
-
-    toast.promise(acceptPromise, {
-      loading: `กำลังรับทราบโครงการ: ${project.title}...`,
-      success: 'รับทราบโครงการสำเร็จ',
-      error: 'ไม่สามารถรับทราบโครงการได้',
-    });
   };
 
   if (isLoading) {

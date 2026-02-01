@@ -13,6 +13,7 @@ export interface DatePickerProps {
   setDate: (date: Date | undefined) => void;
   className?: string;
   placeholder?: string;
+  disabled?: boolean;
 }
 
 export function DatePicker({
@@ -20,12 +21,14 @@ export function DatePicker({
   setDate,
   className,
   placeholder = 'กรุณาเลือกวันที่',
+  disabled = false,
 }: DatePickerProps) {
   return (
     <Popover>
       <PopoverTrigger asChild>
         <Button
           variant="outline"
+          disabled={disabled}
           className={cn(
             'w-[240px] justify-start text-left font-normal',
             !date && 'text-muted-foreground',
@@ -36,9 +39,11 @@ export function DatePicker({
           {date ? formatDateThaiShort(date) : <span>{placeholder}</span>}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-auto p-0" align="start">
-        <Calendar mode="single" selected={date} onSelect={setDate} initialFocus />
-      </PopoverContent>
+      {!disabled && (
+        <PopoverContent className="w-auto p-0" align="start">
+          <Calendar mode="single" selected={date} onSelect={setDate} initialFocus />
+        </PopoverContent>
+      )}
     </Popover>
   );
 }

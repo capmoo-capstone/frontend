@@ -157,7 +157,7 @@ export function StepActionForm({
             </Button>
             <Button className="w-full" variant="brand" onClick={onSupApprove}>
               <CircleCheckBig className="mr-2 h-4 w-4" />
-              เสนอผู้อำนวยเรียบร้อยแล้ว
+              เสนอผู้อำนวยการเรียบร้อยแล้ว
             </Button>
           </>
         )}

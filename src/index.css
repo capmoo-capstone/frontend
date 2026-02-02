@@ -214,67 +214,67 @@
 }
 
 @layer utilities {
-  .text-h1-topic {
+  .h1-topic {
     font-family: var(--font-family-heading1-topic);
     font-size: var(--font-size-heading1-topic);
     font-weight: var(--font-weight-heading1-topic);
   }
 
-  .text-h2-topic {
+  .h2-topic {
     font-family: var(--font-family-heading2-topic);
     font-size: var(--font-size-heading2-topic);
     font-weight: var(--font-weight-heading2-topic);
   }
 
-  .text-h2-sub {
+  .h2-sub {
     font-family: var(--font-family-heading2-sub);
     font-size: var(--font-size-heading2-sub);
     font-weight: var(--font-weight-heading2-sub);
   }
 
-  .text-h3-topic {
+  .h3-topic {
     font-family: var(--font-family-heading3-topic);
     font-size: var(--font-size-heading3-topic);
     font-weight: var(--font-weight-heading3-topic);
   }
 
-  .text-h3-sub {
+  .h3-sub {
     font-family: var(--font-family-heading3-sub);
     font-size: var(--font-size-heading3-sub);
     font-weight: var(--font-weight-heading3-sub);
   }
 
-  .text-h4-topic {
+  .h4-topic {
     font-family: var(--font-family-heading4-topic);
     font-size: var(--font-size-heading4-topic);
     font-weight: var(--font-weight-heading4-topic);
   }
 
-  .text-h4-sub {
+  .h4-sub {
     font-family: var(--font-family-heading4-sub);
     font-size: var(--font-size-heading4-sub);
     font-weight: var(--font-weight-heading4-sub);
   }
 
-  .text-normal-normal {
+  .normal {
     font-family: var(--font-family-normal-normal);
     font-size: var(--font-size-normal-normal);
     font-weight: var(--font-weight-normal-normal);
   }
 
-  .text-normal-bold {
+  .normal-b {
     font-family: var(--font-family-normal-bold);
     font-size: var(--font-size-normal-bold);
     font-weight: var(--font-weight-normal-bold);
   }
 
-  .text-normal-light {
+  .normal-l {
     font-family: var(--font-family-normal-light);
     font-size: var(--font-size-normal-light);
     font-weight: var(--font-weight-normal-light);
   }
 
-  .text-caption {
+  .caption {
     font-family: var(--font-family-caption);
     font-size: var(--font-size-caption);
     font-weight: var(--font-weight-caption);

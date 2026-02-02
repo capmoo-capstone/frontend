@@ -166,7 +166,7 @@ export const getColumns = ({
       return SupervisorRoles.includes(viewAsRole) ||
         ManageUnitRoles.includes(viewAsRole) ||
         ViewUnitRoles.includes(viewAsRole) ? (
-        <div className="text-sm font-medium">{row.original.assignee_full_name ?? '-'}</div>
+        <div>{row.original.assignee_full_name ?? '-'}</div>
       ) : ManageSelfRoles.includes(viewAsRole) && row.original.status === 'WAITING_ACCEPT' ? (
         <Button variant="outline" size="sm" onClick={() => onAcceptProject(row.original)}>
           รับทราบ

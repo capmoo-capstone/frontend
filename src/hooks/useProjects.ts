@@ -7,14 +7,27 @@ import {
   changeProjectAssignee,
   claimProject,
   getAssignedProjects,
+  getProjectDetail,
   getProjects,
   getUnassignedProjects,
 } from '@/api/project.api';
+import type { ProjectDetail } from '@/types/project-detail';
 
 export const useProjects = () => {
   return useQuery({
     queryKey: ['projects'],
     queryFn: getProjects,
+  });
+};
+
+export const useProjectDetail = (id: string | undefined) => {
+  return useQuery<ProjectDetail, Error>({
+    queryKey: ['project', id],
+    queryFn: () => {
+      if (!id) throw new Error('Project ID is required');
+      return getProjectDetail(id);
+    },
+    enabled: !!id,
   });
 };
 

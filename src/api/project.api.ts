@@ -7,9 +7,16 @@ import {
   type UnassignedProjectItem,
   UnassignedProjectItemSchema,
 } from '@/types/project';
-import { type Project, ProjectListSchema, ProjectSchema } from '@/types/project';
+import { type Project, ProjectListSchema } from '@/types/project';
+import type { ProjectDetail } from '@/types/project-detail';
 
-import { MOCK_ASSIGNED_PROJECTS, MOCK_PROJECTS, MOCK_UNASSIGNED_PROJECTS } from './mock-data';
+import {
+  MOCK_ASSIGNED_PROJECTS,
+  MOCK_PROJECTS,
+  MOCK_PROJECT_DETAIL,
+  MOCK_UNASSIGNED_PROJECTS,
+} from './mock-data';
+import { mockProjects } from './mock-project';
 
 export const getProjects = async (): Promise<Project[]> => {
   // return mock data;
@@ -20,13 +27,13 @@ export const getProjects = async (): Promise<Project[]> => {
   return ProjectListSchema.parse(data);
 };
 
-export const getProjectById = async (id: string) => {
-  // return mock data;
-  return MOCK_PROJECTS[0];
+export const getProjectDetail = async (id: string): Promise<ProjectDetail> => {
+  // return mock data
+  return mockProjects.find((project) => project.id === id)!;
+  return MOCK_PROJECT_DETAIL;
 
   const { data } = await api.get(`/projects/${id}`);
-
-  return ProjectSchema.parse(data);
+  return data;
 };
 
 export const getAssignedProjects = async (

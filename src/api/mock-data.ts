@@ -4,6 +4,7 @@ import {
   type Project,
   type UnassignedProjectItem,
 } from '@/types/project';
+import { type ProjectDetail } from '@/types/project-detail';
 import { type UserSelectionResponse } from '@/types/user';
 
 export const MOCK_PROJECTS: Project[] = [
@@ -1147,6 +1148,280 @@ export const MOCK_USER_PROJECT_STATS = {
       id: 'u-115',
       full_name: 'นายอนุชา รุ่งเรือง',
       project_count: 10,
+    },
+  ],
+};
+
+export const MOCK_PROJECT_DETAIL: ProjectDetail = {
+  id: 'proj-12345-abcd',
+  procurement_type: 'MT500K',
+  current_template_type: 'MT500K',
+  is_urgent: true,
+  title: 'โครงการจัดซื้อครุภัณฑ์คอมพิวเตอร์และอุปกรณ์ต่อพ่วง ประจำปี 2569',
+  description:
+    'จัดซื้อเครื่องคอมพิวเตอร์ All-in-One จำนวน 10 เครื่อง สำหรับห้องปฏิบัติการคอมพิวเตอร์',
+  budget: 480000,
+  status: 'IN_PROGRESS',
+  receive_no: '69/0012',
+  less_no: 'LP-2569-0045',
+  pr_no: null,
+  po_no: null,
+  contract_no: null,
+  migo_no: null,
+  expected_approval_date: '2026-02-28T00:00:00.000Z',
+  created_at: '2026-01-20T09:00:00.000Z',
+  updated_at: '2026-01-25T14:30:00.000Z',
+
+  vendor: {
+    name: 'บริษัท ไอที โซลูชั่น จำกัด',
+    tax_id: '1234567890123',
+    email: 'sales@itsolution.co.th',
+  },
+
+  requester: {
+    unit_name: 'ภาควิชาวิทยาการคอมพิวเตอร์',
+    unit_id: 'unit-cs-01',
+    dept_name: 'คณะวิทยาศาสตร์',
+    dept_id: 'dept-sci-01',
+  },
+
+  creator: {
+    full_name: 'นางสาวสมหญิง รักงาน',
+    role: 'GENERAL_STAFF',
+    unit_name: 'งานพัสดุ',
+    unit_id: 'unit-procure-01',
+    dept_name: 'สำนักงานเลขานุการ',
+    dept_id: 'dept-office-01',
+  },
+
+  assignee_procurement: {
+    id: 'staff-001',
+    full_name: 'นายสมชาย ใจดี',
+    role: 'GENERAL_STAFF',
+    unit_name: 'งานพัสดุ',
+    unit_id: 'unit-procure-01',
+  },
+
+  assignee_contract: {
+    id: 'staff-002',
+    full_name: 'นางหัวหน้า งานดี',
+    role: 'HEAD_OF_UNIT',
+    unit_name: 'งานสัญญา',
+    unit_id: 'unit-contract-01',
+  },
+
+  // Currently stuck at Step 2
+  current_step: {
+    name: 'จัดทำรายงานขอซื้อหรือขอจ้าง, คำสั่งแต่งตั้งคณะกรรมการซื้อหรือจ้าง และหนังสือเชิญชวน',
+    order: 2,
+  },
+
+  // Full Workflow Definition (MT500K)
+  workflow: {
+    type: 'MT500K',
+    steps: [
+      {
+        name: 'จัดทำแผนจัดการจัดซื้อจัดจ้าง และจัดทำคำสั่งแต่งตั้งคณะกรรมการฯ TOR',
+        order: 1,
+        required_step: [],
+        required_documents: [
+          {
+            type: 'FILE_UPLOAD',
+            label: 'แผนการจัดซื้อจัดจ้าง',
+            field_key: 'mt500k_procurement_plan_file',
+            is_required: false,
+          },
+          {
+            type: 'FILE_UPLOAD',
+            label: 'คำสั่งแต่งตั้งคณะกรรมการจัดทำขอบเขตของงาน (TOR)',
+            field_key: 'mt500k_tor_committee_appt_file',
+            is_required: true,
+          },
+        ],
+      },
+      {
+        name: 'จัดทำรายงานขอซื้อหรือขอจ้าง, คำสั่งแต่งตั้งคณะกรรมการซื้อหรือจ้าง และหนังสือเชิญชวน',
+        order: 2,
+        required_step: [1],
+        required_documents: [
+          {
+            type: 'FILE_UPLOAD',
+            label: 'รายงานขอซื้อ/จ้าง',
+            field_key: 'mt500k_requisition_report_file',
+            is_required: true,
+          },
+          {
+            type: 'FILE_UPLOAD',
+            label: 'คำสั่งแต่งตั้งคณะกรรมการซื้อ/จ้าง',
+            field_key: 'mt500k_procurement_committee_file',
+            is_required: true,
+          },
+          {
+            type: 'FILE_UPLOAD',
+            label: 'หนังสือเชิญชวน',
+            field_key: 'mt500k_invitation_letter_file',
+            is_required: false,
+          },
+        ],
+      },
+      {
+        name: 'จัดทำรายงานผลการพิจารณาจัดซื้อจัดจ้าง, รายงานผลฯ อนุมัติ ประกาศผู้ชนะ และหนังสือสนองรับราคาฯ',
+        order: 3,
+        required_step: [2],
+        required_documents: [
+          {
+            type: 'FILE_UPLOAD',
+            label: 'รายงานผลการพิจารณาและอนุมัติสั่งซื้อ/จ้าง',
+            field_key: 'mt500k_consideration_report_file',
+            is_required: true,
+          },
+          {
+            type: 'FILE_UPLOAD',
+            label: 'ประกาศผู้ชนะการเสนอราคา',
+            field_key: 'mt500k_winner_announcement_file',
+            is_required: true,
+          },
+          {
+            type: 'TEXT_INPUT',
+            label: 'เลขที่ใบขอซื้อ (PR Number)',
+            field_key: 'mt500k_pr_number',
+            is_required: true,
+          },
+        ],
+      },
+      {
+        name: 'จัดทำร่างสัญญา / ใบสั่งซื้อสั่งจ้าง / หนังสือข้อตกลง',
+        order: 4,
+        required_step: [3],
+        required_documents: [
+          {
+            type: 'FILE_UPLOAD',
+            label: 'สัญญา / ใบสั่งซื้อสั่งจ้าง / หนังสือข้อตกลง',
+            field_key: 'mt500k_contract_doc_file',
+            is_required: true,
+          },
+          {
+            type: 'TEXT_INPUT',
+            label: 'เลขที่ใบสั่งซื้อ (PO Number)',
+            field_key: 'mt500k_po_number',
+            is_required: true,
+          },
+        ],
+      },
+      {
+        name: 'test for every input type',
+        order: 5,
+        required_step: [],
+        required_documents: [
+          {
+            type: 'FILE_UPLOAD',
+            label: 'เอกสารแนบ (File Upload)',
+            field_key: 'mt500k_test_file_upload',
+            is_required: false,
+          },
+          {
+            type: 'TEXT_INPUT',
+            label: 'ข้อความสั้น (Text Input)',
+            field_key: 'mt500k_test_text_input',
+            is_required: false,
+          },
+          {
+            type: 'DATE_PICKER',
+            label: 'วันที่ (Date Picker)',
+            field_key: 'mt500k_test_date_picker',
+            is_required: false,
+          },
+          {
+            type: 'DATE_WITH_CHECKBOX',
+            label: 'วันที่พร้อมช่องทำเครื่องหมาย (Date with Checkbox)',
+            field_key: 'mt500k_test_date_with_checkbox',
+            is_required: false,
+          },
+          {
+            type: 'BOOLEAN',
+            label: 'ใช่/ไม่ใช่ (Boolean)',
+            field_key: 'mt500k_test_boolean',
+            is_required: false,
+          },
+        ],
+      },
+    ],
+  },
+
+  submissions: [
+    {
+      step_name: 'จัดทำแผนจัดการจัดซื้อจัดจ้าง และจัดทำคำสั่งแต่งตั้งคณะกรรมการฯ TOR',
+      step_order: 1,
+      submission_round: 1,
+      status: 'APPROVED',
+      submitted_by: 'นายสมชาย ใจดี',
+      submitted_at: '2026-01-21T10:00:00.000Z',
+      action_by: 'นางหัวหน้า งานดี',
+      action_at: '2026-01-21T14:00:00.000Z',
+      documents: [
+        {
+          field_key: 'mt500k_procurement_plan_file',
+          file_name: 'แผนจัดซื้อ_2569.pdf',
+          file_path: '/uploads/proj-123/plan.pdf',
+        },
+        {
+          field_key: 'mt500k_tor_committee_appt_file',
+          file_name: 'คำสั่งแต่งตั้ง_TOR.pdf',
+          file_path: '/uploads/proj-123/tor_appt.pdf',
+        },
+      ],
+      meta_data: {},
+      comments: 'เอกสารครบถ้วน ดำเนินการต่อได้',
+    },
+
+    // --- Step 2 History: Round 1 (Returned) ---
+    {
+      step_name:
+        'จัดทำรายงานขอซื้อหรือขอจ้าง, คำสั่งแต่งตั้งคณะกรรมการซื้อหรือจ้าง และหนังสือเชิญชวน',
+      step_order: 2,
+      submission_round: 1,
+      status: 'REJECTED',
+      submitted_by: 'นายสมชาย ใจดี',
+      submitted_at: '2026-01-23T09:30:00.000Z',
+      action_by: 'นางหัวหน้า งานดี',
+      action_at: '2026-01-23T11:15:00.000Z',
+      documents: [
+        {
+          field_key: 'mt500k_requisition_report_file',
+          file_name: 'รายงานขอซื้อ.pdf',
+          file_path: '/uploads/proj-123/req_v1.pdf',
+        },
+      ],
+      meta_data: {},
+      comments:
+        'ช่วยแก้ไขรายชื่อกรรมการคนที่ 2 เนื่องจากพิมพ์นามสกุลผิด และแนบไฟล์คำสั่งแต่งตั้งเพิ่มด้วยครับ',
+    },
+
+    // --- Step 2 History: Round 2 (Submitted - Current Active State) ---
+    {
+      step_name:
+        'จัดทำรายงานขอซื้อหรือขอจ้าง, คำสั่งแต่งตั้งคณะกรรมการซื้อหรือจ้าง และหนังสือเชิญชวน',
+      step_order: 2,
+      submission_round: 2,
+      status: 'ACCEPTED',
+      submitted_by: 'นายสมชาย ใจดี',
+      submitted_at: '2026-01-24T15:45:00.000Z',
+      // No action yet because it's pending review
+      action_by: null,
+      action_at: null,
+      documents: [
+        {
+          field_key: 'mt500k_requisition_report_file',
+          file_name: 'รายงานขอซื้อ_แก้ไข.pdf',
+          file_path: '/uploads/proj-123/req_v2.pdf',
+        },
+        {
+          field_key: 'mt500k_procurement_committee_file',
+          file_name: 'คำสั่งแต่งตั้ง_กรรมการ.pdf',
+          file_path: '/uploads/proj-123/committee.pdf',
+        },
+      ],
+      meta_data: {},
     },
   ],
 };

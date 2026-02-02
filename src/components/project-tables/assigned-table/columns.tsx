@@ -203,7 +203,7 @@ export const getColumns = ({
             )}
 
             <DropdownMenuItem onClick={() => onCancelProject(project)} variant="destructive">
-              <Trash2 className="h-4 w-4" />
+              <Trash2 className="text-destructive h-4 w-4" />
               {ManageUnitRoles.includes(viewAsRole) || SupervisorRoles.includes(viewAsRole)
                 ? 'ยกเลิกโครงการ'
                 : 'ขอยกเลิกโครงการ'}

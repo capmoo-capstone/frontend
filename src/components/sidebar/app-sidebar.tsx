@@ -20,6 +20,7 @@ import {
 import type { LucideIcon } from 'lucide-react';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -41,9 +42,8 @@ import {
 } from '@/components/ui/sidebar';
 import { useAuth } from '@/context/AuthContext';
 import { useLogout } from '@/hooks/useAuth';
+import { cn } from '@/lib/utils';
 import { type Role } from '@/types/auth';
-
-import { Button } from '../ui/button';
 
 type MenuItem = {
   title: string;
@@ -182,22 +182,24 @@ export function AppSidebar() {
   const location = useLocation();
   const { user } = useAuth();
   const { mutate: logout, isPending } = useLogout();
-  const { toggleSidebar } = useSidebar();
+  const { toggleSidebar, state } = useSidebar();
 
   const isHomeActive = location.pathname === '/app/home';
   const filteredGroups = getFilteredGroups(menuGroups, user?.role);
 
   return (
     <Sidebar collapsible="icon" className="border-r-0 bg-gray-50/50">
-      {/* --- Header: Logo --- */}
-      <SidebarHeader className="pt-6 pb-2 pl-4">
-        <div className="flex items-center gap-2 text-pink-600 transition-all duration-300 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:pl-0">
-          <Star className="h-5 w-5 fill-current" />
-          <span className="h4-topic group-data-[collapsible=icon]:hidden">NexusProcure</span>
+      {/* Header */}
+      <SidebarHeader className="pt-6 pb-2 pl-4 transition-all group-data-[collapsible=icon]:items-center group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:pl-2">
+        <div className="flex w-full items-center gap-2 text-pink-600 transition-all duration-300 group-data-[collapsible=icon]:justify-center">
+          <Star className="h-5 w-5 shrink-0 fill-current" />
+          <span className="h4-topic truncate group-data-[collapsible=icon]:hidden">
+            NexusProcure
+          </span>
         </div>
       </SidebarHeader>
 
-      <SidebarContent className="px-3">
+      <SidebarContent className="px-3 group-data-[collapsible=icon]:px-0">
         {/* --- Home Button --- */}
         <SidebarGroup>
           <SidebarMenu>
@@ -205,6 +207,7 @@ export function AppSidebar() {
               <SidebarMenuButton
                 asChild
                 isActive={isHomeActive}
+                tooltip="หน้าหลัก"
                 className={`text-primary normal hover:text-brand-9 transition-colors ${isHomeActive ? 'font-medium' : ''} `}
               >
                 <Link to="/app/home">
@@ -219,7 +222,7 @@ export function AppSidebar() {
         {/* --- Menu Groups --- */}
         {filteredGroups.map((group) => (
           <SidebarGroup key={group.label}>
-            <SidebarGroupLabel className="caption text-muted-foreground px-2">
+            <SidebarGroupLabel className="caption text-muted-foreground px-2 group-data-[collapsible=icon]:hidden">
               {group.label}
             </SidebarGroupLabel>
             <SidebarGroupContent>
@@ -231,6 +234,7 @@ export function AppSidebar() {
                       <SidebarMenuButton
                         asChild
                         isActive={isActive}
+                        tooltip={item.title}
                         className={`text-primary normal hover:text-brand-9 transition-colors ${isActive ? 'font-medium' : ''} `}
                       >
                         <Link to={item.url}>
@@ -247,21 +251,20 @@ export function AppSidebar() {
         ))}
       </SidebarContent>
 
-      {/* --- Footer: User Profile & Collapse --- */}
+      {/* Footer */}
       <SidebarFooter className="bg-linear-to-b from-transparent to-pink-50/50 pb-4">
         <SidebarMenu>
-          {/* User Profile Item */}
           <SidebarMenuItem>
-            <div className="flex items-center justify-between gap-2 p-2 transition-all group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:border-none group-data-[collapsible=icon]:bg-transparent group-data-[collapsible=icon]:p-0 group-data-[collapsible=icon]:shadow-none">
-              <div className="flex items-center gap-3">
-                <Avatar className="h-9 w-9 rounded-md border-2 border-white shadow-sm">
+            <div className="flex items-center justify-between gap-2 p-2 transition-all group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:p-0">
+              <div className="flex items-center gap-3 group-data-[collapsible=icon]:justify-center">
+                <Avatar className="h-9 w-9 shrink-0 rounded-md border-2 border-white shadow-sm">
                   <AvatarImage src={`https://avatar.vercel.sh/${user?.username || 'user'}`} />
                   <AvatarFallback className="rounded-md bg-pink-100 text-pink-700">
                     {user?.name?.charAt(0) || 'U'}
                   </AvatarFallback>
                 </Avatar>
-                <div className="flex flex-col group-data-[collapsible=icon]:hidden">
-                  <span className="caption text-primary truncate">
+                <div className="flex min-w-0 flex-col group-data-[collapsible=icon]:hidden">
+                  <span className="caption text-primary truncate font-medium">
                     {user?.name || 'Guest User'}
                   </span>
                   <span className="caption text-muted-foreground truncate">
@@ -270,11 +273,14 @@ export function AppSidebar() {
                 </div>
               </div>
 
-              {/* Dropdown for Logout */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant={'ghost'}>
-                    <MoreVertical className="h-5 w-5" />
+                  <Button
+                    variant={'ghost'}
+                    size="icon"
+                    className="group-data-[collapsible=icon]:hidden"
+                  >
+                    <MoreVertical className="text-muted-foreground h-5 w-5" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48">
@@ -283,7 +289,7 @@ export function AppSidebar() {
                     disabled={isPending}
                     className="cursor-pointer text-red-600 focus:text-red-600"
                   >
-                    <LogOut className="h-4 w-4" />
+                    <LogOut className="mr-2 h-4 w-4" />
                     <span>{isPending ? 'Signing out...' : 'ออกจากระบบ'}</span>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
@@ -295,10 +301,16 @@ export function AppSidebar() {
           <SidebarMenuItem className="mt-2">
             <SidebarMenuButton
               onClick={toggleSidebar}
+              tooltip="ย่อ/ขยาย เมนู"
               className="text-muted-foreground hover:text-primary hover:bg-gray-100"
             >
               <div className="flex w-full items-center gap-2 group-data-[collapsible=icon]:justify-center">
-                <ArrowLeftToLine className={`h-4 w-4 transition-transform`} />
+                <ArrowLeftToLine
+                  className={cn(
+                    'h-4 w-4 transition-transform duration-200',
+                    state === 'collapsed' && 'rotate-180'
+                  )}
+                />
                 <span className="normal group-data-[collapsible=icon]:hidden">ยุบหน้าต่างเมนู</span>
               </div>
             </SidebarMenuButton>

@@ -30,15 +30,15 @@ export const ProjectHeader = ({
     <div className="flex items-start justify-between gap-4">
       <div className="space-y-4">
         <div className="space-y-1">
-          <h1 className="text-primary text-h1-topic">
+          <h1 className="text-primary h1-topic">
             {project.is_urgent && <span className="text-destructive">ด่วน </span>}
             {project.title}
           </h1>
           {project.description && (
-            <p className="text-muted-foreground text-normal-light">{project.description}</p>
+            <p className="text-muted-foreground normal-l">{project.description}</p>
           )}
         </div>
-        <h3 className="text-primary text-h2-sub">
+        <h3 className="text-primary h2-sub">
           ผู้รับผิดชอบโครงการ: {project.assignee_procurement?.full_name || 'ยังไม่ได้มอบหมาย'}
         </h3>
       </div>

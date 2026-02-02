@@ -56,13 +56,13 @@ export const ProjectInfoGrid = ({ project }: ProjectInfoGridProps) => {
   return (
     <Card className="space-y-4 p-6">
       <div className="space-y-2">
-        <h6 className="text-primary text-h3-topic">รายละเอียดโครงการ</h6>
+        <h6 className="text-primary h3-topic">รายละเอียดโครงการ</h6>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
           {ProjectInfo.map((info) => (
             <div key={info.label} className="flex flex-col gap-1">
-              <span className="text-muted-foreground text-h4-sub">{info.label}</span>
+              <span className="text-muted-foreground h4-sub">{info.label}</span>
               <div className="flex items-center gap-2">
-                <span className="text-normal-normal">{info.value}</span>
+                <span className="normal">{info.value}</span>
                 {info.isCopyable && (
                   <Button
                     variant="ghost"
@@ -81,13 +81,13 @@ export const ProjectInfoGrid = ({ project }: ProjectInfoGridProps) => {
         </div>
       </div>
       <div className="space-y-2">
-        <h6 className="text-primary text-h3-topic">ข้อมูลของผู้ขาย/ผู้รับจ้าง</h6>
+        <h6 className="text-primary h3-topic">ข้อมูลของผู้ขาย/ผู้รับจ้าง</h6>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
           {VendorInfo.map((info) => (
             <div key={info.label} className="flex flex-col gap-1">
-              <span className="text-muted-foreground text-h4-sub">{info.label}</span>
+              <span className="text-muted-foreground h4-sub">{info.label}</span>
               <div className="flex items-center gap-2">
-                <span className="text-normal-normal">{info.value}</span>
+                <span className="normal">{info.value}</span>
                 {info.isCopyable && (
                   <Button
                     variant="ghost"

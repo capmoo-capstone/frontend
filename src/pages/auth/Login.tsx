@@ -27,11 +27,11 @@ export default function LoginPage() {
             <img src="/chula.svg" alt="Chula Logo" className="mr-4" />
             <h1 className="text-brand-9 mt-9 text-5xl">NexusProcure</h1>
           </div>
-          <div className="text-dark text-normal-normal text-right">Procurement Staff Login</div>
+          <div className="text-dark normal text-right">Procurement Staff Login</div>
         </div>
         <div className="flex w-full flex-col space-y-6">
           <div>
-            <label className="text-normal-normal text-dark">CU NET</label>
+            <label className="normal text-dark">CU NET</label>
             <Input
               value={cunet}
               onChange={(e) => setCunet(e.target.value)}
@@ -40,7 +40,7 @@ export default function LoginPage() {
             />
           </div>
           <div>
-            <label className="text-normal-normal text-dark">รหัสผ่าน</label>
+            <label className="normal text-dark">รหัสผ่าน</label>
             <div className="relative w-full">
               <Input
                 type={showPassword ? 'text' : 'password'}

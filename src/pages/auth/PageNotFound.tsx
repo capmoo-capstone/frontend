@@ -11,8 +11,8 @@ export default function PageNotFound() {
   return (
     <div className="flex h-screen flex-col items-center justify-center">
       <TriangleAlert className="text-dark mb-6 h-36 w-36" />
-      <h1 className="text-h1-topic text-dark text-center">ไม่พบหน้าที่ต้องการ</h1>
-      <div className="text-normal-normal text-muted-foreground text-center">
+      <h1 className="h1-topic text-dark text-center">ไม่พบหน้าที่ต้องการ</h1>
+      <div className="normal text-muted-foreground text-center">
         (รหัสข้อผิดพลาด: 404 NOT FOUND)
       </div>
       <Button

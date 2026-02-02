@@ -70,7 +70,7 @@ export function StepActionForm({
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div>
-            <h3 className="text-foreground text-lg font-semibold">
+            <h3 className="text-foreground text-h3-topic">
               ประวัติการส่งงาน (ครั้งที่ {viewSubmission.submission_round})
             </h3>
           </div>
@@ -86,7 +86,7 @@ export function StepActionForm({
     <div className="flex h-full flex-col">
       {/* Header */}
       <div className="mb-6 border-b pb-4">
-        <h3 className="text-foreground text-lg font-semibold">ข้อมูลประกอบขั้นตอน</h3>
+        <h3 className="text-foreground text-h3-topic">ข้อมูลประกอบขั้นตอน</h3>
       </div>
 
       {/* Form Body */}
@@ -109,7 +109,7 @@ export function StepActionForm({
             {showRejectInput ? (
               <div className="space-y-3">
                 <div className="space-y-2">
-                  <p className="text-sm font-medium">เหตุผลในการส่งกลับ</p>
+                  <p className="text-h4-topic">เหตุผลในการส่งกลับ</p>
                   <Textarea
                     value={rejectReason}
                     onChange={(e) => setRejectReason(e.target.value)}

@@ -58,7 +58,7 @@ export function DynamicStepForm({ fields, formData, onChange, disabled }: Dynami
         const isSkipped = isFieldSkipped(field.key);
         return (
           <div key={field.key} className="space-y-2">
-            <Label className="text-sm font-medium">
+            <Label className="text-normal-normal">
               {field.label} {field.required && <span className="text-destructive">*</span>}
             </Label>
 

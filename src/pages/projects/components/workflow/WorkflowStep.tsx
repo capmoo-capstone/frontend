@@ -58,7 +58,7 @@ export function WorkflowStep({
             )}
           >
             {/* Title Text */}
-            <span className="flex-1 text-left text-lg font-semibold">{title}</span>
+            <span className="text-h3-topic flex-1 text-left">{title}</span>
 
             {/* Chevron Icon */}
             <ChevronDown className="h-5 w-5 shrink-0 transition-transform duration-200 group-data-[state=open]:rotate-180" />

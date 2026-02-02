@@ -122,7 +122,7 @@ export function AssignedTable({ unitId }: { unitId?: string }) {
     return (
       <div className="bg-secondary flex h-48 w-full items-center justify-center rounded-md">
         <AlertTriangle className="text-destructive mr-2 h-6 w-6" />
-        <p className="text-foreground">เกิดข้อผิดพลาดในการโหลดข้อมูล</p>
+        <p className="text-primary text-normal-normal">เกิดข้อผิดพลาดในการโหลดข้อมูล</p>
       </div>
     );
   }

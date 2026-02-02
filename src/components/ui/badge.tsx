@@ -15,14 +15,14 @@ const badgeVariants = cva(
         secondary:
           'border-transparent bg-secondary text-secondary-foreground [a&]:hover:bg-secondary/90 before:bg-muted-foreground',
         destructive:
-          'border-transparent bg-error-light text-foreground [a&]:hover:bg-error/90 focus-visible:ring-error/20 dark:focus-visible:ring-error/40 dark:bg-error/60 before:bg-error',
+          'border-transparent bg-error-light text-primary [a&]:hover:bg-error/90 focus-visible:ring-error/20 dark:focus-visible:ring-error/40 dark:bg-error/60 before:bg-error',
         outline:
-          'text-foreground [a&]:hover:bg-accent [a&]:hover:text-accent-foreground before:bg-current',
+          'text-primary [a&]:hover:bg-accent [a&]:hover:text-accent-foreground before:bg-current',
         warning:
-          'border-transparent bg-warning-light text-foreground [a&]:hover:bg-warning-light/90 before:bg-warning',
+          'border-transparent bg-warning-light text-primary [a&]:hover:bg-warning-light/90 before:bg-warning',
         success:
-          'border-transparent bg-success-light text-foreground [a&]:hover:bg-success-light/90 before:bg-success',
-        info: 'border-transparent bg-info-light text-foreground [a&]:hover:bg-info-light/90 before:bg-info',
+          'border-transparent bg-success-light text-primary [a&]:hover:bg-success-light/90 before:bg-success',
+        info: 'border-transparent bg-info-light text-primary [a&]:hover:bg-info-light/90 before:bg-info',
       },
     },
     defaultVariants: {

@@ -83,7 +83,7 @@ export function ChangeAssigneeDialog({
           </DialogTitle>
           <DialogDescription>
             เลือกเจ้าหน้าที่คนใหม่สำหรับโครงการ{' '}
-            <span className="text-foreground font-medium">"{projectTitle}"</span>
+            <span className="text-primary font-medium">"{projectTitle}"</span>
           </DialogDescription>
         </DialogHeader>
 

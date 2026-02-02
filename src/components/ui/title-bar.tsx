@@ -22,7 +22,7 @@ function TitleBar({ title, variant }: { title: string; variant?: string }) {
       className={` ${variantStyles[variant].background} flex w-full items-center justify-start space-x-3 rounded-md px-5 py-2`}
     >
       <div className={`${variantStyles[variant].foreground} size-2.5 rounded-full`} />
-      <h3 className="text-foreground text-base font-medium">{title}</h3>
+      <h3 className="text-primary text-base font-medium">{title}</h3>
     </div>
   );
 }

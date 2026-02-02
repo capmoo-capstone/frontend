@@ -115,7 +115,7 @@ export function FileUpload({
               >
                 <div className="flex items-center gap-3 overflow-hidden">
                   {getFileIcon(name)}
-                  <span className="text-foreground truncate text-sm font-medium">{name}</span>
+                  <span className="text-primary truncate text-sm font-medium">{name}</span>
                 </div>
 
                 {!disabled && (

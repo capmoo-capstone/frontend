@@ -66,7 +66,7 @@ export function StepActionForm({
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div>
-            <h3 className="text-foreground text-h3-topic">
+            <h3 className="text-primary text-h3-topic">
               ประวัติการส่งงาน (ครั้งที่ {viewSubmission.submission_round})
             </h3>
           </div>
@@ -82,7 +82,7 @@ export function StepActionForm({
     <div className="flex h-full flex-col">
       {/* Header */}
       <div className="mb-6 border-b pb-4">
-        <h3 className="text-foreground text-h3-topic">ข้อมูลประกอบขั้นตอน</h3>
+        <h3 className="text-primary text-h3-topic">ข้อมูลประกอบขั้นตอน</h3>
       </div>
 
       {/* Form Body */}

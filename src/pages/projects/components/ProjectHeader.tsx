@@ -9,36 +9,44 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { ManageUnitRoles, SupervisorRoles } from '@/lib/role-permissions';
 import type { Role } from '@/types/auth';
+import type { ProjectDetail } from '@/types/project-detail';
 
 interface ProjectHeaderProps {
+  project: ProjectDetail;
   viewAsRole: Role;
   onCancelProject?: () => void;
   onExportReport?: () => void;
+  onGenerateContract?: () => void;
 }
 
 export const ProjectHeader = ({
+  project,
   viewAsRole,
   onCancelProject,
   onExportReport,
+  onGenerateContract,
 }: ProjectHeaderProps) => {
   return (
     <div className="flex items-start justify-between gap-4">
       <div className="space-y-4">
         <div className="space-y-1">
-          <h1 className="text-primary text-3xl font-semibold">
-            <span className="text-destructive">ด่วน</span>
-            โครงการจัดซื้อพัสดุสำหรับคณะหมูกรอบ
+          <h1 className="text-primary text-2xl font-semibold">
+            {project.is_urgent && <span className="text-destructive">ด่วน </span>}
+            {project.title}
           </h1>
-          <p className="text-muted-foreground text-base">
-            dugwduhqbdhjbqwdjhbqjhdbqjhdbqhjdbhqwjdb
-          </p>
+          {project.description && (
+            <p className="text-muted-foreground text-base">{project.description}</p>
+          )}
         </div>
-        <h3 className="text-primary text-xl font-medium">
-          ผู้รับผิดชอบโครงการ: ทิพปภานันท์ รอดวัฒนกุล
+        <h3 className="text-primary text-lg font-medium">
+          ผู้รับผิดชอบโครงการ: {project.assignee_procurement?.full_name || 'ยังไม่ได้มอบหมาย'}
         </h3>
       </div>
 
       <div className="flex items-center gap-2">
+        <Button variant="default" onClick={onGenerateContract}>
+          สร้างเลขที่สัญญา
+        </Button>
         <Button variant="brand" onClick={onExportReport}>
           ส่งออกรายงาน
         </Button>

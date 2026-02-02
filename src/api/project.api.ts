@@ -16,6 +16,7 @@ import {
   MOCK_PROJECT_DETAIL,
   MOCK_UNASSIGNED_PROJECTS,
 } from './mock-data';
+import { mockProjects } from './mock-project';
 
 export const getProjects = async (): Promise<Project[]> => {
   // return mock data;
@@ -28,6 +29,7 @@ export const getProjects = async (): Promise<Project[]> => {
 
 export const getProjectDetail = async (id: string): Promise<ProjectDetail> => {
   // return mock data
+  return mockProjects.find((project) => project.id === id)!;
   return MOCK_PROJECT_DETAIL;
 
   const { data } = await api.get(`/projects/${id}`);

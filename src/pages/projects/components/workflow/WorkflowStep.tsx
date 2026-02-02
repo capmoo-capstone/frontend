@@ -4,12 +4,16 @@ import { ChevronDown } from 'lucide-react';
 
 import { AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { cn } from '@/lib/utils';
+import { getStepColor } from '@/lib/workflow-utils';
+import type { Role } from '@/types/auth';
+import type { StepStatus } from '@/types/project-detail';
 
 interface WorkflowStepProps {
   id: string;
   index: number;
   title: string;
-  status?: 'pending' | 'active' | 'completed' | 'error' | 'waiting';
+  status?: StepStatus;
+  viewAsRole: Role;
   isLast?: boolean;
   children: React.ReactNode;
 }
@@ -18,27 +22,19 @@ export function WorkflowStep({
   id,
   index,
   title,
-  status = 'pending',
+  status = 'not_started',
+  viewAsRole,
   isLast = false,
   children,
 }: WorkflowStepProps) {
+  const colors = getStepColor(status, viewAsRole);
+
   return (
     <AccordionItem value={id} className="relative border-none">
       {/* Connecting Line */}
       {!isLast && (
         <div
-          className={cn(
-            'absolute top-10 bottom-0 left-4 z-0 w-1 -translate-x-1/2',
-            status === 'completed'
-              ? 'bg-success'
-              : status === 'active'
-                ? 'bg-primary'
-                : status === 'error'
-                  ? 'bg-error'
-                  : status === 'waiting'
-                    ? 'bg-info'
-                    : 'bg-warning/50'
-          )}
+          className={cn('absolute top-10 bottom-0 left-4 z-0 w-1 -translate-x-1/2', colors.line)}
         />
       )}
 
@@ -49,15 +45,7 @@ export function WorkflowStep({
           <div
             className={cn(
               'relative z-10 flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-bold transition-colors',
-              status === 'completed'
-                ? 'bg-success text-white'
-                : status === 'active'
-                  ? 'bg-primary text-primary-foreground'
-                  : status === 'error'
-                    ? 'bg-error text-white'
-                    : status === 'waiting'
-                      ? 'bg-info text-white'
-                      : 'bg-warning text-white'
+              colors.bubble
             )}
           >
             {index}
@@ -65,16 +53,8 @@ export function WorkflowStep({
 
           <div
             className={cn(
-              'flex w-full items-center gap-4 rounded-lg px-6 py-3 transition-colors',
-              status === 'completed'
-                ? 'border-success bg-success-light text-success-dark'
-                : status === 'active'
-                  ? 'border-primary bg-primary/10 text-primary'
-                  : status === 'error'
-                    ? 'border-error bg-error-light text-error'
-                    : status === 'waiting'
-                      ? 'border-info bg-info-light text-info'
-                      : 'border-warning bg-warning-light text-warning-dark'
+              'flex w-full items-center gap-4 rounded-lg px-6 py-3 inset-shadow-xs transition-colors',
+              colors.container
             )}
           >
             {/* Title Text */}

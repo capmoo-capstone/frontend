@@ -126,13 +126,11 @@ export default function ProjectDetail() {
                   <div className="lg:col-span-8">
                     {showForm ? (
                       <StepActionForm
-                        stepId={`step-${step.order}`}
                         isActive={!viewSubmission && !isCompleted}
                         stepStatus={status}
                         viewAsRole={user.role}
                         viewSubmission={viewSubmission || null}
                         onBackToEdit={() => handleBackToEdit(step.order)}
-                        fields={fields}
                       >
                         <DynamicStepForm
                           fields={fields}

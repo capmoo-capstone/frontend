@@ -8,14 +8,11 @@ import { cn } from '@/lib/utils';
 import type { Role } from '@/types/auth';
 import type { Submission } from '@/types/project-detail';
 import type { StepStatus } from '@/types/project-detail';
-import type { FieldConfig } from '@/types/workflow';
 
 interface StepActionFormProps {
-  stepId: string;
   isActive?: boolean;
   stepStatus: StepStatus;
   viewAsRole: Role;
-  fields: FieldConfig[];
   onSubmit?: () => void;
   onReject?: (reason: string) => void;
   onApprove?: () => void;
@@ -27,7 +24,6 @@ interface StepActionFormProps {
 }
 
 export function StepActionForm({
-  stepId: _stepId,
   isActive = true,
   stepStatus,
   viewAsRole,

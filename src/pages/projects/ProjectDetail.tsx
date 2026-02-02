@@ -84,9 +84,11 @@ export default function ProjectDetail() {
       <ProjectInfoGrid project={project} />
 
       <WorkflowList>
-        {project.workflow.steps
-          .sort((a, b) => a.order - b.order)
-          .map((step) => {
+        {(() => {
+          const sortedSteps = [...project.workflow.steps].sort((a, b) => a.order - b.order);
+          const lastStepOrder = sortedSteps[sortedSteps.length - 1]?.order;
+
+          return sortedSteps.map((step) => {
             const status = getStepStatus(step.order);
             const submissions = getStepSubmissions(step.order);
             const viewSubmission = viewingSubmissions[step.order];
@@ -102,7 +104,7 @@ export default function ProjectDetail() {
                 id={`step-${step.order}`}
                 index={step.order}
                 viewAsRole={user.role}
-                isLast={step.order === project.workflow.steps.length}
+                isLast={step.order === lastStepOrder}
                 title={step.name}
                 status={status}
               >
@@ -155,7 +157,8 @@ export default function ProjectDetail() {
                 </div>
               </WorkflowStep>
             );
-          })}
+          });
+        })()}
       </WorkflowList>
 
       <CancelProjectDialog

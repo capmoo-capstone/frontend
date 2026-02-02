@@ -94,6 +94,7 @@
   --border: oklch(0.923 0.003 48.717);
   --input: oklch(0.923 0.003 48.717);
   --ring: oklch(0.709 0.01 56.259);
+
   --chart-1-light: #fefbee;
   --chart-1-dark: #ecd24f;
   --chart-2-light: #fdf4ec;
@@ -106,6 +107,7 @@
   --chart-5-dark: #063773;
   --chart-6-light: #f9f3fc;
   --chart-6-dark: #be83dd;
+
   --sidebar: oklch(0.985 0.001 106.423);
   --sidebar-foreground: oklch(0.147 0.004 49.25);
   --sidebar-primary: oklch(0.216 0.006 56.043);

@@ -83,7 +83,7 @@ export const getColumns = ({
         />
       </div>
     ),
-    cell: ({ row }) => <div>{getResponsibleTypeFormat(row.original.procurement_type)}</div>,
+    cell: ({ row }) => <div>{getResponsibleTypeFormat(row.original.procurement_type).label}</div>,
     accessorFn: (row) => row.procurement_type,
   },
   {

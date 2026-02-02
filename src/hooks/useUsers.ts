@@ -1,6 +1,7 @@
-import { keepPreviousData, useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
-import { getUsers, getUsersForSelection } from '@/api/user.api';
+import { delegateUser, getUsers, getUsersForSelection } from '@/api/user.api';
+import type { UserRole } from '@/types/user';
 
 interface UseUsersProps {
   page?: number;
@@ -32,5 +33,34 @@ export const useUsersForSelection = ({ unitId, departmentId }: UseUsersSelection
       throw new Error('Either unitId or departmentId is required');
     },
     enabled: !!unitId || !!departmentId,
+  });
+};
+
+export const useDelegateUser = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      unitId,
+      userId,
+      startDate,
+      endDate,
+      role,
+    }: {
+      unitId?: string;
+      userId: string;
+      startDate: Date;
+      endDate?: Date;
+      role?: UserRole;
+    }) => delegateUser(unitId, userId, startDate, endDate, role),
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['users', 'selection'],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ['units'],
+      });
+    },
   });
 };

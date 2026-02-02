@@ -5,6 +5,7 @@ import {
   type UnassignedProjectItem,
 } from '@/types/project';
 import { type ProjectDetail } from '@/types/project-detail';
+import type { Unit } from '@/types/unit';
 import { type UserSelectionResponse } from '@/types/user';
 
 export const MOCK_PROJECTS: Project[] = [
@@ -905,52 +906,115 @@ export const MOCK_USER_SELECTION: UserSelectionResponse = {
     {
       id: 'u-101',
       full_name: 'นายสมชาย ใจดี',
-      role: 'STAFF',
+      role: 'HEAD_OF_UNIT',
     },
     {
       id: 'u-102',
       full_name: 'นางสาวสมหญิง รักงาน',
-      role: 'STAFF',
+      role: 'GENERAL_STAFF',
     },
     {
       id: 'u-103',
       full_name: 'นายวิชัย เก่งวิทย์',
-      role: 'กรรมการตรวจรับ',
+      role: 'GENERAL_STAFF',
     },
     {
       id: 'u-104',
       full_name: 'นางมาลี สีสวย',
-      role: 'เจ้าหน้าที่จัดซื้อ',
+      role: 'GENERAL_STAFF',
     },
     {
       id: 'u-105',
       full_name: 'นายกล้าหาญ ชาญชัย',
-      role: 'หัวหน้าฝ่ายจัดซื้อ',
+      role: 'GENERAL_STAFF',
     },
     {
       id: 'u-106',
       full_name: 'นางสาวปิติ ยินดี',
-      role: 'ธุรการ',
+      role: 'GENERAL_STAFF',
     },
     {
       id: 'u-107',
       full_name: 'นายมานะ อดทน',
-      role: 'เจ้าหน้าที่พัสดุ',
+      role: 'GENERAL_STAFF',
     },
     {
       id: 'u-108',
       full_name: 'นางสาวชูใจ ใฝ่เรียน',
-      role: 'กรรมการร่าง TOR',
+      role: 'GENERAL_STAFF',
     },
     {
       id: 'u-109',
       full_name: 'นายปัญญา รอบรู้',
-      role: 'ผู้ตรวจสอบภายใน',
+      role: 'GENERAL_STAFF',
     },
     {
       id: 'u-110',
       full_name: 'นางแก้วตา ดวงใจ',
-      role: 'ผู้ช่วยเจ้าหน้าที่',
+      role: 'GENERAL_STAFF',
+    },
+  ],
+};
+
+export const MOCK_USER_DEPARTMENT_SELECTION: UserSelectionResponse = {
+  id: 'department_procure',
+  name: 'สำนักพัสดุ',
+  entity_type: 'department',
+  data: [
+    {
+      id: 'u-100',
+      full_name: 'นางโสรทิพย์ สวัสดิ์ดี',
+      role: 'HEAD_OF_DEPARTMENT',
+    },
+    {
+      id: 'u-101',
+      full_name: 'นายสมชาย ใจดี',
+      role: 'HEAD_OF_UNIT',
+    },
+    {
+      id: 'u-102',
+      full_name: 'นางสาวสมหญิง รักงาน',
+      role: 'GENERAL_STAFF',
+    },
+    {
+      id: 'u-103',
+      full_name: 'นายวิชัย เก่งวิทย์',
+      role: 'GENERAL_STAFF',
+    },
+    {
+      id: 'u-104',
+      full_name: 'นางมาลี สีสวย',
+      role: 'GENERAL_STAFF',
+    },
+    {
+      id: 'u-105',
+      full_name: 'นายกล้าหาญ ชาญชัย',
+      role: 'GENERAL_STAFF',
+    },
+    {
+      id: 'u-106',
+      full_name: 'นางสาวปิติ ยินดี',
+      role: 'GENERAL_STAFF',
+    },
+    {
+      id: 'u-107',
+      full_name: 'นายมานะ อดทน',
+      role: 'GENERAL_STAFF',
+    },
+    {
+      id: 'u-108',
+      full_name: 'นางสาวชูใจ ใฝ่เรียน',
+      role: 'GENERAL_STAFF',
+    },
+    {
+      id: 'u-109',
+      full_name: 'นายปัญญา รอบรู้',
+      role: 'GENERAL_STAFF',
+    },
+    {
+      id: 'u-110',
+      full_name: 'นางแก้วตา ดวงใจ',
+      role: 'GENERAL_STAFF',
     },
   ],
 };
@@ -960,7 +1024,7 @@ export const MOCK_USER: User = {
   username: 'user',
   name: 'user',
   email: 'user@gmail.com',
-  role: 'GENERAL_STAFF',
+  role: 'SUPER_ADMIN',
   isStaff: true,
   department: {
     id: 'dept-01',
@@ -1425,3 +1489,18 @@ export const MOCK_PROJECT_DETAIL: ProjectDetail = {
     },
   ],
 };
+
+export const MOCK_UNITS: Unit[] = [
+  {
+    id: 'unit_procure_01',
+    name: 'ฝ่ายพัสดุและจัดซื้อ',
+    dept_id: 'dept_01',
+    type: ['LT100K', 'LT500K', 'MT500K'],
+  },
+  {
+    id: 'unit_procure_02',
+    name: 'ฝ่ายบริหารสัญญา',
+    dept_id: 'dept_01',
+    type: ['CONTRACT'],
+  },
+];

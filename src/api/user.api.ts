@@ -3,7 +3,12 @@ import type { User } from '@/types/auth';
 import { type UserListResponse, UserListResponseSchema } from '@/types/user';
 import { type UserSelectionResponse, UserSelectionResponseSchema } from '@/types/user';
 
-import { MOCK_USER, MOCK_USERS_BY_ROLE, MOCK_USER_SELECTION } from './mock-data';
+import {
+  MOCK_USER,
+  MOCK_USERS_BY_ROLE,
+  MOCK_USER_DEPARTMENT_SELECTION,
+  MOCK_USER_SELECTION,
+} from './mock-data';
 
 interface GetUsersParams {
   page?: number;
@@ -32,7 +37,11 @@ export const getUsersForSelection = async (
   params: GetUsersSelectionParams
 ): Promise<UserSelectionResponse> => {
   // return mock data
-  return MOCK_USER_SELECTION;
+  if (params.unit_id) {
+    return MOCK_USER_SELECTION;
+  } else if (params.department_id === 'department_procure') {
+    return MOCK_USER_DEPARTMENT_SELECTION;
+  }
 
   const { data } = await api.get('/users/selection', {
     params,
@@ -50,4 +59,32 @@ export const login = async (cunet: string, password: string): Promise<User> => {
 
 export const devLogin = async (role: string): Promise<User> => {
   return MOCK_USERS_BY_ROLE[role] || MOCK_USER;
+};
+
+export const delegateUser = async (
+  unitId: string | undefined,
+  userId: string,
+  startDate: Date,
+  endDate?: Date,
+  role?: string
+) => {
+  // return mock response
+  return {
+    success: true,
+    unitId,
+    userId,
+    startDate,
+    endDate,
+    role,
+  };
+
+  const { data } = await api.post('/users/delegate', {
+    unit_id: unitId,
+    user_id: userId,
+    start_date: startDate.toISOString(),
+    end_date: endDate ? endDate.toISOString() : null,
+    role,
+  });
+
+  return data;
 };

@@ -1,6 +1,16 @@
 import { z } from 'zod';
 
-export const UserRoleEnum = z.enum(['ADMIN', 'STAFF', 'MANAGER', 'GUEST']);
+export const UserRoleEnum = z.enum([
+  'SUPER_ADMIN',
+  'ADMIN',
+  'HEAD_OF_DEPARTMENT',
+  'HEAD_OF_UNIT',
+  'REPRESENTATIVE',
+  'DOCUMENT_STAFF',
+  'FINANCE_STAFF',
+  'GENERAL_STAFF',
+  'GUEST',
+]);
 
 export const UserSchema = z.object({
   id: z.string(),
@@ -22,13 +32,14 @@ export const UserListResponseSchema = z.object({
   data: z.array(UserSchema),
 });
 
+export type UserRole = z.infer<typeof UserRoleEnum>;
 export type User = z.infer<typeof UserSchema>;
 export type UserListResponse = z.infer<typeof UserListResponseSchema>;
 
 export const UserSelectionItemSchema = z.object({
   id: z.string(),
   full_name: z.string(),
-  role: z.string(),
+  role: UserRoleEnum,
 });
 
 export const UserSelectionResponseSchema = z.object({
@@ -38,4 +49,5 @@ export const UserSelectionResponseSchema = z.object({
   data: z.array(UserSelectionItemSchema),
 });
 
+export type UserSelectionItem = z.infer<typeof UserSelectionItemSchema>;
 export type UserSelectionResponse = z.infer<typeof UserSelectionResponseSchema>;

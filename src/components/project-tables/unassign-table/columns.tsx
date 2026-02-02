@@ -167,7 +167,7 @@ export const getColumns = ({
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuItem onClick={() => onOpenCancelDialog(project)} variant="destructive">
-              <Trash2 className="h-4 w-4 text-destructive" />
+              <Trash2 className="text-destructive h-4 w-4" />
               {ManageUnitRoles.includes(viewAsRole) || SupervisorRoles.includes(viewAsRole)
                 ? 'ยกเลิกโครงการ'
                 : 'ขอยกเลิกโครงการ'}

@@ -23,7 +23,7 @@ export const getStepColor = (status: StepStatus, role: Role) => {
     };
   }
 
-  if(status === 'rejected' && role === 'GENERAL_STAFF') {
+  if (status === 'rejected' && role === 'GENERAL_STAFF') {
     return {
       line: 'bg-error',
       bubble: 'bg-error text-white',

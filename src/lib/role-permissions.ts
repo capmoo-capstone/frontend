@@ -15,4 +15,3 @@ export const ViewUnitRoles: Role[] = ['ADMIN', 'DOCUMENT_STAFF', 'FINANCE_STAFF'
 
 /** Roles that can manage their own assignments */
 export const ManageSelfRoles: Role[] = ['GENERAL_STAFF'];
-

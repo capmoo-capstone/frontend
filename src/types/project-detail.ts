@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import type { ProcurementType, ProjectStatus, UnitResponsibleType } from './project';
+import { ProcurementTypeEnum, ProjectStatusEnum, UnitResponsibleTypeEnum } from './project';
 
 export const FieldTypeSchema = z.enum([
   'FILE_UPLOAD',
@@ -67,13 +67,13 @@ export type Submission = z.infer<typeof SubmissionSchema>;
 
 export const ProjectDetailSchema = z.object({
   id: z.string(),
-  procurement_type: z.string() as z.ZodType<ProcurementType>,
-  current_template_type: z.string() as z.ZodType<UnitResponsibleType>,
+  procurement_type: ProcurementTypeEnum,
+  current_template_type: UnitResponsibleTypeEnum,
   is_urgent: z.boolean(),
   title: z.string(),
   description: z.string().nullable(),
   budget: z.number().nullable(),
-  status: z.string() as z.ZodType<ProjectStatus>,
+  status: ProjectStatusEnum,
   receive_no: z.string(),
   less_no: z.string().nullable(),
   pr_no: z.string().nullable(),

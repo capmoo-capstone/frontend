@@ -165,6 +165,9 @@
   --font-family-normal-light: 'Noto Sans Thai';
   --font-size-normal-light: 16px;
   --font-weight-normal-light: 300;
+  --font-family-caption: 'Noto Sans Thai';
+  --font-size-caption: 14px;
+  --font-weight-caption: 400;
 }
 
 /* .dark {
@@ -269,5 +272,11 @@
     font-family: var(--font-family-normal-light);
     font-size: var(--font-size-normal-light);
     font-weight: var(--font-weight-normal-light);
+  }
+
+  .text-caption {
+    font-family: var(--font-family-caption);
+    font-size: var(--font-size-caption);
+    font-weight: var(--font-weight-caption);
   }
 }

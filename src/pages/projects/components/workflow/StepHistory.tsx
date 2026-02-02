@@ -43,11 +43,11 @@ export function StepHistory({
             <div className="flex flex-row items-start justify-between">
               <div className="flex flex-col space-y-1">
                 <span className="text-h4-topic">ส่งครั้งที่ {submission.submission_round}</span>
-                <p className="text-muted-foreground text-normal-normal">
+                <p className="text-muted-foreground text-caption">
                   โดย {submission.submitted_by || 'ไม่ทราบชื่อ'}
                 </p>
               </div>
-              <span className="text-muted-foreground text-normal-normal">
+              <span className="text-muted-foreground text-caption">
                 {formatDateThai(submission.submitted_at, 'd MMM yyyy HH:mm น.')}
               </span>
             </div>
@@ -60,12 +60,12 @@ export function StepHistory({
                   <div className="flex w-full flex-row items-center justify-between gap-2">
                     <CornerDownRight className="text-primary h-4 w-4" />
                     <span className="text-h4-topic flex-1">ถูกตีกลับ</span>
-                    <span className="text-muted-foreground text-normal-normal">
+                    <span className="text-muted-foreground text-caption">
                       {formatDateThai(submission.action_at, 'd MMM yyyy HH:mm น.')}
                     </span>
                   </div>
-                  <p className="text-normal-normal ml-6">"{submission.comments}"</p>
-                  <p className="text-muted-foreground text-normal-normal ml-6">
+                  <p className="text-caption ml-6">"{submission.comments}"</p>
+                  <p className="text-muted-foreground text-caption ml-6">
                     โดย {submission.action_by || 'ไม่ทราบชื่อ'}
                   </p>
                 </div>
@@ -78,11 +78,11 @@ export function StepHistory({
                   <div className="flex w-full flex-row items-center justify-between gap-2">
                     <CornerDownRight className="text-primary h-4 w-4" />
                     <span className="text-h4-topic flex-1">อนุมัติ</span>
-                    <span className="text-muted-foreground text-normal-normal">
+                    <span className="text-muted-foreground text-caption">
                       {formatDateThai(submission.action_at, 'd MMM yyyy HH:mm น.')}
                     </span>
                   </div>
-                  <p className="text-muted-foreground text-normal-normal ml-6">
+                  <p className="text-muted-foreground text-caption ml-6">
                     โดย {submission.action_by || 'ไม่ทราบชื่อ'}
                   </p>
                 </div>
@@ -95,7 +95,7 @@ export function StepHistory({
                   <div className="flex w-full flex-row items-center justify-between gap-2">
                     <CornerDownRight className="text-primary h-4 w-4" />
                     <span className="text-h4-topic flex-1">ผู้บริหารลงนามฯ</span>
-                    <span className="text-muted-foreground text-normal-normal">
+                    <span className="text-muted-foreground text-caption">
                       {formatDateThai(submission.action_at, 'd MMM yyyy HH:mm น.')}
                     </span>
                   </div>

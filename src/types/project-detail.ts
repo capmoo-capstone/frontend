@@ -1,5 +1,6 @@
 import { z } from 'zod';
 
+import { RoleEnum } from './auth';
 import { ProcurementTypeEnum, ProjectStatusEnum, UnitResponsibleTypeEnum } from './project';
 
 export const FieldTypeSchema = z.enum([
@@ -96,7 +97,7 @@ export const ProjectDetailSchema = z.object({
   }),
   creator: z.object({
     full_name: z.string(),
-    role: z.string(),
+    role: RoleEnum,
     unit_name: z.string(),
     unit_id: z.string(),
     dept_name: z.string(),
@@ -105,14 +106,14 @@ export const ProjectDetailSchema = z.object({
   assignee_procurement: z.object({
     id: z.string().nullable(),
     full_name: z.string().nullable(),
-    role: z.string().nullable(),
+    role: RoleEnum.nullable(),
     unit_name: z.string().nullable(),
     unit_id: z.string().nullable(),
   }),
   assignee_contract: z.object({
     id: z.string().nullable(),
     full_name: z.string().nullable(),
-    role: z.string().nullable(),
+    role: RoleEnum.nullable(),
     unit_name: z.string().nullable(),
     unit_id: z.string().nullable(),
   }),
@@ -121,7 +122,7 @@ export const ProjectDetailSchema = z.object({
     order: z.number(),
   }),
   workflow: z.object({
-    type: z.string(),
+    type: UnitResponsibleTypeEnum,
     steps: z.array(WorkflowStepConfigSchema),
   }),
   submissions: z.array(SubmissionSchema),

@@ -135,27 +135,27 @@
   --info-dark: #1e3a8a;
 
   /* Text Styles */
-  --font-family-h1-topic: 'Noto Sans Thai';
-  --font-size-h1-topic: 32px;
-  --font-weight-h1-topic: 600;
-  --font-family-h2-topic: 'Noto Sans Thai';
-  --font-size-h2-topic: 24px;
-  --font-weight-h2-topic: 600;
-  --font-family-h2-sub: 'Noto Sans Thai';
-  --font-size-h2-sub: 20px;
-  --font-weight-h2-sub: 500;
-  --font-family-h3-topic: 'Noto Sans Thai';
-  --font-size-h3-topic: 20px;
-  --font-weight-h3-topic: 600;
-  --font-family-h3-sub: 'Noto Sans Thai';
-  --font-size-h3-sub: 18px;
-  --font-weight-h3-sub: 400;
-  --font-family-h4-topic: 'Noto Sans Thai';
-  --font-size-h4-topic: 18px;
-  --font-weight-h4-topic: 500;
-  --font-family-h4-sub: 'Noto Sans Thai';
-  --font-size-h4-sub: 16px;
-  --font-weight-h4-sub: 400;
+  --font-family-heading1-topic: 'Noto Sans Thai';
+  --font-size-heading1-topic: 24px;
+  --font-weight-heading1-topic: 700;
+  --font-family-heading2-topic: 'Noto Sans Thai';
+  --font-size-heading2-topic: 20px;
+  --font-weight-heading2-topic: 600;
+  --font-family-heading2-sub: 'Noto Sans Thai';
+  --font-size-heading2-sub: 20px;
+  --font-weight-heading2-sub: 500;
+  --font-family-heading3-topic: 'Noto Sans Thai';
+  --font-size-heading3-topic: 18px;
+  --font-weight-heading3-topic: 600;
+  --font-family-heading3-sub: 'Noto Sans Thai';
+  --font-size-heading3-sub: 18px;
+  --font-weight-heading3-sub: 400;
+  --font-family-heading4-topic: 'Noto Sans Thai';
+  --font-size-heading4-topic: 16px;
+  --font-weight-heading4-topic: 500;
+  --font-family-heading4-sub: 'Noto Sans Thai';
+  --font-size-heading4-sub: 16px;
+  --font-weight-heading4-sub: 400;
   --font-family-normal-normal: 'Noto Sans Thai';
   --font-size-normal-normal: 16px;
   --font-weight-normal-normal: 400;
@@ -212,45 +212,45 @@
 
 @layer utilities {
   .text-h1-topic {
-    font-family: var(--font-family-h1-topic);
-    font-size: var(--font-size-h1-topic);
-    font-weight: var(--font-weight-h1-topic);
+    font-family: var(--font-family-heading1-topic);
+    font-size: var(--font-size-heading1-topic);
+    font-weight: var(--font-weight-heading1-topic);
   }
 
   .text-h2-topic {
-    font-family: var(--font-family-h2-topic);
-    font-size: var(--font-size-h2-topic);
-    font-weight: var(--font-weight-h2-topic);
+    font-family: var(--font-family-heading2-topic);
+    font-size: var(--font-size-heading2-topic);
+    font-weight: var(--font-weight-heading2-topic);
   }
 
   .text-h2-sub {
-    font-family: var(--font-family-h2-sub);
-    font-size: var(--font-size-h2-sub);
-    font-weight: var(--font-weight-h2-sub);
+    font-family: var(--font-family-heading2-sub);
+    font-size: var(--font-size-heading2-sub);
+    font-weight: var(--font-weight-heading2-sub);
   }
 
   .text-h3-topic {
-    font-family: var(--font-family-h3-topic);
-    font-size: var(--font-size-h3-topic);
-    font-weight: var(--font-weight-h3-topic);
+    font-family: var(--font-family-heading3-topic);
+    font-size: var(--font-size-heading3-topic);
+    font-weight: var(--font-weight-heading3-topic);
   }
 
   .text-h3-sub {
-    font-family: var(--font-family-h3-sub);
-    font-size: var(--font-size-h3-sub);
-    font-weight: var(--font-weight-h3-sub);
+    font-family: var(--font-family-heading3-sub);
+    font-size: var(--font-size-heading3-sub);
+    font-weight: var(--font-weight-heading3-sub);
   }
 
   .text-h4-topic {
-    font-family: var(--font-family-h4-topic);
-    font-size: var(--font-size-h4-topic);
-    font-weight: var(--font-weight-h4-topic);
+    font-family: var(--font-family-heading4-topic);
+    font-size: var(--font-size-heading4-topic);
+    font-weight: var(--font-weight-heading4-topic);
   }
 
   .text-h4-sub {
-    font-family: var(--font-family-h4-sub);
-    font-size: var(--font-size-h4-sub);
-    font-weight: var(--font-weight-h4-sub);
+    font-family: var(--font-family-heading4-sub);
+    font-size: var(--font-size-heading4-sub);
+    font-weight: var(--font-weight-heading4-sub);
   }
 
   .text-normal-normal {

@@ -19,7 +19,7 @@ export function StepHistory({
     return (
       <div className="text-muted-foreground bg-muted/20 flex h-48 flex-col items-center justify-center rounded-lg border border-dashed">
         <FileText className="mb-2 h-8 w-8 opacity-50" />
-        <span className="text-normal-light">ยังไม่มีประวัติการส่งงาน</span>
+        <span className="normal-l">ยังไม่มีประวัติการส่งงาน</span>
       </div>
     );
   }
@@ -42,12 +42,12 @@ export function StepHistory({
             {/* Header */}
             <div className="flex flex-row items-start justify-between">
               <div className="flex flex-col space-y-1">
-                <span className="text-h4-topic">ส่งครั้งที่ {submission.submission_round}</span>
-                <p className="text-muted-foreground text-caption">
+                <span className="h4-topic">ส่งครั้งที่ {submission.submission_round}</span>
+                <p className="text-muted-foreground caption">
                   โดย {submission.submitted_by || 'ไม่ทราบชื่อ'}
                 </p>
               </div>
-              <span className="text-muted-foreground text-caption">
+              <span className="text-muted-foreground caption">
                 {formatDateThai(submission.submitted_at, 'd MMM yyyy HH:mm น.')}
               </span>
             </div>
@@ -59,13 +59,13 @@ export function StepHistory({
                 <div className="flex flex-col items-start gap-1">
                   <div className="flex w-full flex-row items-center justify-between gap-2">
                     <CornerDownRight className="text-primary h-4 w-4" />
-                    <span className="text-h4-topic flex-1">ถูกตีกลับ</span>
-                    <span className="text-muted-foreground text-caption">
+                    <span className="h4-topic flex-1">ถูกตีกลับ</span>
+                    <span className="text-muted-foreground caption">
                       {formatDateThai(submission.action_at, 'd MMM yyyy HH:mm น.')}
                     </span>
                   </div>
-                  <p className="text-caption ml-6">"{submission.comments}"</p>
-                  <p className="text-muted-foreground text-caption ml-6">
+                  <p className="caption ml-6">"{submission.comments}"</p>
+                  <p className="text-muted-foreground caption ml-6">
                     โดย {submission.action_by || 'ไม่ทราบชื่อ'}
                   </p>
                 </div>
@@ -77,12 +77,12 @@ export function StepHistory({
                 <div className="flex flex-col items-start gap-1">
                   <div className="flex w-full flex-row items-center justify-between gap-2">
                     <CornerDownRight className="text-primary h-4 w-4" />
-                    <span className="text-h4-topic flex-1">อนุมัติ</span>
-                    <span className="text-muted-foreground text-caption">
+                    <span className="h4-topic flex-1">อนุมัติ</span>
+                    <span className="text-muted-foreground caption">
                       {formatDateThai(submission.action_at, 'd MMM yyyy HH:mm น.')}
                     </span>
                   </div>
-                  <p className="text-muted-foreground text-caption ml-6">
+                  <p className="text-muted-foreground caption ml-6">
                     โดย {submission.action_by || 'ไม่ทราบชื่อ'}
                   </p>
                 </div>
@@ -94,8 +94,8 @@ export function StepHistory({
                 <div className="flex flex-col items-start gap-1">
                   <div className="flex w-full flex-row items-center justify-between gap-2">
                     <CornerDownRight className="text-primary h-4 w-4" />
-                    <span className="text-h4-topic flex-1">ผู้บริหารลงนามฯ</span>
-                    <span className="text-muted-foreground text-caption">
+                    <span className="h4-topic flex-1">ผู้บริหารลงนามฯ</span>
+                    <span className="text-muted-foreground caption">
                       {formatDateThai(submission.action_at, 'd MMM yyyy HH:mm น.')}
                     </span>
                   </div>

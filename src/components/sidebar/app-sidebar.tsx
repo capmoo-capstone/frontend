@@ -193,7 +193,7 @@ export function AppSidebar() {
       <SidebarHeader className="pt-6 pb-2 pl-4">
         <div className="flex items-center gap-2 text-pink-600 transition-all duration-300 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:pl-0">
           <Star className="h-5 w-5 fill-current" />
-          <span className="text-h4-topic group-data-[collapsible=icon]:hidden">NexusProcure</span>
+          <span className="h4-topic group-data-[collapsible=icon]:hidden">NexusProcure</span>
         </div>
       </SidebarHeader>
 

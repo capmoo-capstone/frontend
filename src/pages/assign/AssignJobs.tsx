@@ -9,7 +9,7 @@ export default function ProcumentJobs() {
 
   return (
     <div className="relative space-y-6">
-      <h1 className="text-h1-topic text-primary text-center">{`มอบหมายงาน${id}`}</h1>
+      <h1 className="h1-topic text-primary text-center">{`มอบหมายงาน${id}`}</h1>
       <UnassignTable unitId={id} />
       <AssignedTable unitId={id} />
     </div>

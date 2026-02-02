@@ -1,4 +1,5 @@
 // Adjust import path as needed
+import type { Role } from '@/types/auth';
 import type { ProjectDetail, WorkflowStepConfig } from '@/types/project-detail';
 
 // --- Shared Workflow Definition ---
@@ -124,7 +125,7 @@ const COMMON_META = {
   },
   creator: {
     full_name: 'นายสมชาย ใจดี',
-    role: 'GENERAL_STAFF',
+    role: 'GENERAL_STAFF' as Role,
     unit_name: 'งานพัสดุ',
     unit_id: 'P01',
     dept_name: 'กองคลัง',
@@ -133,7 +134,7 @@ const COMMON_META = {
   assignee_procurement: {
     id: 'ST001',
     full_name: 'นางสาวจัดซื้อ มือโปร',
-    role: 'PROCUREMENT_OFFICER',
+    role: 'GENERAL_STAFF' as Role,
     unit_name: 'งานจัดซื้อ',
     unit_id: 'P02',
   },

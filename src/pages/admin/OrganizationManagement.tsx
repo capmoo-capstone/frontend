@@ -1,18 +1,13 @@
-import { Plus } from 'lucide-react';
-
-import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { UnitCard } from '@/components/unit-management/unit-card/unit-card';
-import { useUnits } from '@/hooks/useUnits';
-import type { Unit } from '@/types/unit';
+
+import GroupManagement from './components/GroupManagement';
 
 export default function OrganizationManagement() {
-  const { data: units } = useUnits();
   return (
-    <div className="text-foreground flex w-screen flex-col p-9">
-      <h1 className="text-h1-topic text-foreground">ตั้งค่าบุคลากร</h1>
-      <Tabs defaultValue="organization" className="mt-6 w-full">
+    <div className="text-primary flex flex-col p-9">
+      <h1 className="h1-topic text-primary">ตั้งค่าบุคลากร</h1>
+      <Tabs defaultValue="organization" className="mt-6">
         <TabsList className="mb-6 w-full">
           <TabsTrigger value="group" className="rounded-r-none text-base font-semibold">
             กลุ่มงาน
@@ -28,18 +23,7 @@ export default function OrganizationManagement() {
           </TabsTrigger>
         </TabsList>
         <TabsContent value="group">
-          <div className="flex flex-col gap-4">
-            {units?.map((unitItem: Unit, index: number) => (
-              <UnitCard key={unitItem.id} unitItem={unitItem} index={index + 1} />
-            ))}
-          </div>
-          <Button
-            className="text-h2-topic text-muted-foreground border-muted-foreground mt-6 w-full p-6 font-semibold"
-            variant="dash"
-          >
-            <Plus />
-            สร้างกลุ่มงานใหม่
-          </Button>
+          <GroupManagement />
         </TabsContent>
         <TabsContent value="department">
           <Card>

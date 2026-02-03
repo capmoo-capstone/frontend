@@ -74,7 +74,7 @@ export const delegateUser = async (
     unitId,
     userId,
     startDate,
-    endDate,
+    endDate: endDate ?? null,
     role,
   };
 
@@ -82,7 +82,7 @@ export const delegateUser = async (
     unit_id: unitId,
     user_id: userId,
     start_date: startDate.toISOString(),
-    end_date: endDate ? endDate.toISOString() : null,
+    end_date: endDate ? endDate.toISOString() : null, // error because of mock data
     role,
   });
 

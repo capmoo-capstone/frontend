@@ -51,7 +51,7 @@ export function DeleteMemberDialog({
             ลบสมาชิก
           </DialogTitle>
           <DialogDescription>
-            <span className="text-foreground font-medium">
+            <span className="text-primary font-medium">
               คุณแน่ใจหรือไม่ที่จะลบสมาชิก{memberName}
             </span>
           </DialogDescription>

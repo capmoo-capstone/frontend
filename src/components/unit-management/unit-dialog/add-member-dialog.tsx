@@ -63,11 +63,11 @@ export function AddMemberDialog({ isOpen, onClose, index, unitId }: AddMemberDia
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader className="flex flex-col items-center text-center">
-          <DialogTitle className="text-h3-topic flex items-center justify-center">
+          <DialogTitle className="h3-topic flex items-center justify-center">
             การเพิ่มเจ้าหน้าที่ในกลุ่มงานที่ {index}
           </DialogTitle>
           <DialogDescription className="mt-6 mb-3 flex w-full flex-col items-start">
-            <div className="text-foreground text-base font-medium">
+            <div className="text-primary text-base font-medium">
               ชื่อพนักงาน <span className="text-destructive">*</span>
             </div>
 

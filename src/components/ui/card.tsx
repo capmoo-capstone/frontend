@@ -30,7 +30,7 @@ function CardHeader({ className, ...props }: React.ComponentProps<'div'>) {
 
 function CardTitle({ className, ...props }: React.ComponentProps<'div'>) {
   return (
-    <div data-slot="card-title" className={cn('h4-topic leading-none', className)} {...props} />
+    <div data-slot="card-title" className={cn('text-based leading-none', className)} {...props} />
   );
 }
 

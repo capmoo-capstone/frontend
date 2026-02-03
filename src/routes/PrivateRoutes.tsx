@@ -116,7 +116,7 @@ export const PrivateRoutes = () => {
         </Route>
 
         <Route element={<ProtectedRoute allowedRoles={['ADMIN']} />}>
-          <Route path="app/management/organization" element={<OrganizationManagement />} />
+          <Route path="app/settings" element={<OrganizationManagement />} />
         </Route>
 
         {/* === FALLBACK === */}

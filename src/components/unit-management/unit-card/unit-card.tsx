@@ -33,7 +33,7 @@ export function UnitCard({ unitItem, index }: { unitItem: Unit; index: number })
       <Card className="p-6">
         <CardHeader className="flex flex-row items-center justify-between">
           <div className="flex items-center gap-2">
-            <CardTitle className="text-h2-topic flex flex-row items-center gap-2">
+            <CardTitle className="h2-topic flex flex-row items-center gap-2">
               <Users /> กลุ่มงานที่ {index}
             </CardTitle>
           </div>
@@ -61,13 +61,13 @@ export function UnitCard({ unitItem, index }: { unitItem: Unit; index: number })
         </CardHeader>
         <CardContent className="flex flex-col gap-7">
           <span className="flex items-center gap-4">
-            <span className="text-h3-topic">ประเภทงาน</span>
+            <span className="h3-topic">ประเภทงาน</span>
             {unitItem.type?.map((t: UnitResponsibleType) => (
               <ProjectBadge type={t} />
             ))}
           </span>
           <span className="flex items-center gap-7">
-            <span className="text-h3-topic">หัวหน้ากลุ่มงาน</span>
+            <span className="h3-topic">หัวหน้ากลุ่มงาน</span>
             <span className="text-normal-normal">{headUnit?.full_name}</span>
             {isEditing && (
               <Button
@@ -80,7 +80,7 @@ export function UnitCard({ unitItem, index }: { unitItem: Unit; index: number })
             )}
           </span>
           <Collapsible>
-            <CollapsibleTrigger className="group text-h3-topic">
+            <CollapsibleTrigger className="group h3-topic">
               เจ้าหน้าที่ ({users?.data?.length ?? 0})
               <Button className="ml-4 inline-block px-1" variant="ghost">
                 <ChevronDown className="group-data-[state=open]:rotate-180" />

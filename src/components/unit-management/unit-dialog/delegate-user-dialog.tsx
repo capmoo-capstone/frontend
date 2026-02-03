@@ -82,23 +82,24 @@ export function DelegateUserDialog({ isOpen, onClose, unitId, role }: DelegateUs
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader className="flex flex-col items-center text-center">
-          <DialogTitle className="text-h3-topic flex items-center justify-center">
+          <DialogTitle className="h3-topic flex items-center justify-center">
             การแต่งตั้งหัวหน้างานใหม่/ผู้รักษาการแทน
           </DialogTitle>
           <DialogDescription className="mt-6 mb-3 flex w-full flex-col items-start">
-            <div className="text-foreground text-base font-medium">
+            <div className="text-primary text-base font-medium">
               ชื่อพนักงาน <span className="text-destructive">*</span>
             </div>
             <UserSelect
+              value={selectedUser}
               onChange={setSelectedUser}
-              className="mt-1 w-full"
+              departmentId="department_procure"
+              className="w-full"
               placeholder="เลือกเจ้าหน้าที่..."
               hasClearButton={false}
-              departmentId="department_procure"
             />
             <div className="my-6 flex w-full gap-6">
               <div className="flex flex-1 flex-col">
-                <div className="text-foreground text-base font-medium">
+                <div className="text-primary text-base font-medium">
                   ตั้งแต่วันที่ <span className="text-destructive">*</span>
                 </div>
                 <DatePicker
@@ -110,12 +111,12 @@ export function DelegateUserDialog({ isOpen, onClose, unitId, role }: DelegateUs
               </div>
 
               <div className="flex flex-1 flex-col">
-                <div className="text-foreground text-base font-medium">
+                <div className="text-primary text-base font-medium">
                   ถึงวันที่ <span className="text-destructive text-base">*</span>
                 </div>
                 <DatePicker
                   className={`w-full ${checkBox ? 'bg-secondary' : ''}`}
-                  date={endDate}
+                  date={checkBox ? undefined : endDate}
                   setDate={setEndDate}
                   isDisabled={checkBox}
                   disabled={(date) => {
@@ -132,7 +133,7 @@ export function DelegateUserDialog({ isOpen, onClose, unitId, role }: DelegateUs
                 checked={checkBox}
                 onCheckedChange={(checked) => setCheckBox(checked === true)}
               />
-              <div className="text-foreground text-base font-normal">ไม่กำหนดวันที่สิ้นสุด</div>
+              <div className="text-primary text-base font-normal">ไม่กำหนดวันที่สิ้นสุด</div>
             </div>
           </DialogDescription>
         </DialogHeader>

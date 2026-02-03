@@ -1,8 +1,6 @@
-// Adjust import path as needed
 import type { Role } from '@/types/auth';
 import type { ProjectDetail, WorkflowStepConfig } from '@/types/project-detail';
 
-// --- Shared Workflow Definition ---
 const WORKFLOW_STEPS: WorkflowStepConfig[] = [
   {
     name: 'จัดทำแผนจัดการจัดซื้อจัดจ้าง และจัดทำคำสั่งแต่งตั้งคณะกรรมการฯ TOR',
@@ -10,13 +8,13 @@ const WORKFLOW_STEPS: WorkflowStepConfig[] = [
     required_step: [],
     required_documents: [
       {
-        type: 'FILE_UPLOAD',
+        type: 'FILE',
         label: 'แผนการจัดซื้อจัดจ้าง',
         field_key: 'mt500k_procurement_plan_file',
         is_required: false,
       },
       {
-        type: 'FILE_UPLOAD',
+        type: 'FILE',
         label: 'คำสั่งแต่งตั้งคณะกรรมการจัดทำขอบเขตของงาน (TOR)',
         field_key: 'mt500k_tor_committee_appt_file',
         is_required: false,
@@ -29,19 +27,19 @@ const WORKFLOW_STEPS: WorkflowStepConfig[] = [
     required_step: [1],
     required_documents: [
       {
-        type: 'FILE_UPLOAD',
+        type: 'FILE',
         label: 'รายงานขอซื้อ/จ้าง',
         field_key: 'mt500k_requisition_report_file',
         is_required: false,
       },
       {
-        type: 'FILE_UPLOAD',
+        type: 'FILE',
         label: 'คำสั่งแต่งตั้งคณะกรรมการซื้อ/จ้าง',
         field_key: 'mt500k_procurement_committee_file',
         is_required: false,
       },
       {
-        type: 'FILE_UPLOAD',
+        type: 'FILE',
         label: 'หนังสือเชิญชวน',
         field_key: 'mt500k_invitation_letter_file',
         is_required: false,
@@ -54,25 +52,25 @@ const WORKFLOW_STEPS: WorkflowStepConfig[] = [
     required_step: [2],
     required_documents: [
       {
-        type: 'FILE_UPLOAD',
+        type: 'FILE',
         label: 'รายงานผลการพิจารณาและอนุมัติสั่งซื้อ/จ้าง',
         field_key: 'mt500k_consideration_report_file',
         is_required: false,
       },
       {
-        type: 'FILE_UPLOAD',
+        type: 'FILE',
         label: 'ประกาศผู้ชนะการเสนอราคา',
         field_key: 'mt500k_winner_announcement_file',
         is_required: false,
       },
       {
-        type: 'FILE_UPLOAD',
+        type: 'FILE',
         label: 'หนังสือแจ้งให้มาลงนามในสัญญา',
         field_key: 'mt500k_contract_notice_file',
         is_required: false,
       },
       {
-        type: 'TEXT_INPUT',
+        type: 'TEXT',
         label: 'เลขที่ใบขอซื้อ (PR Number)',
         field_key: 'mt500k_pr_number',
         is_required: false,
@@ -85,13 +83,13 @@ const WORKFLOW_STEPS: WorkflowStepConfig[] = [
     required_step: [3],
     required_documents: [
       {
-        type: 'FILE_UPLOAD',
+        type: 'FILE',
         label: 'สัญญา / ใบสั่งซื้อสั่งจ้าง / หนังสือข้อตกลง',
         field_key: 'mt500k_contract_doc_file',
         is_required: false,
       },
       {
-        type: 'TEXT_INPUT',
+        type: 'TEXT',
         label: 'เลขที่ใบสั่งซื้อ (PO Number)',
         field_key: 'mt500k_po_number',
         is_required: false,

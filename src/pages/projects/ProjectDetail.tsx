@@ -96,7 +96,8 @@ export default function ProjectDetail() {
 
             const userCanAct = isActionRequired(user.role, status);
             const isCompleted = status === 'completed';
-            const showForm = userCanAct || viewSubmission || isCompleted;
+            const showForm =
+              userCanAct || viewSubmission || isCompleted || status === 'not_started';
 
             return (
               <WorkflowStep

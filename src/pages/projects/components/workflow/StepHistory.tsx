@@ -17,9 +17,9 @@ export function StepHistory({
 }: StepHistoryProps) {
   if (!submissions || submissions.length === 0) {
     return (
-      <div className="text-muted-foreground bg-muted/20 flex h-48 flex-col items-center justify-center rounded-lg border border-dashed">
+      <div className="text-muted-foreground flex h-48 flex-col items-center justify-center rounded-lg border border-dashed">
         <FileText className="mb-2 h-8 w-8 opacity-50" />
-        <span className="normal-l">ยังไม่มีประวัติการส่งงาน</span>
+        <span className="normal">ยังไม่มีประวัติการส่งงาน</span>
       </div>
     );
   }

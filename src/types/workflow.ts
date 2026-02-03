@@ -1,9 +1,4 @@
-export type FieldType =
-  | 'FILE_UPLOAD'
-  | 'TEXT_INPUT'
-  | 'DATE_PICKER'
-  | 'DATE_WITH_CHECKBOX'
-  | 'BOOLEAN';
+import type { FieldType } from './project-detail';
 
 export interface FieldConfig {
   key: string;

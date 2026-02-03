@@ -4,11 +4,15 @@ import { RoleEnum } from './auth';
 import { ProcurementTypeEnum, ProjectStatusEnum, UnitResponsibleTypeEnum } from './project';
 
 export const FieldTypeSchema = z.enum([
-  'FILE_UPLOAD',
-  'TEXT_INPUT',
-  'DATE_PICKER',
-  'DATE_WITH_CHECKBOX',
+  'FILE',
+  'TEXT',
+  'NUMBER',
   'BOOLEAN',
+  'DATE',
+  'DUE_DATE_SELECT',
+  'GEN_CONT_NO',
+  'VENDOR_EMAIL',
+  'COMMITTEE_EMAIL',
 ]);
 
 export type FieldType = z.infer<typeof FieldTypeSchema>;

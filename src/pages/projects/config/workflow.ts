@@ -1,5 +1,4 @@
 import type { UnitResponsibleType } from '@/types/project';
-import type { WorkflowStepConfig } from '@/types/project-detail';
 
 export const ProcurementWorkflows = [
   {

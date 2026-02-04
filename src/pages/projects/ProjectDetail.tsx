@@ -6,20 +6,12 @@ import { toast } from 'sonner';
 
 import { CancelProjectDialog } from '@/components/project-dialog/cancel-project-dialog';
 import { useAuth } from '@/context/AuthContext';
-import { useProjectWorkflow } from '@/hooks/useProjectWorkflow';
 import { useProjectDetail } from '@/hooks/useProjects';
-import { ManageUnitRoles, SupervisorRoles } from '@/lib/permissions';
-import { isActionRequired } from '@/lib/workflow-utils';
-import type { FieldConfig } from '@/types/workflow';
+import { ManageUnitRoles, SupervisorRoles } from '@/lib/role-permissions';
 
 import { ProjectHeader } from './components/ProjectHeader';
 import { ProjectInfoGrid } from './components/ProjectInfoGrid';
-import { DynamicStepForm } from './components/workflow/DynamicStepForm';
-import { StatusWaitingCard } from './components/workflow/StatusWaitingCard';
-import { StepActionForm } from './components/workflow/StepActionForm';
-import { StepHistory } from './components/workflow/StepHistory';
-import { WorkflowList } from './components/workflow/WorkflowList';
-import { WorkflowStep } from './components/workflow/WorkflowStep';
+import { ProjectWorkflowSteps } from './components/workflow/ProjectWorkflowSteps';
 
 export default function ProjectDetail() {
   const { id } = useParams();
@@ -27,17 +19,6 @@ export default function ProjectDetail() {
   const [isCancelDialogOpen, setIsCancelDialogOpen] = useState(false);
 
   const { data: project, isLoading, isError, error } = useProjectDetail(id);
-
-  const {
-    getStepStatus,
-    getStepSubmissions,
-    getStepFormData,
-    getSubmissionFormData,
-    handleStepFormChange,
-    handleSelectSubmission,
-    handleBackToEdit,
-    viewingSubmissions,
-  } = useProjectWorkflow(project);
 
   if (!id || !user) return null;
   if (isLoading)
@@ -49,14 +30,6 @@ export default function ProjectDetail() {
   if (isError) return <div className="p-8 text-center text-red-500">Error: {error?.message}</div>;
   if (!project) return null;
 
-  const convertToFieldConfig = (docs: any[]): FieldConfig[] =>
-    docs.map((doc) => ({
-      key: doc.field_key,
-      label: doc.label,
-      type: doc.type,
-      required: doc.mark_as_done,
-    }));
-
   const handleConfirmCancel = async () => {
     toast.success('ยกเลิกโครงการสำเร็จ');
     setIsCancelDialogOpen(false);
@@ -64,10 +37,6 @@ export default function ProjectDetail() {
 
   const handleExportReport = async () => {
     toast.success('ส่งออกรายงานสำเร็จ');
-  };
-
-  const handleGenerateContract = async (contractType: string, year: string) => {
-    toast.success(`สร้างเลขที่สัญญาประเภท ${contractType} ปี ${year} สำเร็จ`);
   };
 
   return (
@@ -80,86 +49,7 @@ export default function ProjectDetail() {
       />
       <ProjectInfoGrid project={project} />
 
-      <WorkflowList>
-        {(() => {
-          const sortedSteps = [...project.workflow.steps].sort((a, b) => a.order - b.order);
-          const lastStepOrder = sortedSteps[sortedSteps.length - 1]?.order;
-
-          return sortedSteps.map((step) => {
-            const status = getStepStatus(step.order);
-            const submissions = getStepSubmissions(step.order);
-            const viewSubmission = viewingSubmissions[step.order];
-            const fields = convertToFieldConfig(step.required_documents);
-
-            const userCanAct = isActionRequired(user.role, status);
-            const isCompleted = status === 'completed';
-            const showForm =
-              userCanAct || viewSubmission || isCompleted || status === 'not_started';
-            const isGuest = user.role === 'GUEST' || user.role === 'REPRESENTATIVE';
-
-            return (
-              <WorkflowStep
-                key={`step-${step.order}`}
-                id={`step-${step.order}`}
-                index={step.order}
-                viewAsRole={user.role}
-                isLast={step.order === lastStepOrder}
-                title={step.name}
-                status={status}
-                isGuest={isGuest}
-              >
-                {!isGuest && (
-                  <div className="grid grid-cols-1 gap-8 pt-2 lg:grid-cols-12">
-                    {/* Left: History */}
-                    <div className="lg:col-span-4">
-                      <StepHistory
-                        submissions={submissions}
-                        onSelectSubmission={(sub) => handleSelectSubmission(step.order, sub)}
-                        selectedSubmissionId={
-                          viewSubmission
-                            ? `${step.order}-${viewSubmission.submission_round}`
-                            : undefined
-                        }
-                      />
-                    </div>
-
-                    {/* Right: Form OR Status Card */}
-                    <div className="lg:col-span-8">
-                      {showForm ? (
-                        <StepActionForm
-                          isActive={!viewSubmission && !isCompleted}
-                          stepStatus={status}
-                          viewAsRole={user.role}
-                          viewSubmission={viewSubmission || null}
-                          onBackToEdit={() => handleBackToEdit(step.order)}
-                        >
-                          <DynamicStepForm
-                            fields={fields}
-                            formData={
-                              viewSubmission
-                                ? getSubmissionFormData(viewSubmission)
-                                : getStepFormData(step.order)
-                            }
-                            onChange={(key, val) => handleStepFormChange(step.order, key, val)}
-                            disabled={
-                              isCompleted ||
-                              viewSubmission !== undefined ||
-                              !userCanAct ||
-                              user.role !== 'GENERAL_STAFF'
-                            }
-                          />
-                        </StepActionForm>
-                      ) : (
-                        <StatusWaitingCard status={status} viewAsRole={user.role} />
-                      )}
-                    </div>
-                  </div>
-                )}
-              </WorkflowStep>
-            );
-          });
-        })()}
-      </WorkflowList>
+      <ProjectWorkflowSteps project={project} />
 
       <CancelProjectDialog
         isOpen={isCancelDialogOpen}

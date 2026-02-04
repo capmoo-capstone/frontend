@@ -5,7 +5,6 @@ import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { CancelProjectDialog } from '@/components/project-dialog/cancel-project-dialog';
-import { GenerateContractDialog } from '@/components/project-dialog/generate-contract-dialog';
 import { useAuth } from '@/context/AuthContext';
 import { useProjectWorkflow } from '@/hooks/useProjectWorkflow';
 import { useProjectDetail } from '@/hooks/useProjects';
@@ -26,7 +25,6 @@ export default function ProjectDetail() {
   const { id } = useParams();
   const { user } = useAuth();
   const [isCancelDialogOpen, setIsCancelDialogOpen] = useState(false);
-  const [isGenerateContractDialogOpen, setIsGenerateContractDialogOpen] = useState(false);
 
   const { data: project, isLoading, isError, error } = useProjectDetail(id);
 
@@ -56,7 +54,7 @@ export default function ProjectDetail() {
       key: doc.field_key,
       label: doc.label,
       type: doc.type,
-      required: doc.is_required,
+      required: doc.mark_as_done,
     }));
 
   const handleConfirmCancel = async () => {
@@ -78,7 +76,6 @@ export default function ProjectDetail() {
         project={project}
         onCancelProject={() => setIsCancelDialogOpen(true)}
         onExportReport={handleExportReport}
-        onGenerateContract={() => setIsGenerateContractDialogOpen(true)}
         viewAsRole={user.role}
       />
       <ProjectInfoGrid project={project} />
@@ -98,6 +95,7 @@ export default function ProjectDetail() {
             const isCompleted = status === 'completed';
             const showForm =
               userCanAct || viewSubmission || isCompleted || status === 'not_started';
+            const isGuest = user.role === 'GUEST' || user.role === 'REPRESENTATIVE';
 
             return (
               <WorkflowStep
@@ -108,52 +106,55 @@ export default function ProjectDetail() {
                 isLast={step.order === lastStepOrder}
                 title={step.name}
                 status={status}
+                isGuest={isGuest}
               >
-                <div className="grid grid-cols-1 gap-8 pt-2 lg:grid-cols-12">
-                  {/* Left: History */}
-                  <div className="lg:col-span-4">
-                    <StepHistory
-                      submissions={submissions}
-                      onSelectSubmission={(sub) => handleSelectSubmission(step.order, sub)}
-                      selectedSubmissionId={
-                        viewSubmission
-                          ? `${step.order}-${viewSubmission.submission_round}`
-                          : undefined
-                      }
-                    />
-                  </div>
+                {!isGuest && (
+                  <div className="grid grid-cols-1 gap-8 pt-2 lg:grid-cols-12">
+                    {/* Left: History */}
+                    <div className="lg:col-span-4">
+                      <StepHistory
+                        submissions={submissions}
+                        onSelectSubmission={(sub) => handleSelectSubmission(step.order, sub)}
+                        selectedSubmissionId={
+                          viewSubmission
+                            ? `${step.order}-${viewSubmission.submission_round}`
+                            : undefined
+                        }
+                      />
+                    </div>
 
-                  {/* Right: Form OR Status Card */}
-                  <div className="lg:col-span-8">
-                    {showForm ? (
-                      <StepActionForm
-                        isActive={!viewSubmission && !isCompleted}
-                        stepStatus={status}
-                        viewAsRole={user.role}
-                        viewSubmission={viewSubmission || null}
-                        onBackToEdit={() => handleBackToEdit(step.order)}
-                      >
-                        <DynamicStepForm
-                          fields={fields}
-                          formData={
-                            viewSubmission
-                              ? getSubmissionFormData(viewSubmission)
-                              : getStepFormData(step.order)
-                          }
-                          onChange={(key, val) => handleStepFormChange(step.order, key, val)}
-                          disabled={
-                            isCompleted ||
-                            viewSubmission !== undefined ||
-                            !userCanAct ||
-                            user.role !== 'GENERAL_STAFF'
-                          }
-                        />
-                      </StepActionForm>
-                    ) : (
-                      <StatusWaitingCard status={status} />
-                    )}
+                    {/* Right: Form OR Status Card */}
+                    <div className="lg:col-span-8">
+                      {showForm ? (
+                        <StepActionForm
+                          isActive={!viewSubmission && !isCompleted}
+                          stepStatus={status}
+                          viewAsRole={user.role}
+                          viewSubmission={viewSubmission || null}
+                          onBackToEdit={() => handleBackToEdit(step.order)}
+                        >
+                          <DynamicStepForm
+                            fields={fields}
+                            formData={
+                              viewSubmission
+                                ? getSubmissionFormData(viewSubmission)
+                                : getStepFormData(step.order)
+                            }
+                            onChange={(key, val) => handleStepFormChange(step.order, key, val)}
+                            disabled={
+                              isCompleted ||
+                              viewSubmission !== undefined ||
+                              !userCanAct ||
+                              user.role !== 'GENERAL_STAFF'
+                            }
+                          />
+                        </StepActionForm>
+                      ) : (
+                        <StatusWaitingCard status={status} viewAsRole={user.role} />
+                      )}
+                    </div>
                   </div>
-                </div>
+                )}
               </WorkflowStep>
             );
           });
@@ -166,13 +167,6 @@ export default function ProjectDetail() {
         onConfirm={handleConfirmCancel}
         projectTitle={project.title}
         isAuthorized={ManageUnitRoles.includes(user.role) || SupervisorRoles.includes(user.role)}
-      />
-
-      <GenerateContractDialog
-        isOpen={isGenerateContractDialogOpen}
-        onClose={() => setIsGenerateContractDialogOpen(false)}
-        onConfirm={handleGenerateContract}
-        projectTitle={project.title}
       />
     </>
   );

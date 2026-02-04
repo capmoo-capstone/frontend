@@ -1,0 +1,890 @@
+import type { UnitResponsibleType } from '@/types/project';
+import type { WorkflowStepConfig } from '@/types/project-detail';
+
+export const ProcurementWorkflows = [
+  {
+    type: 'MT500K' as UnitResponsibleType,
+    steps: [
+      {
+        name: 'จัดทำแผนจัดการจัดซื้อจัดจ้าง และจัดทำคำสั่งแต่งตั้งคณะกรรมการฯ TOR',
+        order: 1,
+        required_step: [],
+        required_documents: [
+          {
+            type: 'FILE',
+            label: 'แผนการจัดซื้อจัดจ้าง',
+            field_key: 'mt500k_procurement_plan_file',
+            mark_as_done: false,
+          },
+          {
+            type: 'FILE',
+            label: 'คำสั่งแต่งตั้งคณะกรรมการจัดทำขอบเขตของงาน (TOR)',
+            field_key: 'mt500k_tor_committee_appt_file',
+            mark_as_done: false,
+          },
+        ],
+      },
+      {
+        name: 'จัดทำรายงานขอซื้อหรือขอจ้าง, คำสั่งแต่งตั้งคณะกรรมการซื้อหรือจ้าง และหนังสือเชิญชวน',
+        order: 2,
+        required_step: [1],
+        required_documents: [
+          {
+            type: 'FILE',
+            label: 'รายงานขอซื้อ/จ้าง',
+            field_key: 'mt500k_requisition_report_file',
+            mark_as_done: false,
+          },
+          {
+            type: 'FILE',
+            label: 'คำสั่งแต่งตั้งคณะกรรมการซื้อ/จ้าง',
+            field_key: 'mt500k_procurement_committee_file',
+            mark_as_done: false,
+          },
+          {
+            type: 'FILE',
+            label: 'หนังสือเชิญชวน',
+            field_key: 'mt500k_invitation_letter_file',
+            mark_as_done: false,
+          },
+        ],
+      },
+      {
+        name: 'จัดทำรายงานผลการพิจารณาจัดซื้อจัดจ้าง, รายงานผลฯ อนุมัติ ประกาศผู้ชนะ และหนังสือสนองรับราคาฯ',
+        order: 3,
+        required_step: [2],
+        required_documents: [
+          {
+            type: 'FILE',
+            label: 'รายงานผลการพิจารณาและอนุมัติสั่งซื้อ/จ้าง',
+            field_key: 'mt500k_consideration_report_file',
+            mark_as_done: false,
+          },
+          {
+            type: 'FILE',
+            label: 'ประกาศผู้ชนะการเสนอราคา',
+            field_key: 'mt500k_winner_announcement_file',
+            mark_as_done: false,
+          },
+          {
+            type: 'FILE',
+            label: 'หนังสือแจ้งให้มาลงนามในสัญญา',
+            field_key: 'mt500k_contract_notice_file',
+            mark_as_done: false,
+          },
+          {
+            type: 'TEXT',
+            label: 'เลขที่ใบขอซื้อ (PR Number)',
+            field_key: 'mt500k_pr_number',
+            mark_as_done: true,
+          },
+        ],
+      },
+      {
+        name: 'จัดทำร่างสัญญา / ใบสั่งซื้อสั่งจ้าง / หนังสือข้อตกลง',
+        order: 4,
+        required_step: [3],
+        required_documents: [
+          {
+            type: 'GEN_CONT_NO',
+            label: 'เลขที่สัญญา',
+            field_key: 'mt500k_contract_number',
+            mark_as_done: true,
+          },
+          {
+            type: 'FILE',
+            label: 'สัญญา / ใบสั่งซื้อสั่งจ้าง / หนังสือข้อตกลง',
+            field_key: 'mt500k_contract_doc_file',
+            mark_as_done: false,
+          },
+          {
+            type: 'TEXT',
+            label: 'เลขที่ใบสั่งซื้อ (PO Number)',
+            field_key: 'mt500k_po_number',
+            mark_as_done: true,
+          },
+        ],
+      },
+      {
+        name: 'แจ้งเตือนผู้ค้าให้เข้ามาลงนามในเอกสารสั่งซื้อ/จ้าง',
+        order: 5,
+        required_step: [4],
+        required_documents: [
+          {
+            type: 'VENDOR_EMAIL',
+            label: 'อีเมลผู้ค้า',
+            field_key: 'mt500k_vendor_email',
+            mark_as_done: true,
+          },
+        ],
+      },
+      {
+        name: 'ส่งไปยังฝ่ายตรวจรับ',
+        order: 6,
+        required_step: [5],
+        required_documents: [
+          {
+            type: 'NUMBER',
+            label: 'จำนวนงวด',
+            field_key: 'mt500k_installment_count',
+            mark_as_done: true,
+          },
+          { type: 'NUMBER', label: 'วงเงิน', field_key: 'mt500k_credit_limit', mark_as_done: true },
+          {
+            type: 'DATE',
+            label: 'วันเริ่มต้นสัญญา',
+            field_key: 'mt500k_contract_start_date',
+            mark_as_done: true,
+          },
+          {
+            type: 'DATE',
+            label: 'วันสิ้นสุดสัญญา',
+            field_key: 'mt500k_contract_end_date',
+            mark_as_done: true,
+          },
+        ],
+      },
+    ],
+  },
+  {
+    type: 'EBIDDING' as UnitResponsibleType,
+    steps: [
+      {
+        name: 'จัดทำแผนจัดการจัดซื้อจัดจ้าง',
+        order: 1,
+        required_step: [],
+        required_documents: [
+          {
+            type: 'FILE',
+            label: 'แผนการจัดซื้อจัดจ้าง',
+            field_key: 'ebid_procurement_plan_file',
+            mark_as_done: false,
+          },
+        ],
+      },
+      {
+        name: 'จัดทำรายงานขอมอบหมายผู้จัดทำขอบเขตของงาน และคำสั่งแต่งตั้ง',
+        order: 2,
+        required_step: [1],
+        required_documents: [
+          {
+            type: 'FILE',
+            label: 'รายงานขอมอบหมายผู้จัดทำขอบเขตของงาน',
+            field_key: 'ebid_tor_assignment_report_file',
+            mark_as_done: false,
+          },
+          {
+            type: 'FILE',
+            label: 'คำสั่งแต่งตั้งคณะกรรมการจัดทำขอบเขตของงาน (TOR)',
+            field_key: 'ebid_tor_committee_appt_file',
+            mark_as_done: false,
+          },
+        ],
+      },
+      {
+        name: 'จัดประชุมคณะกรรมการจัดทำขอบเขตของงาน',
+        order: 3,
+        required_step: [2],
+        required_documents: [
+          {
+            type: 'DATE',
+            label: 'วันที่ประชุมจัดทำร่างขอบเขตของงาน',
+            field_key: 'ebid_tor_meeting_date',
+            mark_as_done: true,
+          },
+          {
+            type: 'FILE',
+            label: 'บันทึกรายงานการประชุม',
+            field_key: 'ebid_tor_meeting_minutes_file',
+            mark_as_done: false,
+          },
+        ],
+      },
+      {
+        name: 'จัดทำรายงานขอซื้อ / จ้าง, คำสั่งแต่งตั้งคณะกรรมการพิจารณาผลและตรวจรับ, เอกสารประกวดราคาจ้างฯ และร่างประกาศ',
+        order: 4,
+        required_step: [3],
+        required_documents: [
+          {
+            type: 'FILE',
+            label: 'รายงานขอซื้อ/จ้าง',
+            field_key: 'ebid_requisition_report_file',
+            mark_as_done: false,
+          },
+          {
+            type: 'FILE',
+            label: 'คำสั่งแต่งตั้งคณะกรรมการพิจารณาผลและตรวจรับ',
+            field_key: 'ebid_procurement_committee_file',
+            mark_as_done: false,
+          },
+          {
+            type: 'FILE',
+            label: 'เอกสารประกวดราคาจ้าง',
+            field_key: 'ebid_tender_doc_file',
+            mark_as_done: false,
+          },
+          {
+            type: 'FILE',
+            label: 'เอกสารประกาศเชิญชวน',
+            field_key: 'ebid_announcement_draft_file',
+            mark_as_done: false,
+          },
+          {
+            type: 'FILE',
+            label: 'ขอบเขตของงาน (TOR)',
+            field_key: 'ebid_tor_file',
+            mark_as_done: false,
+          },
+        ],
+      },
+      {
+        name: 'จัดทำรายงานผลการรับฟังความเห็น, เอกสารประกวดราคาฯ และประกาศฉบับจริง',
+        order: 5,
+        required_step: [4],
+        required_documents: [
+          {
+            type: 'FILE',
+            label: 'รายงานผลการรับฟังความเห็น',
+            field_key: 'ebid_hearing_report_file',
+            mark_as_done: false,
+          },
+          { type: 'BOOLEAN', label: 'มีอุทธรณ์', field_key: 'ebid_is_appeal', mark_as_done: false },
+          {
+            type: 'FILE',
+            label: 'เอกสารประกวดราคา',
+            field_key: 'ebid_final_tender_doc_file',
+            mark_as_done: false,
+          },
+          {
+            type: 'FILE',
+            label: 'เอกสารประกาศเชิญชวน',
+            field_key: 'ebid_final_announcement_file',
+            mark_as_done: false,
+          },
+        ],
+      },
+      {
+        name: 'จัดประชุมคณะกรรมการพิจารณาผลฯ',
+        order: 6,
+        required_step: [5],
+        required_documents: [
+          {
+            type: 'DATE',
+            label: 'วันที่ประชุมคณะกรรมการพิจารณาผล',
+            field_key: 'ebid_consideration_meeting_date',
+            mark_as_done: true,
+          },
+          {
+            type: 'FILE',
+            label: 'เอกสารประกอบการประชุม',
+            field_key: 'ebid_consideration_meeting_doc_file',
+            mark_as_done: true,
+          },
+        ],
+      },
+      {
+        name: 'จัดทำรายงานผลการพิจารณาจัดซื้อจัดจ้าง, รายงานผลฯอนุมัติ, แบบแจ้งผลการจัดซื้อ / จ้าง, แบบแจ้งเหตุผลเพิ่มเติม ประกาศผู้ชนะ และหนังสือสนองรับราคาฯ',
+        order: 7,
+        required_step: [6],
+        required_documents: [
+          {
+            type: 'FILE',
+            label: 'รายงานผลการพิจารณาและแบบแจ้งผลการจัดซื้อ/จ้าง',
+            field_key: 'ebid_consideration_report_file',
+            mark_as_done: false,
+          },
+          {
+            type: 'FILE',
+            label: 'ประกาศผู้ชนะการเสนอราคา',
+            field_key: 'ebid_winner_announcement_file',
+            mark_as_done: false,
+          },
+          {
+            type: 'FILE',
+            label: 'หนังสือแจ้งให้มาลงนามในสัญญา',
+            field_key: 'ebid_contract_notice_file',
+            mark_as_done: false,
+          },
+          {
+            type: 'TEXT',
+            label: 'เลขที่ใบขอซื้อ (PR Number)',
+            field_key: 'ebid_pr_number',
+            mark_as_done: true,
+          },
+          {
+            type: 'GEN_CONT_NO',
+            label: 'เลขที่สัญญา',
+            field_key: 'ebid_contract_number',
+            mark_as_done: true,
+          },
+        ],
+      },
+      {
+        name: 'จัดทำร่างสัญญา พร้อมเอกสารประกอบสัญญา และหลักประกันสัญญา',
+        order: 8,
+        required_step: [7],
+        required_documents: [
+          {
+            type: 'FILE',
+            label: 'สัญญา / ใบสั่งซื้อสั่งจ้าง / หนังสือข้อตกลง',
+            field_key: 'ebid_contract_doc_file',
+            mark_as_done: false,
+          },
+          {
+            type: 'TEXT',
+            label: 'เลขที่ใบสั่งซื้อ (PO Number)',
+            field_key: 'ebid_po_number',
+            mark_as_done: true,
+          },
+        ],
+      },
+      {
+        name: 'แจ้งเตือนผู้ค้าให้เข้ามาลงนามในเอกสารสั่งซื้อ/จ้าง',
+        order: 9,
+        required_step: [8],
+        required_documents: [
+          {
+            type: 'VENDOR_EMAIL',
+            label: 'อีเมลผู้ค้า',
+            field_key: 'ebid_vendor_email',
+            mark_as_done: true,
+          },
+        ],
+      },
+      {
+        name: 'ส่งไปยังฝ่ายตรวจรับ',
+        order: 10,
+        required_step: [9],
+        required_documents: [
+          {
+            type: 'NUMBER',
+            label: 'จำนวนงวด',
+            field_key: 'ebid_installment_count',
+            mark_as_done: true,
+          },
+          { type: 'NUMBER', label: 'วงเงิน', field_key: 'ebid_credit_limit', mark_as_done: true },
+          {
+            type: 'DATE',
+            label: 'วันเริ่มต้นสัญญา',
+            field_key: 'ebid_contract_start_date',
+            mark_as_done: true,
+          },
+          {
+            type: 'DATE',
+            label: 'วันสิ้นสุดสัญญา',
+            field_key: 'ebid_contract_end_date',
+            mark_as_done: true,
+          },
+        ],
+      },
+    ],
+  },
+  {
+    type: 'SELECTION' as UnitResponsibleType,
+    steps: [
+      {
+        name: 'แผนจัดการจัดซื้อจัดจ้าง และจัดทำคำสั่งแต่งตั้งคณะกรรมการฯ TOR',
+        order: 1,
+        required_step: [],
+        required_documents: [
+          {
+            type: 'FILE',
+            label: 'แผนการจัดซื้อ/จ้าง',
+            field_key: 'select_procurement_plan_file',
+            mark_as_done: false,
+          },
+          {
+            type: 'FILE',
+            label: 'คำสั่งแต่งตั้งคณะกรรมการจัดทำขอบเขตของงาน (TOR)',
+            field_key: 'select_tor_committee_appt_file',
+            mark_as_done: false,
+          },
+        ],
+      },
+      {
+        name: 'รายงานขอซื้อ / จ้าง, คำสั่งคณะกรรมการซื้อ / จ้าง โดยวิธีคัดเลือก, หนังสือเชิญชวน',
+        order: 2,
+        required_step: [1],
+        required_documents: [
+          {
+            type: 'FILE',
+            label: 'รายงานขอซื้อ/จ้าง',
+            field_key: 'select_requisition_report_file',
+            mark_as_done: false,
+          },
+          {
+            type: 'FILE',
+            label: 'คำสั่งแต่งตั้งคณะกรรมการซื้อหรือจ้าง',
+            field_key: 'select_procurement_committee_file',
+            mark_as_done: false,
+          },
+          {
+            type: 'FILE',
+            label: 'หนังสือเชิญชวน',
+            field_key: 'select_invitation_letter_file',
+            mark_as_done: false,
+          },
+        ],
+      },
+      {
+        name: 'จัดประชุมคณะกรรมการจ้างโดยวิธีคัดเลือก',
+        order: 3,
+        required_step: [2],
+        required_documents: [
+          {
+            type: 'DATE',
+            label: 'วันที่ประชุมคณะกรรมการ',
+            field_key: 'select_meeting_date',
+            mark_as_done: true,
+          },
+          {
+            type: 'BOOLEAN',
+            label: 'ประชุมเสร็จเรียบร้อยหรือยัง',
+            field_key: 'select_meeting_completed',
+            mark_as_done: true,
+          },
+          {
+            type: 'FILE',
+            label: 'เอกสารประกอบการประชุม',
+            field_key: 'select_meeting_doc_file',
+            mark_as_done: false,
+          },
+        ],
+      },
+      {
+        name: 'จัดทำรายงานผลการพิจารณาจัดซื้อจัดจ้าง, รายงานผลฯ อนุมัติ, แบบแจ้งผลการจัดซื้อ / จ้าง, แบบแจ้งเหตุผลเพิ่มเติม ประกาศผู้ชนะ และหนังสือสนองรับราคาฯ',
+        order: 4,
+        required_step: [3],
+        required_documents: [
+          {
+            type: 'FILE',
+            label: 'รายงานผลการพิจารณาและแบบแจ้งผลการจัดซื้อ/จ้าง',
+            field_key: 'select_consideration_report_file',
+            mark_as_done: false,
+          },
+          {
+            type: 'FILE',
+            label: 'ประกาศผู้ชนะการเสนอราคา',
+            field_key: 'select_winner_announcement_file',
+            mark_as_done: false,
+          },
+          {
+            type: 'FILE',
+            label: 'หนังสือแจ้งให้มาลงนามในสัญญา',
+            field_key: 'select_contract_notice_file',
+            mark_as_done: false,
+          },
+          {
+            type: 'TEXT',
+            label: 'เลขที่ใบขอซื้อ (PR Number)',
+            field_key: 'select_is_sap_pr_approved',
+            mark_as_done: true,
+          },
+          {
+            type: 'GEN_CONT_NO',
+            label: 'เลขที่สัญญา',
+            field_key: 'select_contract_number',
+            mark_as_done: true,
+          },
+        ],
+      },
+      {
+        name: 'จัดทำร่างสัญญา / ใบสั่งซื้อ/จ้าง',
+        order: 5,
+        required_step: [4],
+        required_documents: [
+          {
+            type: 'FILE',
+            label: 'สัญญา / ใบสั่งซื้อสั่งจ้าง / หนังสือข้อตกลง',
+            field_key: 'select_contract_doc_file',
+            mark_as_done: false,
+          },
+          {
+            type: 'TEXT',
+            label: 'เลขที่ใบสั่งซื้อ (PO Number)',
+            field_key: 'select_po_number',
+            mark_as_done: true,
+          },
+        ],
+      },
+      {
+        name: 'แจ้งเตือนผู้ค้าให้เข้ามาลงนามในเอกสารสั่งซื้อ/จ้าง',
+        order: 6,
+        required_step: [5],
+        required_documents: [
+          {
+            type: 'VENDOR_EMAIL',
+            label: 'อีเมลผู้ค้า',
+            field_key: 'select_vendor_email',
+            mark_as_done: true,
+          },
+        ],
+      },
+      {
+        name: 'ส่งไปยังฝ่ายตรวจรับ',
+        order: 7,
+        required_step: [6],
+        required_documents: [
+          {
+            type: 'NUMBER',
+            label: 'จำนวนงวด',
+            field_key: 'select_installment_count',
+            mark_as_done: true,
+          },
+          { type: 'NUMBER', label: 'วงเงิน', field_key: 'select_credit_limit', mark_as_done: true },
+          {
+            type: 'DATE',
+            label: 'วันเริ่มต้นสัญญา',
+            field_key: 'select_contract_start_date',
+            mark_as_done: true,
+          },
+          {
+            type: 'DATE',
+            label: 'วันสิ้นสุดสัญญา',
+            field_key: 'select_contract_end_date',
+            mark_as_done: true,
+          },
+        ],
+      },
+    ],
+  },
+  {
+    type: 'LT500K' as UnitResponsibleType,
+    steps: [
+      {
+        name: 'จัดทำรายงานขอซื้อ/จ้าง ,รายงานผลฯอนุมัติ ประกาศผู้ชนะ',
+        order: 1,
+        required_step: [],
+        required_documents: [
+          {
+            type: 'FILE',
+            label: 'รายงานขอซื้อ/จ้าง',
+            field_key: 'lt500k_requisition_report_file',
+            mark_as_done: false,
+          },
+          {
+            type: 'FILE',
+            label: 'รายงานผลฯอนุมัติ',
+            field_key: 'lt500k_consideration_report_file',
+            mark_as_done: false,
+          },
+          {
+            type: 'FILE',
+            label: 'ประกาศผู้ชนะ',
+            field_key: 'lt500k_winner_announcement_file',
+            mark_as_done: false,
+          },
+          {
+            type: 'TEXT',
+            label: 'เลขที่ใบขอซื้อ (PR Number)',
+            field_key: 'lt500k_pr_number',
+            mark_as_done: true,
+          },
+        ],
+      },
+      {
+        name: 'จัดทำใบสั่งซื้อสั่งจ้าง',
+        order: 2,
+        required_step: [1],
+        required_documents: [
+          {
+            type: 'GEN_CONT_NO',
+            label: 'เลขที่สัญญา',
+            field_key: 'lt500k_contract_number',
+            mark_as_done: true,
+          },
+          {
+            type: 'FILE',
+            label: 'สัญญา / ใบสั่งซื้อสั่งจ้าง / หนังสือข้อตกลง',
+            field_key: 'lt500k_contract_doc_file',
+            mark_as_done: false,
+          },
+          {
+            type: 'TEXT',
+            label: 'เลขที่ใบสั่งซื้อ (PO Number)',
+            field_key: 'lt500k_po_number',
+            mark_as_done: true,
+          },
+        ],
+      },
+      {
+        name: 'แจ้งเตือนผู้ค้าให้เข้ามาลงนามในเอกสารสั่งซื้อ/จ้าง',
+        order: 3,
+        required_step: [2],
+        required_documents: [
+          {
+            type: 'VENDOR_EMAIL',
+            label: 'อีเมลผู้ค้า',
+            field_key: 'lt500k_vendor_email',
+            mark_as_done: true,
+          },
+        ],
+      },
+      {
+        name: 'ส่งไปยังฝ่ายตรวจรับ',
+        order: 4,
+        required_step: [3],
+        required_documents: [
+          {
+            type: 'NUMBER',
+            label: 'จำนวนงวด',
+            field_key: 'lt500k_installment_count',
+            mark_as_done: true,
+          },
+          { type: 'NUMBER', label: 'วงเงิน', field_key: 'lt500k_credit_limit', mark_as_done: true },
+          {
+            type: 'DATE',
+            label: 'วันเริ่มต้นสัญญา',
+            field_key: 'lt500k_contract_start_date',
+            mark_as_done: true,
+          },
+          {
+            type: 'DATE',
+            label: 'วันสิ้นสุดสัญญา',
+            field_key: 'lt500k_contract_end_date',
+            mark_as_done: true,
+          },
+        ],
+      },
+    ],
+  },
+  {
+    type: 'LT100K' as UnitResponsibleType,
+    steps: [
+      {
+        name: 'จัดใบขอซื้อ',
+        order: 1,
+        required_step: [],
+        required_documents: [
+          {
+            type: 'TEXT',
+            label: 'เลขที่ใบขอซื้อ (PR Number)',
+            field_key: 'lt100k_pr_number',
+            mark_as_done: true,
+          },
+          {
+            type: 'FILE',
+            label: 'เอกสารเพิ่มเติม',
+            field_key: 'lt100k_pr_doc',
+            mark_as_done: false,
+          },
+        ],
+      },
+      {
+        name: 'จัดทำใบสั่งซื้อสั่งจ้าง',
+        order: 2,
+        required_step: [1],
+        required_documents: [
+          {
+            type: 'TEXT',
+            label: 'เลขที่ใบสั่งซื้อ (PO Number)',
+            field_key: 'lt100k_po_number',
+            mark_as_done: true,
+          },
+          {
+            type: 'FILE',
+            label: 'เอกสารเพิ่มเติม',
+            field_key: 'lt100k_po_doc',
+            mark_as_done: false,
+          },
+        ],
+      },
+      {
+        name: 'แจ้งเตือนผู้ค้าให้เข้ามาลงนามในเอกสารสั่งซื้อ/จ้าง',
+        order: 3,
+        required_step: [2],
+        required_documents: [
+          {
+            type: 'VENDOR_EMAIL',
+            label: 'อีเมลผู้ค้า',
+            field_key: 'lt100k_vendor_email',
+            mark_as_done: true,
+          },
+        ],
+      },
+      {
+        name: 'ส่งไปยังฝ่ายตรวจรับ',
+        order: 4,
+        required_step: [3],
+        required_documents: [
+          {
+            type: 'NUMBER',
+            label: 'จำนวนงวด',
+            field_key: 'lt100k_installment_count',
+            mark_as_done: true,
+          },
+          { type: 'NUMBER', label: 'วงเงิน', field_key: 'lt100k_credit_limit', mark_as_done: true },
+          {
+            type: 'DATE',
+            label: 'วันเริ่มต้นสัญญา',
+            field_key: 'lt100k_contract_start_date',
+            mark_as_done: true,
+          },
+          {
+            type: 'DATE',
+            label: 'วันสิ้นสุดสัญญา',
+            field_key: 'lt100k_contract_end_date',
+            mark_as_done: true,
+          },
+        ],
+      },
+    ],
+  },
+  {
+    type: 'CONTRACT' as UnitResponsibleType,
+    steps: [
+      {
+        name: 'ระบบแจ้งเตือน',
+        order: 1,
+        required_step: [],
+        required_documents: [
+          {
+            type: 'DATE',
+            label: 'วันที่ตรวจรับ',
+            field_key: 'contract_inspection_date',
+            mark_as_done: true,
+          },
+          {
+            type: 'BOOLEAN',
+            label: 'ต้องการระบบแจ้งเตือนไหม',
+            field_key: 'contract_enable_notification',
+            mark_as_done: true,
+          },
+          {
+            type: 'DUE_DATE_SELECT',
+            label: 'แจ้งเตือนก่อนวันครบกำหนดมอบงาน(3/5/7/15 วัน)',
+            field_key: 'contract_notification_days',
+            mark_as_done: true,
+          },
+          {
+            type: 'COMMITTEE_EMAIL',
+            label: 'อีเมลกรรมการตรวจรับ',
+            field_key: 'contract_committee_email',
+            mark_as_done: true,
+          },
+        ],
+      },
+      {
+        name: 'ตรวจสอบและบันทึกข้อมูลการส่งมอบงาน',
+        order: 2,
+        required_step: [1],
+        required_documents: [
+          {
+            type: 'BOOLEAN',
+            label: 'ล่าช้าหรือทิ้งงานหรือไม่',
+            field_key: 'contract_is_delayed_or_abandoned',
+            mark_as_done: true,
+          },
+          {
+            type: 'BOOLEAN',
+            label: 'สงวนสิทธิ์การปรับ / สงวนสิทธิ์บอกเลิกสัญญา',
+            field_key: 'contract_penalty',
+            mark_as_done: true,
+          },
+          {
+            type: 'TEXT',
+            label: 'บันทึกข้อมูลทิ้งงาน',
+            field_key: 'contract_abandon_detail',
+            mark_as_done: true,
+          },
+        ],
+      },
+      {
+        name: 'บันทึกข้อมูลการตรวจรับ',
+        order: 3,
+        required_step: [2],
+        required_documents: [
+          {
+            type: 'TEXT',
+            label: 'เลข MIGO',
+            field_key: 'contract_migo_number',
+            mark_as_done: true,
+          },
+        ],
+      },
+      {
+        name: 'บันทึกรายงานผลการตรวจรับพัสดุเสนอผู้บริหาร',
+        order: 4,
+        required_step: [3],
+        required_documents: [
+          {
+            type: 'FILE',
+            label: 'รายงานผลการตรวจรับพัสดุ(กรณีมีค่าปรับ)',
+            field_key: 'contract_inspection_report_with_penalty',
+            mark_as_done: false,
+          },
+          {
+            type: 'FILE',
+            label: 'รายงานผลการตรวจรับ(กรณีมีขยายเวลา งด หรือลดค่าปรับ)',
+            field_key: 'inspection_report_with_extension',
+            mark_as_done: false,
+          },
+          {
+            type: 'FILE',
+            label: 'รายงานผลการตรวจรับ (กรณีส่งมอบครบตามกำหนด)',
+            field_key: 'inspection_report_on_time',
+            mark_as_done: false,
+          },
+        ],
+      },
+      {
+        name: 'บันทึกส่งเบิกฝ่ายการเงิน',
+        order: 5,
+        required_step: [4],
+        required_documents: [
+          {
+            type: 'FILE',
+            label: 'บันทึกส่งเบิกฝ่ายการเงิน',
+            field_key: 'contract_finance_file',
+            mark_as_done: true,
+          },
+          {
+            type: 'BOOLEAN',
+            label: 'ต้องการส่งต่อให้ฝ่ายทะเบียนหรือไม่',
+            field_key: 'contract_forward_to_registration',
+            mark_as_done: true,
+          },
+        ],
+      },
+      {
+        name: 'บันทึกส่งให้ฝ่ายทะเบียน (กรณีครุภัณฑ์)',
+        order: 6,
+        required_step: [5],
+        required_documents: [
+          {
+            type: 'TEXT',
+            label: 'รหัสสินทรัพย์',
+            field_key: 'contract_asset_code',
+            mark_as_done: true,
+          },
+        ],
+      },
+      {
+        name: 'กดปิดโครงการ',
+        order: 7,
+        required_step: [6],
+        required_documents: [
+          {
+            type: 'BOOLEAN',
+            label: 'ปิดโครงการ',
+            field_key: 'contract_close_project',
+            mark_as_done: true,
+          },
+        ],
+      },
+      {
+        name: 'กรณีแก้ไข',
+        order: 8,
+        required_step: [],
+        required_documents: [
+          {
+            type: 'TEXT',
+            label: 'คอมเม้น',
+            field_key: 'contract_edit_comment',
+            mark_as_done: true,
+          },
+        ],
+      },
+    ],
+  },
+];

@@ -15,6 +15,7 @@ interface WorkflowStepProps {
   status?: StepStatus;
   viewAsRole: Role;
   isLast?: boolean;
+  isGuest?: boolean;
   children: React.ReactNode;
 }
 
@@ -25,6 +26,7 @@ export function WorkflowStep({
   status = 'not_started',
   viewAsRole,
   isLast = false,
+  isGuest = false,
   children,
 }: WorkflowStepProps) {
   const colors = getStepColor(status, viewAsRole);
@@ -39,7 +41,10 @@ export function WorkflowStep({
       )}
 
       {/* --- TRIGGER HEADER --- */}
-      <AccordionTrigger className="group py-4 hover:no-underline [&>svg]:hidden [&[data-state=open]>div]:rounded-b-none">
+      <AccordionTrigger
+        className="group py-4 hover:no-underline disabled:opacity-100 [&>svg]:hidden [&[data-state=open]>div]:rounded-b-none"
+        disabled={isGuest}
+      >
         <div className={cn('flex w-full items-center gap-4 transition-colors')}>
           {/* Number Bubble */}
           <div
@@ -61,7 +66,9 @@ export function WorkflowStep({
             <span className="h3-topic flex-1 text-left">{title}</span>
 
             {/* Chevron Icon */}
-            <ChevronDown className="h-5 w-5 shrink-0 transition-transform duration-200 group-data-[state=open]:rotate-180" />
+            {!isGuest && (
+              <ChevronDown className="h-5 w-5 shrink-0 transition-transform duration-200 group-data-[state=open]:rotate-180" />
+            )}
           </div>
         </div>
       </AccordionTrigger>

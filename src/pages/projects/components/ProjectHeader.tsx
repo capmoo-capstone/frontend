@@ -16,7 +16,6 @@ interface ProjectHeaderProps {
   viewAsRole: Role;
   onCancelProject?: () => void;
   onExportReport?: () => void;
-  onGenerateContract?: () => void;
 }
 
 export const ProjectHeader = ({
@@ -24,7 +23,6 @@ export const ProjectHeader = ({
   viewAsRole,
   onCancelProject,
   onExportReport,
-  onGenerateContract,
 }: ProjectHeaderProps) => {
   return (
     <div className="flex items-start justify-between gap-4">
@@ -44,9 +42,6 @@ export const ProjectHeader = ({
       </div>
 
       <div className="flex items-center gap-2">
-        <Button variant="default" onClick={onGenerateContract}>
-          สร้างเลขที่สัญญา
-        </Button>
         <Button variant="brand" onClick={onExportReport}>
           ส่งออกรายงาน
         </Button>

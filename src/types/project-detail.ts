@@ -31,7 +31,7 @@ export const WorkflowDocumentConfigSchema = z.object({
   type: FieldTypeSchema,
   label: z.string(),
   field_key: z.string(),
-  is_required: z.boolean(),
+  mark_as_done: z.boolean(),
 });
 
 export type WorkflowDocumentConfig = z.infer<typeof WorkflowDocumentConfigSchema>;

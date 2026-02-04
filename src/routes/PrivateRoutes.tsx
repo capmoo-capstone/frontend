@@ -27,6 +27,12 @@ export const PrivateRoutes = () => {
         {/* <Route path="/" element={<Home />} />
         <Route path="/app/home" element={<Home />} /> */}
 
+        {/* === PROJECTS === */}
+        <Route path="app/projects" element={<ProjectList />} />
+
+        <Route element={<ProjectAccessGuard />}>
+          <Route path="app/projects/:id" element={<ProjectDetail />} />
+        </Route>
         {/* === DASHBOARDS === */}
         <Route path="app/dashboards/department" element={<DepartmentDashboard />} />
         {/* <Route path="app/dashboards/indiv" element={<IndividualDashboardV2 />} /> */}

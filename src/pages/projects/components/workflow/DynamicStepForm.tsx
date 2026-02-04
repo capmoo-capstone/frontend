@@ -75,7 +75,7 @@ export function DynamicStepForm({ fields, formData, onChange, disabled }: Dynami
         return (
           <div key={field.key} className="space-y-2">
             <Label className="normal">
-              {field.label} {field.required && <span className="text-destructive">*</span>}
+              {field.label} {field.mark_as_done && <span className="text-destructive">*</span>}
             </Label>
 
             <div className={cn(isSkipped && 'pointer-events-none opacity-50')}>
@@ -169,27 +169,36 @@ export function DynamicStepForm({ fields, formData, onChange, disabled }: Dynami
             </div>
 
             {/* --- Mark as Done Button --- */}
-            {!field.required && !disabled && !fieldHasValue && (
-              <Button
-                type="button"
-                variant={isSkipped ? 'outline' : 'default'}
-                size="sm"
-                className={cn('caption w-full')}
-                onClick={() => handleMarkAsDone(field.key)}
-              >
-                {isSkipped ? (
-                  <>
-                    <CircleCheckBig className="mr-2 h-3 w-3" />
-                    ยกเลิกการทำเครื่องหมายว่าเสร็จ
-                  </>
-                ) : (
-                  <>
-                    <CircleCheckBig className="mr-2 h-3 w-3" />
-                    ทำเครื่องหมายว่าเสร็จ
-                  </>
-                )}
-              </Button>
-            )}
+            {!field.mark_as_done &&
+              !disabled &&
+              !fieldHasValue &&
+              ![
+                'BOOLEAN',
+                'DUE_DATE_SELECT',
+                'VENDOR_EMAIL',
+                'COMMITTEE_EMAIL',
+                'GEN_CONT_NO',
+              ].includes(field.type) && (
+                <Button
+                  type="button"
+                  variant={isSkipped ? 'outline' : 'default'}
+                  size="sm"
+                  className={cn('caption w-full')}
+                  onClick={() => handleMarkAsDone(field.key)}
+                >
+                  {isSkipped ? (
+                    <>
+                      <CircleCheckBig className="mr-2 h-3 w-3" />
+                      ยกเลิกการทำเครื่องหมายว่าเสร็จ
+                    </>
+                  ) : (
+                    <>
+                      <CircleCheckBig className="mr-2 h-3 w-3" />
+                      ทำเครื่องหมายว่าเสร็จ
+                    </>
+                  )}
+                </Button>
+              )}
           </div>
         );
       })}

@@ -4,5 +4,5 @@ export interface FieldConfig {
   key: string;
   label: string;
   type: FieldType;
-  required?: boolean;
+  mark_as_done?: boolean;
 }

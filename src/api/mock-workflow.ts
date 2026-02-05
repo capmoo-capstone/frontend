@@ -1,7 +1,7 @@
 // Assuming the array you provided is exported here
 import { ProcurementWorkflows } from '@/pages/projects/config/workflow';
 import type { Role } from '@/types/auth';
-import type { ProjectDetail, Submission } from '@/types/project-detail';
+import type { ProjectDetail, StepStatus, Submission } from '@/types/project-detail';
 
 // Helper to get workflow by type
 const getWorkflow = (type: string) => ProcurementWorkflows.find((w) => w.type === type)!;
@@ -345,5 +345,149 @@ export const mockProjects: ProjectDetail[] = [
     },
     workflow: getWorkflow('CONTRACT') as ProjectDetail['workflow'],
     submissions: [], // Fresh contract phase
+  },
+
+  // ==================================================================================
+  // ID 7: MT500K - ALL STEPS COMPLETED
+  // Scenario: All workflow steps submitted and approved
+  // ==================================================================================
+  {
+    ...COMMON_META,
+    id: '7',
+    title: 'โครงการจัดซื้อเครื่องมือวิทยาศาสตร์ (MT500K - Complete)',
+    procurement_type: 'MT500K',
+    current_template_type: 'MT500K',
+    status: 'COMPLETED' as ProjectDetail['status'],
+    budget: 850000,
+    current_step: {
+      name: 'ส่งไปยังฝ่ายตรวจรับ',
+      order: 5,
+    },
+    workflow: getWorkflow('MT500K') as ProjectDetail['workflow'],
+    submissions: [
+      {
+        step_name: 'จัดทำแผนจัดการจัดซื้อจัดจ้าง และจัดทำคำสั่งแต่งตั้งคณะกรรมการฯ TOR',
+        step_order: 1,
+        submission_round: 1,
+        status: 'APPROVED',
+        submitted_by: 'สมหญิง พัสดุ',
+        submitted_at: '2026-01-05T09:00:00Z',
+        action_by: 'หัวหน้างาน',
+        action_at: '2026-01-05T15:00:00Z',
+        documents: [
+          {
+            field_key: 'mt500k_procurement_plan_file',
+            file_name: 'แผนการจัดซื้อ_2026.pdf',
+            file_path: '/files/plan_2026.pdf',
+          },
+          {
+            field_key: 'mt500k_tor_committee_appt_file',
+            file_name: 'คำสั่งแต่งตั้ง_TOR.pdf',
+            file_path: '/files/tor_appt.pdf',
+          },
+        ],
+        meta_data: {},
+      },
+      {
+        step_name:
+          'จัดทำรายงานขอซื้อหรือขอจ้าง, คำสั่งแต่งตั้งคณะกรรมการซื้อหรือจ้าง และหนังสือเชิญชวน',
+        step_order: 2,
+        submission_round: 1,
+        status: 'APPROVED',
+        submitted_by: 'สมหญิง พัสดุ',
+        submitted_at: '2026-01-08T10:00:00Z',
+        action_by: 'หัวหน้างาน',
+        action_at: '2026-01-08T16:00:00Z',
+        documents: [
+          {
+            field_key: 'mt500k_requisition_report_file',
+            file_name: 'รายงานขอซื้อ.pdf',
+            file_path: '/files/requisition.pdf',
+          },
+          {
+            field_key: 'mt500k_procurement_committee_file',
+            file_name: 'คำสั่งแต่งตั้งคณะกรรมการ.pdf',
+            file_path: '/files/committee.pdf',
+          },
+          {
+            field_key: 'mt500k_invitation_letter_file',
+            file_name: 'หนังสือเชิญชวน.pdf',
+            file_path: '/files/invitation.pdf',
+          },
+        ],
+        meta_data: {},
+      },
+      {
+        step_name:
+          'จัดทำรายงานผลการพิจารณาจัดซื้อจัดจ้าง, รายงานผลฯ อนุมัติ ประกาศผู้ชนะ และหนังสือสนองรับราคาฯ',
+        step_order: 3,
+        submission_round: 1,
+        status: 'APPROVED',
+        submitted_by: 'สมหญิง พัสดุ',
+        submitted_at: '2026-01-12T11:00:00Z',
+        action_by: 'หัวหน้างาน',
+        action_at: '2026-01-12T17:00:00Z',
+        documents: [
+          {
+            field_key: 'mt500k_consideration_report_file',
+            file_name: 'รายงานผลพิจารณา.pdf',
+            file_path: '/files/consideration.pdf',
+          },
+          {
+            field_key: 'mt500k_winner_announcement_file',
+            file_name: 'ประกาศผู้ชนะ.pdf',
+            file_path: '/files/winner.pdf',
+          },
+          {
+            field_key: 'mt500k_contract_notice_file',
+            file_name: 'หนังสือแจ้งลงนาม.pdf',
+            file_path: '/files/notice.pdf',
+          },
+          { field_key: 'mt500k_pr_number', value: 'PR-2026-MT-001' },
+        ],
+        meta_data: {},
+      },
+      {
+        step_name: 'จัดทำร่างสัญญา / ใบสั่งซื้อสั่งจ้าง / หนังสือข้อตกลง',
+        step_order: 4,
+        submission_round: 1,
+        status: 'APPROVED',
+        submitted_by: 'สมหญิง พัสดุ',
+        submitted_at: '2026-01-16T09:30:00Z',
+        action_by: 'ผู้อำนวยการ',
+        action_at: '2026-01-16T14:00:00Z',
+        documents: [
+          { field_key: 'mt500k_contract_number', value: 'CU8501/2569' },
+          {
+            field_key: 'mt500k_contract_doc_file',
+            file_name: 'สัญญาจัดซื้อ.pdf',
+            file_path: '/files/contract.pdf',
+          },
+          { field_key: 'mt500k_po_number', value: 'PO-2026-001' },
+        ],
+        meta_data: {},
+      },
+      {
+        step_name: 'ส่งไปยังฝ่ายตรวจรับ',
+        step_order: 5,
+        submission_round: 1,
+        status: 'APPROVED',
+        submitted_by: 'สมหญิง พัสดุ',
+        submitted_at: '2026-01-20T08:00:00Z',
+        action_by: 'ผู้อำนวยการ',
+        action_at: '2026-01-20T10:00:00Z',
+        documents: [
+          {
+            field_key: 'mt500k_vendor_email',
+            value: ['vendor@science-supply.co.th', 'contact@science-supply.co.th'],
+          },
+          { field_key: 'mt500k_installment_count', value: '2' },
+          { field_key: 'mt500k_credit_limit', value: '850000' },
+          { field_key: 'mt500k_contract_start_date', value: '2026-02-01' },
+          { field_key: 'mt500k_contract_end_date', value: '2026-04-30' },
+        ],
+        meta_data: {},
+      },
+    ],
   },
 ];

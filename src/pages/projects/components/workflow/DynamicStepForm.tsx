@@ -164,7 +164,7 @@ export function DynamicStepForm({ fields, formData, onChange, disabled }: Dynami
             </div>
 
             {/* --- Mark as Done Button --- */}
-            {!field.mark_as_done &&
+            {field.mark_as_done &&
               !disabled &&
               !fieldHasValue &&
               ![

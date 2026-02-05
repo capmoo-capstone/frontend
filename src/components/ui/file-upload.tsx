@@ -1,12 +1,10 @@
 import * as React from 'react';
 
-import { FileIcon } from '@untitledui/file-icons';
-import { Upload, X } from 'lucide-react';
+import { Upload } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
 
-import { Button } from './button';
-import { Card } from './card';
+import { FileCard } from './file-card';
 
 interface FileUploadProps {
   value?: (string | File)[];
@@ -29,20 +27,6 @@ export function FileUpload({
 }: FileUploadProps) {
   const inputRef = React.useRef<HTMLInputElement>(null);
 
-  const getFileName = (file: File | string): string => {
-    if (file instanceof File) {
-      return file.name;
-    }
-    const parts = file.split('/');
-    return parts[parts.length - 1];
-  };
-
-  const getFileIcon = (name: string) => {
-    const ext = name.split('.').pop()?.toLowerCase() || '';
-
-    return <FileIcon type={ext} size={20} className="text-muted-foreground" />;
-  };
-
   const handleClick = () => {
     if (!disabled && (!maxFiles || value.length < maxFiles)) {
       inputRef.current?.click();
@@ -61,8 +45,7 @@ export function FileUpload({
     }
   };
 
-  const handleRemove = (index: number) => (e: React.MouseEvent) => {
-    e.stopPropagation();
+  const handleRemove = (index: number) => {
     const newFiles = value.filter((_, i) => i !== index);
     onChange?.(newFiles);
   };
@@ -103,35 +86,14 @@ export function FileUpload({
       {/* File List */}
       {value.length > 0 && (
         <div className="space-y-2">
-          {value.map((file, index) => {
-            const name = getFileName(file);
-            return (
-              <Card
-                key={`${name}-${index}`}
-                className={cn(
-                  'border-muted-foreground/25 bg-muted/10 flex flex-row items-center justify-between rounded-md border-none p-2 transition',
-                  !disabled && 'hover:bg-muted/20'
-                )}
-              >
-                <div className="flex items-center gap-3 overflow-hidden">
-                  {getFileIcon(name)}
-                  <span className="text-primary truncate text-sm font-medium">{name}</span>
-                </div>
-
-                {!disabled && (
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    className="hover:bg-destructive/10 hover:text-destructive h-6 w-6 shrink-0"
-                    onClick={handleRemove(index)}
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
-                )}
-              </Card>
-            );
-          })}
+          {value.map((file, index) => (
+            <FileCard
+              key={index}
+              file={file}
+              disabled={disabled}
+              onRemove={() => handleRemove(index)}
+            />
+          ))}
         </div>
       )}
     </div>

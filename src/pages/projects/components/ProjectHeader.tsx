@@ -36,9 +36,9 @@ export const ProjectHeader = ({
             <p className="text-muted-foreground normal-l">{project.description}</p>
           )}
         </div>
-        <h3 className="text-primary h2-sub">
+        {/* <h3 className="text-primary h2-sub">
           ผู้รับผิดชอบโครงการ: {project.assignee_procurement?.full_name || 'ยังไม่ได้มอบหมาย'}
-        </h3>
+        </h3> */}
       </div>
 
       <div className="flex items-center gap-2">

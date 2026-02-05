@@ -49,7 +49,7 @@ export const SubmissionDocumentSchema = z.object({
   field_key: z.string(),
   file_name: z.string().optional(),
   file_path: z.string().optional(),
-  value: z.string().optional(),
+  value: z.string().optional().or(z.number().optional()).or(z.boolean().optional()).or(z.array(z.string()).optional()),
 });
 
 export type SubmissionDocument = z.infer<typeof SubmissionDocumentSchema>;

@@ -22,3 +22,14 @@ export const addMemberToUnit = async (unitId: string, userId: string) => {
   const { data } = await api.patch(`/unit/${unitId}/add-users`, { user_id: userId });
   return data;
 };
+
+export const updateUnit = async (unitId: string, updateData: Partial<Unit>) => {
+  // return mock response
+  return {
+    success: true,
+    unitId,
+    updateData,
+  };
+  const { data } = await api.put(`/unit/${unitId}`, updateData);
+  return data;
+};

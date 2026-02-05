@@ -1,24 +1,29 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
-import { Check, ChevronDown, Pencil, UserRoundPen, UserRoundPlus, Users, X } from 'lucide-react';
+import { Check, ChevronDown, Pencil, Plus, Users, X } from 'lucide-react';
+import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { useUsersForSelection } from '@/hooks/useUsers';
+import { UserSelect } from '@/components/user-select';
+import { useAddUnitMember, useUpdateUnit } from '@/hooks/useUnits';
+import { useDelegateUser, useUsersForSelection } from '@/hooks/useUsers';
 import type { UnitResponsibleType } from '@/types/project';
 import type { Unit } from '@/types/unit';
-import type { UserSelectionItem } from '@/types/user';
+import type { User, UserSelectionItem } from '@/types/user';
 
+import { DelegateUserSelect } from '../delegate-user-select';
 import { ProjectBadge } from '../project-badge';
-import { AddMemberDialog } from '../unit-dialog/add-member-dialog';
-import { DelegateUserDialog } from '../unit-dialog/delegate-user-dialog';
+import { ProjectTypeSelectButton } from '../project-type-select';
 import { UnitTable } from '../unit-table';
 
 export function UnitCard({ unitItem, index }: { unitItem: Unit; index: number }) {
   const [isEditing, setIsEditing] = useState(false);
-  const [isAddMember, setIsAddMember] = useState(false);
-  const [isDelegateUser, setIsDelegateUser] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<string | null>(null);
+  const [newMemberIds, setNewMemberIds] = useState<string[]>([]);
+  const [currentTypes, setCurrentTypes] = useState<UnitResponsibleType[]>(unitItem.type || []);
+  const [isDelegateRemoved, setIsDelegateRemoved] = useState(false);
 
   const { data: users } = useUsersForSelection(
     unitItem.id ? { unitId: unitItem.id } : { departmentId: '' }
@@ -27,6 +32,84 @@ export function UnitCard({ unitItem, index }: { unitItem: Unit; index: number })
   const headUnit = useMemo(() => {
     return users?.data?.find((user: UserSelectionItem) => user.role === 'HEAD_OF_UNIT');
   }, [users]);
+
+  const excludeMemberIds = useMemo(() => {
+    const existingMemberIds = users?.data?.map((u) => u.id) || [];
+    return [...existingMemberIds, ...newMemberIds];
+  }, [users?.data, newMemberIds]);
+
+  useEffect(() => {
+    setCurrentTypes(unitItem.type || []);
+  }, [unitItem.type]);
+
+  const handleCancel = () => {
+    setCurrentTypes(unitItem.type || []);
+    setIsEditing(false);
+    setIsDelegateRemoved(false);
+  };
+  const handleDeleteProjectBadge = (typeToDelete: UnitResponsibleType) => {
+    setCurrentTypes((prev) => prev.filter((t) => t !== typeToDelete));
+  };
+
+  const handleAddProjectBadge = (newType: UnitResponsibleType) => {
+    setCurrentTypes((prev) => [...prev, newType]);
+  };
+
+  const handleAddMember = () => {
+    if (!selectedUser) return;
+    setNewMemberIds((prev) => [selectedUser, ...prev]);
+    setSelectedUser(null);
+  };
+
+  const { mutateAsync: addMemberMutate } = useAddUnitMember();
+  const { mutateAsync: delegateMutate } = useDelegateUser();
+  const { mutateAsync: updateUnitMutate } = useUpdateUnit();
+
+  const handleSave = async () => {
+    try {
+      const promises: Promise<any>[] = [];
+
+      promises.push(
+        updateUnitMutate({
+          unitId: unitItem.id,
+          updateData: {
+            type: currentTypes,
+          },
+        })
+      );
+
+      if (newMemberIds.length > 0) {
+        newMemberIds.forEach((userId) => {
+          promises.push(
+            addMemberMutate({
+              unitId: unitItem.id,
+              userId: userId,
+            })
+          );
+        });
+      }
+
+      // if (delegateData?.userId && delegateData.startDate) {
+      //   promises.push(
+      //     delegateMutate({
+      //       unitId: unitItem.id,
+      //       userId: delegateData.userId,
+      //       startDate: delegateData.startDate,
+      //       endDate: delegateData.noEndDate ? undefined : delegateData.endDate,
+      //       role: 'DELEGATED_HEAD',
+      //     })
+      //   );
+      // }
+
+      await Promise.all(promises);
+      toast.success('บันทึกข้อมูลสำเร็จ');
+      setIsEditing(false);
+      setNewMemberIds([]);
+    } catch (error) {
+      toast.error('เกิดข้อผิดพลาดในการบันทึกข้อมูล');
+      console.error(error);
+    }
+  };
 
   return (
     <>
@@ -48,73 +131,88 @@ export function UnitCard({ unitItem, index }: { unitItem: Unit; index: number })
               <Button
                 variant="outline"
                 className="text-normal-bold mr-3"
-                onClick={() => setIsEditing(false)}
+                onClick={() => handleCancel()}
               >
                 <X />
                 ยกเลิก
               </Button>
-              <Button variant="brand" className="text-normal text-info-light font-semibold">
+              <Button
+                variant="brand"
+                className="text-normal-b text-info-light"
+                onClick={handleSave}
+              >
                 <Check /> บันทึก
               </Button>
             </div>
           )}
         </CardHeader>
         <CardContent className="flex flex-col gap-7">
-          <span className="flex items-center gap-4">
+          <span className="flex items-center gap-3">
             <span className="h3-topic">ประเภทงาน</span>
-            {unitItem.type?.map((t: UnitResponsibleType) => (
-              <ProjectBadge type={t} />
+            {currentTypes.map((t: UnitResponsibleType) => (
+              <ProjectBadge
+                type={t}
+                isEditing={isEditing}
+                onDeleteProjectBadge={() => handleDeleteProjectBadge(t)}
+              />
             ))}
+            {isEditing && (
+              <ProjectTypeSelectButton
+                currentTypes={currentTypes}
+                onSelect={handleAddProjectBadge}
+              />
+            )}
           </span>
+
           <span className="flex items-center gap-7">
             <span className="h3-topic">หัวหน้ากลุ่มงาน</span>
             <span className="text-normal-normal">{headUnit?.full_name}</span>
-            {isEditing && (
-              <Button
-                className="text-normal-bold"
-                variant="outline"
-                onClick={() => setIsDelegateUser(true)}
-              >
-                <UserRoundPen /> แต่งตั้งหัวหน้างานใหม่/ผู้รักษาการแทน
-              </Button>
-            )}
           </span>
+          {/* <DelegateUser /> */}
+          {isEditing && (
+            <DelegateUserSelect onRemoveDelegateUser={() => setIsDelegateRemoved(true)} />
+          )}
+
           <Collapsible>
-            <CollapsibleTrigger className="group h3-topic">
-              เจ้าหน้าที่ ({users?.data?.length ?? 0})
-              <Button className="ml-4 inline-block px-1" variant="ghost">
-                <ChevronDown className="group-data-[state=open]:rotate-180" />
-              </Button>
-            </CollapsibleTrigger>
-            {isEditing && (
-              <Button
-                className="text-normal-bold ml-4"
-                variant="outline"
-                onClick={() => setIsAddMember(true)}
-              >
-                <UserRoundPlus /> เพิ่มเจ้าหน้าที่
-              </Button>
-            )}
-            <CollapsibleContent>
-              <UnitTable unitId={unitItem.id} isEditing={isEditing} />
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <CollapsibleTrigger className="group h3-topic flex items-center">
+                  เจ้าหน้าที่ ({(users?.data?.length ?? 0) + newMemberIds.length})
+                  <ChevronDown className="ml-2 h-4 w-4 group-data-[state=open]:rotate-180" />
+                </CollapsibleTrigger>
+
+                {isEditing && (
+                  <div className="flex items-center gap-2">
+                    <UserSelect
+                      value={selectedUser}
+                      onChange={setSelectedUser}
+                      className="h-9 w-60"
+                      placeholder="เลือกเจ้าหน้าที่..."
+                      hasClearButton={false}
+                      departmentId="department_procure"
+                      excludeIds={excludeMemberIds}
+                    />
+                    <Button
+                      type="button"
+                      className="bg-accent text-normal-normal hover:bg-accent/80 flex h-9 w-9 items-center justify-center p-0"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        handleAddMember();
+                      }}
+                    >
+                      <Plus className="h-5 w-5" />
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <CollapsibleContent className="mt-4">
+              <UnitTable unitId={unitItem.id} isEditing={isEditing} newMemberIds={newMemberIds} />
             </CollapsibleContent>
           </Collapsible>
         </CardContent>
       </Card>
-
-      <AddMemberDialog
-        isOpen={isAddMember}
-        onClose={() => setIsAddMember(false)}
-        index={index}
-        unitId={unitItem.id}
-      />
-
-      <DelegateUserDialog
-        isOpen={isDelegateUser}
-        onClose={() => setIsDelegateUser(false)}
-        unitId={unitItem.id}
-        role="HEAD_OF_UNIT"
-      />
     </>
   );
 }

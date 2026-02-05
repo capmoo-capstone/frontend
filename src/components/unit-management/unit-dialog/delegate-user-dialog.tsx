@@ -97,8 +97,8 @@ export function DelegateUserDialog({ isOpen, onClose, unitId, role }: DelegateUs
               placeholder="เลือกเจ้าหน้าที่..."
               hasClearButton={false}
             />
-            <div className="my-6 flex w-full gap-6">
-              <div className="flex flex-1 flex-col">
+            <div className="flex w-full gap-6">
+              <div className="flex flex-1">
                 <div className="text-primary text-base font-medium">
                   ตั้งแต่วันที่ <span className="text-destructive">*</span>
                 </div>
@@ -110,8 +110,8 @@ export function DelegateUserDialog({ isOpen, onClose, unitId, role }: DelegateUs
                 />
               </div>
 
-              <div className="flex flex-1 flex-col">
-                <div className="text-primary text-base font-medium">
+              <div className="flex flex-1">
+                <div className="text-info-dark">
                   ถึงวันที่ <span className="text-destructive text-base">*</span>
                 </div>
                 <DatePicker

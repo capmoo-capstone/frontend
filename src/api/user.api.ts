@@ -61,6 +61,11 @@ export const devLogin = async (role: string): Promise<User> => {
   return MOCK_USERS_BY_ROLE[role] || MOCK_USER;
 };
 
+export const getUserById = async (userId: string): Promise<User> => {
+  const { data } = await api.get(`/users/${userId}`);
+  return data;
+};
+
 export const delegateUser = async (
   unitId: string | undefined,
   userId: string,

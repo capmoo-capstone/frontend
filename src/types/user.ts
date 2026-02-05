@@ -12,6 +12,15 @@ export const UserRoleEnum = z.enum([
   'GUEST',
 ]);
 
+export const DelegateSchema = z.object({
+  id: z.string(),
+  user_id: z.string(),
+  delegate_to: z.string(),
+  start_date: z.iso.datetime(),
+  end_date: z.iso.datetime().nullable(),
+  is_active: z.boolean(),
+});
+
 export const UserSchema = z.object({
   id: z.string(),
   unit_id: z.string().nullable(),
@@ -19,8 +28,7 @@ export const UserSchema = z.object({
   email: z.email().nullable(),
   full_name: z.string(),
   role: UserRoleEnum.nullable(),
-  is_delegate: z.boolean(),
-  delegate_user_id: z.string().nullable(),
+  delegate_info: DelegateSchema.nullable().optional(),
   created_at: z.iso.datetime(),
 });
 

@@ -1,5 +1,6 @@
 import { type ColumnDef } from '@tanstack/react-table';
 
+import { cn } from '@/lib/utils';
 import type { UserSelectionItem } from '@/types/user';
 
 interface GetColumnsProps {
@@ -14,7 +15,20 @@ export const getColumns = ({
   {
     id: 'full_name',
     header: 'ชื่อ-นามสกุล',
-    cell: ({ row }) => <div className="text-normal-normal">{row.original.full_name}</div>,
+    cell: ({ row }) => {
+      const member = row.original as UserSelectionItem & { isNew?: boolean };
+
+      return (
+        <span
+          className={cn(
+            'text-normal-normal',
+            member.isNew ? 'text-info-dark font-medium' : 'text-primary'
+          )}
+        >
+          {member.full_name}
+        </span>
+      );
+    },
   },
   {
     id: 'actions',

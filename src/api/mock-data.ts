@@ -943,16 +943,6 @@ export const MOCK_USER_SELECTION: UserSelectionResponse = {
       full_name: 'นางสาวชูใจ ใฝ่เรียน',
       role: 'GENERAL_STAFF',
     },
-    {
-      id: 'u-109',
-      full_name: 'นายปัญญา รอบรู้',
-      role: 'GENERAL_STAFF',
-    },
-    {
-      id: 'u-110',
-      full_name: 'นางแก้วตา ดวงใจ',
-      role: 'GENERAL_STAFF',
-    },
   ],
 };
 
@@ -1014,6 +1004,11 @@ export const MOCK_USER_DEPARTMENT_SELECTION: UserSelectionResponse = {
     {
       id: 'u-110',
       full_name: 'นางแก้วตา ดวงใจ',
+      role: 'GENERAL_STAFF',
+    },
+    {
+      id: 'u-111',
+      full_name: 'นายใจกล้า กล้าหาญ',
       role: 'GENERAL_STAFF',
     },
   ],

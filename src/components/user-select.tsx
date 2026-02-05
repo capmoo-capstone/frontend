@@ -27,6 +27,7 @@ interface UserSelectProps {
   className?: string;
   disabled?: boolean;
   hasClearButton?: boolean;
+  excludeIds?: string[];
 }
 
 export function UserSelect({
@@ -39,6 +40,7 @@ export function UserSelect({
   className,
   hasClearButton = true,
   disabled = false,
+  excludeIds = [],
 }: UserSelectProps) {
   const [open, setOpen] = React.useState(false);
 
@@ -46,8 +48,13 @@ export function UserSelect({
     unitId ? { unitId } : { departmentId: departmentId || '' }
   );
 
-  const users = data?.data || [];
-  const selectedUser = users.find((user) => user.id === value);
+  const filteredUsers = React.useMemo(() => {
+    const allUsers = data?.data || [];
+    if (excludeIds.length === 0) return allUsers;
+    return allUsers.filter((user) => !excludeIds.includes(user.id));
+  }, [data?.data, excludeIds]);
+
+  const selectedUser = (data?.data || []).find((user) => user.id === value);
 
   const handleClear = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -101,7 +108,7 @@ export function UserSelect({
           <CommandList>
             <CommandEmpty>{isError ? 'Error loading users.' : 'No user found.'}</CommandEmpty>
             <CommandGroup>
-              {users.map((user) => (
+              {filteredUsers.map((user) => (
                 <CommandItem
                   key={user.id}
                   value={user.full_name}

@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
-import { addMemberToUnit, getUnits } from '@/api/unit.api';
+import { addMemberToUnit, getUnits, updateUnit } from '@/api/unit.api';
+import type { UnitResponsibleType } from '@/types/project';
 
 export const useUnits = () => {
   return useQuery({
@@ -20,6 +21,29 @@ export const useAddUnitMember = () => {
       queryClient.invalidateQueries({
         queryKey: ['users', 'selection'],
       });
+      queryClient.invalidateQueries({
+        queryKey: ['units'],
+      });
+    },
+  });
+};
+
+export const useUpdateUnit = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      unitId,
+      updateData,
+    }: {
+      unitId: string;
+      updateData: Partial<{
+        name: string;
+        type: UnitResponsibleType[];
+      }>;
+    }) => updateUnit(unitId, updateData),
+
+    onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ['units'],
       });

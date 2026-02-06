@@ -32,14 +32,6 @@ export function ProjectWorkflowSteps({ project, steps }: ProjectWorkflowStepsPro
 
   if (!user) return null;
 
-  const convertToFieldConfig = (docs: any[]): FieldConfig[] =>
-    docs.map((doc) => ({
-      key: doc.field_key,
-      label: doc.label,
-      type: doc.type,
-      required: doc.mark_as_done,
-    }));
-
   const sortedSteps = [...steps].sort((a, b) => a.order - b.order);
   const lastStepOrder = sortedSteps[sortedSteps.length - 1]?.order;
 
@@ -49,7 +41,7 @@ export function ProjectWorkflowSteps({ project, steps }: ProjectWorkflowStepsPro
         const status = getStepStatus(step.order);
         const submissions = getStepSubmissions(step.order);
         const viewSubmission = viewingSubmissions[step.order];
-        const fields = convertToFieldConfig(step.required_documents);
+        const fields = step.required_documents;
 
         const userCanAct = isActionRequired(user.role, status);
         const isCompleted = status === 'completed';

@@ -8,6 +8,13 @@ import { DatePicker } from '@/components/ui/date-picker';
 import { FileUpload } from '@/components/ui/file-upload';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { cn } from '@/lib/utils';
 import { type FieldConfig } from '@/types/workflow';
 
@@ -18,7 +25,7 @@ import { MultiEmailInput } from './fields/MultiEmailInput';
 interface DynamicStepFormProps {
   fields: FieldConfig[];
   formData: Record<string, any>;
-  onChange: (key: string, value: any) => void;
+  onChange: (field_key: string, value: any) => void;
   disabled?: boolean;
 }
 
@@ -64,21 +71,19 @@ export function DynamicStepForm({ fields, formData, onChange, disabled }: Dynami
   return (
     <div className="space-y-6">
       {fields.map((field) => {
-        const isSkipped = isFieldSkipped(field.key);
-        const fieldHasValue = hasValue(field.key);
+        const isSkipped = isFieldSkipped(field.field_key);
+        const fieldHasValue = hasValue(field.field_key);
 
         return (
-          <div key={field.key} className="space-y-2">
-            <Label className="normal">
-              {field.label} {field.mark_as_done && <span className="text-destructive">*</span>}
-            </Label>
+          <div key={field.field_key} className="space-y-2">
+            <Label className="normal">{field.label}</Label>
 
             <div className={cn(isSkipped && 'pointer-events-none opacity-50')}>
               {/* --- 1. FILE --- */}
               {field.type === 'FILE' && (
                 <FileUpload
-                  value={getFileValue(formData[field.key])}
-                  onChange={(files) => onChange(field.key, files)}
+                  value={getFileValue(formData[field.field_key])}
+                  onChange={(files) => onChange(field.field_key, files)}
                   disabled={disabled}
                   placeholder="คลิกเพื่ออัปโหลดเอกสาร"
                   accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png"
@@ -89,8 +94,8 @@ export function DynamicStepForm({ fields, formData, onChange, disabled }: Dynami
               {field.type === 'TEXT' && (
                 <Input
                   type="text"
-                  value={formData[field.key] || ''}
-                  onChange={(e) => onChange(field.key, e.target.value)}
+                  value={formData[field.field_key] || ''}
+                  onChange={(e) => onChange(field.field_key, e.target.value)}
                   disabled={disabled}
                   placeholder="ระบุข้อมูล..."
                 />
@@ -100,8 +105,8 @@ export function DynamicStepForm({ fields, formData, onChange, disabled }: Dynami
               {field.type === 'NUMBER' && (
                 <Input
                   type="number"
-                  value={formData[field.key] || ''}
-                  onChange={(e) => onChange(field.key, e.target.value)}
+                  value={formData[field.field_key] || ''}
+                  onChange={(e) => onChange(field.field_key, e.target.value)}
                   disabled={disabled}
                   placeholder="0"
                 />
@@ -110,8 +115,8 @@ export function DynamicStepForm({ fields, formData, onChange, disabled }: Dynami
               {/* --- 4. DATE --- */}
               {field.type === 'DATE' && (
                 <DatePicker
-                  date={getDateValue(formData[field.key])}
-                  setDate={(d) => onChange(field.key, d)}
+                  date={getDateValue(formData[field.field_key])}
+                  setDate={(d) => onChange(field.field_key, d)}
                   className="w-full"
                   disabled={disabled}
                 />
@@ -121,12 +126,12 @@ export function DynamicStepForm({ fields, formData, onChange, disabled }: Dynami
               {field.type === 'BOOLEAN' && (
                 <div className="flex h-10 items-center space-x-2">
                   <Checkbox
-                    id={field.key}
-                    checked={!!formData[field.key]}
-                    onCheckedChange={(c) => onChange(field.key, c)}
+                    id={field.field_key}
+                    checked={!!formData[field.field_key]}
+                    onCheckedChange={(c) => onChange(field.field_key, c)}
                     disabled={disabled}
                   />
-                  <label htmlFor={field.key} className="cursor-pointer text-sm select-none">
+                  <label htmlFor={field.field_key} className="cursor-pointer text-sm select-none">
                     ใช่ / มีข้อมูลนี้
                   </label>
                 </div>
@@ -135,8 +140,8 @@ export function DynamicStepForm({ fields, formData, onChange, disabled }: Dynami
               {/* --- 6. GENERATE CONTRACT NO --- */}
               {field.type === 'GEN_CONT_NO' && (
                 <ContractNumberGenerator
-                  value={formData[field.key] || ''}
-                  onChange={(val) => onChange(field.key, val)}
+                  value={formData[field.field_key] || ''}
+                  onChange={(val) => onChange(field.field_key, val)}
                   disabled={disabled}
                 />
               )}
@@ -144,8 +149,8 @@ export function DynamicStepForm({ fields, formData, onChange, disabled }: Dynami
               {/* --- 7. MULTI-EMAIL --- */}
               {(field.type === 'VENDOR_EMAIL' || field.type === 'COMMITTEE_EMAIL') && (
                 <MultiEmailInput
-                  value={formData[field.key] || []}
-                  onChange={(emails) => onChange(field.key, emails)}
+                  value={formData[field.field_key] || []}
+                  onChange={(emails) => onChange(field.field_key, emails)}
                   disabled={disabled}
                   placeholder={
                     field.type === 'VENDOR_EMAIL' ? 'ระบุอีเมลผู้ค้า...' : 'ระบุอีเมลกรรมการ...'
@@ -156,10 +161,46 @@ export function DynamicStepForm({ fields, formData, onChange, disabled }: Dynami
               {/* --- 8. DUE DATE SELECT --- */}
               {field.type === 'DUE_DATE_SELECT' && (
                 <DueDateMultiSelect
-                  value={formData[field.key] || []}
-                  onChange={(val) => onChange(field.key, val)}
+                  value={formData[field.field_key] || []}
+                  onChange={(val) => onChange(field.field_key, val)}
                   disabled={disabled}
                 />
+              )}
+
+              {/* --- 9. CONTRACT STATUS SELECT --- */}
+              {field.type === 'SELECT_CONTRACT_STATUS' && (
+                <Select
+                  value={formData[field.field_key]}
+                  onValueChange={(val) => onChange(field.field_key, val)}
+                  disabled={disabled}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="เลือกสถานะ..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="ON_TIME">ตามสัญญา</SelectItem>
+                    <SelectItem value="DELAYED">ล่าช้า</SelectItem>
+                    <SelectItem value="ABANDONED">ทิ้งงาน</SelectItem>
+                  </SelectContent>
+                </Select>
+              )}
+
+              {/* --- 10. DELIVERY STATUS SELECT --- */}
+              {field.type === 'SELECT_DELIVERY_STATUS' && (
+                <Select
+                  value={formData[field.field_key]}
+                  onValueChange={(val) => onChange(field.field_key, val)}
+                  disabled={disabled}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="เลือกสถานะการตรวจรับ..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="COMPLETE">ส่งมอบครบตามกำหนด</SelectItem>
+                    <SelectItem value="EXTENDED">มีขยายเวลา งด หรือลดค่าปรับ</SelectItem>
+                    <SelectItem value="PENALTY">มีค่าปรับ</SelectItem>
+                  </SelectContent>
+                </Select>
               )}
             </div>
 
@@ -173,13 +214,15 @@ export function DynamicStepForm({ fields, formData, onChange, disabled }: Dynami
                 'VENDOR_EMAIL',
                 'COMMITTEE_EMAIL',
                 'GEN_CONT_NO',
+                'SELECT_CONTRACT_STATUS',
+                'SELECT_DELIVERY_STATUS',
               ].includes(field.type) && (
                 <Button
                   type="button"
                   variant={isSkipped ? 'outline' : 'default'}
                   size="sm"
                   className={cn('caption w-full')}
-                  onClick={() => handleMarkAsDone(field.key)}
+                  onClick={() => handleMarkAsDone(field.field_key)}
                 >
                   {isSkipped ? (
                     <>

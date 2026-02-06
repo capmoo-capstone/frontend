@@ -40,6 +40,10 @@ export function useProjectWorkflow(
   const getStepStatus = useCallback(
     (stepOrder: number): StepStatus => {
       if (!project) return 'not_started';
+      // --- TESTING MODE START ---
+      // Uncomment this line to force all steps to be open and editable
+      return 'in_progress';
+      // --- TESTING MODE END ---
 
       // Note: project.current_step might belong to Procurement or Contract.
       // Ideally, the backend should provide separate current steps or we infer it.

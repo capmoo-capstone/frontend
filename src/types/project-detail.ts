@@ -13,6 +13,8 @@ export const FieldTypeSchema = z.enum([
   'GEN_CONT_NO',
   'VENDOR_EMAIL',
   'COMMITTEE_EMAIL',
+  'SELECT_CONTRACT_STATUS',
+  'SELECT_DELIVERY_STATUS',
 ]);
 
 export type FieldType = z.infer<typeof FieldTypeSchema>;
@@ -49,7 +51,12 @@ export const SubmissionDocumentSchema = z.object({
   field_key: z.string(),
   file_name: z.string().optional(),
   file_path: z.string().optional(),
-  value: z.string().optional().or(z.number().optional()).or(z.boolean().optional()).or(z.array(z.string()).optional()),
+  value: z
+    .string()
+    .optional()
+    .or(z.number().optional())
+    .or(z.boolean().optional())
+    .or(z.array(z.string()).optional()),
 });
 
 export type SubmissionDocument = z.infer<typeof SubmissionDocumentSchema>;

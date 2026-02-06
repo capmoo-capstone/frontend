@@ -82,7 +82,6 @@ export default function ProjectDetail() {
         onCancelProject={() => setIsCancelDialogOpen(true)}
         viewAsRole={user.role}
       />
-      <ProjectInfoGrid project={project} />
 
       {/* --- Project Alerts --- */}
       <div className="space-y-6">
@@ -93,6 +92,8 @@ export default function ProjectDetail() {
         />
         {/* <CancelledProjectBanner /> */}
       </div>
+
+      <ProjectInfoGrid project={project} />
 
       <Tabs defaultValue="timeline" className="mt-6">
         {/* --- Workflow Tabs & View Toggle --- */}

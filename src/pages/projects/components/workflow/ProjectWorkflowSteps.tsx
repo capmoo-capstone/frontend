@@ -1,6 +1,7 @@
 import { useAuth } from '@/context/AuthContext';
 import { useProjectWorkflow } from '@/hooks/useProjectWorkflow';
 import { isActionRequired } from '@/lib/workflow-utils';
+import type { ProjectDetail, WorkflowStepConfig } from '@/types/project-detail';
 import type { FieldConfig } from '@/types/workflow';
 
 import { DynamicStepForm } from './DynamicStepForm';
@@ -11,11 +12,13 @@ import { WorkflowList } from './WorkflowList';
 import { WorkflowStep } from './WorkflowStep';
 
 interface ProjectWorkflowStepsProps {
-  project: any;
+  project: ProjectDetail;
+  steps: WorkflowStepConfig[];
 }
 
-export function ProjectWorkflowSteps({ project }: ProjectWorkflowStepsProps) {
+export function ProjectWorkflowSteps({ project, steps }: ProjectWorkflowStepsProps) {
   const { user } = useAuth();
+
   const {
     getStepStatus,
     getStepSubmissions,
@@ -25,7 +28,7 @@ export function ProjectWorkflowSteps({ project }: ProjectWorkflowStepsProps) {
     handleSelectSubmission,
     handleBackToEdit,
     viewingSubmissions,
-  } = useProjectWorkflow(project);
+  } = useProjectWorkflow(project, steps);
 
   if (!user) return null;
 
@@ -37,7 +40,7 @@ export function ProjectWorkflowSteps({ project }: ProjectWorkflowStepsProps) {
       required: doc.mark_as_done,
     }));
 
-  const sortedSteps = [...project.workflow.steps].sort((a, b) => a.order - b.order);
+  const sortedSteps = [...steps].sort((a, b) => a.order - b.order);
   const lastStepOrder = sortedSteps[sortedSteps.length - 1]?.order;
 
   return (

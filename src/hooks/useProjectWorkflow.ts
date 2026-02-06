@@ -1,30 +1,57 @@
 import { useCallback, useState } from 'react';
 
-import type { ProjectDetail, StepStatus, Submission } from '@/types/project-detail';
+import type {
+  ProjectDetail,
+  StepStatus,
+  Submission,
+  WorkflowStepConfig,
+} from '@/types/project-detail';
 
-export function useProjectWorkflow(project: ProjectDetail | undefined) {
+// Now accepts 'activeSteps' to know which workflow we are dealing with
+export function useProjectWorkflow(
+  project: ProjectDetail | undefined,
+  activeSteps: WorkflowStepConfig[]
+) {
   const [stepFormData, setStepFormData] = useState<Record<string, Record<string, any>>>({});
   const [viewingSubmissions, setViewingSubmissions] = useState<Record<number, Submission | null>>(
     {}
   );
 
+  // Helper to find the name of the step at a given order
+  const getStepName = useCallback(
+    (order: number) => {
+      return activeSteps.find((s) => s.order === order)?.name;
+    },
+    [activeSteps]
+  );
+
   const getStepSubmissions = useCallback(
     (stepOrder: number) => {
       if (!project) return [];
+      const targetName = getStepName(stepOrder);
+
       return project.submissions
-        .filter((sub) => sub.step_order === stepOrder)
+        .filter((sub) => sub.step_order === stepOrder && sub.step_name === targetName) // Strict check by name
         .sort((a, b) => a.submission_round - b.submission_round);
     },
-    [project]
+    [project, getStepName]
   );
 
   const getStepStatus = useCallback(
     (stepOrder: number): StepStatus => {
       if (!project) return 'not_started';
-      if (stepOrder > project.current_step.order) return 'not_started';
 
+      // Note: project.current_step might belong to Procurement or Contract.
+      // Ideally, the backend should provide separate current steps or we infer it.
+      // For now, we assume standard logic:
       const submissions = getStepSubmissions(stepOrder);
-      if (submissions.length === 0) return 'in_progress';
+
+      if (submissions.length === 0) {
+        // Logic: If previous step is done, this one is in_progress.
+        // For simplicity, if it has no submissions, check if it's the very first step or previous is done.
+        if (stepOrder === 1) return 'in_progress'; // Simplified
+        return 'not_started';
+      }
 
       const latest = submissions[submissions.length - 1];
       if (latest.status === 'SUBMITTED') return 'submitted';

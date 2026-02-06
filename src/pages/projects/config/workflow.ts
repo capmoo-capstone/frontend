@@ -1,6 +1,12 @@
 import type { UnitResponsibleType } from '@/types/project';
+import type { WorkflowStepConfig } from '@/types/project-detail';
 
-export const ProcurementWorkflows = [
+type WorkflowConfig = {
+  type: UnitResponsibleType;
+  steps: WorkflowStepConfig[];
+};
+
+export const ProcurementWorkflows: WorkflowConfig[] = [
   {
     type: 'MT500K' as UnitResponsibleType,
     steps: [

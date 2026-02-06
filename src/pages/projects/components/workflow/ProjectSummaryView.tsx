@@ -5,17 +5,20 @@ import { Button } from '@/components/ui/button';
 import { FileCard } from '@/components/ui/file-card';
 import { formatDateThai } from '@/lib/date-utils';
 import { cn } from '@/lib/utils';
+import type { ProjectDetail, WorkflowStepConfig } from '@/types/project-detail';
 
 interface ProjectSummaryViewProps {
-  project: any;
+  project: ProjectDetail;
+  steps: WorkflowStepConfig[];
 }
 
-export function ProjectSummaryView({ project }: ProjectSummaryViewProps) {
-  const stepsWithDocs = project.workflow.steps
-    .map((step: any) => {
+export function ProjectSummaryView({ project, steps }: ProjectSummaryViewProps) {
+  const stepsWithDocs = steps
+    .map((step) => {
+      // Filter submissions by Step Order AND Step Name
       const submissions = project.submissions
-        .filter((s: any) => s.step_order === step.order)
-        .sort((a: any, b: any) => b.submission_round - a.submission_round);
+        .filter((s) => s.step_order === step.order && s.step_name === step.name)
+        .sort((a, b) => b.submission_round - a.submission_round);
 
       const approved = submissions.find((s: any) => ['APPROVED', 'ACCEPTED'].includes(s.status));
       const latest = submissions[0];
@@ -107,7 +110,7 @@ export function ProjectSummaryView({ project }: ProjectSummaryViewProps) {
     <div className="animate-in fade-in space-y-6 duration-500">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h2 className="text-primary h2-topic tracking-tight">สรุปข้อมูล (Summary)</h2>
+        <h2 className="h2-topic">สรุปข้อมูลเอกสารโครงการ</h2>
         <Button variant="outline" size="sm" onClick={handleDownloadAll}>
           <Download className="mr-2 h-4 w-4" />
           ดาวน์โหลดเอกสารทั้งหมด

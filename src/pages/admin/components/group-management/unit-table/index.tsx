@@ -1,10 +1,9 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 
 import { getCoreRowModel, useReactTable } from '@tanstack/react-table';
 import { AlertTriangle, Loader2 } from 'lucide-react';
-import { toast } from 'sonner';
 
 import { useUsersForSelection } from '@/hooks/useUsers';
 import type { UserSelectionItem } from '@/types/user';
@@ -12,15 +11,21 @@ import type { UserSelectionItem } from '@/types/user';
 import { getColumns } from './columns';
 import { UnitDataTable } from './data-table';
 
+interface UnitTableProps {
+  unitId: string;
+  isEditing: boolean;
+  newMemberIds: string[];
+  membersToDelete: string[];
+  onDeletedMembersChange?: (deletedMemberIds: string[]) => void;
+}
+
 export function UnitTable({
   unitId,
   isEditing,
   newMemberIds = [],
-}: {
-  unitId: string;
-  isEditing: boolean;
-  newMemberIds: string[];
-}) {
+  membersToDelete = [],
+  onDeletedMembersChange,
+}: UnitTableProps) {
   const {
     data: users,
     isLoading,
@@ -29,30 +34,38 @@ export function UnitTable({
 
   const { data: allUsers } = useUsersForSelection({ departmentId: 'department_procure' });
 
-  const [memberToDelete, setMemberToDelete] = useState<UserSelectionItem | null>(null);
-
   const columns = useMemo(
-    () => getColumns({ onDeleteMember: (user) => setMemberToDelete(user), isEditing }),
-    [isEditing]
+    () =>
+      getColumns({
+        onDeleteMember: (user) => {
+          if (isEditing) {
+            const updatedList = membersToDelete.includes(user.id)
+              ? membersToDelete
+              : [...membersToDelete, user.id];
+            onDeletedMembersChange?.(updatedList);
+          }
+        },
+        isEditing,
+      }),
+    [isEditing, membersToDelete, onDeletedMembersChange] // เพิ่ม dependencies
   );
 
   const combinedData = useMemo(() => {
     const existingMembers =
       users?.data?.filter((user: UserSelectionItem) => user.role !== 'HEAD_OF_UNIT') ?? [];
 
+    const filteredExisting = existingMembers.filter((em) => !membersToDelete.includes(em.id));
+
     const newMembers = newMemberIds
       .map((id) => {
         const userData =
           allUsers?.data?.find((u) => u.id === id) || users?.data?.find((u) => u.id === id);
-
         return userData ? { ...userData, isNew: true } : null;
       })
       .filter((u): u is UserSelectionItem & { isNew: boolean } => !!u);
 
-    const uniqueExistingMembers = existingMembers.filter((em) => !newMemberIds.includes(em.id));
-
-    return [...newMembers, ...uniqueExistingMembers];
-  }, [users?.data, newMemberIds, allUsers?.data]);
+    return [...newMembers, filteredExisting.filter((em) => !newMemberIds.includes(em.id))].flat();
+  }, [users?.data, newMemberIds, allUsers?.data, membersToDelete]);
 
   const table = useReactTable({
     data: combinedData,

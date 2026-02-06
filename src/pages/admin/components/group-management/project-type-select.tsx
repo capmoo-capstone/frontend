@@ -2,13 +2,12 @@ import { useState } from 'react';
 
 import { ChevronDown } from 'lucide-react';
 
+import { Button } from '@/components/ui/button';
+import { Command, CommandGroup, CommandItem, CommandList } from '@/components/ui/command';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { getResponsibleTypeFormat } from '@/lib/responsible-type-format';
 import type { UnitResponsibleType } from '@/types/project';
 import { UnitResponsibleTypeEnum } from '@/types/project';
-
-import { Button } from '../ui/button';
-import { Command, CommandGroup, CommandItem, CommandList } from '../ui/command';
-import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
 
 export function ProjectTypeSelectButton({
   currentTypes,

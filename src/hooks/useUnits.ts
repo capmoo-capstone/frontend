@@ -40,6 +40,7 @@ export const useUpdateUnit = () => {
       updateData: Partial<{
         name: string;
         type: UnitResponsibleType[];
+        removeMemberIds: string[];
       }>;
     }) => updateUnit(unitId, updateData),
 

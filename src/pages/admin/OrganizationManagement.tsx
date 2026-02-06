@@ -7,7 +7,7 @@ export default function OrganizationManagement() {
   return (
     <div className="text-primary flex flex-col p-9">
       <h1 className="h1-topic text-primary">ตั้งค่าบุคลากร</h1>
-      <Tabs defaultValue="organization" className="mt-6">
+      <Tabs defaultValue="group" className="mt-6">
         <TabsList className="mb-6 w-full">
           <TabsTrigger value="group" className="rounded-r-none text-base font-semibold">
             กลุ่มงาน

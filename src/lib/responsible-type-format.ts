@@ -44,6 +44,10 @@ export const getResponsibleTypeFormat = (type: UnitResponsibleType) => {
       };
 
     default:
-      return type;
+      return {
+        label: type,
+        indicator: 'var(--foreground)',
+        bg: 'var(--background)',
+      };
   }
 };

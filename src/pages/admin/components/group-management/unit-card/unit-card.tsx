@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 
 import { Check, ChevronDown, Pencil, Plus, Users, X } from 'lucide-react';
 import { toast } from 'sonner';
+import { set } from 'zod';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -22,6 +23,7 @@ export function UnitCard({ unitItem, index }: { unitItem: Unit; index: number })
   const [isEditing, setIsEditing] = useState(false);
   const [selectedUser, setSelectedUser] = useState<string | null>(null);
   const [newMemberIds, setNewMemberIds] = useState<string[]>([]);
+  const [membersToDelete, setMembersToDelete] = useState<string[]>([]);
   const [currentTypes, setCurrentTypes] = useState<UnitResponsibleType[]>(unitItem.type || []);
   const [isDelegateRemoved, setIsDelegateRemoved] = useState(false);
 
@@ -38,14 +40,12 @@ export function UnitCard({ unitItem, index }: { unitItem: Unit; index: number })
     return [...existingMemberIds, ...newMemberIds];
   }, [users?.data, newMemberIds]);
 
-  useEffect(() => {
-    setCurrentTypes(unitItem.type || []);
-  }, [unitItem.type]);
-
   const handleCancel = () => {
     setCurrentTypes(unitItem.type || []);
     setIsEditing(false);
     setIsDelegateRemoved(false);
+    setNewMemberIds([]);
+    setMembersToDelete([]);
   };
   const handleDeleteProjectBadge = (typeToDelete: UnitResponsibleType) => {
     setCurrentTypes((prev) => prev.filter((t) => t !== typeToDelete));
@@ -72,20 +72,13 @@ export function UnitCard({ unitItem, index }: { unitItem: Unit; index: number })
       promises.push(
         updateUnitMutate({
           unitId: unitItem.id,
-          updateData: {
-            type: currentTypes,
-          },
+          updateData: { type: currentTypes, removeMemberIds: membersToDelete },
         })
       );
 
       if (newMemberIds.length > 0) {
         newMemberIds.forEach((userId) => {
-          promises.push(
-            addMemberMutate({
-              unitId: unitItem.id,
-              userId: userId,
-            })
-          );
+          promises.push(addMemberMutate({ unitId: unitItem.id, userId }));
         });
       }
 
@@ -177,7 +170,8 @@ export function UnitCard({ unitItem, index }: { unitItem: Unit; index: number })
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
                 <CollapsibleTrigger className="group h3-topic flex items-center">
-                  เจ้าหน้าที่ ({(users?.data?.length ?? 0) + newMemberIds.length})
+                  เจ้าหน้าที่ (
+                  {(users?.data?.length ?? 0) + newMemberIds.length - membersToDelete.length})
                   <ChevronDown className="ml-2 h-4 w-4 group-data-[state=open]:rotate-180" />
                 </CollapsibleTrigger>
 
@@ -208,7 +202,13 @@ export function UnitCard({ unitItem, index }: { unitItem: Unit; index: number })
             </div>
 
             <CollapsibleContent className="mt-4">
-              <UnitTable unitId={unitItem.id} isEditing={isEditing} newMemberIds={newMemberIds} />
+              <UnitTable
+                unitId={unitItem.id}
+                isEditing={isEditing}
+                newMemberIds={newMemberIds}
+                membersToDelete={membersToDelete}
+                onDeletedMembersChange={setMembersToDelete}
+              />
             </CollapsibleContent>
           </Collapsible>
         </CardContent>

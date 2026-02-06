@@ -16,8 +16,8 @@ export const DelegateSchema = z.object({
   id: z.string(),
   user_id: z.string(),
   delegate_to: z.string(),
-  start_date: z.iso.datetime(),
-  end_date: z.iso.datetime().nullable(),
+  start_date: z.string().datetime(),
+  end_date: z.string().datetime().nullable(),
   is_active: z.boolean(),
 });
 
@@ -29,7 +29,7 @@ export const UserSchema = z.object({
   full_name: z.string(),
   role: UserRoleEnum.nullable(),
   delegate_info: DelegateSchema.nullable().optional(),
-  created_at: z.iso.datetime(),
+  created_at: z.string().datetime(),
 });
 
 export const UserListResponseSchema = z.object({

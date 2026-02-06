@@ -1,8 +1,7 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import { Check, ChevronDown, Pencil, Plus, Users, X } from 'lucide-react';
 import { toast } from 'sonner';
-import { set } from 'zod';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -12,7 +11,7 @@ import { useAddUnitMember, useUpdateUnit } from '@/hooks/useUnits';
 import { useDelegateUser, useUsersForSelection } from '@/hooks/useUsers';
 import type { UnitResponsibleType } from '@/types/project';
 import type { Unit } from '@/types/unit';
-import type { User, UserSelectionItem } from '@/types/user';
+import type { UserSelectionItem } from '@/types/user';
 
 import { DelegateUser } from '../delegate-user';
 import { DelegateUserSelect } from '../delegate-user-select';
@@ -145,6 +144,7 @@ export function UnitCard({ unitItem, index }: { unitItem: Unit; index: number })
             <span className="h3-topic">ประเภทงาน</span>
             {currentTypes.map((t: UnitResponsibleType) => (
               <ProjectBadge
+                key={t}
                 type={t}
                 isEditing={isEditing}
                 onDeleteProjectBadge={() => handleDeleteProjectBadge(t)}
@@ -176,7 +176,10 @@ export function UnitCard({ unitItem, index }: { unitItem: Unit; index: number })
               <div className="flex items-center gap-4">
                 <CollapsibleTrigger className="group h3-topic flex items-center">
                   เจ้าหน้าที่ (
-                  {(users?.data?.length ?? 0) + newMemberIds.length - membersToDelete.length})
+                  {(users?.data ?? []).filter((user) => user.id !== headUnit?.id).length +
+                    newMemberIds.length -
+                    membersToDelete.length}
+                  )
                   <ChevronDown className="ml-2 h-4 w-4 group-data-[state=open]:rotate-180" />
                 </CollapsibleTrigger>
 

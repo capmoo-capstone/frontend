@@ -95,11 +95,7 @@ export function UnitTable({
       <UnitDataTable
         table={table}
         columnsLength={columns.length}
-        toolbar={
-          <div className="flex w-full items-center justify-between space-x-4">
-            <div className="flex items-center gap-2"></div>
-          </div>
-        }
+        toolbar={<div className="flex w-full items-center justify-between space-x-4" />}
       />
     </>
   );

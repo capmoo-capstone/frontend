@@ -120,6 +120,48 @@ export default function ProjectDetail() {
         </div>
       </div>
 
+      {/* Project has been cancelled (completed state) */}
+      <div className="border-destructive/20 bg-destructive/5 rounded-lg border p-6">
+        <div className="flex items-start gap-4">
+          <div className="bg-destructive flex h-10 w-10 shrink-0 items-center justify-center rounded-full">
+            <AlertTriangle className="h-5 w-5 text-white" />
+          </div>
+          <div className="flex-1 space-y-3">
+            <div>
+              <h3 className="h3-topic text-destructive">โครงการถูกยกเลิกแล้ว</h3>
+              <p className="caption text-muted-foreground mt-1">
+                ยกเลิกเมื่อ {formatDateThai(new Date())} เวลา{' '}
+                {new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' })} น.
+              </p>
+            </div>
+            <div className="bg-background rounded-md p-4 space-y-2">
+              <p className="normal text-primary">
+                <span className="text-muted-foreground">ผู้ขอยกเลิก:</span> นางสาว เจ้าหน้าที่
+              </p>
+              <p className="normal text-primary">
+                <span className="text-muted-foreground">ผู้อนุมัติ:</span> นายหัวหน้าหน่วยงาน
+              </p>
+              <p className="normal text-primary">
+                <span className="text-muted-foreground">วันที่ขอยกเลิก:</span>{' '}
+                {formatDateThai(new Date(Date.now() - 2 * 24 * 60 * 60 * 1000))} เวลา{' '}
+                {new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toLocaleTimeString('th-TH', {
+                  hour: '2-digit',
+                  minute: '2-digit',
+                })}{' '}
+                น.
+              </p>
+              <div className="pt-2 border-t">
+                <p className="normal text-muted-foreground">
+                  <span className="text-foreground font-medium">เหตุผล:</span>{' '}
+                  ขอยกเลิกเนื่องจากโครงการมีความล่าช้าในการดำเนินงาน
+                  และไม่สามารถปฏิบัติงานได้ตามแผนที่วางไว้ ส่งผลกระทบต่อการใช้งบประมาณของหน่วยงาน
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <Tabs defaultValue="timeline" className="mt-6">
         {/* --- Workflow Tabs & View Toggle --- */}
         <div className="mb-4 flex items-end justify-between border-b">

@@ -14,6 +14,7 @@ import type { UnitResponsibleType } from '@/types/project';
 import type { Unit } from '@/types/unit';
 import type { User, UserSelectionItem } from '@/types/user';
 
+import { DelegateUser } from '../delegate-user';
 import { DelegateUserSelect } from '../delegate-user-select';
 import { ProjectBadge } from '../project-badge';
 import { ProjectTypeSelectButton } from '../project-type-select';
@@ -157,11 +158,15 @@ export function UnitCard({ unitItem, index }: { unitItem: Unit; index: number })
             )}
           </span>
 
-          <span className="flex items-center gap-7">
-            <span className="h3-topic">หัวหน้ากลุ่มงาน</span>
-            <span className="text-normal-normal">{headUnit?.full_name}</span>
-          </span>
-          {/* <DelegateUser /> */}
+          <div className="flex items-start gap-7">
+            <span className="h3-topic whitespace-nowrap">หัวหน้ากลุ่มงาน</span>
+
+            <div className="flex flex-col gap-2">
+              <span className="text-normal-normal">{headUnit?.full_name}</span>
+
+              <DelegateUser />
+            </div>
+          </div>
           {isEditing && (
             <DelegateUserSelect onRemoveDelegateUser={() => setIsDelegateRemoved(true)} />
           )}

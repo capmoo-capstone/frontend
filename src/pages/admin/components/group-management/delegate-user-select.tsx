@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 
 import { isBefore, startOfToday } from 'date-fns';
 import { X } from 'lucide-react';

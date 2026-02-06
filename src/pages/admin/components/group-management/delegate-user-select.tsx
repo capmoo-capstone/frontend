@@ -2,13 +2,13 @@
 
 import { useMemo, useState } from 'react';
 
+import { isBefore, startOfToday } from 'date-fns';
 import { X } from 'lucide-react';
 
+import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { DatePicker } from '@/components/ui/date-picker';
 import { UserSelect } from '@/components/user-select';
-
-import { Button } from '../ui/button';
 
 export function DelegateUserSelect({ onRemoveDelegateUser }: { onRemoveDelegateUser: () => void }) {
   const [selectedUser, setSelectedUser] = useState<string | null>(null);
@@ -47,7 +47,7 @@ export function DelegateUserSelect({ onRemoveDelegateUser }: { onRemoveDelegateU
             className="w-40"
             date={startDate}
             setDate={setStartDate}
-            disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
+            disabled={(date) => isBefore(date, startOfToday())}
           />
         </div>
       </div>
@@ -72,7 +72,10 @@ export function DelegateUserSelect({ onRemoveDelegateUser }: { onRemoveDelegateU
           <Checkbox
             id="no-end-date-inline"
             checked={checkBox}
-            onCheckedChange={(checked) => setCheckBox(checked === true)}
+            onCheckedChange={(check) => {
+              if (check === true) setEndDate(undefined);
+              setCheckBox(check === true);
+            }}
           />
           <label
             htmlFor="no-end-date-inline"

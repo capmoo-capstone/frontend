@@ -25,14 +25,14 @@ export const getResponsibleTypeFormat = (type: UnitResponsibleType) => {
 
     case 'SELECTION':
       return {
-        label: 'คัดเลือก',
+        label: 'ซื้อ/จ้าง แบบคัดเลือก',
         indicator: 'var(--chart-4-dark)',
         bg: 'var(--chart-4-light)',
       };
 
     case 'EBIDDING':
       return {
-        label: 'บริหารสัญญา',
+        label: 'ซื้อ/จ้าง แบบประกาศเชิญชวนทั่วไป',
         indicator: 'var(--chart-5-dark)',
         bg: 'var(--chart-5-light)',
       };

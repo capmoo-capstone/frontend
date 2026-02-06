@@ -42,21 +42,13 @@ export function DatePicker({
         </Button>
       </PopoverTrigger>
 
-      {!disabled && (
-        <PopoverContent className="w-auto p-0" align="start">
-          <Calendar mode="single" selected={date} onSelect={setDate} initialFocus />
-        </PopoverContent>
-      )}
-
       <PopoverContent className="w-auto p-0" align="start">
         <Calendar
           mode="single"
           selected={date}
           onSelect={setDate}
           initialFocus
-          disabled={
-            isDisabled || disabled || ((d) => d < new Date(new Date().setHours(0, 0, 0, 0)))
-          }
+          disabled={disabled || isDisabled}
         />
       </PopoverContent>
     </Popover>

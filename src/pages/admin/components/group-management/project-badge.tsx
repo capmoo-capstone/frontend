@@ -1,10 +1,9 @@
 import { X } from 'lucide-react';
 
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { getResponsibleTypeFormat } from '@/lib/responsible-type-format';
 import type { UnitResponsibleType } from '@/types/project';
-
-import { Badge } from '../ui/badge';
-import { Button } from '../ui/button';
 
 export function ProjectBadge({
   type,

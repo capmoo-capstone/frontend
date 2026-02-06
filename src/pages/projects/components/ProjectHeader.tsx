@@ -1,4 +1,4 @@
-import { MoreVertical, Trash2 } from 'lucide-react';
+import { MoreVertical, Pencil, Trash2 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -14,6 +14,7 @@ import type { ProjectDetail } from '@/types/project-detail';
 interface ProjectHeaderProps {
   project: ProjectDetail;
   viewAsRole: Role;
+  onEditProject?: () => void;
   onCancelProject?: () => void;
   onExportReport?: () => void;
 }
@@ -21,6 +22,7 @@ interface ProjectHeaderProps {
 export const ProjectHeader = ({
   project,
   viewAsRole,
+  onEditProject,
   onCancelProject,
   onExportReport,
 }: ProjectHeaderProps) => {
@@ -36,9 +38,6 @@ export const ProjectHeader = ({
             <p className="text-muted-foreground normal-l">{project.description}</p>
           )}
         </div>
-        {/* <h3 className="text-primary h2-sub">
-          ผู้รับผิดชอบโครงการ: {project.assignee_procurement?.full_name || 'ยังไม่ได้มอบหมาย'}
-        </h3> */}
       </div>
 
       <div className="flex items-center gap-2">
@@ -53,6 +52,10 @@ export const ProjectHeader = ({
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={onEditProject}>
+              <Pencil className="h-4 w-4" />
+              แก้ไขข้อมูลโครงการ
+            </DropdownMenuItem>
             <DropdownMenuItem
               onClick={onCancelProject}
               className="text-destructive focus:text-destructive"

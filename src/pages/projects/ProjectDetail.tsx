@@ -1,14 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
-import {
-  AlertTriangle,
-  CalendarRange,
-  ClipboardList,
-  LayoutList,
-  Loader2,
-  ShoppingCart,
-} from 'lucide-react';
+import { CalendarRange, ClipboardList, LayoutList, Loader2, ShoppingCart } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { ApproveCancelDialog } from '@/components/project-dialog/approve-cancel-dialog';
@@ -17,11 +10,10 @@ import {
   type EditProjectData,
   EditProjectDialog,
 } from '@/components/project-dialog/edit-project-dialog';
-import { Button } from '@/components/ui/button';
+import { CancellationRequestBanner } from '@/components/project/ProjectStatusBanners';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/context/AuthContext';
 import { useProjectDetail } from '@/hooks/useProjects';
-import { formatDateThai } from '@/lib/date-utils';
 import { ManageUnitRoles, SupervisorRoles } from '@/lib/role-permissions';
 import { cn } from '@/lib/utils';
 
@@ -37,7 +29,6 @@ export default function ProjectDetail() {
 
   // View States
   const [workflowTab, setWorkflowTab] = useState<'PROCUREMENT' | 'CONTRACT'>('PROCUREMENT');
-
   const [isCancelDialogOpen, setIsCancelDialogOpen] = useState(false);
   const [isApproveCancelDialogOpen, setIsApproveCancelDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
@@ -47,12 +38,9 @@ export default function ProjectDetail() {
   // --- Logic to get specific steps ---
   const activeSteps = useMemo(() => {
     if (!project) return [];
-
     if (workflowTab === 'PROCUREMENT') {
-      // Find steps based on project type (e.g., 'MT500K', 'EBIDDING')
       return ProcurementWorkflows.find((w) => w.type === project.procurement_type)?.steps || [];
     } else {
-      // Find 'CONTRACT' steps
       return ProcurementWorkflows.find((w) => w.type === 'CONTRACT')?.steps || [];
     }
   }, [project, workflowTab]);
@@ -68,10 +56,22 @@ export default function ProjectDetail() {
   if (!project) return null;
 
   const handleEditProject = async (data: EditProjectData) => {
-    // TODO: Implement API call to update project
-    console.log('Updating project with data:', data);
+    console.log('Updating project:', data);
     toast.success('อัปเดตข้อมูลโครงการสำเร็จ');
     setIsEditDialogOpen(false);
+  };
+
+  const getResponsiblePerson = () => {
+    if (workflowTab === 'PROCUREMENT') {
+      const names = [
+        project.assignee_procurement?.full_name,
+        'นางสาวพิมพ์ชนก ใจดีนามสกุลยาว',
+      ].filter(Boolean);
+      return names.join(', ');
+    } else {
+      const names = [project.assignee_contract?.full_name, 'นายสมชาย รักงาน'].filter(Boolean);
+      return names.join(', ');
+    }
   };
 
   return (
@@ -84,82 +84,14 @@ export default function ProjectDetail() {
       />
       <ProjectInfoGrid project={project} />
 
-      {/* Request from staff to confirm a project deletion */}
-      <div className="border-destructive/20 bg-destructive/5 rounded-lg border p-6">
-        <div className="flex items-start gap-4">
-          <div className="bg-destructive/10 flex h-10 w-10 shrink-0 items-center justify-center rounded-full">
-            <AlertTriangle className="text-destructive h-5 w-5" />
-          </div>
-          <div className="flex-1 space-y-3">
-            <div>
-              <h3 className="h3-topic text-destructive">คำขอยกเลิกโครงการ</h3>
-              <p className="caption text-muted-foreground mt-1">
-                ส่งคำขอเมื่อ {formatDateThai(new Date())} เวลา{' '}
-                {new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' })} น.
-              </p>
-            </div>
-            <div>
-              <p className="normal text-primary">
-                <span className="text-muted-foreground">ผู้ขอ:</span> นางสาว เจ้าหน้าที่
-              </p>
-              <p className="normal text-primary">
-                <span className="text-muted-foreground">เหตุผล:</span>{' '}
-                ขอยกเลิกเนื่องจากโครงการมีความล่าช้าในการดำเนินงาน
-                และไม่สามารถปฏิบัติงานได้ตามแผนที่วางไว้ ส่งผลกระทบต่อการใช้งบประมาณของหน่วยงาน
-              </p>
-            </div>
-            <div className="flex items-center gap-2 pt-2">
-              <Button variant="destructive" onClick={() => setIsApproveCancelDialogOpen(true)}>
-                อนุมัติและยกเลิกโครงการ
-              </Button>
-              <Button variant="outline" onClick={() => {}}>
-                ปฏิเสธคำขอ
-              </Button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Project has been cancelled (completed state) */}
-      <div className="border-destructive/20 bg-destructive/5 rounded-lg border p-6">
-        <div className="flex items-start gap-4">
-          <div className="bg-destructive flex h-10 w-10 shrink-0 items-center justify-center rounded-full">
-            <AlertTriangle className="h-5 w-5 text-white" />
-          </div>
-          <div className="flex-1 space-y-3">
-            <div>
-              <h3 className="h3-topic text-destructive">โครงการถูกยกเลิกแล้ว</h3>
-              <p className="caption text-muted-foreground mt-1">
-                ยกเลิกเมื่อ {formatDateThai(new Date())} เวลา{' '}
-                {new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' })} น.
-              </p>
-            </div>
-            <div className="bg-background rounded-md p-4 space-y-2">
-              <p className="normal text-primary">
-                <span className="text-muted-foreground">ผู้ขอยกเลิก:</span> นางสาว เจ้าหน้าที่
-              </p>
-              <p className="normal text-primary">
-                <span className="text-muted-foreground">ผู้อนุมัติ:</span> นายหัวหน้าหน่วยงาน
-              </p>
-              <p className="normal text-primary">
-                <span className="text-muted-foreground">วันที่ขอยกเลิก:</span>{' '}
-                {formatDateThai(new Date(Date.now() - 2 * 24 * 60 * 60 * 1000))} เวลา{' '}
-                {new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toLocaleTimeString('th-TH', {
-                  hour: '2-digit',
-                  minute: '2-digit',
-                })}{' '}
-                น.
-              </p>
-              <div className="pt-2 border-t">
-                <p className="normal text-muted-foreground">
-                  <span className="text-foreground font-medium">เหตุผล:</span>{' '}
-                  ขอยกเลิกเนื่องจากโครงการมีความล่าช้าในการดำเนินงาน
-                  และไม่สามารถปฏิบัติงานได้ตามแผนที่วางไว้ ส่งผลกระทบต่อการใช้งบประมาณของหน่วยงาน
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
+      {/* --- Project Alerts --- */}
+      <div className="space-y-6">
+        {/* Example: Logic to show banners based on project status would go here */}
+        <CancellationRequestBanner
+          onRequestApprove={() => setIsApproveCancelDialogOpen(true)}
+          onRequestReject={() => {}}
+        />
+        {/* <CancelledProjectBanner /> */}
       </div>
 
       <Tabs defaultValue="timeline" className="mt-6">
@@ -169,7 +101,7 @@ export default function ProjectDetail() {
             <button
               onClick={() => setWorkflowTab('PROCUREMENT')}
               className={cn(
-                'flex flex-col items-start gap-1 border-b-2 px-1 pb-3 text-sm font-medium transition-colors',
+                'caption flex flex-col items-start gap-1 border-b-2 px-1 pb-3 transition-colors',
                 workflowTab === 'PROCUREMENT'
                   ? 'border-brand-9 text-brand-11'
                   : 'text-muted-foreground hover:text-foreground border-transparent'
@@ -183,7 +115,7 @@ export default function ProjectDetail() {
             <button
               onClick={() => setWorkflowTab('CONTRACT')}
               className={cn(
-                'flex flex-col items-start gap-1 border-b-2 px-1 pb-3 text-sm font-medium transition-colors',
+                'caption flex flex-col items-start gap-1 border-b-2 px-1 pb-3 transition-colors',
                 workflowTab === 'CONTRACT'
                   ? 'border-brand-9 text-brand-11'
                   : 'text-muted-foreground hover:text-foreground border-transparent'
@@ -208,46 +140,11 @@ export default function ProjectDetail() {
           </TabsList>
         </div>
 
-        {workflowTab === 'PROCUREMENT' && project.assignee_procurement?.full_name && (
-          <div className="text-muted-foreground normal-b mb-2 flex items-center gap-1">
-            <span>ผู้รับผิดชอบ:</span>
-            {(() => {
-              const mockAssignees = [
-                project.assignee_procurement.full_name,
-                'นางสาวพิมพ์ชนก ใจดีนามสกุลยาว',
-              ];
-              return (
-                <div className="text-primary flex items-center gap-1">
-                  {mockAssignees.map((name, idx) => (
-                    <span key={idx}>
-                      {name}
-                      {idx < mockAssignees.length - 1 && ', '}
-                    </span>
-                  ))}
-                </div>
-              );
-            })()}
-          </div>
-        )}
-
-        {workflowTab === 'CONTRACT' && project.assignee_contract?.full_name && (
-          <div className="text-muted-foreground normal-b mb-2 flex items-center gap-1">
-            <span>ผู้รับผิดชอบ:</span>
-            {(() => {
-              const mockAssignees = [project.assignee_contract.full_name, 'นายสมชาย รักงาน'];
-              return (
-                <div className="text-primary flex items-center gap-1">
-                  {mockAssignees.map((name, idx) => (
-                    <span key={idx}>
-                      {name}
-                      {idx < mockAssignees.length - 1 && ', '}
-                    </span>
-                  ))}
-                </div>
-              );
-            })()}
-          </div>
-        )}
+        {/* --- Responsible Person Display --- */}
+        <div className="text-muted-foreground normal-b mb-2 flex items-center gap-1">
+          <span>ผู้รับผิดชอบ:</span>
+          <span className="text-primary">{getResponsiblePerson()}</span>
+        </div>
 
         {/* --- Content Area --- */}
         <TabsContent value="timeline">
@@ -259,7 +156,7 @@ export default function ProjectDetail() {
         </TabsContent>
       </Tabs>
 
-      {/* Dialogs */}
+      {/* --- Dialogs --- */}
       <ApproveCancelDialog
         isOpen={isApproveCancelDialogOpen}
         onClose={() => setIsApproveCancelDialogOpen(false)}

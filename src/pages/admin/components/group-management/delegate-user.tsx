@@ -7,7 +7,7 @@ export function DelegateUser() {
   return (
     <div className="flex flex-col gap-2">
       <div className="flex items-center gap-2">
-        <span className="text-normal-normal">ตัวแทน นามสกุลชั่วคราว</span>
+        <span className="normal">ตัวแทน นามสกุลชั่วคราว</span>
 
         {hasDelegate && (
           <TooltipProvider>

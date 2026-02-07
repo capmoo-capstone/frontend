@@ -20,10 +20,7 @@ export const getColumns = ({
 
       return (
         <span
-          className={cn(
-            'text-normal-normal',
-            member.isNew ? 'text-info-dark font-medium' : 'text-primary'
-          )}
+          className={cn('normal', member.isNew ? 'text-info-dark font-medium' : 'text-primary')}
         >
           {member.full_name}
         </span>
@@ -36,10 +33,7 @@ export const getColumns = ({
     cell: ({ row }) => {
       if (!isEditing) return null;
       return (
-        <div
-          className="text-normal-bold text-destructive"
-          onClick={() => onDeleteMember(row.original)}
-        >
+        <div className="normal-b text-destructive" onClick={() => onDeleteMember(row.original)}>
           ลบสมาชิก
         </div>
       );

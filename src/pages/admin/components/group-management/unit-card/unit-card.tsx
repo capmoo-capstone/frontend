@@ -121,11 +121,7 @@ export function UnitCard({ unitItem, index }: { unitItem: Unit; index: number })
             </div>
           ) : (
             <div className="flex items-center">
-              <Button
-                variant="outline"
-                className="text-normal-bold mr-3"
-                onClick={() => handleCancel()}
-              >
+              <Button variant="outline" className="normal-b mr-3" onClick={() => handleCancel()}>
                 <X />
                 ยกเลิก
               </Button>
@@ -162,7 +158,7 @@ export function UnitCard({ unitItem, index }: { unitItem: Unit; index: number })
             <span className="h3-topic whitespace-nowrap">หัวหน้ากลุ่มงาน</span>
 
             <div className="flex flex-col gap-2">
-              <span className="text-normal-normal">{headUnit?.full_name}</span>
+              <span className="normal">{headUnit?.full_name}</span>
 
               <DelegateUser />
             </div>
@@ -182,34 +178,32 @@ export function UnitCard({ unitItem, index }: { unitItem: Unit; index: number })
                   )
                   <ChevronDown className="ml-2 h-4 w-4 group-data-[state=open]:rotate-180" />
                 </CollapsibleTrigger>
-
-                {isEditing && (
-                  <div className="flex items-center gap-2">
-                    <UserSelect
-                      value={selectedUser}
-                      onChange={setSelectedUser}
-                      className="h-9 w-60"
-                      placeholder="เลือกเจ้าหน้าที่..."
-                      hasClearButton={false}
-                      departmentId="department_procure"
-                      excludeIds={excludeMemberIds}
-                    />
-                    <Button
-                      type="button"
-                      className="bg-accent text-normal-normal hover:bg-accent/80 flex h-9 w-9 items-center justify-center p-0"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        handleAddMember();
-                      }}
-                    >
-                      <Plus className="h-5 w-5" />
-                    </Button>
-                  </div>
-                )}
               </div>
             </div>
 
             <CollapsibleContent className="mt-4">
+              {isEditing && (
+                <div className="flex items-center gap-2">
+                  <UserSelect
+                    value={selectedUser}
+                    onChange={setSelectedUser}
+                    className="normal h-9 w-60"
+                    placeholder="เลือกเจ้าหน้าที่..."
+                    hasClearButton={false}
+                    departmentId="department_procure"
+                    excludeIds={excludeMemberIds}
+                  />
+                  <Button
+                    className="bg-accent normal text-primary hover:bg-accent/80 flex h-9 w-9 items-center justify-center p-0"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleAddMember();
+                    }}
+                  >
+                    <Plus className="h-5 w-5" />
+                  </Button>
+                </div>
+              )}
               <UnitTable
                 unitId={unitItem.id}
                 isEditing={isEditing}

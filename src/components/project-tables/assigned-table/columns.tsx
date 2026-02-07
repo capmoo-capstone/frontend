@@ -63,8 +63,11 @@ export const getColumns = ({
     ),
     cell: ({ row }) => (
       <div>
-        {row.original.is_urgent && (
+        {row.original.urgent_status === 'URGENT' && (
           <span className="text-destructive mr-2 font-semibold">ด่วน</span>
+        )}
+        {row.original.urgent_status === 'VERY_URGENT' && (
+          <span className="text-destructive mr-2 font-semibold">ด่วนพิเศษ</span>
         )}
         {row.getValue('title')}
       </div>
@@ -83,7 +86,7 @@ export const getColumns = ({
         />
       </div>
     ),
-    cell: ({ row }) => <div>{getResponsibleTypeFormat(row.original.procurement_type)}</div>,
+    cell: ({ row }) => <div>{getResponsibleTypeFormat(row.original.procurement_type).label}</div>,
     accessorFn: (row) => row.procurement_type,
   },
   {

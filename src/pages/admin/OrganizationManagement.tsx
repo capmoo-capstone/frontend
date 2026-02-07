@@ -5,10 +5,10 @@ import GroupManagement from './components/GroupManagement';
 
 export default function OrganizationManagement() {
   return (
-    <div className="text-primary flex flex-col p-9">
+    <div className="relative space-y-6">
       <h1 className="h1-topic text-primary">ตั้งค่าบุคลากร</h1>
       <Tabs defaultValue="group" className="mt-6">
-        <TabsList className="mb-6 w-full">
+        <TabsList className="mb-2 w-full">
           <TabsTrigger value="group" className="rounded-r-none text-base font-semibold">
             กลุ่มงาน
           </TabsTrigger>

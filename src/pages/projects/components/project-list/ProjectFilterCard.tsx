@@ -17,7 +17,7 @@ import { useUsersForSelection } from '@/hooks/useUsers';
 import { getResponsibleTypeFormat } from '@/lib/responsible-type-format';
 import type { ProcurementType, ProjectStatus, ProjectUrgentStatus } from '@/types/project';
 
-import { DatePickerWithRange } from '../../../../components/ui/DatePickerWithRange';
+import { DatePickerWithRange } from '../../../../components/ui/date-picker-with-range';
 import { FilterCheckbox } from './FilterCheckBox';
 import { SearchCheckbox } from './SearchCheckbox';
 
@@ -82,6 +82,7 @@ export function ProjectFilterCard({ filters, setFilters }: ProjectFilterCardProp
           />
         </div>
 
+        {/* to do ปีงบประมาณ */}
         <div className="flex w-full flex-col gap-2">
           <span className="normal-b">ปีงบประมาณ</span>
           <Select
@@ -93,6 +94,8 @@ export function ProjectFilterCard({ filters, setFilters }: ProjectFilterCardProp
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="2023">2566</SelectItem>
+              <SelectItem value="2024">2567</SelectItem>
+              <SelectItem value="2025">2568</SelectItem>
             </SelectContent>
           </Select>
         </div>

@@ -1,5 +1,6 @@
 import { z } from 'zod';
 
+import type { ProjectFilterParams } from '@/hooks/useProjects';
 import api from '@/lib/axios';
 import {
   type AssignedProjectItem,
@@ -18,7 +19,7 @@ import {
 } from './mock-data';
 import { mockProjects } from './mock-project';
 
-export const getProjects = async (): Promise<Project[]> => {
+export const getProjects = async (params?: ProjectFilterParams): Promise<Project[]> => {
   // return mock data;
   return MOCK_PROJECTS;
 
@@ -29,8 +30,8 @@ export const getProjects = async (): Promise<Project[]> => {
 
 export const getProjectDetail = async (id: string): Promise<ProjectDetail> => {
   // return mock data
-  return mockProjects.find((project) => project.id === id)!;
   return MOCK_PROJECT_DETAIL;
+  return mockProjects.find((project) => project.id === id)!;
 
   const { data } = await api.get(`/projects/${id}`);
   return data;

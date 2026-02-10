@@ -1,3 +1,5 @@
+import type { DateRange } from 'react-day-picker';
+
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import {
@@ -13,10 +15,22 @@ import {
 } from '@/api/project.api';
 import type { ProjectDetail } from '@/types/project-detail';
 
-export const useProjects = () => {
+export interface ProjectFilterParams {
+  search?: string;
+  title?: string;
+  dateRange?: DateRange;
+  fiscalYear?: string;
+  procurementType?: string[];
+  status?: string[];
+  urgentStatus?: string[];
+  assignees?: string[];
+  departments?: string[];
+  myTasks?: boolean;
+}
+export const useProjects = (filters?: ProjectFilterParams) => {
   return useQuery({
-    queryKey: ['projects'],
-    queryFn: getProjects,
+    queryKey: ['projects', filters],
+    queryFn: () => getProjects(filters),
   });
 };
 

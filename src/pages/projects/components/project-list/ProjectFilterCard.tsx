@@ -1,6 +1,7 @@
-import { Delete, RotateCcw, Search, TextSearch } from 'lucide-react';
+import { useMemo } from 'react';
 
-import { Button } from '@/components/ui/button';
+import { Search } from 'lucide-react';
+
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import {
@@ -10,37 +11,83 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { useProjects } from '@/hooks/useProjects';
+import { useDepartments } from '@/hooks/useDepartments';
+import { type ProjectFilterParams } from '@/hooks/useProjects';
+import { useUsersForSelection } from '@/hooks/useUsers';
+import { getResponsibleTypeFormat } from '@/lib/responsible-type-format';
+import type { ProcurementType, ProjectStatus, ProjectUrgentStatus } from '@/types/project';
 
 import { DatePickerWithRange } from '../../../../components/ui/DatePickerWithRange';
 import { FilterCheckbox } from './FilterCheckBox';
-import { SearchInput } from './Search';
 import { SearchCheckbox } from './SearchCheckbox';
 
-export function ProjectFilterCard() {
-  const projects = useProjects();
+interface ProjectFilterCardProps {
+  filters: ProjectFilterParams;
+  setFilters: React.Dispatch<React.SetStateAction<ProjectFilterParams>>;
+}
 
-  const departments = [
-    { label: 'สำนักงานมหาวิทยาลัย', value: 'office' },
-    { label: 'คณะวิศวกรรมศาสตร์', value: 'eng' },
-    { label: 'สถาบันนวัตกรรมบูรณาการแห่ง...', value: 'inter' },
+export function ProjectFilterCard({ filters, setFilters }: ProjectFilterCardProps) {
+  const handleToggleFilter = (key: keyof ProjectFilterParams, value: string) => {
+    setFilters((prev) => {
+      const current = (prev[key] as string[]) || [];
+      const next = current.includes(value)
+        ? current.filter((i) => i !== value)
+        : [...current, value];
+      return { ...prev, [key]: next };
+    });
+  };
+
+  const procurementTypes: ProcurementType[] = [
+    'LT100K',
+    'LT500K',
+    'MT500K',
+    'SELECTION',
+    'EBIDDING',
   ];
+
+  const departments = useDepartments();
+  const { data: users } = useUsersForSelection({ departmentId: 'procurement' });
+  const generalStaff = useMemo(() => {
+    if (!users?.data) return [];
+
+    return users.data
+      .filter((user) => user.role === 'GENERAL_STAFF')
+      .map((user) => ({
+        id: user.id,
+        full_name: user.full_name,
+      }));
+  }, [users]);
+
   return (
     <Card className="p-6">
       <div className="grid grid-cols-4 gap-4">
         <div className="flex w-full flex-col gap-2">
           <span className="normal-b">ชื่อโครงการ</span>
-          <SearchInput placeholder="ค้นหาโครงการ" />
+          <div className="bg-background relative rounded-lg">
+            <Input
+              className="normal pr-10"
+              placeholder={'ค้นหาโครงการ'}
+              value={filters.search}
+              onChange={(e) => setFilters((p) => ({ ...p, search: e.target.value }))}
+            />
+            <Search className="text-muted-foreground absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2" />
+          </div>
         </div>
 
         <div className="flex w-full flex-col gap-2">
           <span className="normal-b">ช่วงเวลา</span>
-          <DatePickerWithRange />
+          <DatePickerWithRange
+            value={filters.dateRange}
+            onChange={(val) => setFilters((p) => ({ ...p, dateRange: val }))}
+          />
         </div>
 
         <div className="flex w-full flex-col gap-2">
           <span className="normal-b">ปีงบประมาณ</span>
-          <Select>
+          <Select
+            value={filters.fiscalYear}
+            onValueChange={(v) => setFilters((p) => ({ ...p, fiscalYear: v }))}
+          >
             <SelectTrigger className="normal w-full">
               <SelectValue placeholder="เลือกปีงบประมาณ" />
             </SelectTrigger>
@@ -52,40 +99,84 @@ export function ProjectFilterCard() {
 
         <div className="flex w-full flex-col gap-2">
           <span className="normal-b">ผู้รับผิดชอบ</span>
-          <SearchCheckbox items={departments} placeholder="ค้นหาผู้รับผิดชอบ" />
+          <SearchCheckbox
+            items={generalStaff}
+            placeholder="ค้นหาผู้รับผิดชอบ"
+            value={filters.assignees}
+            onChange={(val) => setFilters((p) => ({ ...p, assignees: val }))}
+          />
         </div>
       </div>
 
-      <FilterCheckbox id="MY_TASKS" label="งานของฉัน" />
+      <FilterCheckbox
+        id="MY_TASKS"
+        label="งานของฉัน"
+        checked={filters.myTasks}
+        onCheckedChange={(checked) => setFilters((prev) => ({ ...prev, myTasks: checked }))}
+      />
 
       <div className="grid grid-cols-4 gap-4">
         <div className="flex flex-col gap-0.5">
           <span className="normal-b">ประเภทงาน</span>
-          <FilterCheckbox id="LT100K" label="ซื้อ/จ้าง แบบเจาะจง ไม่เกิน 1 แสน" />
-          <FilterCheckbox id="LT500K" label="ซื้อ/จ้าง แบบเจาะจง 1 - 5 แสน" />
-          <FilterCheckbox id="MT500K" label="ซื้อ/จ้าง แบบเจาะจง เกิน 5 แสน" />
-          <FilterCheckbox id="SELECTION" label="ซื้อ/จ้าง แบบคัดเลือก" />
-          <FilterCheckbox id="EBIDDING" label="ซื้อ/จ้าง แบบประกาศเชิญชวนทั่วไป" />
+          {procurementTypes.map((type) => {
+            const format = getResponsibleTypeFormat(type);
+
+            return (
+              <FilterCheckbox
+                key={type}
+                id={type}
+                label={format.label}
+                checked={filters.procurementType?.includes(type)}
+                onCheckedChange={() => handleToggleFilter('procurementType', type)}
+              />
+            );
+          })}
         </div>
 
         <div className="flex flex-col gap-0.5">
           <span className="normal-b">สถานะ</span>
-          <FilterCheckbox id="IN_PROGRESS" label="กำลังดำเนินการ" />
-          <FilterCheckbox id="CLOSED" label="เสร็จสิ้น" />
-          <FilterCheckbox id="CANCELLED" label="ยกเลิก" />
-          <FilterCheckbox id="UNASSIGNED" label="ยังไม่ได้มอบหมาย" />
+          {[
+            { id: 'UNASSIGNED', label: 'ยังไม่ได้มอบหมาย' },
+            { id: 'WAITING_ACCEPT', label: 'รอการตอบรับ' },
+            { id: 'IN_PROGRESS', label: 'กำลังดำเนินการ' },
+            { id: 'CLOSED', label: 'เสร็จสิ้น' },
+            { id: 'CANCELLED', label: 'ยกเลิก' },
+          ].map((item) => (
+            <FilterCheckbox
+              key={item.id}
+              id={item.id as ProjectStatus}
+              label={item.label}
+              checked={filters.status?.includes(item.id as ProjectStatus)}
+              onCheckedChange={() => handleToggleFilter('status', item.id)}
+            />
+          ))}
         </div>
 
         <div className="flex flex-col gap-0.5">
           <span className="normal-b">ความเร่งด่วน</span>
-          <FilterCheckbox id="NORMAL" label="ปกติ" />
-          <FilterCheckbox id="URGENT" label="ด่วน" />
-          <FilterCheckbox id="VERY_URGENT" label="ด่วนพิเศษ" />
+          {[
+            { id: 'NORMAL', label: 'ปกติ' },
+            { id: 'URGENT', label: 'ด่วน' },
+            { id: 'VERY_URGENT', label: 'ด่วนพิเศษ' },
+          ].map((item) => (
+            <FilterCheckbox
+              key={item.id}
+              id={item.id as ProjectUrgentStatus}
+              label={item.label}
+              checked={filters.urgentStatus?.includes(item.id as ProjectUrgentStatus)}
+              onCheckedChange={() => handleToggleFilter('urgentStatus', item.id)}
+            />
+          ))}
         </div>
 
         <div className="flex flex-col gap-0.5">
           <span className="normal-b">หน่วยงาน</span>
-          <SearchCheckbox items={departments} placeholder="ค้นหาหน่วยงาน" />
+          <SearchCheckbox
+            items={departments.data ?? []}
+            placeholder="ค้นหาหน่วยงาน"
+            value={filters.departments}
+            onChange={(val) => setFilters((p) => ({ ...p, departments: val }))}
+          />
         </div>
       </div>
     </Card>

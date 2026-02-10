@@ -1,13 +1,13 @@
 import { type ColumnDef } from '@tanstack/react-table';
-import { MoreVertical, UserRoundPlus } from 'lucide-react';
+import { ArrowUpDown, MoreVertical, UserRoundPlus } from 'lucide-react';
 
-import { Badge } from '@/components/ui/badge';
+import { getProjectStatusFormat } from '@/lib/project-status-format';
 import { getResponsibleTypeFormat } from '@/lib/responsible-type-format';
 import { ManageSelfRoles, ManageUnitRoles } from '@/lib/role-permissions';
-import { cn } from '@/lib/utils';
 import type { Role, User } from '@/types/auth';
 import { type Project } from '@/types/project';
 
+import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
 import {
   DropdownMenu,
@@ -27,29 +27,62 @@ export const baseColumns = ({
 }: SharedColumnsProps): ColumnDef<Project>[] => [
   {
     accessorKey: 'receive_no',
-    header: 'เลขที่ลงรับ',
+    header: ({ column }) => (
+      <div
+        className="flex cursor-pointer items-center"
+        onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+      >
+        เลขที่ลงรับ
+        <ArrowUpDown
+          className={`ml-2 h-4 w-4 ${column.getIsSorted() ? 'text-primary' : 'text-ring'}`}
+        />
+      </div>
+    ),
     cell: ({ row }) => <div className="normal">{row.getValue('receive_no')}</div>,
   },
   {
     accessorKey: 'title',
-    header: 'โครงการ',
-    cell: ({ row }) => {
-      const isUrgent = row.original.urgent_status === 'URGENT';
-      const isVeryUrgent = row.original.urgent_status === 'VERY_URGENT';
-      return (
-        <div className="flex items-center gap-2">
-          {isUrgent && <span className="font-bold whitespace-nowrap text-red-500">ด่วน</span>}
-          {isVeryUrgent && (
-            <span className="font-bold whitespace-nowrap text-red-700">ด่วนพิเศษ</span>
-          )}
-          <span className="normal">{row.getValue('title')}</span>
-        </div>
-      );
-    },
+    header: ({ column }) => (
+      <div
+        className="flex cursor-pointer items-center"
+        onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+      >
+        โครงการ
+        <ArrowUpDown
+          className={`ml-2 h-4 w-4 ${column.getIsSorted() ? 'text-primary' : 'text-ring'}`}
+        />
+      </div>
+    ),
+    cell: ({ row }) => (
+      <div>
+        {row.original.urgent_status === 'URGENT' && (
+          <span className="text-destructive normal-b mr-2">ด่วน</span>
+        )}
+        {row.original.urgent_status === 'VERY_URGENT' && (
+          <span className="text-destructive normal-b mr-2">ด่วนพิเศษ</span>
+        )}
+        {row.getValue('title')}
+      </div>
+    ),
   },
   {
     accessorKey: 'responsible_users',
-    header: 'ผู้รับผิดชอบ',
+    sortingFn: (rowA, rowB) => {
+      const nameA = rowA.original.assignee_procurement?.[0]?.name ?? '';
+      const nameB = rowB.original.assignee_procurement?.[0]?.name ?? '';
+      return nameA.localeCompare(nameB, 'th');
+    },
+    header: ({ column }) => (
+      <div
+        className="flex cursor-pointer items-center"
+        onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+      >
+        ผู้รับผิดชอบ
+        <ArrowUpDown
+          className={`ml-2 h-4 w-4 ${column.getIsSorted() ? 'text-primary' : 'text-ring'}`}
+        />
+      </div>
+    ),
     cell: ({ row }) => {
       const procurementUsers = (row.original.assignee_procurement ?? []) as User[];
       const contractUsers = (row.original.assignee_contract ?? []) as User[];
@@ -75,7 +108,22 @@ export const baseColumns = ({
   },
   {
     accessorKey: 'type',
-    header: 'ประเภทงาน',
+    sortingFn: (rowA, rowB) => {
+      const labelA = getResponsibleTypeFormat(rowA.original.procurement_type).label;
+      const labelB = getResponsibleTypeFormat(rowB.original.procurement_type).label;
+      return labelA.localeCompare(labelB, 'th');
+    },
+    header: ({ column }) => (
+      <div
+        className="flex cursor-pointer items-center"
+        onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+      >
+        ประเภทงาน
+        <ArrowUpDown
+          className={`ml-2 h-4 w-4 ${column.getIsSorted() ? 'text-primary' : 'text-ring'}`}
+        />
+      </div>
+    ),
     cell: ({ row }) => {
       const config = getResponsibleTypeFormat(row.original.procurement_type);
       return <div className="normal">{config.label}</div>;
@@ -83,19 +131,69 @@ export const baseColumns = ({
   },
   {
     accessorKey: 'procure_status',
-    header: 'ซื้อ/จ้าง',
+    sortingFn: (rowA, rowB) => {
+      const labelA = getProjectStatusFormat(
+        rowA.original.status,
+        rowA.original.workflow_status.p
+      ).label;
+      const labelB = getProjectStatusFormat(
+        rowB.original.status,
+        rowB.original.workflow_status.p
+      ).label;
+      return labelA.localeCompare(labelB, 'th');
+    },
+    header: ({ column }) => (
+      <div
+        className="flex cursor-pointer items-center"
+        onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+      >
+        ซื้อ/จ้าง
+        <ArrowUpDown
+          className={`ml-2 h-4 w-4 ${column.getIsSorted() ? 'text-primary' : 'text-ring'}`}
+        />
+      </div>
+    ),
     cell: ({ row }) => {
-      const status = row.original.workflow_status.p;
-
-      return <StatusBadge status={status} />;
+      const { variant, label } = getProjectStatusFormat(
+        row.original.status,
+        row.original.workflow_status.p
+      );
+      return <Badge variant={variant}>{label} </Badge>;
     },
   },
   {
     accessorKey: 'contract_status',
-    header: 'บริหารสัญญา',
+    sortingFn: (rowA, rowB) => {
+      const labelA = getProjectStatusFormat(
+        rowA.original.status,
+        rowA.original.workflow_status.c,
+        rowA.original.workflow_status.p
+      ).label;
+      const labelB = getProjectStatusFormat(
+        rowB.original.status,
+        rowB.original.workflow_status.c,
+        rowB.original.workflow_status.p
+      ).label;
+      return labelA.localeCompare(labelB, 'th');
+    },
+    header: ({ column }) => (
+      <div
+        className="flex cursor-pointer items-center"
+        onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+      >
+        บริหารสัญญา
+        <ArrowUpDown
+          className={`ml-2 h-4 w-4 ${column.getIsSorted() ? 'text-primary' : 'text-ring'}`}
+        />
+      </div>
+    ),
     cell: ({ row }) => {
-      const status = row.original.workflow_status.c;
-      return <StatusBadge status={status} />;
+      const { variant, label } = getProjectStatusFormat(
+        row.original.status,
+        row.original.workflow_status.c,
+        row.original.workflow_status.p
+      );
+      return <Badge variant={variant}>{label} </Badge>;
     },
   },
   {
@@ -103,51 +201,37 @@ export const baseColumns = ({
     enableHiding: false,
     cell: ({ row }) => {
       const project = row.original;
-
-      const canEdit = project.status === 'WAITING_ACCEPT';
+      const canEdit =
+        project.status === 'IN_PROGRESS' ||
+        project.status == 'UNASSIGNED' ||
+        project.status == 'WAITING_ACCEPT';
 
       if (row.original.status === 'CANCELLED') {
         return null;
       }
 
       return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreVertical className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            {(ManageUnitRoles.includes(viewAsRole) || ManageSelfRoles.includes(viewAsRole)) && (
-              <DropdownMenuItem onClick={() => onAddAssignee(project)} disabled={!canEdit}>
-                <UserRoundPlus className="h-4 w-4" />
-                เพิ่มผู้รับผิดชอบ
-              </DropdownMenuItem>
-            )}
-          </DropdownMenuContent>
-        </DropdownMenu>
+        canEdit && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="h-8 w-8 p-0">
+                <MoreVertical className="normal h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              {(ManageUnitRoles.includes(viewAsRole) || ManageSelfRoles.includes(viewAsRole)) && (
+                <DropdownMenuItem
+                  onClick={() => onAddAssignee(project)}
+                  className="normal text-foreground"
+                >
+                  <UserRoundPlus className="normal h-4 w-4" />
+                  เพิ่มผู้รับผิดชอบ
+                </DropdownMenuItem>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )
       );
     },
   },
 ];
-
-// Helper Component สำหรับ Badge สถานะ
-function StatusBadge({ status }: { status: string }) {
-  if (!status || status === '-') return <span className="text-slate-400">-</span>;
-
-  const config: Record<string, string> = {
-    ยังไม่ได้มอบหมาย: 'bg-slate-100 text-slate-700 border-none',
-    'ขั้นตอนที่ 2': 'bg-amber-50 text-amber-700 border-amber-200',
-    เสร็จสิ้น: 'bg-teal-50 text-teal-700 border-teal-200',
-    ยกเลิก: 'bg-red-50 text-red-700 border-red-200',
-    การเงินส่งคืนแก้ไข: 'bg-rose-50 text-rose-700 border-rose-200',
-  };
-
-  return (
-    <Badge variant="outline" className={cn('rounded-full px-3 py-0.5 font-normal', config[status])}>
-      <span className="mr-1.5 h-1.5 w-1.5 rounded-full bg-current" />
-      {status}
-    </Badge>
-  );
-}

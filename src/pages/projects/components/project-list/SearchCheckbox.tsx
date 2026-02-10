@@ -9,16 +9,27 @@ import { Input } from '@/components/ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
 interface SearchCheckboxProps {
-  items: { value: string; label: string }[];
+  items: { id: string; name?: string; full_name?: string }[];
   placeholder?: string;
+  value?: string[];
+  onChange?: (values: string[]) => void;
 }
-export function SearchCheckbox({ items, placeholder }: SearchCheckboxProps) {
-  const [selectedValues, setSelectedValues] = useState<string[]>([]);
+export function SearchCheckbox({
+  items = [],
+  placeholder,
+  value = [],
+  onChange,
+}: SearchCheckboxProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [open, setOpen] = useState(false);
 
+  const selectedLabels = items
+    .filter((item) => value.includes(item.id))
+    .map((item) => item.name || item.full_name)
+    .join(', ');
+
   const filteredItems = items.filter((item) =>
-    item.label.toLowerCase().includes(searchTerm.toLowerCase())
+    (item.name || item.full_name || '').toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
@@ -27,13 +38,13 @@ export function SearchCheckbox({ items, placeholder }: SearchCheckboxProps) {
         <PopoverTrigger asChild>
           <div className="normal relative">
             <Input
-              placeholder={placeholder}
-              value={searchTerm}
+              placeholder={placeholder || 'ค้นหา'}
+              value={open ? searchTerm : selectedLabels}
               onChange={(e) => {
                 setSearchTerm(e.target.value);
                 if (!open) setOpen(true);
               }}
-              onFocus={() => setOpen(true)}
+              readOnly={!open}
               className="normal"
             />
             <div className="absolute inset-y-0 right-0 flex items-center pr-3 hover:bg-transparent">
@@ -45,27 +56,28 @@ export function SearchCheckbox({ items, placeholder }: SearchCheckboxProps) {
         <PopoverContent
           className="bg-background mt-2 w-[var(--radix-popover-trigger-width)] rounded-lg border-1 p-2 shadow-xs"
           align="start"
-          onOpenAutoFocus={(e) => e.preventDefault()}
+          onOpenAutoFocus={(e) => {
+            e.preventDefault();
+          }}
         >
-          <div>
+          <div className="max-h-[200px] overflow-y-auto">
             {filteredItems.map((item) => (
               <div
-                key={item.value}
-                className="flex items-center gap-2 rounded-xl px-2 py-2"
+                key={item.id}
+                className="flex cursor-pointer items-center gap-2 rounded-lg px-2 py-2 hover:bg-slate-50"
                 onClick={() => {
-                  setSelectedValues((prev) =>
-                    prev.includes(item.value)
-                      ? prev.filter((v) => v !== item.value)
-                      : [...prev, item.value]
-                  );
+                  const nextValues = value.includes(item.id)
+                    ? value.filter((v) => v !== item.id)
+                    : [...value, item.id];
+                  onChange?.(nextValues);
                 }}
               >
-                <Checkbox checked={selectedValues.includes(item.value)} />
-                <span className="normal">{item.label}</span>
+                <Checkbox checked={value.includes(item.id)} />
+                <span className="normal">{item.name || item.full_name}</span>
               </div>
             ))}
             {filteredItems.length === 0 && (
-              <div className="py-8 text-center text-sm">ไม่พบข้อมูล</div>
+              <div className="text-destructive py-8 text-center text-sm">ไม่พบข้อมูล</div>
             )}
           </div>
         </PopoverContent>

@@ -1,21 +1,20 @@
 'use client';
 
-import { useState } from 'react';
 import { type DateRange } from 'react-day-picker';
 
-import { addDays, addYears, format } from 'date-fns';
+import { addYears, format } from 'date-fns';
 import { CalendarIcon } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
-export function DatePickerWithRange() {
-  const [date, setDate] = useState<DateRange | undefined>({
-    from: new Date(new Date().getFullYear(), 0, 20),
-    to: addDays(new Date(new Date().getFullYear(), 0, 20), 20),
-  });
+interface DatePickerWithRangeProps {
+  value?: DateRange;
+  onChange?: (date: DateRange | undefined) => void;
+}
 
+export function DatePickerWithRange({ value, onChange }: DatePickerWithRangeProps) {
   const formatThaiDate = (date: Date) => {
     return format(addYears(date, 543), 'dd/MM/yyyy');
   };
@@ -29,13 +28,13 @@ export function DatePickerWithRange() {
           className="text-muted-foreground normal w-full justify-between px-3 py-2"
         >
           <div className="flex gap-2">
-            {date?.from ? (
-              date.to ? (
+            {value?.from ? (
+              value.to ? (
                 <>
-                  {formatThaiDate(date.from)} - {formatThaiDate(date.to)}
+                  {formatThaiDate(value.from)} - {formatThaiDate(value.to)}
                 </>
               ) : (
-                formatThaiDate(date.from)
+                formatThaiDate(value.from)
               )
             ) : (
               <span>เลือกวันที่เริ่มต้น - สิ้นสุด</span>
@@ -47,9 +46,9 @@ export function DatePickerWithRange() {
       <PopoverContent className="w-auto p-0" align="start">
         <Calendar
           mode="range"
-          defaultMonth={date?.from}
-          selected={date}
-          onSelect={setDate}
+          defaultMonth={value?.from}
+          selected={value}
+          onSelect={onChange}
           numberOfMonths={2}
           disabled={(date) => date > new Date()}
         />

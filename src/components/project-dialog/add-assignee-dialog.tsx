@@ -15,7 +15,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { UserSelect } from '@/components/user-select';
-import { useAssignProjects } from '@/hooks/useProjects';
+import { useAssignProjects, useProjectDetail } from '@/hooks/useProjects';
 
 interface AddMemberDialogProps {
   isOpen: boolean;
@@ -26,6 +26,12 @@ interface AddMemberDialogProps {
 export function AddAssigneeDialog({ isOpen, onClose, projectId }: AddMemberDialogProps) {
   const [selectedUser, setSelectedUser] = useState<string | null>(null);
   const { mutateAsync: assignProjectsMutation, isPending } = useAssignProjects();
+  const projectDetail = useProjectDetail(projectId);
+  const data = projectDetail.data;
+  const unitId =
+    (data?.current_template_type !== 'CONTRACT'
+      ? data?.assignee_contract?.unit_id
+      : data?.assignee_procurement?.unit_id) ?? undefined;
 
   useEffect(() => {
     if (isOpen) {
@@ -67,18 +73,23 @@ export function AddAssigneeDialog({ isOpen, onClose, projectId }: AddMemberDialo
           <DialogTitle className="h3-topic flex items-center justify-center">
             การเพิ่มเจ้าหน้าที่ในโครงการ
           </DialogTitle>
-          <DialogDescription className="mt-6 mb-3 flex w-full flex-col items-start">
-            <div className="text-primary text-base font-medium">
-              ชื่อพนักงาน <span className="text-destructive">*</span>
+
+          <div className="mt-6 mb-3 flex w-full flex-col items-start space-y-2">
+            <div className="text-base font-medium">
+              ชื่อเจ้าหน้าที่ <span className="text-destructive">*</span>
             </div>
 
-            <UserSelect
-              onChange={setSelectedUser}
-              className="mt-1 w-full"
-              placeholder="เลือกเจ้าหน้าที่..."
-              hasClearButton={false}
-            />
-          </DialogDescription>
+            <div className="relative w-full">
+              <UserSelect
+                value={selectedUser}
+                onChange={setSelectedUser}
+                className="normal w-full"
+                placeholder="เลือกเจ้าหน้าที่..."
+                hasClearButton={false}
+                unitId={unitId}
+              />
+            </div>
+          </div>
         </DialogHeader>
 
         <DialogFooter className="flex flex-row items-center justify-center sm:justify-center">

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import { Delete, Funnel, Import, Inbox, Search, TextSearch } from 'lucide-react';
 import { AlertTriangle } from 'lucide-react';
@@ -7,12 +7,15 @@ import { AllProjectTable } from '@/components/project-tables/all-project';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { useAuth } from '@/context/AuthContext';
 import { type ProjectFilterParams } from '@/hooks/useProjects';
 
 import { ProjectFilterCard } from './components/project-list/ProjectFilterCard';
 import { StatusCard } from './components/project-list/StatusCard';
 
 export default function ProjectListPage() {
+  const { user } = useAuth();
+
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [topSearch, setTopSearch] = useState('');
 
@@ -45,6 +48,16 @@ export default function ProjectListPage() {
     setTempFilters(initialFilters);
     setAppliedFilters(initialFilters);
   };
+
+  const finalFilters = useMemo(() => {
+    const filters = { ...appliedFilters };
+
+    if (user?.department?.name !== 'procurement') {
+      filters.departments = [user?.department?.id || ''];
+    }
+
+    return filters;
+  }, [appliedFilters, user]);
 
   return (
     <div className="relative space-y-6">
@@ -108,8 +121,13 @@ export default function ProjectListPage() {
             onChange={(e) => setTopSearch(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleGlobalSearch()}
           />
-
-          <Search className="text-muted-foreground absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2" />
+          <Button
+            variant="ghost"
+            className="absolute inset-y-0 right-0 flex items-center pr-3"
+            onClick={handleGlobalSearch}
+          >
+            <Search className="text-muted-foreground absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2" />
+          </Button>
         </div>
         <Button variant="outline" onClick={() => setIsFilterOpen(!isFilterOpen)}>
           <Funnel /> ค้นหาขั้นสูง
@@ -133,7 +151,7 @@ export default function ProjectListPage() {
           </div>
         </div>
       )}
-      <AllProjectTable filters={appliedFilters} />
+      <AllProjectTable filters={finalFilters} />
     </div>
   );
 }

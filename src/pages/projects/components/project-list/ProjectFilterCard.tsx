@@ -11,6 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { useAuth } from '@/context/AuthContext';
 import { useDepartments } from '@/hooks/useDepartments';
 import { type ProjectFilterParams } from '@/hooks/useProjects';
 import { useUsersForSelection } from '@/hooks/useUsers';
@@ -27,6 +28,8 @@ interface ProjectFilterCardProps {
 }
 
 export function ProjectFilterCard({ filters, setFilters }: ProjectFilterCardProps) {
+  const { user } = useAuth();
+
   const handleToggleFilter = (key: keyof ProjectFilterParams, value: string) => {
     setFilters((prev) => {
       const current = (prev[key] as string[]) || [];
@@ -172,15 +175,17 @@ export function ProjectFilterCard({ filters, setFilters }: ProjectFilterCardProp
           ))}
         </div>
 
-        <div className="flex flex-col gap-0.5">
-          <span className="normal-b">หน่วยงาน</span>
-          <SearchCheckbox
-            items={departments.data ?? []}
-            placeholder="ค้นหาหน่วยงาน"
-            value={filters.departments}
-            onChange={(val) => setFilters((p) => ({ ...p, departments: val }))}
-          />
-        </div>
+        {user?.department?.name === 'procurement' && (
+          <div className="flex flex-col gap-0.5">
+            <span className="normal-b">หน่วยงาน</span>
+            <SearchCheckbox
+              items={departments.data ?? []}
+              placeholder="ค้นหาหน่วยงาน"
+              value={filters.departments}
+              onChange={(val) => setFilters((p) => ({ ...p, departments: val }))}
+            />
+          </div>
+        )}
       </div>
     </Card>
   );

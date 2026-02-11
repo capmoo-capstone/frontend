@@ -2,7 +2,7 @@ import { Copy } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { formatDateThai } from '@/lib/date-utils';
+import { formatDateThai } from '@/lib/formatters';
 import type { ProjectDetail } from '@/types/project-detail';
 
 interface ProjectInfoGridProps {

@@ -9,7 +9,7 @@ import { GenerateContractDialog } from '@/components/project-dialog/generate-con
 import { useAuth } from '@/context/AuthContext';
 import { useProjectWorkflow } from '@/hooks/useProjectWorkflow';
 import { useProjectDetail } from '@/hooks/useProjects';
-import { ManageUnitRoles, SupervisorRoles } from '@/lib/role-permissions';
+import { ManageUnitRoles, SupervisorRoles } from '@/lib/permissions';
 import { isActionRequired } from '@/lib/workflow-utils';
 import type { FieldConfig } from '@/types/workflow';
 

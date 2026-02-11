@@ -9,14 +9,13 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { formatDateThaiShort } from '@/lib/date-utils';
-import { getResponsibleTypeFormat } from '@/lib/responsible-type-format';
+import { formatDateThaiShort, getResponsibleTypeFormat } from '@/lib/formatters';
 import {
   ManageSelfRoles,
   ManageUnitRoles,
   SupervisorRoles,
   ViewUnitRoles,
-} from '@/lib/role-permissions';
+} from '@/lib/permissions';
 import type { Role } from '@/types/auth';
 import { type AssignedProjectItem } from '@/types/project';
 

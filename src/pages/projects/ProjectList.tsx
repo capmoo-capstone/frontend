@@ -1,124 +1,58 @@
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 
-import { Delete, Funnel, Import, Inbox, Search, TextSearch } from 'lucide-react';
-import { AlertTriangle } from 'lucide-react';
+import { Funnel, Import, Search } from 'lucide-react';
 
-import { AllProjectTable } from '@/components/project-tables/all-project';
+import { AllProjectTable, ProjectFilterPanel, ProjectStats } from '@/components/projects';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { useAuth } from '@/context/AuthContext';
-import { type ProjectFilterParams } from '@/hooks/useProjects';
 
-import { ProjectFilterCard } from './components/project-list/ProjectFilterCard';
-import { StatusCard } from './components/project-list/StatusCard';
+import { useProjectFilters } from '../../hooks/useProjectFilters';
 
 export default function ProjectListPage() {
   const { user } = useAuth();
 
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [topSearch, setTopSearch] = useState('');
-
-  const handleGlobalSearch = () => {
-    const newFilters = { ...tempFilters, search: topSearch };
-    setTempFilters(newFilters);
-    setAppliedFilters(newFilters);
-  };
-
-  const initialFilters: ProjectFilterParams = {
-    search: '',
-    title: '',
-    dateRange: undefined,
-    fiscalYear: '',
-    procurementType: [],
-    status: [],
-    urgentStatus: [],
-    departments: [],
-    myTasks: false,
-  };
-
-  const [tempFilters, setTempFilters] = useState<ProjectFilterParams>(initialFilters);
-  const [appliedFilters, setAppliedFilters] = useState<ProjectFilterParams>(initialFilters);
-
-  const handleApplyFilter = () => {
-    setAppliedFilters(tempFilters);
-  };
-
-  const handleReset = () => {
-    setTempFilters(initialFilters);
-    setAppliedFilters(initialFilters);
-  };
+  const {
+    filters,
+    tempFilters,
+    setTempFilters,
+    searchQuery,
+    setSearchQuery,
+    isFilterOpen,
+    setIsFilterOpen,
+    handleGlobalSearch,
+    handleApplyFilter,
+    handleResetFilter,
+  } = useProjectFilters();
 
   const finalFilters = useMemo(() => {
-    const filters = { ...appliedFilters };
+    const appliedFilters = { ...filters };
 
     if (user?.department?.name !== 'procurement') {
-      filters.departments = [user?.department?.id || ''];
+      appliedFilters.departments = [user?.department?.id || ''];
     }
 
-    return filters;
-  }, [appliedFilters, user]);
+    return appliedFilters;
+  }, [filters, user]);
 
   return (
     <div className="relative space-y-6">
-      <h1 className="h1-topic">โครงการทั้งหมด</h1>
-      <Card className="py-6">
-        <div className="grid grid-cols-7 items-center">
-          <div className="border-r">
-            <StatusCard
-              label="โครงการทั้งหมด"
-              count={3156}
-              icon={<Inbox />}
-              iconColor="text-primary"
-            />
-          </div>
+      {/* Header */}
+      <div className="flex flex-col gap-2">
+        <h1 className="h1-topic text-primary">โครงการทั้งหมด</h1>
+      </div>
 
-          <div className="border-r">
-            <StatusCard
-              label="ยังไม่ได้มอบหมาย"
-              count={4}
-              icon={<Inbox />}
-              iconColor="text-primary/70"
-            />
-          </div>
+      {/* Stats */}
+      <ProjectStats />
 
-          <div className="border-r">
-            <StatusCard
-              label="กำลังดำเนินการ"
-              count={320}
-              icon={<Inbox />}
-              iconColor="text-warning"
-            />
-          </div>
-
-          <div className="border-r">
-            <StatusCard label="เสร็จสิ้น" count={2800} icon={<Inbox />} iconColor="text-success" />
-          </div>
-
-          <div className="border-r">
-            <StatusCard label="ยกเลิก" count={32} icon={<Inbox />} iconColor="text-error" />
-          </div>
-
-          <div className="border-r">
-            <StatusCard label="ด่วน" count={12} icon={<AlertTriangle />} iconColor="text-error" />
-          </div>
-          <div>
-            <StatusCard
-              label="ด่วนพิเศษ"
-              count={12}
-              icon={<AlertTriangle />}
-              iconColor="text-error-dark"
-            />
-          </div>
-        </div>
-      </Card>
+      {/* Toolbar */}
       <div className="flex items-end justify-end gap-2">
         <div className="bg-background relative rounded-lg">
           <Input
             className="normal pr-10"
             placeholder="ค้นหา"
-            value={topSearch}
-            onChange={(e) => setTopSearch(e.target.value)}
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleGlobalSearch()}
           />
           <Button
@@ -137,20 +71,18 @@ export default function ProjectListPage() {
           นำเข้าโครงการ
         </Button>
       </div>
-      {isFilterOpen && (
-        <div>
-          <ProjectFilterCard filters={tempFilters} setFilters={setTempFilters} />
 
-          <div className="col-span-4 mt-4 flex justify-end gap-3">
-            <Button variant="brand" onClick={handleApplyFilter}>
-              <TextSearch /> ค้นหาขั้นสูง
-            </Button>
-            <Button variant="outline" onClick={handleReset}>
-              <Delete /> ล้างค่าตัวกรอง
-            </Button>
-          </div>
-        </div>
+      {/* Filter Panel */}
+      {isFilterOpen && (
+        <ProjectFilterPanel
+          filters={tempFilters}
+          setFilters={setTempFilters}
+          onApply={handleApplyFilter}
+          onReset={handleResetFilter}
+        />
       )}
+
+      {/* Data Table */}
       <AllProjectTable filters={finalFilters} />
     </div>
   );

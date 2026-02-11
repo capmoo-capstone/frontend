@@ -4,6 +4,7 @@ import React from 'react';
 import { Search } from 'lucide-react';
 
 import { Card } from '@/components/ui/card';
+import { DatePickerWithRange } from '@/components/ui/date-picker-with-range';
 import { Input } from '@/components/ui/input';
 import {
   Select,
@@ -16,12 +17,11 @@ import { useAuth } from '@/context/AuthContext';
 import { useDepartments } from '@/hooks/useDepartments';
 import { type ProjectFilterParams } from '@/hooks/useProjects';
 import { useUsersForSelection } from '@/hooks/useUsers';
-import { getResponsibleTypeFormat } from '@/lib/responsible-type-format';
+import { getResponsibleTypeFormat } from '@/lib/formatters';
 import type { ProcurementType, ProjectStatus, ProjectUrgentStatus } from '@/types/project';
 
-import { DatePickerWithRange } from '../../../../components/ui/date-picker-with-range';
-import { FilterCheckbox } from './FilterCheckBox';
-import { SearchCheckbox } from './SearchCheckbox';
+import { FilterCheckbox } from './filter-checkbox';
+import { SearchCheckbox } from './search-checkbox';
 
 interface ProjectFilterCardProps {
   filters: ProjectFilterParams;

@@ -1,9 +1,8 @@
 import { type ColumnDef } from '@tanstack/react-table';
 import { ArrowUpDown, MoreVertical, UserRoundPlus } from 'lucide-react';
 
-import { getProjectStatusFormat } from '@/lib/project-status-format';
-import { getResponsibleTypeFormat } from '@/lib/responsible-type-format';
-import { ManageSelfRoles, ManageUnitRoles } from '@/lib/role-permissions';
+import { getProjectStatusFormat, getResponsibleTypeFormat } from '@/lib/formatters';
+import { ManageSelfRoles, ManageUnitRoles } from '@/lib/permissions';
 import type { Role, User } from '@/types/auth';
 import { type Project } from '@/types/project';
 
@@ -19,11 +18,13 @@ import {
 interface SharedColumnsProps {
   onAddAssignee: (project: Project) => void;
   viewAsRole: Role;
+  user?: User; // Add user to pass department info
 }
 
 export const baseColumns = ({
   onAddAssignee,
   viewAsRole,
+  user,
 }: SharedColumnsProps): ColumnDef<Project>[] => [
   {
     accessorKey: 'receive_no',
@@ -134,11 +135,13 @@ export const baseColumns = ({
     sortingFn: (rowA, rowB) => {
       const labelA = getProjectStatusFormat(
         rowA.original.status,
-        rowA.original.workflow_status.p
+        rowA.original.workflow_status.p,
+        user?.department?.name
       ).label;
       const labelB = getProjectStatusFormat(
         rowB.original.status,
-        rowB.original.workflow_status.p
+        rowB.original.workflow_status.p,
+        user?.department?.name
       ).label;
       return labelA.localeCompare(labelB, 'th');
     },
@@ -156,7 +159,8 @@ export const baseColumns = ({
     cell: ({ row }) => {
       const { variant, label } = getProjectStatusFormat(
         row.original.status,
-        row.original.workflow_status.p
+        row.original.workflow_status.p,
+        user?.department?.name
       );
       return <Badge variant={variant}>{label} </Badge>;
     },
@@ -167,11 +171,13 @@ export const baseColumns = ({
       const labelA = getProjectStatusFormat(
         rowA.original.status,
         rowA.original.workflow_status.c,
+        user?.department?.name,
         rowA.original.workflow_status.p
       ).label;
       const labelB = getProjectStatusFormat(
         rowB.original.status,
         rowB.original.workflow_status.c,
+        user?.department?.name,
         rowB.original.workflow_status.p
       ).label;
       return labelA.localeCompare(labelB, 'th');
@@ -191,6 +197,7 @@ export const baseColumns = ({
       const { variant, label } = getProjectStatusFormat(
         row.original.status,
         row.original.workflow_status.c,
+        user?.department?.name,
         row.original.workflow_status.p
       );
       return <Badge variant={variant}>{label} </Badge>;

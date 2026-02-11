@@ -1,0 +1,293 @@
+import { format } from 'date-fns';
+import { th } from 'date-fns/locale';
+import { Clock, FileCheck, UserCheck, UserCog } from 'lucide-react';
+
+import { type UnitResponsibleType } from '@/types/project';
+import type { StepStatus } from '@/types/project-detail';
+
+// ==================== DATE FORMATTERS ====================
+
+/**
+ * Formats a date to Thai Buddhist Era string.
+ * Example: 19 มกราคม 2569
+ * @param date - Date object or ISO date string
+ * @param formatStr - Optional format string (default: 'd MMMM yyyy')
+ */
+export const formatDateThai = (
+  date: Date | string | undefined | null,
+  formatStr: string = 'd MMMM yyyy'
+): string => {
+  if (!date) return '-';
+
+  const dateObj = typeof date === 'string' ? new Date(date) : date;
+
+  // Validate that the date is valid
+  if (isNaN(dateObj.getTime())) {
+    console.warn('Invalid date provided to formatDateThai:', date);
+    return '-';
+  }
+
+  // 1. Format the date using Thai locale
+  // This gives AD year (e.g., 2026)
+  const formatted = format(dateObj, formatStr, { locale: th });
+
+  // 2. Convert AD Year (ค.ศ.) to BE Year (พ.ศ.)
+  // We look for 4 digits that match the AD year and add 543
+  const yearAD = dateObj.getFullYear();
+  const yearBE = yearAD + 543;
+
+  return formatted.replace(String(yearAD), String(yearBE));
+};
+
+/**
+ * Short format Example: 19 ม.ค. 69
+ */
+export const formatDateThaiShort = (date: Date | string | undefined | null) => {
+  return formatDateThai(date, 'd MMM yyyy');
+};
+
+// ==================== RESPONSIBLE TYPE FORMATTERS ====================
+
+export const getResponsibleTypeFormat = (type: UnitResponsibleType) => {
+  switch (type) {
+    case 'LT100K':
+      return {
+        label: 'ซื้อ/จ้าง แบบเจาะจง ไม่เกิน 1 แสน',
+        indicator: 'var(--chart-1-dark)',
+        bg: 'var(--chart-1-light)',
+      };
+
+    case 'LT500K':
+      return {
+        label: 'ซื้อ/จ้าง แบบเจาะจง 1 - 5 แสน',
+        indicator: 'var(--chart-2-dark)',
+        bg: 'var(--chart-2-light)',
+      };
+
+    case 'MT500K':
+      return {
+        label: 'ซื้อ/จ้าง แบบเจาะจง เกิน 5 แสน',
+        indicator: 'var(--chart-3-dark)',
+        bg: 'var(--chart-3-light)',
+      };
+
+    case 'SELECTION':
+      return {
+        label: 'ซื้อ/จ้าง แบบคัดเลือก',
+        indicator: 'var(--chart-4-dark)',
+        bg: 'var(--chart-4-light)',
+      };
+
+    case 'EBIDDING':
+      return {
+        label: 'ซื้อ/จ้าง แบบประกาศเชิญชวนทั่วไป',
+        indicator: 'var(--chart-5-dark)',
+        bg: 'var(--chart-5-light)',
+      };
+    case 'CONTRACT':
+      return {
+        label: 'บริหารสัญญา',
+        indicator: 'var(--chart-6-dark)',
+        bg: 'var(--chart-6-light)',
+      };
+
+    default:
+      return {
+        label: type,
+        indicator: 'var(--foreground)',
+        bg: 'var(--background)',
+      };
+  }
+};
+
+// ==================== WORKFLOW STATUS FORMATTERS ====================
+
+export const getWaitingStatusInfo = (status: StepStatus) => {
+  switch (status) {
+    case 'in_progress':
+    case 'rejected':
+      return {
+        title: 'อยู่ระหว่างดำเนินการ',
+        description: 'เจ้าหน้าที่พัสดุกำลังจัดทำหรือแก้ไขเอกสาร',
+        icon: UserCog,
+        color: 'text-error bg-error-light',
+      };
+    case 'submitted':
+      return {
+        title: 'รอการตรวจสอบ',
+        description: 'หัวหน้ากลุ่มงานกำลังตรวจสอบความถูกต้อง',
+        icon: UserCheck,
+        color: 'text-info bg-info-light',
+      };
+    case 'approved':
+      return {
+        title: 'รอเสนอลงนาม',
+        description: 'เจ้าหน้าที่งานระเบียบกำลังเตรียมเสนอผู้อำนวยการ',
+        icon: FileCheck,
+        color: 'text-info bg-info-light',
+      };
+    case 'completed':
+      return {
+        title: 'ดำเนินการเสร็จสิ้น',
+        description: 'ขั้นตอนนี้เสร็จสมบูรณ์แล้ว',
+        icon: FileCheck,
+        color: 'text-success bg-success-light',
+      };
+    default:
+      return {
+        title: 'ยังไม่ถึงขั้นตอนนี้',
+        description: 'กรุณารอการดำเนินการจากขั้นตอนก่อนหน้า',
+        icon: Clock,
+        color: 'text-muted-foreground bg-muted',
+      };
+  }
+};
+
+// ==================== PROJECT STATUS FORMATTERS ====================
+
+/**
+ * Get formatted project status label and badge variant
+ * Note: This function requires user context to determine department-specific logic.
+ * Pass the user's department name as a parameter to keep it testable.
+ */
+export const getProjectStatusFormat = (
+  project_status: string,
+  workflow_status: string,
+  userDepartmentName: string | undefined,
+  procure_status?: string
+) => {
+  let variant: 'secondary' | 'destructive' | 'warning' | 'success' | 'ghost' = 'secondary';
+  let label: string;
+
+  if (userDepartmentName !== 'procurement') {
+    if (
+      workflow_status.startsWith('IN_PROGRESS') ||
+      workflow_status.startsWith('WAITING_APPROVAL') ||
+      workflow_status.startsWith('PENDING_PROPOSAL') ||
+      workflow_status.startsWith('PROPOSING') ||
+      workflow_status.startsWith('REJECTED')
+    ) {
+      label = 'กำลังดำเนินการ';
+      variant = 'warning';
+    } else if (workflow_status === 'COMPLETED') {
+      label = 'เสร็จสิ้น';
+      variant = 'success';
+    } else if (workflow_status === 'NOT_STARTED' && project_status === 'IN_PROGRESS') {
+      label = '-';
+      variant = 'ghost';
+    } else {
+      switch (project_status) {
+        case 'UNASSIGNED':
+          if (procure_status === 'NOT_STARTED') {
+            label = '-';
+            variant = 'ghost';
+          } else {
+            label = 'ยังไม่เริ่ม';
+            variant = 'secondary';
+          }
+          break;
+        case 'WAITING_ACCEPT':
+          if (procure_status === 'NOT_STARTED') {
+            label = '-';
+            variant = 'ghost';
+          } else {
+            label = 'ยังไม่เริ่ม';
+            variant = 'secondary';
+          }
+          break;
+        case 'IN_PROGRESS':
+          label = 'กำลังดำเนินการ';
+          variant = 'warning';
+          break;
+        case 'CLOSED':
+          label = 'เสร็จสิ้น';
+          variant = 'success';
+          break;
+        case 'CANCELLED':
+          if (procure_status === 'CANCELLED') {
+            label = '-';
+            variant = 'ghost';
+          } else {
+            label = 'ยกเลิก';
+            variant = 'destructive';
+          }
+          break;
+        case 'REQUEST_EDIT':
+          label = 'กำลังดำเนินการ';
+          variant = 'warning';
+          break;
+        default:
+          label = workflow_status;
+      }
+    }
+  } else {
+    if (workflow_status.startsWith('IN_PROGRESS')) {
+      const stepNumber = workflow_status.split(' ').pop();
+      label = `ขั้นตอนที่ ${stepNumber}`;
+      variant = 'warning';
+    } else if (workflow_status.startsWith('WAITING_APPROVAL')) {
+      const stepNumber = workflow_status.split(' ').pop();
+      label = `รออนุมัติขั้นตอนที่ ${stepNumber}`;
+      variant = 'warning';
+    } else if (workflow_status.startsWith('PENDING_PROPOSAL')) {
+      const stepNumber = workflow_status.split(' ').pop();
+      label = `รอจัดทำแบบเสนอขั้นตอนที่ ${stepNumber}`;
+      variant = 'warning';
+    } else if (workflow_status.startsWith('PROPOSING')) {
+      const stepNumber = workflow_status.split(' ').pop();
+      label = `เสนอลงนามขั้นตอนที่ ${stepNumber}`;
+      variant = 'warning';
+    } else if (workflow_status.startsWith('REJECTED')) {
+      const stepNumber = workflow_status.split(' ').pop();
+      label = `แก้ไขขั้นตอนที่ ${stepNumber}`;
+      variant = 'destructive';
+    } else if (workflow_status === 'COMPLETED') {
+      label = 'เสร็จสิ้น';
+      variant = 'success';
+    } else if (workflow_status === 'NOT_STARTED' && project_status === 'IN_PROGRESS') {
+      label = '-';
+      variant = 'ghost';
+    } else {
+      switch (project_status) {
+        case 'UNASSIGNED':
+          if (procure_status === 'NOT_STARTED') {
+            label = '-';
+            variant = 'ghost';
+          } else {
+            label = 'ยังไม่ได้มอบหมาย';
+            variant = 'secondary';
+          }
+          break;
+        case 'WAITING_ACCEPT':
+          if (procure_status === 'NOT_STARTED') {
+            label = '-';
+            variant = 'ghost';
+          } else {
+            label = 'รอการตอบรับ';
+            variant = 'secondary';
+          }
+          break;
+        case 'CLOSED':
+          label = 'เสร็จสิ้น';
+          variant = 'success';
+          break;
+        case 'CANCELLED':
+          if (procure_status === 'CANCELLED') {
+            label = '-';
+            variant = 'ghost';
+          } else {
+            label = 'ยกเลิก';
+            variant = 'destructive';
+          }
+          break;
+        case 'REQUEST_EDIT':
+          label = 'การเงินส่งคืนแก้ไข';
+          variant = 'destructive';
+          break;
+        default:
+          label = workflow_status;
+      }
+    }
+  }
+  return { label, variant };
+};

@@ -9,9 +9,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { formatDateThaiShort } from '@/lib/date-utils';
-import { getResponsibleTypeFormat } from '@/lib/responsible-type-format';
-import { ManageSelfRoles, ManageUnitRoles, SupervisorRoles } from '@/lib/role-permissions';
+import { formatDateThaiShort } from '@/lib/formatters';
+import { getResponsibleTypeFormat } from '@/lib/formatters';
+import { ManageSelfRoles, ManageUnitRoles, SupervisorRoles } from '@/lib/permissions';
 import { type Role } from '@/types/auth';
 import { type UnassignedProjectItem } from '@/types/project';
 

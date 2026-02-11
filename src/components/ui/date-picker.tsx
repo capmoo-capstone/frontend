@@ -5,7 +5,7 @@ import { Calendar as CalendarIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { formatDateThaiShort } from '@/lib/date-utils';
+import { formatDateThaiShort } from '@/lib/formatters';
 import { cn } from '@/lib/utils';
 
 export interface DatePickerProps {

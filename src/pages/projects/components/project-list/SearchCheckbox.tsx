@@ -54,7 +54,7 @@ export function SearchCheckbox({
         </PopoverTrigger>
 
         <PopoverContent
-          className="bg-background mt-2 w-[var(--radix-popover-trigger-width)] rounded-lg border-1 p-2 shadow-xs"
+          className="bg-background mt-2 w-[var(--radix-popover-trigger-width)] rounded-lg border p-2 shadow-xs"
           align="start"
           onOpenAutoFocus={(e) => {
             e.preventDefault();

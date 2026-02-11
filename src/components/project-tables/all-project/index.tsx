@@ -25,7 +25,7 @@ export function AllProjectTable({ filters }: { filters: ProjectFilterParams }) {
   if (!user) return null;
 
   const { data: projects, isLoading, isError } = useProjects(filters);
-  const [sorting, setSorting] = useState<SortingState>([{ id: 'status', desc: true }]);
+  const [sorting, setSorting] = useState<SortingState>([]);
   const [projectToAddAssignee, setProjectToAddAssignee] = useState<Project | null>(null);
 
   const columns = useMemo(

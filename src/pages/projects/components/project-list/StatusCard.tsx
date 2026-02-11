@@ -1,7 +1,9 @@
+import { type ReactNode } from 'react';
+
 import { cn } from '@/lib/utils';
 
 interface StatusItemProps {
-  icon: React.ReactNode;
+  icon: ReactNode;
   label: string;
   count: number;
   iconColor?: string;

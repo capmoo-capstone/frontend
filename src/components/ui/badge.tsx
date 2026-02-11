@@ -23,7 +23,7 @@ const badgeVariants = cva(
         success:
           'border-transparent bg-success-light text-primary [a&]:hover:bg-success-light/90 before:bg-success',
         info: 'border-transparent bg-info-light text-primary [a&]:hover:bg-info-light/90 before:bg-info',
-        ghost: 'border-transparent  text-primary [a&]:hover:bg-accent before:transparent',
+        ghost: 'border-transparent  text-primary [a&]:hover:bg-accent before:bg-transparent',
       },
     },
     defaultVariants: {

@@ -6,7 +6,7 @@ export const getProjectStatusFormat = (
   procure_status?: string
 ) => {
   let variant: 'secondary' | 'destructive' | 'warning' | 'success' | 'ghost' = 'secondary';
-  let label = workflow_status;
+  let label: string;
   const { user } = useAuth();
 
   if (user?.department?.name !== 'procurement') {

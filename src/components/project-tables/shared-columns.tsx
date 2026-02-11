@@ -210,8 +210,8 @@ export const baseColumns = ({
       const project = row.original;
       const canEdit =
         project.status === 'IN_PROGRESS' ||
-        project.status == 'UNASSIGNED' ||
-        project.status == 'WAITING_ACCEPT';
+        project.status === 'UNASSIGNED' ||
+        project.status === 'WAITING_ACCEPT';
 
       if (row.original.status === 'CANCELLED') {
         return null;

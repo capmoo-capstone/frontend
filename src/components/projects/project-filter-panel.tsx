@@ -1,3 +1,5 @@
+import type { Dispatch, SetStateAction } from 'react';
+
 import { Delete, TextSearch } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -7,7 +9,7 @@ import { ProjectFilterCard } from './project-filter-card';
 
 interface ProjectFilterPanelProps {
   filters: ProjectFilterParams;
-  setFilters: React.Dispatch<React.SetStateAction<ProjectFilterParams>>;
+  setFilters: Dispatch<SetStateAction<ProjectFilterParams>>;
   onApply: () => void;
   onReset: () => void;
 }

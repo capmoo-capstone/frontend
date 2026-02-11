@@ -33,7 +33,7 @@ export function GenerateContractDialog({
   isOpen,
   onClose,
   onConfirm,
-  projectTitle,
+  projectTitle: _projectTitle,
 }: GenerateContractDialogProps) {
   const currentYear = new Date().getFullYear() + 543;
   const [contractType, setContractType] = useState('purchase');
@@ -58,7 +58,7 @@ export function GenerateContractDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-106.5">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <FileText className="h-5 w-5" />

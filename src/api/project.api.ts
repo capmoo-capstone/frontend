@@ -19,7 +19,7 @@ import {
 } from './mock-data';
 import { mockProjects } from './mock-project';
 
-export const getProjects = async (params?: ProjectFilterParams): Promise<Project[]> => {
+export const getProjects = async (_params?: ProjectFilterParams): Promise<Project[]> => {
   // return mock data;
   return MOCK_PROJECTS;
 

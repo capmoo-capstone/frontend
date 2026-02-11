@@ -6,8 +6,7 @@ import { AllProjectTable, ProjectFilterPanel, ProjectStats } from '@/components/
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useAuth } from '@/context/AuthContext';
-
-import { useProjectFilters } from '../../hooks/useProjectFilters';
+import { useProjectFilters } from '@/hooks/useProjectFilters';
 
 export default function ProjectListPage() {
   const { user } = useAuth();
@@ -28,8 +27,8 @@ export default function ProjectListPage() {
   const finalFilters = useMemo(() => {
     const appliedFilters = { ...filters };
 
-    if (user?.department?.name !== 'procurement') {
-      appliedFilters.departments = [user?.department?.id || ''];
+    if (user?.department?.name !== 'procurement' && user?.department?.id) {
+      appliedFilters.departments = [user.department.id];
     }
 
     return appliedFilters;

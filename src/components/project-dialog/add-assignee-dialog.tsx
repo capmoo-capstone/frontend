@@ -67,7 +67,7 @@ export function AddAssigneeDialog({ isOpen, onClose, projectId }: AddMemberDialo
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-106.25">
         <DialogHeader className="flex flex-col items-center text-center">
           <DialogTitle className="h3-topic flex items-center justify-center">
             การเพิ่มเจ้าหน้าที่ในโครงการ

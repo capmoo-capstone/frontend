@@ -40,7 +40,7 @@ export const formatDateThai = (
 };
 
 /**
- * Short format Example: 19 ม.ค. 69
+ * Short format Example: 19 ม.ค. 2569
  */
 export const formatDateThaiShort = (date: Date | string | undefined | null) => {
   return formatDateThai(date, 'd MMM yyyy');

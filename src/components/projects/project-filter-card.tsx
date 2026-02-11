@@ -1,5 +1,4 @@
-import { useMemo } from 'react';
-import React from 'react';
+import React, { useMemo } from 'react';
 
 import { Search } from 'lucide-react';
 

@@ -7,7 +7,7 @@ import { th } from 'date-fns/locale';
 import { ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
 
 import { Button, buttonVariants } from '@/components/ui/button';
-import { formatDateThai } from '@/lib/date-utils';
+import { formatDateThai } from '@/lib/formatters';
 import { cn } from '@/lib/utils';
 
 function Calendar({

@@ -9,14 +9,13 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { formatDateThaiShort } from '@/lib/date-utils';
-import { getResponsibleTypeFormat } from '@/lib/responsible-type-format';
+import { formatDateThaiShort, getResponsibleTypeFormat } from '@/lib/formatters';
 import {
   ManageSelfRoles,
   ManageUnitRoles,
   SupervisorRoles,
   ViewUnitRoles,
-} from '@/lib/role-permissions';
+} from '@/lib/permissions';
 import type { Role } from '@/types/auth';
 import { type AssignedProjectItem } from '@/types/project';
 
@@ -63,8 +62,11 @@ export const getColumns = ({
     ),
     cell: ({ row }) => (
       <div>
-        {row.original.is_urgent && (
+        {row.original.urgent_status === 'URGENT' && (
           <span className="text-destructive mr-2 font-semibold">ด่วน</span>
+        )}
+        {row.original.urgent_status === 'VERY_URGENT' && (
+          <span className="text-destructive mr-2 font-semibold">ด่วนพิเศษ</span>
         )}
         {row.getValue('title')}
       </div>
@@ -83,7 +85,7 @@ export const getColumns = ({
         />
       </div>
     ),
-    cell: ({ row }) => <div>{getResponsibleTypeFormat(row.original.procurement_type)}</div>,
+    cell: ({ row }) => <div>{getResponsibleTypeFormat(row.original.procurement_type).label}</div>,
     accessorFn: (row) => row.procurement_type,
   },
   {

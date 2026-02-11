@@ -7,7 +7,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { ManageUnitRoles, SupervisorRoles } from '@/lib/role-permissions';
+import { ManageUnitRoles, SupervisorRoles } from '@/lib/permissions';
 import type { Role } from '@/types/auth';
 import type { ProjectDetail } from '@/types/project-detail';
 

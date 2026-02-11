@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/AuthContext';
-import { useDevLogin, useLogout } from '@/hooks/useAuth';
+import { useDevLogin } from '@/hooks/useAuth';
 
 const ROLES = [
   { value: 'SUPER_ADMIN', label: 'Super Admin', description: 'Full system access' },

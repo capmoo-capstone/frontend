@@ -74,13 +74,6 @@ export const PrivateRoutes = () => {
 
           {/* === OPERATIONAL WORKFLOWS === */}
           <Route path="app/assign/:id" element={<ProcumentJobs />} />
-
-          {/* === PROJECTS === */}
-          <Route path="app/projects" element={<ProjectList />} />
-
-          <Route element={<ProjectAccessGuard />}>
-            <Route path="app/projects/:id" element={<ProjectDetail />} />
-          </Route>
         </Route>
 
         <Route element={<ProtectedRoute allowedRoles={['DOCUMENT_STAFF']} />}>
@@ -113,6 +106,13 @@ export const PrivateRoutes = () => {
               />
             }
           />
+        </Route>
+
+        {/* === PROJECTS === */}
+        <Route path="app/projects" element={<ProjectList />} />
+
+        <Route element={<ProjectAccessGuard />}>
+          <Route path="app/projects/:id" element={<ProjectDetail />} />
         </Route>
 
         <Route element={<ProtectedRoute allowedRoles={['ADMIN']} />}>

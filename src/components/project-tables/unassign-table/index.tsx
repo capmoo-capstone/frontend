@@ -21,7 +21,7 @@ import {
   useClaimProject,
   useUnassignedProjects,
 } from '@/hooks/useProjects';
-import { ManageUnitRoles, SupervisorRoles } from '@/lib/role-permissions';
+import { ManageUnitRoles, SupervisorRoles } from '@/lib/permissions';
 import { type UnassignedProjectItem } from '@/types/project';
 
 import { ProjectDataTable } from '../data-table';

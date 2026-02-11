@@ -1,5 +1,5 @@
+import { getWaitingStatusInfo } from '@/lib/formatters';
 import { cn } from '@/lib/utils';
-import { getWaitingStatusInfo } from '@/lib/workflow-status';
 import type { StepStatus } from '@/types/project-detail';
 
 interface StatusWaitingCardProps {

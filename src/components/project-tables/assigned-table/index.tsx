@@ -18,7 +18,7 @@ import { DatePicker } from '@/components/ui/date-picker';
 import { TitleBar } from '@/components/ui/title-bar';
 import { useAuth } from '@/context/AuthContext';
 import { useAcceptProjects, useAssignedProjects, useCancelProject } from '@/hooks/useProjects';
-import { ManageSelfRoles, ManageUnitRoles, SupervisorRoles } from '@/lib/role-permissions';
+import { ManageSelfRoles, ManageUnitRoles, SupervisorRoles } from '@/lib/permissions';
 import type { AssignedProjectItem } from '@/types/project';
 
 import { ProjectDataTable } from '../data-table';

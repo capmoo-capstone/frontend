@@ -1,4 +1,4 @@
-import { Navigate, Route, Routes } from 'react-router-dom';
+import { Route, Routes } from 'react-router-dom';
 
 import ProjectAccessGuard from '@/components/guards/ProjectAccessGuard';
 import ProtectedRoute from '@/components/guards/ProtectedRoute';
@@ -13,7 +13,7 @@ import OverallDashboard from '@/pages/dashboard/OverallDashboard';
 import ProjectDetail from '@/pages/projects/ProjectDetail';
 import ProjectImport from '@/pages/projects/ProjectImport';
 import ProjectList from '@/pages/projects/ProjectList';
-import MyDashboard from '@/pages/user/MyDashboard';
+import MyToDoDashboard from '@/pages/user/MyToDoDashboard';
 import PersonalKPI from '@/pages/user/PersonalKPI';
 // App Pages
 import VendorSubmission from '@/pages/vendor/VendorSubmission';
@@ -21,36 +21,15 @@ import VendorSubmission from '@/pages/vendor/VendorSubmission';
 export const PrivateRoutes = () => {
   const { user } = useAuth();
 
-  const getHomeRedirect = () => {
-    if (user?.role === 'GUEST' || user?.role === 'REPRESENTATIVE') {
-      return '/app/dashboards/department';
-    }
-    if (
-      user?.role === 'HEAD_OF_DEPARTMENT' ||
-      user?.role === 'ADMIN' ||
-      user?.role === 'SUPER_ADMIN'
-    ) {
-      return '/app/dashboards/overview';
-    }
-    if (
-      user?.role === 'HEAD_OF_UNIT' ||
-      user?.role === 'GENERAL_STAFF' ||
-      user?.role === 'FINANCE_STAFF' ||
-      user?.role === 'DOCUMENT_STAFF'
-    ) {
-      return '/app/me/dashboard';
-    }
-    return '/login';
-  };
-
   return (
     <AppLayout>
       <Routes>
-        <Route path="/" element={<Navigate to={getHomeRedirect()} replace />} />
-        <Route path="/app" element={<Navigate to={getHomeRedirect()} replace />} />
+        {/* <Route path="/" element={<Home />} />
+        <Route path="/app/home" element={<Home />} /> */}
 
         {/* === DASHBOARDS === */}
         <Route path="app/dashboards/department" element={<DepartmentDashboard />} />
+        {/* <Route path="app/dashboards/indiv" element={<IndividualDashboardV2 />} /> */}
 
         <Route
           element={
@@ -69,7 +48,7 @@ export const PrivateRoutes = () => {
           <Route path="app/dashboards/overview" element={<OverallDashboard />} />
 
           {/* === MY SPACE  === */}
-          <Route path="app/me/dashboard" element={<MyDashboard />} />
+          <Route path="app/me/dashboard" element={<MyToDoDashboard />} />
           <Route path="app/me/kpi" element={<PersonalKPI />} />
 
           {/* === OPERATIONAL WORKFLOWS === */}

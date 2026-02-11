@@ -9,6 +9,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table';
+import type { ColumnDef } from '@tanstack/react-table';
 import { AlertTriangle, Loader2 } from 'lucide-react';
 
 import { AddAssigneeDialog } from '@/components/project-dialog/add-assignee-dialog';
@@ -19,7 +20,12 @@ import { useAuth } from '@/context/AuthContext';
 import { type ProjectFilterParams, useProjects } from '@/hooks/useProjects';
 import type { Project } from '@/types/project';
 
-export function AllProjectTable({ filters }: { filters: ProjectFilterParams }) {
+interface AllProjectTableProps {
+  filters: ProjectFilterParams;
+  columns?: ColumnDef<Project>[];
+}
+
+export function AllProjectTable({ filters, columns: customColumns }: AllProjectTableProps) {
   const { user } = useAuth();
   if (!user) return null;
 
@@ -29,12 +35,13 @@ export function AllProjectTable({ filters }: { filters: ProjectFilterParams }) {
 
   const columns = useMemo(
     () =>
+      customColumns ||
       baseColumns({
         onAddAssignee: (project) => setProjectToAddAssignee(project),
         viewAsRole: user.role,
         user,
       }),
-    [user.role, user, setProjectToAddAssignee]
+    [customColumns, user.role, user, setProjectToAddAssignee]
   );
 
   const table = useReactTable({

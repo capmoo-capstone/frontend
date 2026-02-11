@@ -1,4 +1,4 @@
-import { Navigate, Route, Routes } from 'react-router-dom';
+import { Route, Routes } from 'react-router-dom';
 
 import ProjectAccessGuard from '@/components/guards/ProjectAccessGuard';
 import ProtectedRoute from '@/components/guards/ProtectedRoute';
@@ -9,9 +9,7 @@ import ProcumentJobs from '@/pages/assign/AssignJobs';
 import PageNotFound from '@/pages/auth/PageNotFound';
 import DepartmentDashboard from '@/pages/dashboard/DepartmentDashboard';
 import EmployeesDashboard from '@/pages/dashboard/EmployeesDashboard';
-import IndividualDashboardV2 from '@/pages/dashboard/IndividualDashboardV2';
 import OverallDashboard from '@/pages/dashboard/OverallDashboard';
-import Home from '@/pages/home/Home';
 import ProjectDetail from '@/pages/projects/ProjectDetail';
 import ProjectImport from '@/pages/projects/ProjectImport';
 import ProjectList from '@/pages/projects/ProjectList';
@@ -26,12 +24,12 @@ export const PrivateRoutes = () => {
   return (
     <AppLayout>
       <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/app/home" element={<Home />} />
+        {/* <Route path="/" element={<Home />} />
+        <Route path="/app/home" element={<Home />} /> */}
 
         {/* === DASHBOARDS === */}
         <Route path="app/dashboards/department" element={<DepartmentDashboard />} />
-        <Route path="app/dashboards/indiv" element={<IndividualDashboardV2 />} />
+        {/* <Route path="app/dashboards/indiv" element={<IndividualDashboardV2 />} /> */}
 
         <Route
           element={

@@ -4,6 +4,7 @@ import { AllProjectTable, ProjectStats } from '@/components/projects';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/context/AuthContext';
+import type { ProjectStatus } from '@/types/project';
 
 import { CalendarWidget } from './components/calendar-widget';
 import { myTasksColumns } from './components/my-tasks-columns';
@@ -61,17 +62,17 @@ export default function MyToDoDashboard() {
 
     switch (activeTab) {
       case 'in-progress':
-        return { ...baseFilters, status: ['IN_PROGRESS'] };
+        return { ...baseFilters, status: ['IN_PROGRESS' as ProjectStatus] };
       case 'urgent':
         return { ...baseFilters, urgentStatus: ['URGENT', 'VERY_URGENT'] };
-      case 'waiting-fix':
-        return { ...baseFilters, status: ['WAITING_FIX'] };
+      case 'request-edit':
+        return { ...baseFilters, status: ['REQUEST_EDIT' as ProjectStatus] };
       case 'waiting-accept':
-        return { ...baseFilters, status: ['WAITING_ACCEPT'] };
+        return { ...baseFilters, status: ['WAITING_ACCEPT' as ProjectStatus] };
       case 'completed':
-        return { ...baseFilters, status: ['COMPLETED'] };
+        return { ...baseFilters, status: ['CLOSED' as ProjectStatus] };
       case 'cancelled':
-        return { ...baseFilters, status: ['CANCELLED'] };
+        return { ...baseFilters, status: ['CANCELLED' as ProjectStatus] };
       default:
         return baseFilters;
     }
@@ -80,7 +81,7 @@ export default function MyToDoDashboard() {
   return (
     <div className="flex flex-col gap-6">
       {/* Header */}
-      <h1 className="h1-topic text-primary w-full">สวัสดี, คุณชื่อจริง นามสกุล</h1>
+      <h1 className="h1-topic text-primary w-full">สวัสดี, {user?.name}</h1>
 
       {/* Top Section: Notifications & Calendar */}
       <div className="flex flex-col gap-6 xl:flex-row">
@@ -106,7 +107,7 @@ export default function MyToDoDashboard() {
             <TabsTrigger value="urgent" className="normal gap-2">
               งานด่วน <Badge variant="info">3</Badge>
             </TabsTrigger>
-            <TabsTrigger value="waiting-fix" className="normal gap-2">
+            <TabsTrigger value="request-edit" className="normal gap-2">
               งานที่รอการแก้ไข <Badge variant="destructive">2</Badge>
             </TabsTrigger>
             <TabsTrigger value="waiting-accept" className="normal gap-2">

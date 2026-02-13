@@ -29,7 +29,7 @@ export function VendorForm({ onSubmit }: VendorFormProps) {
   };
 
   const removeFile = (index: number) => {
-    setFiles(files.filter((_, i) => i !== index));
+    setFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
   };
 
   const handleSubmit = async () => {

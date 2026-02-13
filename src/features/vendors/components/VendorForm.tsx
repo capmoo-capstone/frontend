@@ -188,6 +188,7 @@ export function VendorForm({ onSubmit }: VendorFormProps) {
                     className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
                     onChange={handleFileChange}
                     accept=".pdf,.jpg,.png"
+                    aria-label="อัปโหลดไฟล์ส่งมอบ/ใบแจ้งหนี้"
                   />
                   <div className="bg-primary/10 mb-3 rounded-full p-3">
                     <CloudUpload className="text-primary h-6 w-6" />

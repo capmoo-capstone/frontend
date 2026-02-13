@@ -64,7 +64,7 @@ export function DateRangeFilter({
     let newRange: DateRange | undefined;
 
     switch (preset) {
-      case 'this-fiscal':
+      case 'this-fiscal': {
         const currentMonth = today.getMonth();
         const fiscalYear = currentMonth >= 9 ? today.getFullYear() + 1 : today.getFullYear();
         newRange = {
@@ -72,6 +72,7 @@ export function DateRangeFilter({
           to: new Date(fiscalYear, 8, 30),
         };
         break;
+      }
       case 'this-year':
         newRange = { from: startOfYear(today), to: endOfYear(today) };
         break;

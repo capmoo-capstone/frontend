@@ -5,6 +5,7 @@ import { Check, CloudUpload, FileText, Loader2, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { cn } from '@/lib/utils';
 
 import type { VendorFormData } from '../types';
 
@@ -16,6 +17,7 @@ export function VendorForm({ onSubmit }: VendorFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [files, setFiles] = useState<File[]>([]);
+  const [errors, setErrors] = useState<{ po?: string; files?: string }>({});
 
   const [formData, setFormData] = useState<VendorFormData>({
     po: '',
@@ -24,7 +26,19 @@ export function VendorForm({ onSubmit }: VendorFormProps) {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       const newFiles = Array.from(e.target.files);
+      const maxSize = 5 * 1024 * 1024; // 5MB
+
+      const oversizedFiles = newFiles.filter((file) => file.size > maxSize);
+      if (oversizedFiles.length > 0) {
+        setErrors((prev) => ({
+          ...prev,
+          files: `ไฟล์ ${oversizedFiles.map((f) => f.name).join(', ')} มีขนาดเกิน 5MB`,
+        }));
+        return;
+      }
+
       setFiles((prev) => [...prev, ...newFiles]);
+      setErrors((prev) => ({ ...prev, files: undefined }));
     }
   };
 
@@ -32,7 +46,30 @@ export function VendorForm({ onSubmit }: VendorFormProps) {
     setFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
   };
 
+  const validateForm = (): boolean => {
+    const newErrors: { po?: string; files?: string } = {};
+
+    // Validate PO number (must be exactly 13 digits)
+    if (!formData.po.trim()) {
+      newErrors.po = 'กรุณากรอกเลขที่ใบสั่งซื้อ';
+    } else if (!/^\d{13}$/.test(formData.po.trim())) {
+      newErrors.po = 'เลขที่ใบสั่งซื้อต้องเป็นตัวเลข 13 หลัก';
+    }
+
+    // Validate files
+    if (files.length === 0) {
+      newErrors.files = 'กรุณาอัปโหลดไฟล์อย่างน้อย 1 ไฟล์';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleSubmit = async () => {
+    if (!validateForm()) {
+      return;
+    }
+
     setIsSubmitting(true);
     try {
       if (onSubmit) {
@@ -54,6 +91,7 @@ export function VendorForm({ onSubmit }: VendorFormProps) {
     setIsSuccess(false);
     setFormData({ po: '' });
     setFiles([]);
+    setErrors({});
   };
 
   return (
@@ -121,10 +159,14 @@ export function VendorForm({ onSubmit }: VendorFormProps) {
                   </Label>
                   <Input
                     value={formData.po}
-                    onChange={(e) => setFormData({ ...formData, po: e.target.value })}
+                    onChange={(e) => {
+                      setFormData({ ...formData, po: e.target.value });
+                      setErrors((prev) => ({ ...prev, po: undefined }));
+                    }}
                     placeholder="เลข 13 หลัก"
-                    className="h-11 bg-white"
+                    className={errors.po ? 'h-11 border-red-500 bg-white' : 'h-11 bg-white'}
                   />
+                  {errors.po && <p className="text-sm text-red-500">{errors.po}</p>}
                 </div>
               </div>
 
@@ -134,7 +176,12 @@ export function VendorForm({ onSubmit }: VendorFormProps) {
                   อัปโหลดไฟล์ส่งมอบ/ใบแจ้งหนี้ <span className="text-red-500">*</span>
                 </Label>
 
-                <div className="border-input bg-muted/20 hover:bg-muted/40 relative flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed p-6 text-center transition-colors">
+                <div
+                  className={cn(
+                    'border-input bg-muted/20 hover:bg-muted/40 relative flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed p-6 text-center transition-colors',
+                    errors.files && 'border-red-500'
+                  )}
+                >
                   <input
                     type="file"
                     multiple
@@ -151,7 +198,8 @@ export function VendorForm({ onSubmit }: VendorFormProps) {
                   </p>
                 </div>
 
-                {/* File List */}
+                {errors.files && <p className="text-sm text-red-500">{errors.files}</p>}
+
                 {files.length > 0 && (
                   <div className="mt-3 flex flex-col gap-2">
                     {files.map((file, index) => (

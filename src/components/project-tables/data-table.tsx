@@ -67,7 +67,7 @@ export function ProjectDataTable<TData>({
         <div className="flex items-center gap-2">{toolbar}</div>
       </div>
 
-      <div className="overflow-hidden bg-background">
+      <div className="bg-background overflow-hidden">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (

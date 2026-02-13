@@ -24,12 +24,11 @@ import { cn } from '@/lib/utils';
 
 // Helper to format date with Thai Buddhist Era short year
 const formatThaiShortYear = (date: Date): string => {
-  const formatted = format(date, 'dd MMM yy', { locale: th });
+  const dayMonth = format(date, 'dd MMM', { locale: th });
   const yearAD = date.getFullYear();
   const yearBE = yearAD + 543;
-  const shortYearAD = String(yearAD).slice(-2);
   const shortYearBE = String(yearBE).slice(-2);
-  return formatted.replace(shortYearAD, shortYearBE);
+  return `${dayMonth} ${shortYearBE}`;
 };
 
 interface DateRangeFilterProps {

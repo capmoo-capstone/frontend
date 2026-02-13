@@ -51,7 +51,7 @@ export function CancelProjectDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-106.25">
         <DialogHeader>
           <DialogTitle className="text-destructive flex items-center gap-2">
             <AlertTriangle className="h-5 w-5" />

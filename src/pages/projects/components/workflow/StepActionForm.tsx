@@ -4,10 +4,10 @@ import { ArrowLeft, CircleCheckBig, Download, Send, SquareArrowLeft, X } from 'l
 
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
+import type { Submission } from '@/features/projects';
+import type { StepStatus } from '@/features/projects';
 import { cn } from '@/lib/utils';
 import type { Role } from '@/types/auth';
-import type { Submission } from '@/types/project-detail';
-import type { StepStatus } from '@/types/project-detail';
 
 interface StepActionFormProps {
   isActive?: boolean;

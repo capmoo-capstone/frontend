@@ -17,9 +17,9 @@ import { Button } from '@/components/ui/button';
 import { DatePicker } from '@/components/ui/date-picker';
 import { TitleBar } from '@/components/ui/title-bar';
 import { useAuth } from '@/context/AuthContext';
-import { useAcceptProjects, useAssignedProjects, useCancelProject } from '@/hooks/useProjects';
+import { useAcceptProjects, useAssignedProjects, useCancelProject } from '@/features/projects';
+import type { AssignedProjectItem } from '@/features/projects';
 import { ManageSelfRoles, ManageUnitRoles, SupervisorRoles } from '@/lib/permissions';
-import type { AssignedProjectItem } from '@/types/project';
 
 import { ProjectDataTable } from '../data-table';
 import { getColumns } from './columns';

@@ -2,8 +2,8 @@ import { format } from 'date-fns';
 import { th } from 'date-fns/locale';
 import { Clock, FileCheck, UserCheck, UserCog } from 'lucide-react';
 
-import { type UnitResponsibleType } from '@/types/project';
-import type { StepStatus } from '@/types/project-detail';
+import { type UnitResponsibleType } from '@/features/projects';
+import type { StepStatus } from '@/features/projects';
 
 // ==================== DATE FORMATTERS ====================
 

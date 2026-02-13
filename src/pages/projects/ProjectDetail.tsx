@@ -13,7 +13,7 @@ import {
 import { CancellationRequestBanner } from '@/components/project/ProjectStatusBanners';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/context/AuthContext';
-import { useProjectDetail } from '@/hooks/useProjects';
+import { useProjectDetail } from '@/features/projects';
 import { ManageUnitRoles, SupervisorRoles } from '@/lib/permissions';
 import { cn } from '@/lib/utils';
 

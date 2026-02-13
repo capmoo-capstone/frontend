@@ -1,4 +1,3 @@
-import { ProjectStats } from '@/components/projects';
 import { useAuth } from '@/context/AuthContext';
 import {
   CalendarWidget,
@@ -7,6 +6,7 @@ import {
   MyTasksTable,
   NotificationList,
 } from '@/features/dashboard';
+import { ProjectStats } from '@/features/projects';
 
 export default function MyToDoDashboard() {
   const { user } = useAuth();

@@ -7,9 +7,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import type { ProjectDetail } from '@/features/projects';
 import { ManageUnitRoles, SupervisorRoles } from '@/lib/permissions';
 import type { Role } from '@/types/auth';
-import type { ProjectDetail } from '@/types/project-detail';
 
 interface ProjectHeaderProps {
   project: ProjectDetail;

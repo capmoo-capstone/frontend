@@ -1,10 +1,9 @@
 import { useState } from 'react';
 
-import { AllProjectTable } from '@/components/projects';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { AllProjectTable } from '@/features/projects';
 import type { User } from '@/types/auth';
-import type { ProjectStatus } from '@/types/project';
 
 import { myTasksColumns } from './MyTasksColumns';
 

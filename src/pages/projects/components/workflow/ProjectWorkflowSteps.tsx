@@ -1,7 +1,7 @@
 import { useAuth } from '@/context/AuthContext';
-import { useProjectWorkflow } from '@/hooks/useProjectWorkflow';
+import { useProjectWorkflow } from '@/features/projects';
+import type { ProjectDetail, WorkflowStepConfig } from '@/features/projects';
 import { isActionRequired } from '@/lib/workflow-utils';
-import type { ProjectDetail, WorkflowStepConfig } from '@/types/project-detail';
 import type { FieldConfig } from '@/types/workflow';
 
 import { DynamicStepForm } from './DynamicStepForm';

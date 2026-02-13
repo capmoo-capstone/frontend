@@ -9,6 +9,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { type AssignedProjectItem } from '@/features/projects';
 import { formatDateThaiShort, getResponsibleTypeFormat } from '@/lib/formatters';
 import {
   ManageSelfRoles,
@@ -17,7 +18,6 @@ import {
   ViewUnitRoles,
 } from '@/lib/permissions';
 import type { Role } from '@/types/auth';
-import { type AssignedProjectItem } from '@/types/project';
 
 interface GetColumnsProps {
   onCancelProject: (project: AssignedProjectItem) => void;

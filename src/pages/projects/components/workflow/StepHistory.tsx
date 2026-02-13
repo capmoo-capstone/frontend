@@ -1,8 +1,8 @@
 import { CornerDownRight, FileText } from 'lucide-react';
 
+import type { Submission } from '@/features/projects';
 import { formatDateThai } from '@/lib/formatters';
 import { cn } from '@/lib/utils';
-import type { Submission } from '@/types/project-detail';
 
 interface StepHistoryProps {
   submissions?: Submission[];

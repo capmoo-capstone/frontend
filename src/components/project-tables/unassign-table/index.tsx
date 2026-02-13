@@ -20,9 +20,9 @@ import {
   useCancelProject,
   useClaimProject,
   useUnassignedProjects,
-} from '@/hooks/useProjects';
+} from '@/features/projects';
+import { type UnassignedProjectItem } from '@/features/projects';
 import { ManageUnitRoles, SupervisorRoles } from '@/lib/permissions';
-import { type UnassignedProjectItem } from '@/types/project';
 
 import { ProjectDataTable } from '../data-table';
 import { getColumns } from './columns';

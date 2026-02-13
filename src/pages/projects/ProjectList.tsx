@@ -1,12 +1,13 @@
 import { useMemo } from 'react';
 
-import { Funnel, Import, Search } from 'lucide-react';
-
-import { AllProjectTable, ProjectFilterPanel, ProjectStats } from '@/components/projects';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { useAuth } from '@/context/AuthContext';
-import { useProjectFilters } from '@/hooks/useProjectFilters';
+import {
+  AllProjectTable,
+  ProjectFilterPanel,
+  ProjectStats,
+  ProjectToolbar,
+  useProjectFilters,
+} from '@/features/projects';
 
 export default function ProjectListPage() {
   const { user } = useAuth();
@@ -45,31 +46,12 @@ export default function ProjectListPage() {
       <ProjectStats />
 
       {/* Toolbar */}
-      <div className="flex items-end justify-end gap-2">
-        <div className="bg-background relative rounded-lg">
-          <Input
-            className="normal pr-10"
-            placeholder="ค้นหา"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && handleGlobalSearch()}
-          />
-          <Button
-            variant="ghost"
-            className="absolute inset-y-0 right-0 flex items-center pr-3"
-            onClick={handleGlobalSearch}
-          >
-            <Search className="text-muted-foreground absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2" />
-          </Button>
-        </div>
-        <Button variant="outline" onClick={() => setIsFilterOpen(!isFilterOpen)}>
-          <Funnel /> ค้นหาขั้นสูง
-        </Button>
-        <Button variant="brand">
-          <Import />
-          นำเข้าโครงการ
-        </Button>
-      </div>
+      <ProjectToolbar
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        onSearch={handleGlobalSearch}
+        onFilterToggle={() => setIsFilterOpen(!isFilterOpen)}
+      />
 
       {/* Filter Panel */}
       {isFilterOpen && (

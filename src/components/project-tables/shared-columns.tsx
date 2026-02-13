@@ -1,10 +1,10 @@
 import { type ColumnDef } from '@tanstack/react-table';
 import { ArrowUpDown, MoreVertical, UserRoundPlus } from 'lucide-react';
 
+import { type Project } from '@/features/projects';
 import { getProjectStatusFormat, getResponsibleTypeFormat } from '@/lib/formatters';
 import { ManageSelfRoles, ManageUnitRoles } from '@/lib/permissions';
 import type { Role, User } from '@/types/auth';
-import { type Project } from '@/types/project';
 
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';

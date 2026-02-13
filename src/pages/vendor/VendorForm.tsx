@@ -1,3 +1,5 @@
-export default function VendorForm() {
-  return <div>Vendor Form Page</div>;
+import { VendorForm } from '@/features/vendors';
+
+export default function VendorFormPage() {
+  return <VendorForm />;
 }

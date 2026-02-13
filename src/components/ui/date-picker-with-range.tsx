@@ -2,12 +2,12 @@
 
 import { type DateRange } from 'react-day-picker';
 
-import { addYears, format } from 'date-fns';
 import { CalendarIcon } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { formatDateThai } from '@/lib/formatters';
 
 interface DatePickerWithRangeProps {
   value?: DateRange;
@@ -16,7 +16,7 @@ interface DatePickerWithRangeProps {
 
 export function DatePickerWithRange({ value, onChange }: DatePickerWithRangeProps) {
   const formatThaiDate = (date: Date) => {
-    return format(addYears(date, 543), 'dd/MM/yyyy');
+    return formatDateThai(date, 'dd/MM/yyyy');
   };
 
   return (

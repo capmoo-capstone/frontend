@@ -3,22 +3,13 @@ import { useState } from 'react';
 import { Calendar } from '@/components/ui/calendar';
 import { Card, CardContent } from '@/components/ui/card';
 
-const UPCOMING_SCHEDULE = [
-  {
-    day: '25',
-    month: 'ม.ค.',
-    title: 'วันส่งงานโครงการบลาบลา',
-    desc: 'ขณะนี้โครงการ [ชื่อโครงการ] ได้ดำเนินการเสร็จสิ้นแล้ว',
-  },
-  {
-    day: '25',
-    month: 'ม.ค.',
-    title: 'วันส่งงานโครงการบลาบลา',
-    desc: 'ขณะนี้โครงการ [ชื่อโครงการ] ได้ดำเนินการเสร็จสิ้นแล้ว',
-  },
-];
+import type { UpcomingEvent } from '../types';
 
-export function CalendarWidget() {
+interface CalendarWidgetProps {
+  upcomingEvents?: UpcomingEvent[];
+}
+
+export function CalendarWidget({ upcomingEvents = [] }: CalendarWidgetProps) {
   const [date, setDate] = useState<Date | undefined>(new Date());
 
   return (
@@ -42,7 +33,7 @@ export function CalendarWidget() {
           </div>
 
           <div className="flex flex-col gap-3 pt-2">
-            {UPCOMING_SCHEDULE.map((event, idx) => (
+            {upcomingEvents.map((event, idx) => (
               <div key={idx} className="flex items-center justify-between">
                 <div className="flex flex-1 items-center gap-4">
                   {/* Date Box */}

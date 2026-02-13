@@ -3,15 +3,7 @@ import { AlertCircle, Briefcase, CheckCircle2 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 
-// Types
-export interface NotificationItem {
-  id: number;
-  type: 'ASSIGNED' | 'APPROVED' | 'COMPLETED' | 'REJECTED';
-  title: string;
-  description: string;
-  time: string;
-  isNew?: boolean;
-}
+import type { NotificationItem } from '../types';
 
 const STYLES = {
   ASSIGNED: {

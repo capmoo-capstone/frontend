@@ -3,7 +3,8 @@ import { Check, Download, FileText, Mail, X } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { FileCard } from '@/components/ui/file-card';
-import type { ProjectDetail, WorkflowStepConfig } from '@/features/projects';
+import type { ProjectDetail } from '@/features/projects';
+import type { WorkflowStepConfig } from '@/features/workflow';
 import { formatDateThai } from '@/lib/formatters';
 import { cn } from '@/lib/utils';
 

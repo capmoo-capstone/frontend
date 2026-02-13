@@ -1,7 +1,7 @@
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 
-import { CalendarRange, ClipboardList, LayoutList, Loader2, ShoppingCart } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { ApproveCancelDialog } from '@/components/project-dialog/approve-cancel-dialog';
@@ -11,39 +11,26 @@ import {
   EditProjectDialog,
 } from '@/components/project-dialog/edit-project-dialog';
 import { CancellationRequestBanner } from '@/components/project/ProjectStatusBanners';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/context/AuthContext';
-import { useProjectDetail } from '@/features/projects';
+import {
+  ProjectDetailTabs,
+  ProjectHeader,
+  ProjectInfoGrid,
+  useProjectDetail,
+} from '@/features/projects';
+import { ProcurementWorkflows } from '@/features/workflow';
 import { ManageUnitRoles, SupervisorRoles } from '@/lib/permissions';
-import { cn } from '@/lib/utils';
-
-import { ProjectHeader } from './components/ProjectHeader';
-import { ProjectInfoGrid } from './components/ProjectInfoGrid';
-import { ProjectSummaryView } from './components/workflow/ProjectSummaryView';
-import { ProjectWorkflowSteps } from './components/workflow/ProjectWorkflowSteps';
-import { ProcurementWorkflows } from './config/workflow';
 
 export default function ProjectDetail() {
   const { id } = useParams();
   const { user } = useAuth();
 
   // View States
-  const [workflowTab, setWorkflowTab] = useState<'PROCUREMENT' | 'CONTRACT'>('PROCUREMENT');
   const [isCancelDialogOpen, setIsCancelDialogOpen] = useState(false);
   const [isApproveCancelDialogOpen, setIsApproveCancelDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
   const { data: project, isLoading, isError, error } = useProjectDetail(id);
-
-  // --- Logic to get specific steps ---
-  const activeSteps = useMemo(() => {
-    if (!project) return [];
-    if (workflowTab === 'PROCUREMENT') {
-      return ProcurementWorkflows.find((w) => w.type === project.procurement_type)?.steps || [];
-    } else {
-      return ProcurementWorkflows.find((w) => w.type === 'CONTRACT')?.steps || [];
-    }
-  }, [project, workflowTab]);
 
   if (!id || !user) return null;
   if (isLoading)
@@ -59,19 +46,6 @@ export default function ProjectDetail() {
     console.log('Updating project:', data);
     toast.success('อัปเดตข้อมูลโครงการสำเร็จ');
     setIsEditDialogOpen(false);
-  };
-
-  const getResponsiblePerson = () => {
-    if (workflowTab === 'PROCUREMENT') {
-      const names = [
-        project.assignee_procurement?.full_name,
-        'นางสาวพิมพ์ชนก ใจดีนามสกุลยาว',
-      ].filter(Boolean);
-      return names.join(', ');
-    } else {
-      const names = [project.assignee_contract?.full_name, 'นายสมชาย รักงาน'].filter(Boolean);
-      return names.join(', ');
-    }
   };
 
   return (
@@ -95,67 +69,7 @@ export default function ProjectDetail() {
 
       <ProjectInfoGrid project={project} />
 
-      <Tabs defaultValue="timeline" className="mt-6">
-        {/* --- Workflow Tabs & View Toggle --- */}
-        <div className="mb-4 flex items-end justify-between border-b">
-          <div className="flex items-center gap-6">
-            <button
-              onClick={() => setWorkflowTab('PROCUREMENT')}
-              className={cn(
-                'caption flex flex-col items-start gap-1 border-b-2 px-1 pb-3 transition-colors',
-                workflowTab === 'PROCUREMENT'
-                  ? 'border-brand-9 text-brand-11'
-                  : 'text-muted-foreground hover:text-foreground border-transparent'
-              )}
-            >
-              <div className="normal-b flex items-center gap-2">
-                <ShoppingCart className="h-5 w-5" />
-                งานจัดซื้อ ({project.procurement_type})
-              </div>
-            </button>
-            <button
-              onClick={() => setWorkflowTab('CONTRACT')}
-              className={cn(
-                'caption flex flex-col items-start gap-1 border-b-2 px-1 pb-3 transition-colors',
-                workflowTab === 'CONTRACT'
-                  ? 'border-brand-9 text-brand-11'
-                  : 'text-muted-foreground hover:text-foreground border-transparent'
-              )}
-            >
-              <div className="normal-b flex items-center gap-2">
-                <ClipboardList className="h-5 w-5" />
-                งานบริหารสัญญา
-              </div>
-            </button>
-          </div>
-
-          <TabsList className="mb-3">
-            <TabsTrigger value="timeline" className="gap-2">
-              <CalendarRange className="h-3.5 w-3.5" />
-              ไทม์ไลน์
-            </TabsTrigger>
-            <TabsTrigger value="summary" className="gap-2">
-              <LayoutList className="h-3.5 w-3.5" />
-              สรุปข้อมูล
-            </TabsTrigger>
-          </TabsList>
-        </div>
-
-        {/* --- Responsible Person Display --- */}
-        <div className="text-muted-foreground normal-b mb-2 flex items-center gap-1">
-          <span>ผู้รับผิดชอบ:</span>
-          <span className="text-primary">{getResponsiblePerson()}</span>
-        </div>
-
-        {/* --- Content Area --- */}
-        <TabsContent value="timeline">
-          <ProjectWorkflowSteps project={project} steps={activeSteps} />
-        </TabsContent>
-
-        <TabsContent value="summary">
-          <ProjectSummaryView project={project} steps={activeSteps} />
-        </TabsContent>
-      </Tabs>
+      <ProjectDetailTabs project={project} workflowConfigs={ProcurementWorkflows} />
 
       {/* --- Dialogs --- */}
       <ApproveCancelDialog

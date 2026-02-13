@@ -1,17 +1,11 @@
 import { useCallback, useState } from 'react';
 
-import type {
-  ProjectDetail,
-  StepStatus,
-  Submission,
-  WorkflowStepConfig,
-} from '@/types/project-detail';
+import type { ProjectDetail } from '@/features/projects';
+
+import type { StepStatus, Submission, WorkflowStepConfig } from '../types';
 
 // Now accepts 'activeSteps' to know which workflow we are dealing with
-export function useProjectWorkflow(
-  project: ProjectDetail | undefined,
-  activeSteps: WorkflowStepConfig[]
-) {
+export function useWorkflow(project: ProjectDetail | undefined, activeSteps: WorkflowStepConfig[]) {
   const [stepFormData, setStepFormData] = useState<Record<string, Record<string, any>>>({});
   const [viewingSubmissions, setViewingSubmissions] = useState<Record<number, Submission | null>>(
     {}

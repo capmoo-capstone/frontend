@@ -15,8 +15,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import type { FieldConfig } from '@/features/workflow';
 import { cn } from '@/lib/utils';
-import { type FieldConfig } from '@/types/workflow';
 
 import { ContractNumberGenerator } from './fields/ContractNumberGenerator';
 import { DueDateMultiSelect } from './fields/DueDateMultiSelect';

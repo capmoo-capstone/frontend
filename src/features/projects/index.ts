@@ -2,11 +2,15 @@
 export * from './api';
 
 // Components
+// Components
 export {
   AllProjectTable,
   FilterCheckbox,
+  ProjectDetailTabs,
   ProjectFilterCard,
   ProjectFilterPanel,
+  ProjectHeader,
+  ProjectInfoGrid,
   ProjectStats,
   ProjectToolbar,
   SearchCheckbox,
@@ -25,11 +29,11 @@ export {
   useProjects,
   useUnassignedProjects,
 } from './hooks/useProjects';
-export { useProjectWorkflow } from './hooks/useProjectWorkflow';
 
 // Types
 export type {
   AssignedProjectItem,
+  FieldConfig,
   FieldType,
   ProcurementType,
   Project,

@@ -1,7 +1,8 @@
 // Assuming the array you provided is exported here
-import { ProcurementWorkflows } from '@/pages/projects/config/workflow';
+import { ProcurementWorkflows } from '@/features/workflow';
 import type { Role } from '@/types/auth';
-import type { ProjectDetail, StepStatus, Submission } from '@/types/project-detail';
+import type { ProjectDetail } from '@/features/projects';
+import type { StepStatus, Submission } from '@/features/workflow';
 
 // Helper to get workflow by type
 const getWorkflow = (type: string) => ProcurementWorkflows.find((w) => w.type === type)!;

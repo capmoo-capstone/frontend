@@ -1,4 +1,4 @@
-import type { StepStatus } from '@/features/projects';
+import type { StepStatus } from '@/features/workflow';
 import { getWaitingStatusInfo } from '@/lib/formatters';
 import { cn } from '@/lib/utils';
 

@@ -1,4 +1,5 @@
-import type { UnitResponsibleType, WorkflowStepConfig } from '@/features/projects';
+import type { UnitResponsibleType } from '@/features/projects';
+import type { WorkflowStepConfig } from '../types';
 
 type WorkflowConfig = {
   type: UnitResponsibleType;

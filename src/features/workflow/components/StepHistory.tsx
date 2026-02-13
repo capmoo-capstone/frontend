@@ -1,6 +1,6 @@
 import { CornerDownRight, FileText } from 'lucide-react';
 
-import type { Submission } from '@/features/projects';
+import type { Submission } from '@/features/workflow';
 import { formatDateThai } from '@/lib/formatters';
 import { cn } from '@/lib/utils';
 

@@ -1,5 +1,6 @@
 import { z } from 'zod';
 
+import { SubmissionSchema, WorkflowStepConfigSchema } from '@/features/workflow';
 import { RoleEnum, UserSchema } from '@/types/auth';
 
 // ============================================================================
@@ -116,73 +117,6 @@ export const ProjectListResponseSchema = z.object({
 });
 
 // ============================================================================
-// Workflow & Document Types
-// ============================================================================
-
-export const FieldTypeSchema = z.enum([
-  'FILE',
-  'TEXT',
-  'NUMBER',
-  'BOOLEAN',
-  'DATE',
-  'DUE_DATE_SELECT',
-  'GEN_CONT_NO',
-  'VENDOR_EMAIL',
-  'COMMITTEE_EMAIL',
-  'SELECT_CONTRACT_STATUS',
-  'SELECT_DELIVERY_STATUS',
-]);
-
-export const StepStatusSchema = z.enum([
-  'not_started',
-  'in_progress',
-  'submitted',
-  'approved',
-  'rejected',
-  'completed',
-]);
-
-export const WorkflowDocumentConfigSchema = z.object({
-  type: FieldTypeSchema,
-  label: z.string(),
-  field_key: z.string(),
-  mark_as_done: z.boolean(),
-});
-
-export const WorkflowStepConfigSchema = z.object({
-  name: z.string(),
-  order: z.number(),
-  required_step: z.array(z.number()),
-  required_documents: z.array(WorkflowDocumentConfigSchema),
-});
-
-export const SubmissionDocumentSchema = z.object({
-  field_key: z.string(),
-  file_name: z.string().optional(),
-  file_path: z.string().optional(),
-  value: z
-    .string()
-    .optional()
-    .or(z.number().optional())
-    .or(z.boolean().optional())
-    .or(z.array(z.string()).optional()),
-});
-
-export const SubmissionSchema = z.object({
-  step_name: z.string(),
-  step_order: z.number(),
-  submission_round: z.number(),
-  status: z.enum(['SUBMITTED', 'APPROVED', 'ACCEPTED', 'REJECTED']),
-  submitted_by: z.string(),
-  submitted_at: z.string(),
-  action_by: z.string().nullable().optional(),
-  action_at: z.string().nullable().optional(),
-  documents: z.array(SubmissionDocumentSchema),
-  meta_data: z.record(z.string(), z.any()),
-  comments: z.string().optional(),
-});
-
-// ============================================================================
 // Project Detail Schema
 // ============================================================================
 
@@ -263,10 +197,15 @@ export type AssignedProjectItem = z.infer<typeof AssignedProjectItemSchema>;
 export type UnassignedProjectItem = z.infer<typeof UnassignedProjectItemSchema>;
 export type ProjectListResponse = z.infer<typeof ProjectListResponseSchema>;
 
-export type FieldType = z.infer<typeof FieldTypeSchema>;
-export type StepStatus = z.infer<typeof StepStatusSchema>;
-export type WorkflowDocumentConfig = z.infer<typeof WorkflowDocumentConfigSchema>;
-export type WorkflowStepConfig = z.infer<typeof WorkflowStepConfigSchema>;
-export type SubmissionDocument = z.infer<typeof SubmissionDocumentSchema>;
-export type Submission = z.infer<typeof SubmissionSchema>;
 export type ProjectDetail = z.infer<typeof ProjectDetailSchema>;
+
+// Re-export workflow types for convenience
+export type {
+  FieldConfig,
+  FieldType,
+  StepStatus,
+  Submission,
+  SubmissionDocument,
+  WorkflowDocumentConfig,
+  WorkflowStepConfig,
+} from '@/features/workflow';

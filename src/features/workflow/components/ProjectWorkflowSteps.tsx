@@ -1,8 +1,7 @@
 import { useAuth } from '@/context/AuthContext';
-import { useProjectWorkflow } from '@/features/projects';
-import type { ProjectDetail, WorkflowStepConfig } from '@/features/projects';
+import type { ProjectDetail } from '@/features/projects';
+import { type FieldConfig, type WorkflowStepConfig, useWorkflow } from '@/features/workflow';
 import { isActionRequired } from '@/lib/workflow-utils';
-import type { FieldConfig } from '@/types/workflow';
 
 import { DynamicStepForm } from './DynamicStepForm';
 import { StatusWaitingCard } from './StatusWaitingCard';
@@ -28,7 +27,7 @@ export function ProjectWorkflowSteps({ project, steps }: ProjectWorkflowStepsPro
     handleSelectSubmission,
     handleBackToEdit,
     viewingSubmissions,
-  } = useProjectWorkflow(project, steps);
+  } = useWorkflow(project, steps);
 
   if (!user) return null;
 

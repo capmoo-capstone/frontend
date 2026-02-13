@@ -11,16 +11,20 @@ import {
   TableRow,
 } from '@/components/ui/table';
 
+import { DataTablePagination } from './data-table-pagination';
+
 interface ProjectDataTableProps<TData> {
   table: ReactTable<TData>;
   columnsLength: number;
   toolbar?: React.ReactNode;
+  hasPagination?: boolean;
 }
 
 export function ProjectDataTable<TData>({
   table,
   columnsLength,
   toolbar,
+  hasPagination = true,
 }: ProjectDataTableProps<TData>) {
   const navigate = useNavigate();
 
@@ -63,7 +67,7 @@ export function ProjectDataTable<TData>({
         <div className="flex items-center gap-2">{toolbar}</div>
       </div>
 
-      <div className="overflow-hidden">
+      <div className="overflow-hidden bg-background">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -108,6 +112,8 @@ export function ProjectDataTable<TData>({
           </TableBody>
         </Table>
       </div>
+
+      {hasPagination && <DataTablePagination table={table} />}
     </div>
   );
 }

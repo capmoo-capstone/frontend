@@ -92,7 +92,7 @@ export const PrivateRoutes = () => {
             />
           }
         >
-          <Route path="app/vendors/submission" element={<VendorSubmission />} />
+          <Route path="app/vendor-response" element={<VendorSubmission />} />
         </Route>
 
         {/* === MANAGEMENT (Head) === */}

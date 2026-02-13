@@ -13,7 +13,6 @@ import { AlertTriangle, Loader2 } from 'lucide-react';
 
 import { AddAssigneeDialog } from '@/components/project-dialog/add-assignee-dialog';
 import { ProjectDataTable } from '@/components/project-tables/data-table';
-import { DataTablePagination } from '@/components/project-tables/data-table-pagination';
 import { baseColumns } from '@/components/project-tables/shared-columns';
 import { useAuth } from '@/context/AuthContext';
 import { type ProjectFilterParams, useProjects } from '@/hooks/useProjects';
@@ -80,7 +79,6 @@ export function AllProjectTable({ filters }: { filters: ProjectFilterParams }) {
           projectId={projectToAddAssignee.id}
         />
       )}
-      <DataTablePagination table={table} />
     </>
   );
 }

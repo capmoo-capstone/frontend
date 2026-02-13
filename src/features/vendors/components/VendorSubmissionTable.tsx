@@ -15,6 +15,8 @@ import type { VendorFilterParams } from '../types';
 import { vendorSubmissionColumns } from './VendorColumns';
 
 export function VendorSubmissionTable({ filters }: { filters: VendorFilterParams }) {
+  // Server-side filtering: status and dateRange are handled by the hook/API
+  // Client-side filtering: search is handled by TanStack Table's globalFilter
   const { data, isLoading } = useVendorSubmissions(filters);
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 });
 

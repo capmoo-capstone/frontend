@@ -30,3 +30,8 @@ export interface VendorFilterParams {
   status: SubmissionStatus[];
   dateRange: DateRange | undefined;
 }
+
+export interface VendorFormData {
+  po: string;
+  files?: File[];
+}

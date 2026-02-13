@@ -21,17 +21,17 @@ export function MyTasksTable({ user }: MyTasksTableProps) {
 
     switch (activeTab) {
       case 'in-progress':
-        return { ...baseFilters, status: ['IN_PROGRESS' as ProjectStatus] };
+        return { ...baseFilters, status: ['IN_PROGRESS'] };
       case 'urgent':
         return { ...baseFilters, urgentStatus: ['URGENT', 'VERY_URGENT'] };
       case 'request-edit':
-        return { ...baseFilters, status: ['REQUEST_EDIT' as ProjectStatus] };
+        return { ...baseFilters, status: ['REQUEST_EDIT'] };
       case 'waiting-accept':
-        return { ...baseFilters, status: ['WAITING_ACCEPT' as ProjectStatus] };
+        return { ...baseFilters, status: ['WAITING_ACCEPT'] };
       case 'completed':
-        return { ...baseFilters, status: ['CLOSED' as ProjectStatus] };
+        return { ...baseFilters, status: ['CLOSED'] };
       case 'cancelled':
-        return { ...baseFilters, status: ['CANCELLED' as ProjectStatus] };
+        return { ...baseFilters, status: ['CANCELLED'] };
       default:
         return baseFilters;
     }

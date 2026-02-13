@@ -14,7 +14,7 @@ import { CancellationRequestBanner } from '@/components/project/ProjectStatusBan
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/context/AuthContext';
 import { useProjectDetail } from '@/hooks/useProjects';
-import { ManageUnitRoles, SupervisorRoles } from '@/lib/role-permissions';
+import { ManageUnitRoles, SupervisorRoles } from '@/lib/permissions';
 import { cn } from '@/lib/utils';
 
 import { ProjectHeader } from './components/ProjectHeader';

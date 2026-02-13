@@ -1,7 +1,7 @@
 import { AlertTriangle } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
-import { formatDateThai } from '@/lib/date-utils';
+import { formatDateThai } from '@/lib/formatters';
 
 interface CancellationRequestBannerProps {
   onRequestApprove: () => void;

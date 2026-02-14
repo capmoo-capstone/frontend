@@ -15,7 +15,8 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { UserSelect } from '@/components/user-select';
-import { useChangeProjectAssignee } from '@/features/projects';
+
+import { useChangeProjectAssignee } from '../../hooks/useProjects';
 
 interface ChangeAssigneeDialogProps {
   isOpen: boolean;

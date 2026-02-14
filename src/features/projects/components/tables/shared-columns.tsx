@@ -1,24 +1,24 @@
 import { type ColumnDef } from '@tanstack/react-table';
 import { ArrowUpDown, MoreVertical, UserRoundPlus } from 'lucide-react';
 
-import { type Project } from '@/features/projects';
-import { getProjectStatusFormat, getResponsibleTypeFormat } from '@/lib/formatters';
-import { ManageSelfRoles, ManageUnitRoles } from '@/lib/permissions';
-import type { Role, User } from '@/types/auth';
-
-import { Badge } from '../ui/badge';
-import { Button } from '../ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '../ui/dropdown-menu';
+} from '@/components/ui/dropdown-menu';
+import { getProjectStatusFormat, getResponsibleTypeFormat } from '@/lib/formatters';
+import { ManageSelfRoles, ManageUnitRoles } from '@/lib/permissions';
+import type { Role, User } from '@/types/auth';
+
+import type { Project } from '../../types';
 
 interface SharedColumnsProps {
   onAddAssignee: (project: Project) => void;
   viewAsRole: Role;
-  user?: User; // Add user to pass department info
+  user?: User;
 }
 
 export const baseColumns = ({

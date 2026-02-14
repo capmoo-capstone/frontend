@@ -11,19 +11,19 @@ import {
 import { AlertTriangle, Loader2, Save } from 'lucide-react';
 import { toast } from 'sonner';
 
-import { CancelProjectDialog } from '@/components/project-dialog/cancel-project-dialog';
 import { Button } from '@/components/ui/button';
 import { TitleBar } from '@/components/ui/title-bar';
 import { useAuth } from '@/context/AuthContext';
+import { ManageUnitRoles, SupervisorRoles } from '@/lib/permissions';
+
 import {
   useAssignProjects,
   useCancelProject,
   useClaimProject,
   useUnassignedProjects,
-} from '@/features/projects';
-import { type UnassignedProjectItem } from '@/features/projects';
-import { ManageUnitRoles, SupervisorRoles } from '@/lib/permissions';
-
+} from '../../../hooks/useProjects';
+import { type UnassignedProjectItem } from '../../../types';
+import { CancelProjectDialog } from '../../dialogs/cancel-project-dialog';
 import { ProjectDataTable } from '../data-table';
 import { getColumns } from './columns';
 import { WorkloadChart } from './workload-chart';

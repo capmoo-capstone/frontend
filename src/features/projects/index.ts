@@ -2,10 +2,22 @@
 export * from './api';
 
 // Components
-// Components
 export {
+  AddAssigneeDialog,
   AllProjectTable,
+  ApproveCancelDialog,
+  AssignedTable,
+  baseColumns,
+  CancelledProjectBanner,
+  CancelProjectDialog,
+  CancellationRequestBanner,
+  ChangeAssigneeDialog,
+  DataTablePagination,
+  type EditProjectData,
+  EditProjectDialog,
   FilterCheckbox,
+  ProjectAccessGuard,
+  ProjectDataTable,
   ProjectDetailTabs,
   ProjectFilterCard,
   ProjectFilterPanel,
@@ -14,6 +26,7 @@ export {
   ProjectStats,
   ProjectToolbar,
   SearchCheckbox,
+  UnassignTable,
 } from './components';
 
 // Hooks

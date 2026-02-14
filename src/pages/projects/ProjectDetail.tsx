@@ -4,15 +4,14 @@ import { useParams } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 
-import { ApproveCancelDialog } from '@/components/project-dialog/approve-cancel-dialog';
-import { CancelProjectDialog } from '@/components/project-dialog/cancel-project-dialog';
-import {
-  type EditProjectData,
-  EditProjectDialog,
-} from '@/components/project-dialog/edit-project-dialog';
-import { CancellationRequestBanner } from '@/components/project/ProjectStatusBanners';
 import { useAuth } from '@/context/AuthContext';
 import {
+  ApproveCancelDialog,
+  CancelProjectDialog,
+  CancellationRequestBanner,
+  ChangeAssigneeDialog,
+  type EditProjectData,
+  EditProjectDialog,
   ProjectDetailTabs,
   ProjectHeader,
   ProjectInfoGrid,

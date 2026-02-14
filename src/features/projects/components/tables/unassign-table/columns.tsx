@@ -9,12 +9,11 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { type UnassignedProjectItem } from '@/features/projects';
-import { formatDateThaiShort } from '@/lib/formatters';
-import { getResponsibleTypeFormat } from '@/lib/formatters';
+import { formatDateThaiShort, getResponsibleTypeFormat } from '@/lib/formatters';
 import { ManageSelfRoles, ManageUnitRoles, SupervisorRoles } from '@/lib/permissions';
 import { type Role } from '@/types/auth';
 
+import type { UnassignedProjectItem } from '../../../types';
 import { AssigneeCell } from './assignee-cell';
 
 interface GetColumnsProps {

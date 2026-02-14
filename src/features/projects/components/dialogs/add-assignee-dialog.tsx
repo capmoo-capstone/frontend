@@ -14,7 +14,8 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { UserSelect } from '@/components/user-select';
-import { useAssignProjects, useProjectDetail } from '@/features/projects';
+
+import { useAssignProjects, useProjectDetail } from '../../hooks/useProjects';
 
 interface AddMemberDialogProps {
   isOpen: boolean;

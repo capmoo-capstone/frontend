@@ -11,16 +11,20 @@ import {
 import { AlertTriangle, Loader2, Upload } from 'lucide-react';
 import { toast } from 'sonner';
 
-import { CancelProjectDialog } from '@/components/project-dialog/cancel-project-dialog';
-import { ChangeAssigneeDialog } from '@/components/project-dialog/change-assignee-dialog';
 import { Button } from '@/components/ui/button';
 import { DatePicker } from '@/components/ui/date-picker';
 import { TitleBar } from '@/components/ui/title-bar';
 import { useAuth } from '@/context/AuthContext';
-import { useAcceptProjects, useAssignedProjects, useCancelProject } from '@/features/projects';
-import type { AssignedProjectItem } from '@/features/projects';
 import { ManageSelfRoles, ManageUnitRoles, SupervisorRoles } from '@/lib/permissions';
 
+import {
+  useAcceptProjects,
+  useAssignedProjects,
+  useCancelProject,
+} from '../../../hooks/useProjects';
+import type { AssignedProjectItem } from '../../../types';
+import { CancelProjectDialog } from '../../dialogs/cancel-project-dialog';
+import { ChangeAssigneeDialog } from '../../dialogs/change-assignee-dialog';
 import { ProjectDataTable } from '../data-table';
 import { getColumns } from './columns';
 
@@ -55,8 +59,8 @@ export function AssignedTable({ unitId }: { unitId?: string }) {
   const columns = useMemo(
     () =>
       getColumns({
-        onCancelProject: (project) => setProjectToCancel(project),
-        onChangeAssignee: (project) => setProjectToChangeAssignee(project),
+        onCancelProject: (project: AssignedProjectItem) => setProjectToCancel(project),
+        onChangeAssignee: (project: AssignedProjectItem) => setProjectToChangeAssignee(project),
         onAcceptProject: handleAcceptProject,
         viewAsRole: user.role,
       }),

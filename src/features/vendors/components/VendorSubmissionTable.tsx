@@ -8,7 +8,7 @@ import {
 } from '@tanstack/react-table';
 import { Loader2 } from 'lucide-react';
 
-import { ProjectDataTable } from '@/components/project-tables/data-table';
+import { ProjectDataTable } from '@/features/projects/components/tables/data-table';
 
 import { useVendorSubmissions } from '../hooks/useVendorSubmissions';
 import type { VendorFilterParams } from '../types';

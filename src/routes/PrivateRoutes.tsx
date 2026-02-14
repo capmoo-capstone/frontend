@@ -1,8 +1,8 @@
 import { Route, Routes } from 'react-router-dom';
 
-import ProjectAccessGuard from '@/components/guards/ProjectAccessGuard';
 import ProtectedRoute from '@/components/guards/ProtectedRoute';
 import { useAuth } from '@/context/AuthContext';
+import { ProjectAccessGuard } from '@/features/projects/components';
 import AppLayout from '@/layouts/AppLayout';
 import OrganizationManagement from '@/pages/admin/OrganizationManagement';
 import ProcumentJobs from '@/pages/assign/AssignJobs';

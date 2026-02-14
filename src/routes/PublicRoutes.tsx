@@ -1,10 +1,12 @@
+import { lazy } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 
 import PublicLayout from '../layouts/PublicLayout';
-// Public Pages
-import DevLogin from '../pages/auth/DevLogin';
-import Login from '../pages/auth/Login';
-import VendorForm from '../pages/vendor/VendorForm';
+
+// Lazy load public pages
+const Login = lazy(() => import('../pages/auth/Login'));
+const DevLogin = lazy(() => import('../pages/auth/DevLogin'));
+const VendorForm = lazy(() => import('../pages/vendor/VendorForm'));
 
 export const PublicRoutes = () => {
   return (

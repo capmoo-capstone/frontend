@@ -68,6 +68,11 @@ const menuGroups: MenuGroup[] = [
         icon: ChartPie,
       },
       {
+        title: 'รายงานรายบุคคล',
+        url: '/app/management/employees/kpi',
+        icon: ChartPie,
+      },
+      {
         title: 'โครงการทั้งหมด',
         url: '/app/projects',
         icon: Table2,

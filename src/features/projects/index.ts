@@ -62,3 +62,6 @@ export type {
   WorkflowStatus,
   WorkflowStepConfig,
 } from './types';
+
+// Schemas (for validation)
+export { AssignedProjectItemSchema, ProjectListSchema, UnassignedProjectItemSchema } from './types';

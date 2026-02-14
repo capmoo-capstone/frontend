@@ -1,7 +1,5 @@
 import { Route, Routes } from 'react-router-dom';
 
-
-
 import ProtectedRoute from '@/components/guards/ProtectedRoute';
 import { useAuth } from '@/context/AuthContext';
 import { ProjectAccessGuard } from '@/features/projects/components';
@@ -12,6 +10,7 @@ import PageNotFound from '@/pages/auth/PageNotFound';
 import DepartmentDashboard from '@/pages/dashboard/DepartmentDashboard';
 import EmployeesDashboard from '@/pages/dashboard/EmployeesDashboard';
 import OverallDashboard from '@/pages/dashboard/OverallDashboard';
+import DocExportPage from '@/pages/projects/DocExport';
 import FinanceExportPage from '@/pages/projects/FinanceExport';
 import ProjectDetail from '@/pages/projects/ProjectDetail';
 import ProjectImport from '@/pages/projects/ProjectImport';
@@ -20,31 +19,6 @@ import MyToDoDashboard from '@/pages/user/MyToDoDashboard';
 import PersonalKPI from '@/pages/user/PersonalKPI';
 // App Pages
 import VendorSubmission from '@/pages/vendor/VendorSubmission';
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 export const PrivateRoutes = () => {
   const { user } = useAuth();
@@ -59,7 +33,7 @@ export const PrivateRoutes = () => {
         <Route path="app/projects" element={<ProjectList />} />
         <Route path="app/exports/finance" element={<FinanceExportPage />} />
         <Route path="app/exports/registry" element={<FinanceExportPage />} />
-        <Route path="app/exports/docs" element={<FinanceExportPage />} />
+        <Route path="app/exports/docs" element={<DocExportPage />} />
 
         <Route element={<ProjectAccessGuard />}>
           <Route path="app/projects/:id" element={<ProjectDetail />} />

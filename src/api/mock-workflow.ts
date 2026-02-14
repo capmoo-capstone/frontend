@@ -1,7 +1,6 @@
 // Assuming the array you provided is exported here
 import type { ProjectDetail } from '@/features/projects';
 import { ProcurementWorkflows } from '@/features/workflow';
-import type { StepStatus, Submission } from '@/features/workflow';
 import type { Role } from '@/types/auth';
 
 // Helper to get workflow by type

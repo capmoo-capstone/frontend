@@ -13,7 +13,7 @@ import {
   getProjects,
   getUnassignedProjects,
 } from '@/api/project.api';
-import type { ProjectDetail } from '@/types/project-detail';
+import type { ProjectDetail } from '@/features/projects';
 
 export interface ProjectFilterParams {
   search?: string;

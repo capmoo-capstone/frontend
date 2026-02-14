@@ -1,15 +1,16 @@
 import { z } from 'zod';
 
-import type { ProjectFilterParams } from '@/hooks/useProjects';
-import api from '@/lib/axios';
 import {
   type AssignedProjectItem,
   AssignedProjectItemSchema,
+  type Project,
+  type ProjectDetail,
+  ProjectListSchema,
   type UnassignedProjectItem,
   UnassignedProjectItemSchema,
-} from '@/types/project';
-import { type Project, ProjectListSchema } from '@/types/project';
-import type { ProjectDetail } from '@/types/project-detail';
+} from '@/features/projects';
+import type { ProjectFilterParams } from '@/hooks/useProjects';
+import api from '@/lib/axios';
 
 import { MOCK_ASSIGNED_PROJECTS, MOCK_PROJECTS, MOCK_UNASSIGNED_PROJECTS } from './mock-data';
 import { mockProjects } from './mock-project';

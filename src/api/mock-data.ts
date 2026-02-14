@@ -1,10 +1,10 @@
-import type { User } from '@/types/auth';
-import type { Department } from '@/types/department';
 import {
   type AssignedProjectItem,
   type Project,
   type UnassignedProjectItem,
-} from '@/types/project';
+} from '@/features/projects';
+import type { User } from '@/types/auth';
+import type { Department } from '@/types/department';
 import { type UserSelectionResponse } from '@/types/user';
 
 export const MOCK_PROJECTS: Project[] = [

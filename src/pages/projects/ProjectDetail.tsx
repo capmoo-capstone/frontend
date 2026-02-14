@@ -9,7 +9,6 @@ import {
   ApproveCancelDialog,
   CancelProjectDialog,
   CancellationRequestBanner,
-  ChangeAssigneeDialog,
   type EditProjectData,
   EditProjectDialog,
   ProjectDetailTabs,

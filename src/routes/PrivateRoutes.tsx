@@ -10,9 +10,12 @@ import PageNotFound from '@/pages/auth/PageNotFound';
 import DepartmentDashboard from '@/pages/dashboard/DepartmentDashboard';
 import EmployeesDashboard from '@/pages/dashboard/EmployeesDashboard';
 import OverallDashboard from '@/pages/dashboard/OverallDashboard';
+import DocExportPage from '@/pages/projects/DocExport';
+import FinanceExportPage from '@/pages/projects/FinanceExport';
 import ProjectDetail from '@/pages/projects/ProjectDetail';
 import ProjectImport from '@/pages/projects/ProjectImport';
 import ProjectList from '@/pages/projects/ProjectList';
+import RegistryExportPage from '@/pages/projects/RegistryExport';
 import MyToDoDashboard from '@/pages/user/MyToDoDashboard';
 import PersonalKPI from '@/pages/user/PersonalKPI';
 // App Pages
@@ -29,6 +32,9 @@ export const PrivateRoutes = () => {
 
         {/* === PROJECTS === */}
         <Route path="app/projects" element={<ProjectList />} />
+        <Route path="app/exports/finance" element={<FinanceExportPage />} />
+        <Route path="app/exports/registry" element={<RegistryExportPage />} />
+        <Route path="app/exports/docs" element={<DocExportPage />} />
 
         <Route element={<ProjectAccessGuard />}>
           <Route path="app/projects/:id" element={<ProjectDetail />} />

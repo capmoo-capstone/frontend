@@ -1,3 +1,5 @@
+import type { ReactNode } from 'react';
+
 import { Search, X } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -23,11 +25,13 @@ export interface ExportTableToolbarProps {
   selectAllLabel?: string;
   deselectAllLabel?: string;
   actions: ExportTableAction[];
+  /** Optional date range filter component (e.g., <DateRangeFilter />) */
+  dateRangeFilter?: ReactNode;
 }
 
 /**
  * Reusable toolbar component for export tables
- * Provides search input, selection controls, and customizable action buttons
+ * Provides search input, optional date range filter, selection controls, and customizable action buttons
  */
 export function ExportTableToolbar({
   searchQuery,
@@ -41,6 +45,7 @@ export function ExportTableToolbar({
   selectAllLabel = 'เลือกทั้งหมด',
   deselectAllLabel = 'ยกเลิกการเลือก',
   actions,
+  dateRangeFilter,
 }: ExportTableToolbarProps) {
   return (
     <div className="flex flex-1 flex-col gap-4 py-4 md:flex-row md:items-center md:justify-between">
@@ -72,6 +77,9 @@ export function ExportTableToolbar({
             <Search className="text-muted-foreground h-4 w-4" />
           </Button>
         </div>
+
+        {/* Optional Date Range Filter */}
+        {dateRangeFilter && <div className="flex items-center">{dateRangeFilter}</div>}
 
         {/* Selection Count */}
         {hasSelection && (

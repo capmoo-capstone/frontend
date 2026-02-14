@@ -15,11 +15,11 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ProjectDataTable } from '@/features/projects/components/tables/DataTable';
 
-import { useDocExport } from '../hooks/useDocExport';
-import { getDocExportColumns } from './DocExportColumns';
+import { useRegistryExport } from '../hooks/useRegistryExport';
+import { registryExportColumns } from './RegistryExportColumns';
 
-export function DocExportTable() {
-  const { data, isLoading } = useDocExport();
+export function RegistryExportTable() {
+  const { data, isLoading } = useRegistryExport();
 
   // State Management for Table
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -28,12 +28,9 @@ export function DocExportTable() {
   const [searchQuery, setSearchQuery] = useState('');
   const [globalFilter, setGlobalFilter] = useState('');
 
-  // Generate columns
-  const columns = getDocExportColumns();
-
   const table = useReactTable({
     data: data || [],
-    columns: columns,
+    columns: registryExportColumns,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
@@ -66,10 +63,10 @@ export function DocExportTable() {
     setGlobalFilter(searchQuery);
   };
 
-  const handleBulkSubmit = () => {
+  const handleBulkExport = () => {
     const selectedRows = table.getSelectedRowModel().rows;
     if (selectedRows.length === 0) {
-      toast.error('กรุณาเลือกรายการที่ต้องการส่งเอกสาร');
+      toast.error('กรุณาเลือกรายการที่ต้องการส่งออก');
       return;
     }
 
@@ -79,27 +76,7 @@ export function DocExportTable() {
       .join(', ');
     const moreCount = selectedRows.length > 3 ? ` และอีก ${selectedRows.length - 3} รายการ` : '';
 
-    toast.success(`ส่งเอกสาร ${selectedRows.length} รายการสำเร็จ`, {
-      description: `เลขที่ลงรับ: ${projectNos}${moreCount}`,
-      duration: 4000,
-    });
-    table.resetRowSelection();
-  };
-
-  const handleBulkApprove = () => {
-    const selectedRows = table.getSelectedRowModel().rows;
-    if (selectedRows.length === 0) {
-      toast.error('กรุณาเลือกรายการที่ต้องการอนุมัติ');
-      return;
-    }
-
-    const projectNos = selectedRows
-      .map((row) => row.original.receive_no)
-      .slice(0, 3)
-      .join(', ');
-    const moreCount = selectedRows.length > 3 ? ` และอีก ${selectedRows.length - 3} รายการ` : '';
-
-    toast.success(`อนุมัติเอกสาร ${selectedRows.length} รายการสำเร็จ`, {
+    toast.success(`ส่งออกทะเบียน ${selectedRows.length} รายการสำเร็จ`, {
       description: `เลขที่ลงรับ: ${projectNos}${moreCount}`,
       duration: 4000,
     });
@@ -127,7 +104,7 @@ export function DocExportTable() {
     }
   };
 
-  const DocExportToolbar = (
+  const RegistryToolbar = (
     <div className="flex flex-1 flex-col gap-4 py-4 md:flex-row md:items-center md:justify-between">
       {/* Left Side: Search & Selection Info */}
       <div className="flex flex-1 items-center gap-4">
@@ -178,19 +155,11 @@ export function DocExportTable() {
         </Button>
         <Button
           variant="brand"
-          onClick={handleBulkSubmit}
+          onClick={handleBulkExport}
           disabled={!hasSelection}
-          title={!hasSelection ? 'กรุณาเลือกรายการก่อนส่งเอกสาร' : 'ส่งเอกสารที่เลือก'}
+          title={!hasSelection ? 'กรุณาเลือกรายการก่อนส่งออก' : 'ส่งออกทะเบียนที่เลือก'}
         >
-          เสนอลงนาม
-        </Button>
-        <Button
-          variant="default"
-          onClick={handleBulkApprove}
-          disabled={!hasSelection}
-          title={!hasSelection ? 'กรุณาเลือกรายการก่อนอนุมัติ' : 'อนุมัติที่เลือก'}
-        >
-          ลงนามเรียบร้อย
+          ส่งออกทะเบียน
         </Button>
       </div>
     </div>
@@ -203,7 +172,7 @@ export function DocExportTable() {
         <div className="flex h-64 w-full flex-col items-center justify-center gap-4 rounded-lg border bg-white">
           <div className="text-muted-foreground text-center">
             <p className="text-lg font-medium">ไม่พบข้อมูลโครงการ</p>
-            <p className="text-sm">ยังไม่มีโครงการที่ต้องการส่งเอกสาร</p>
+            <p className="text-sm">ยังไม่มีโครงการในระบบ</p>
           </div>
         </div>
       )}
@@ -213,8 +182,8 @@ export function DocExportTable() {
         <div className="overflow-hidden">
           <ProjectDataTable
             table={table}
-            columnsLength={columns.length}
-            toolbar={DocExportToolbar}
+            columnsLength={registryExportColumns.length}
+            toolbar={RegistryToolbar}
           />
         </div>
       )}

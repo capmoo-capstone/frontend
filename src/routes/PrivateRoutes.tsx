@@ -1,8 +1,8 @@
 import { Route, Routes } from 'react-router-dom';
 
-import ProjectAccessGuard from '@/components/guards/ProjectAccessGuard';
 import ProtectedRoute from '@/components/guards/ProtectedRoute';
 import { useAuth } from '@/context/AuthContext';
+import { ProjectAccessGuard } from '@/features/projects/components';
 import AppLayout from '@/layouts/AppLayout';
 import OrganizationManagement from '@/pages/admin/OrganizationManagement';
 import ProcumentJobs from '@/pages/assign/AssignJobs';
@@ -27,6 +27,12 @@ export const PrivateRoutes = () => {
         {/* <Route path="/" element={<Home />} />
         <Route path="/app/home" element={<Home />} /> */}
 
+        {/* === PROJECTS === */}
+        <Route path="app/projects" element={<ProjectList />} />
+
+        <Route element={<ProjectAccessGuard />}>
+          <Route path="app/projects/:id" element={<ProjectDetail />} />
+        </Route>
         {/* === DASHBOARDS === */}
         <Route path="app/dashboards/department" element={<DepartmentDashboard />} />
         {/* <Route path="app/dashboards/indiv" element={<IndividualDashboardV2 />} /> */}

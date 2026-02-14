@@ -1,4 +1,4 @@
-import type { ProjectStatus } from '@/types/project';
+import type { ProjectStatus } from '@/features/projects';
 
 export interface NotificationItem {
   id: number;

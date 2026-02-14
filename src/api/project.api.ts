@@ -11,13 +11,9 @@ import {
 import { type Project, ProjectListSchema } from '@/types/project';
 import type { ProjectDetail } from '@/types/project-detail';
 
-import {
-  MOCK_ASSIGNED_PROJECTS,
-  MOCK_PROJECTS,
-  MOCK_PROJECT_DETAIL,
-  MOCK_UNASSIGNED_PROJECTS,
-} from './mock-data';
+import { MOCK_ASSIGNED_PROJECTS, MOCK_PROJECTS, MOCK_UNASSIGNED_PROJECTS } from './mock-data';
 import { mockProjects } from './mock-project';
+import { mockProjects as workflow } from './mock-workflow';
 
 export const getProjects = async (_params?: ProjectFilterParams): Promise<Project[]> => {
   // return mock data;
@@ -30,7 +26,7 @@ export const getProjects = async (_params?: ProjectFilterParams): Promise<Projec
 
 export const getProjectDetail = async (id: string): Promise<ProjectDetail> => {
   // return mock data
-  return MOCK_PROJECT_DETAIL;
+  return workflow.find((project) => project.id === id)!;
   return mockProjects.find((project) => project.id === id)!;
 
   const { data } = await api.get(`/projects/${id}`);

@@ -2,9 +2,9 @@ import { type ColumnDef } from '@tanstack/react-table';
 import { ArrowUpDown } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
+import { type Project } from '@/features/projects';
 import { getProjectStatusFormat, getResponsibleTypeFormat } from '@/lib/formatters';
 import type { User } from '@/types/auth';
-import { type Project } from '@/types/project';
 
 interface MyTasksColumnsProps {
   user?: User;

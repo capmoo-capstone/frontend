@@ -4,11 +4,17 @@ import { RoleEnum } from './auth';
 import { ProcurementTypeEnum, ProjectStatusEnum, UnitResponsibleTypeEnum } from './project';
 
 export const FieldTypeSchema = z.enum([
-  'FILE_UPLOAD',
-  'TEXT_INPUT',
-  'DATE_PICKER',
-  'DATE_WITH_CHECKBOX',
+  'FILE',
+  'TEXT',
+  'NUMBER',
   'BOOLEAN',
+  'DATE',
+  'DUE_DATE_SELECT',
+  'GEN_CONT_NO',
+  'VENDOR_EMAIL',
+  'COMMITTEE_EMAIL',
+  'SELECT_CONTRACT_STATUS',
+  'SELECT_DELIVERY_STATUS',
 ]);
 
 export type FieldType = z.infer<typeof FieldTypeSchema>;
@@ -27,7 +33,7 @@ export const WorkflowDocumentConfigSchema = z.object({
   type: FieldTypeSchema,
   label: z.string(),
   field_key: z.string(),
-  is_required: z.boolean(),
+  mark_as_done: z.boolean(),
 });
 
 export type WorkflowDocumentConfig = z.infer<typeof WorkflowDocumentConfigSchema>;
@@ -45,7 +51,12 @@ export const SubmissionDocumentSchema = z.object({
   field_key: z.string(),
   file_name: z.string().optional(),
   file_path: z.string().optional(),
-  value: z.string().optional(),
+  value: z
+    .string()
+    .optional()
+    .or(z.number().optional())
+    .or(z.boolean().optional())
+    .or(z.array(z.string()).optional()),
 });
 
 export type SubmissionDocument = z.infer<typeof SubmissionDocumentSchema>;

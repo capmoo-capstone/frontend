@@ -1,6 +1,6 @@
 import { useAuth } from '@/context/AuthContext';
 import type { ProjectDetail } from '@/features/projects';
-import { type FieldConfig, type WorkflowStepConfig, useWorkflow } from '@/features/workflow';
+import { type WorkflowStepConfig, useWorkflow } from '@/features/workflow';
 import { isActionRequired } from '@/lib/workflow-utils';
 
 import { DynamicStepForm } from './DynamicStepForm';
@@ -100,7 +100,7 @@ export function ProjectWorkflowSteps({ project, steps }: ProjectWorkflowStepsPro
                       />
                     </StepActionForm>
                   ) : (
-                    <StatusWaitingCard status={status} viewAsRole={user.role} />
+                    <StatusWaitingCard status={status} />
                   )}
                 </div>
               </div>

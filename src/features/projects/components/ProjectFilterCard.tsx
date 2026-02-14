@@ -19,8 +19,8 @@ import { getResponsibleTypeFormat } from '@/lib/formatters';
 
 import { type ProjectFilterParams } from '../api';
 import type { ProcurementType, ProjectStatus, ProjectUrgentStatus } from '../types';
-import { FilterCheckbox } from './filter-checkbox';
-import { SearchCheckbox } from './search-checkbox';
+import { FilterCheckbox } from './FilterCheckbox';
+import { SearchCheckbox } from './SearchCheckbox';
 
 interface ProjectFilterCardProps {
   filters: ProjectFilterParams;

@@ -23,10 +23,10 @@ import {
   useUnassignedProjects,
 } from '../../../hooks/useProjects';
 import { type UnassignedProjectItem } from '../../../types';
-import { CancelProjectDialog } from '../../dialogs/cancel-project-dialog';
-import { ProjectDataTable } from '../data-table';
+import { CancelProjectDialog } from '../../dialogs/CancelProjectDialog';
+import { ProjectDataTable } from '../DataTable';
+import { WorkloadChart } from './WorkloadChart';
 import { getColumns } from './columns';
-import { WorkloadChart } from './workload-chart';
 
 export function UnassignTable({ unitId }: { unitId?: string }) {
   const { user } = useAuth();

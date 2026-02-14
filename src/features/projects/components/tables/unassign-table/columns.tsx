@@ -14,7 +14,7 @@ import { ManageSelfRoles, ManageUnitRoles, SupervisorRoles } from '@/lib/permiss
 import { type Role } from '@/types/auth';
 
 import type { UnassignedProjectItem } from '../../../types';
-import { AssigneeCell } from './assignee-cell';
+import { AssigneeCell } from './AssigneeCell';
 
 interface GetColumnsProps {
   pendingChanges: Record<string, string>;

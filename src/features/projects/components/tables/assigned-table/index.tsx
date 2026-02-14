@@ -23,9 +23,9 @@ import {
   useCancelProject,
 } from '../../../hooks/useProjects';
 import type { AssignedProjectItem } from '../../../types';
-import { CancelProjectDialog } from '../../dialogs/cancel-project-dialog';
-import { ChangeAssigneeDialog } from '../../dialogs/change-assignee-dialog';
-import { ProjectDataTable } from '../data-table';
+import { CancelProjectDialog } from '../../dialogs/CancelProjectDialog';
+import { ChangeAssigneeDialog } from '../../dialogs/ChangeAssigneeDialog';
+import { ProjectDataTable } from '../DataTable';
 import { getColumns } from './columns';
 
 export function AssignedTable({ unitId }: { unitId?: string }) {

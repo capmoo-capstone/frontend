@@ -5,7 +5,7 @@ import { Delete, TextSearch } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 import type { ProjectFilterParams } from '../api';
-import { ProjectFilterCard } from './project-filter-card';
+import { ProjectFilterCard } from './ProjectFilterCard';
 
 interface ProjectFilterPanelProps {
   filters: ProjectFilterParams;

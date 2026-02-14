@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 
 import { useProjects } from '@/features/projects/hooks/useProjects';
 import type { Project } from '@/features/projects/types';
+import { getResponsiblePerson } from '@/lib/formatters';
 
 import type { FinanceExportItem, FinanceExportStatus } from '../types';
 
@@ -22,23 +23,6 @@ const mapToFinanceStatus = (projectStatus: Project['status']): FinanceExportStat
     default:
       return 'NOT_EXPORTED';
   }
-};
-
-// Get responsible person name from assignees
-const getResponsiblePerson = (project: Project): string => {
-  // Priority: procurement assignee, then contract assignee, then creator
-  if (project.assignee_procurement && project.assignee_procurement.length > 0) {
-    const assignee = project.assignee_procurement[0];
-    return `${assignee.name}`;
-  }
-  if (project.assignee_contract && project.assignee_contract.length > 0) {
-    const assignee = project.assignee_contract[0];
-    return `${assignee.name}`;
-  }
-  if (project.creator) {
-    return `${project.creator.name}`;
-  }
-  return 'ไม่ระบุ';
 };
 
 export function useFinanceExport() {

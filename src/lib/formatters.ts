@@ -3,8 +3,31 @@ import { th } from 'date-fns/locale';
 import { Clock, FileCheck, UserCheck, UserCog } from 'lucide-react';
 
 import { type UnitResponsibleType } from '@/features/projects';
-import type { StepStatus } from '@/features/projects';
+import type { Project, StepStatus } from '@/features/projects';
 
+// ==================== PROJECT HELPERS ====================
+
+/**
+ * Get responsible person name from project assignees
+ * Priority: procurement assignee > contract assignee > creator
+ * @param project - Project object
+ * @returns Name of the responsible person or 'ไม่ระบุ' if none found
+ */
+export const getResponsiblePerson = (project: Project): string => {
+  // Priority: procurement assignee, then contract assignee, then creator
+  if (project.assignee_procurement && project.assignee_procurement.length > 0) {
+    const assignee = project.assignee_procurement[0];
+    return `${assignee.name}`;
+  }
+  if (project.assignee_contract && project.assignee_contract.length > 0) {
+    const assignee = project.assignee_contract[0];
+    return `${assignee.name}`;
+  }
+  if (project.creator) {
+    return `${project.creator.name}`;
+  }
+  return 'ไม่ระบุ';
+};
 // ==================== DATE FORMATTERS ====================
 
 /**

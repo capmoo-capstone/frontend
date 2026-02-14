@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import {
   type SortingState,
@@ -8,11 +8,10 @@ import {
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table';
-import { Loader2, Search, X } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { ExportTableToolbar } from '@/components/ExportTableToolbar';
 import { ProjectDataTable } from '@/features/projects/components/tables/DataTable';
 
 import { useDocExport } from '../hooks/useDocExport';
@@ -52,17 +51,7 @@ export function DocExportTable() {
     globalFilterFn: 'includesString',
   });
 
-  // Debounced search - auto-search after 300ms of no typing
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setGlobalFilter(searchQuery);
-    }, 300);
-
-    return () => clearTimeout(timer);
-  }, [searchQuery]);
-
   const handleSearch = () => {
-    // Immediate search on button click
     setGlobalFilter(searchQuery);
   };
 
@@ -127,74 +116,10 @@ export function DocExportTable() {
     }
   };
 
-  const DocExportToolbar = (
-    <div className="flex flex-1 flex-col gap-4 py-4 md:flex-row md:items-center md:justify-between">
-      {/* Left Side: Search & Selection Info */}
-      <div className="flex flex-1 items-center gap-4">
-        <div className="bg-background relative w-full max-w-sm rounded-lg">
-          <Input
-            className="normal pr-20"
-            placeholder="ค้นหาโครงการ, เลขที่ลงรับ, ผู้รับผิดชอบ..."
-            value={searchQuery}
-            onChange={(e) => {
-              setSearchQuery(e.target.value);
-            }}
-            onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-          />
-          {searchQuery && (
-            <Button
-              variant="ghost"
-              size="sm"
-              className="absolute inset-y-0 right-8 flex h-full items-center px-2 hover:bg-transparent"
-              onClick={() => {
-                setSearchQuery('');
-                setGlobalFilter('');
-              }}
-            >
-              <X className="text-muted-foreground h-4 w-4" />
-            </Button>
-          )}
-          <Button
-            variant="ghost"
-            className="absolute inset-y-0 right-0 flex items-center pr-3 hover:bg-transparent"
-            onClick={handleSearch}
-          >
-            <Search className="text-muted-foreground h-4 w-4" />
-          </Button>
-        </div>
-
-        {/* Selection Count */}
-        {hasSelection && (
-          <div className="text-muted-foreground hidden text-sm font-medium whitespace-nowrap md:block">
-            เลือกแล้ว {selectedCount} รายการ
-          </div>
-        )}
-      </div>
-
-      {/* Right Side: Bulk Actions */}
-      <div className="flex flex-wrap items-center gap-3">
-        <Button variant="outline" onClick={handleToggleSelectAll}>
-          {hasSelection ? 'ยกเลิกการเลือก' : 'เลือกทั้งหมด'}
-        </Button>
-        <Button
-          variant="brand"
-          onClick={handleBulkSubmit}
-          disabled={!hasSelection}
-          title={!hasSelection ? 'กรุณาเลือกรายการก่อนส่งเอกสาร' : 'ส่งเอกสารที่เลือก'}
-        >
-          เสนอลงนาม
-        </Button>
-        <Button
-          variant="default"
-          onClick={handleBulkApprove}
-          disabled={!hasSelection}
-          title={!hasSelection ? 'กรุณาเลือกรายการก่อนอนุมัติ' : 'อนุมัติที่เลือก'}
-        >
-          ลงนามเรียบร้อย
-        </Button>
-      </div>
-    </div>
-  );
+  const handleClearSearch = () => {
+    setSearchQuery('');
+    setGlobalFilter('');
+  };
 
   return (
     <div className="space-y-4">
@@ -214,7 +139,32 @@ export function DocExportTable() {
           <ProjectDataTable
             table={table}
             columnsLength={columns.length}
-            toolbar={DocExportToolbar}
+            toolbar={
+              <ExportTableToolbar
+                searchQuery={searchQuery}
+                onSearchChange={setSearchQuery}
+                onSearch={handleSearch}
+                onClearSearch={handleClearSearch}
+                selectedCount={selectedCount}
+                hasSelection={hasSelection}
+                onToggleSelectAll={handleToggleSelectAll}
+                actions={[
+                  {
+                    label: 'เสนอลงนาม',
+                    onClick: handleBulkSubmit,
+                    disabled: !hasSelection,
+                    title: !hasSelection ? 'กรุณาเลือกรายการก่อนส่งเอกสาร' : 'ส่งเอกสารที่เลือก',
+                  },
+                  {
+                    label: 'ลงนามเรียบร้อย',
+                    onClick: handleBulkApprove,
+                    variant: 'default',
+                    disabled: !hasSelection,
+                    title: !hasSelection ? 'กรุณาเลือกรายการก่อนอนุมัติ' : 'อนุมัติที่เลือก',
+                  },
+                ]}
+              />
+            }
           />
         </div>
       )}

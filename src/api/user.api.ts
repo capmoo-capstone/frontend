@@ -1,5 +1,6 @@
 import api from '@/lib/axios';
 import type { User } from '@/types/auth';
+import { AuthUserSchema, enrichUser } from '@/types/auth';
 import { type UserListResponse, UserListResponseSchema } from '@/types/user';
 import { type UserSelectionResponse, UserSelectionResponseSchema } from '@/types/user';
 
@@ -9,6 +10,17 @@ interface GetUsersParams {
   page?: number;
   limit?: number;
 }
+
+export const getMe = async (): Promise<User> => {
+  // return mock data
+  return enrichUser(MOCK_USER);
+
+  const { data } = await api.get('/user/me');
+
+  // Parse and enrich the user data
+  const validatedUser = AuthUserSchema.parse(data.data);
+  return enrichUser(validatedUser);
+};
 
 export const getUsers = async ({
   page = 1,
@@ -42,12 +54,14 @@ export const getUsersForSelection = async (
 };
 
 export const login = async (cunet: string, password: string): Promise<User> => {
-  return MOCK_USER;
+  return enrichUser(MOCK_USER);
 
   const { data } = await api.post('/auth/login', { cunet, password });
-  return data;
+  const validatedUser = AuthUserSchema.parse(data.data || data);
+  return enrichUser(validatedUser);
 };
 
 export const devLogin = async (role: string): Promise<User> => {
-  return MOCK_USERS_BY_ROLE[role] || MOCK_USER;
+  const mockUser = MOCK_USERS_BY_ROLE[role] || MOCK_USER;
+  return enrichUser(mockUser);
 };

@@ -1,8 +1,37 @@
-import type { User } from '@/types/auth';
+import type { Role, User } from '@/types/auth';
 import type { Department } from '@/types/department';
 import type { UserSelectionResponse } from '@/types/user';
 
 import type { AssignedProjectItem, Project, UnassignedProjectItem } from '../types';
+
+// Helper to create a simple user for mock data (e.g., assignees in projects)
+const createMockUser = (
+  id: string,
+  username: string,
+  fullName: string,
+  role: Role,
+  deptId?: string,
+  deptName?: string,
+  unitId?: string,
+  unitName?: string
+): User => ({
+  id,
+  username,
+  full_name: fullName,
+  is_delegated: false,
+  roles: {
+    own: [
+      {
+        role,
+        dept_id: deptId || null,
+        dept_name: deptName || null,
+        unit_id: unitId || null,
+        unit_name: unitName || null,
+      },
+    ],
+    delegated: [],
+  },
+});
 
 export const MOCK_PROJECTS: Project[] = [
   {
@@ -69,24 +98,28 @@ export const MOCK_PROJECTS: Project[] = [
     current_templates_id: 'TEMPLATE-SUPPLIES',
     current_step_id: 'STEP-SIGN-CONTRACT',
     assignee_procurement: [
-      {
-        id: 'u-101',
-        username: 'procure01',
-        name: 'นายสมชาย ใจดี',
-        email: 'somchai@gmail.com',
-        role: 'GENERAL_STAFF',
-        token: 'mock-token-1',
-      },
+      createMockUser(
+        'u-101',
+        'procure01',
+        'นายสมชาย ใจดี',
+        'GENERAL_STAFF',
+        'dept-01',
+        'Procurement Department',
+        'unit-01',
+        'Procurement Unit'
+      ),
     ],
     assignee_contract: [
-      {
-        id: 'u-109',
-        username: 'contract02',
-        name: 'นายปัญญา รอบรู้',
-        email: 'panya@gmail.com',
-        role: 'GENERAL_STAFF',
-        token: 'mock-token-9',
-      },
+      createMockUser(
+        'u-109',
+        'contract02',
+        'นายปัญญา รอบรู้',
+        'GENERAL_STAFF',
+        'dept-01',
+        'Procurement Department',
+        'unit-02',
+        'Contract Unit'
+      ),
     ],
     contract_no: 'CN-67001',
     migo_no: null,
@@ -112,24 +145,28 @@ export const MOCK_PROJECTS: Project[] = [
     current_templates_id: 'TEMPLATE-REPAIR',
     current_step_id: 'STEP-SURVEY',
     assignee_procurement: [
-      {
-        id: 'u-102',
-        username: 'procure02',
-        name: 'นางสาวสมหญิง รักงาน',
-        email: 'somying@gmail.com',
-        role: 'GENERAL_STAFF',
-        token: 'mock-token-2',
-      },
+      createMockUser(
+        'u-102',
+        'procure02',
+        'นางสาวสมหญิง รักงาน',
+        'GENERAL_STAFF',
+        'dept-01',
+        'Procurement Department',
+        'unit-01',
+        'Procurement Unit'
+      ),
     ],
     assignee_contract: [
-      {
-        id: 'u-108',
-        username: 'contract01',
-        name: 'นางสาวชูใจ ใฝ่เรียน',
-        email: 'chujai@gmail.com',
-        role: 'GENERAL_STAFF',
-        token: 'mock-token-9',
-      },
+      createMockUser(
+        'u-108',
+        'contract01',
+        'นางสาวชูใจ ใฝ่เรียน',
+        'GENERAL_STAFF',
+        'dept-01',
+        'Procurement Department',
+        'unit-02',
+        'Contract Unit'
+      ),
     ],
     contract_no: null,
     migo_no: null,
@@ -155,14 +192,16 @@ export const MOCK_PROJECTS: Project[] = [
     current_templates_id: 'TEMPLATE-IT-HARDWARE',
     current_step_id: 'STEP-INSPECT-DELIVERY',
     assignee_procurement: [
-      {
-        id: 'u-102',
-        username: 'procure02',
-        name: 'นางสาวสมหญิง รักงาน',
-        email: 'somying@gmail.com',
-        role: 'GENERAL_STAFF',
-        token: 'mock-token-2',
-      },
+      createMockUser(
+        'u-102',
+        'procure02',
+        'นางสาวสมหญิง รักงาน',
+        'GENERAL_STAFF',
+        'dept-01',
+        'Procurement Department',
+        'unit-01',
+        'Procurement Unit'
+      ),
     ],
     assignee_contract: [],
     contract_no: 'CN-67002',
@@ -189,24 +228,28 @@ export const MOCK_PROJECTS: Project[] = [
     current_templates_id: 'TEMPLATE-CONSULT',
     current_step_id: 'STEP-TOR-DRAFT',
     assignee_procurement: [
-      {
-        id: 'u-102',
-        username: 'procure02',
-        name: 'นางสาวสมหญิง รักงาน',
-        email: 'somying@gmail.com',
-        role: 'GENERAL_STAFF',
-        token: 'mock-token-2',
-      },
+      createMockUser(
+        'u-102',
+        'procure02',
+        'นางสาวสมหญิง รักงาน',
+        'GENERAL_STAFF',
+        'dept-01',
+        'Procurement Department',
+        'unit-01',
+        'Procurement Unit'
+      ),
     ],
     assignee_contract: [
-      {
-        id: 'u-108',
-        username: 'contract01',
-        name: 'นางสาวชูใจ ใฝ่เรียน',
-        email: 'panya@gmail.com',
-        role: 'GENERAL_STAFF',
-        token: 'mock-token-9',
-      },
+      createMockUser(
+        'u-108',
+        'contract01',
+        'นางสาวชูใจ ใฝ่เรียน',
+        'GENERAL_STAFF',
+        'dept-01',
+        'Procurement Department',
+        'unit-02',
+        'Contract Unit'
+      ),
     ],
     contract_no: null,
     migo_no: null,
@@ -232,24 +275,28 @@ export const MOCK_PROJECTS: Project[] = [
     current_templates_id: 'TEMPLATE-FURNITURE',
     current_step_id: 'STEP-CLOSE',
     assignee_procurement: [
-      {
-        id: 'u-102',
-        username: 'procure02',
-        name: 'นางสาวสมหญิง รักงาน',
-        email: 'somying@gmail.com',
-        role: 'GENERAL_STAFF',
-        token: 'mock-token-2',
-      },
+      createMockUser(
+        'u-102',
+        'procure02',
+        'นางสาวสมหญิง รักงาน',
+        'GENERAL_STAFF',
+        'dept-01',
+        'Procurement Department',
+        'unit-01',
+        'Procurement Unit'
+      ),
     ],
     assignee_contract: [
-      {
-        id: 'u-109',
-        username: 'contract02',
-        name: 'นายปัญญา รอบรู้',
-        email: 'panya@gmail.com',
-        role: 'GENERAL_STAFF',
-        token: 'mock-token-9',
-      },
+      createMockUser(
+        'u-109',
+        'contract02',
+        'นายปัญญา รอบรู้',
+        'GENERAL_STAFF',
+        'dept-01',
+        'Procurement Department',
+        'unit-02',
+        'Contract Unit'
+      ),
     ],
     contract_no: 'CN-67003',
     migo_no: 'MIGO-67002',
@@ -300,14 +347,16 @@ export const MOCK_PROJECTS: Project[] = [
     current_templates_id: 'TEMPLATE-SUPPLIES',
     current_step_id: 'STEP-PRICE-COMPARE',
     assignee_procurement: [
-      {
-        id: 'u-103',
-        username: 'procure03',
-        name: 'นายวิทยา ฉลาดซื้อ',
-        email: 'vidya@gmail.com',
-        role: 'GENERAL_STAFF',
-        token: 'mock-token-3',
-      },
+      createMockUser(
+        'u-103',
+        'procure03',
+        'นายวิทยา ฉลาดซื้อ',
+        'GENERAL_STAFF',
+        'dept-01',
+        'Procurement Department',
+        'unit-01',
+        'Procurement Unit'
+      ),
     ],
     assignee_contract: [],
     contract_no: null,
@@ -334,14 +383,16 @@ export const MOCK_PROJECTS: Project[] = [
     current_templates_id: 'TEMPLATE-SERVICE-SECURITY',
     current_step_id: 'STEP-MONTHLY-INSPECT',
     assignee_procurement: [
-      {
-        id: 'u-104',
-        username: 'procure04',
-        name: 'นางสาวสมปอง ปลอดภัย',
-        email: 'sompong@gmail.com',
-        role: 'GENERAL_STAFF',
-        token: 'mock-token-4',
-      },
+      createMockUser(
+        'u-104',
+        'procure04',
+        'นางสาวสมปอง ปลอดภัย',
+        'GENERAL_STAFF',
+        'dept-01',
+        'Procurement Department',
+        'unit-01',
+        'Procurement Unit'
+      ),
     ],
     assignee_contract: [],
     contract_no: 'CN-67004',
@@ -368,14 +419,16 @@ export const MOCK_PROJECTS: Project[] = [
     current_templates_id: 'TEMPLATE-SOFTWARE',
     current_step_id: 'STEP-VENDOR-SELECTION',
     assignee_procurement: [
-      {
-        id: 'u-101',
-        username: 'procure01',
-        name: 'นายสมชาย ใจดี',
-        email: 'somchai@gmail.com',
-        role: 'GENERAL_STAFF',
-        token: 'mock-token-1',
-      },
+      createMockUser(
+        'u-101',
+        'procure01',
+        'นายสมชาย ใจดี',
+        'GENERAL_STAFF',
+        'dept-01',
+        'Procurement Department',
+        'unit-01',
+        'Procurement Unit'
+      ),
     ],
     assignee_contract: [],
     contract_no: null,
@@ -402,14 +455,16 @@ export const MOCK_PROJECTS: Project[] = [
     current_templates_id: 'TEMPLATE-VEHICLE',
     current_step_id: 'STEP-GUARANTEE-CHECK',
     assignee_procurement: [
-      {
-        id: 'u-104',
-        username: 'procure04',
-        name: 'นางสาวสมปอง ปลอดภัย',
-        email: 'sompong@gmail.com',
-        role: 'GENERAL_STAFF',
-        token: 'mock-token-4',
-      },
+      createMockUser(
+        'u-104',
+        'procure04',
+        'นางสาวสมปอง ปลอดภัย',
+        'GENERAL_STAFF',
+        'dept-01',
+        'Procurement Department',
+        'unit-01',
+        'Procurement Unit'
+      ),
     ],
     assignee_contract: [],
     contract_no: 'CN-67005',
@@ -436,24 +491,28 @@ export const MOCK_PROJECTS: Project[] = [
     current_templates_id: 'TEMPLATE-MAINTENANCE',
     current_step_id: 'STEP-PAYMENT',
     assignee_procurement: [
-      {
-        id: 'u-102',
-        username: 'procure02',
-        name: 'นางสาวสมหญิง ใจดี',
-        email: 'somying@gmail.com',
-        role: 'GENERAL_STAFF',
-        token: 'mock-token-2',
-      },
+      createMockUser(
+        'u-102',
+        'procure02',
+        'นางสาวสมหญิง ใจดี',
+        'GENERAL_STAFF',
+        'dept-01',
+        'Procurement Department',
+        'unit-01',
+        'Procurement Unit'
+      ),
     ],
     assignee_contract: [
-      {
-        id: 'u-105',
-        username: 'contract05',
-        name: 'นายสมชาย สัญญา',
-        email: 'somchai.contract@gmail.com',
-        role: 'GENERAL_STAFF',
-        token: 'mock-token-5',
-      },
+      createMockUser(
+        'u-105',
+        'contract05',
+        'นายสมชาย สัญญา',
+        'GENERAL_STAFF',
+        'dept-01',
+        'Procurement Department',
+        'unit-02',
+        'Contract Unit'
+      ),
     ],
     contract_no: null,
     migo_no: 'MIGO-67004',
@@ -479,14 +538,16 @@ export const MOCK_PROJECTS: Project[] = [
     current_templates_id: 'TEMPLATE-CHEMICAL',
     current_step_id: 'STEP-APPROVE-BUDGET',
     assignee_procurement: [
-      {
-        id: 'u-102',
-        username: 'procure02',
-        name: 'นางสาวสมหญิง ใจดี',
-        email: 'somying@gmail.com',
-        role: 'GENERAL_STAFF',
-        token: 'mock-token-2',
-      },
+      createMockUser(
+        'u-102',
+        'procure02',
+        'นางสาวสมหญิง ใจดี',
+        'GENERAL_STAFF',
+        'dept-01',
+        'Procurement Department',
+        'unit-01',
+        'Procurement Unit'
+      ),
     ],
     assignee_contract: [],
     contract_no: null,
@@ -513,14 +574,16 @@ export const MOCK_PROJECTS: Project[] = [
     current_templates_id: 'TEMPLATE-DESIGN',
     current_step_id: 'STEP-DRAFT-REQ',
     assignee_procurement: [
-      {
-        id: 'u-103',
-        username: 'procure03',
-        name: 'นายวิทยา ฉลาดซื้อ',
-        email: 'vidya@gmail.com',
-        role: 'GENERAL_STAFF',
-        token: 'mock-token-3',
-      },
+      createMockUser(
+        'u-103',
+        'procure03',
+        'นายวิทยา ฉลาดซื้อ',
+        'GENERAL_STAFF',
+        'dept-01',
+        'Procurement Department',
+        'unit-01',
+        'Procurement Unit'
+      ),
     ],
     assignee_contract: [],
     contract_no: null,
@@ -547,14 +610,16 @@ export const MOCK_PROJECTS: Project[] = [
     current_templates_id: 'TEMPLATE-TRAINING',
     current_step_id: 'STEP-EVALUATE',
     assignee_procurement: [
-      {
-        id: 'u-103',
-        username: 'procure03',
-        name: 'นายวิทยา ฉลาดซื้อ',
-        email: 'vidya@gmail.com',
-        role: 'GENERAL_STAFF',
-        token: 'mock-token-3',
-      },
+      createMockUser(
+        'u-103',
+        'procure03',
+        'นายวิทยา ฉลาดซื้อ',
+        'GENERAL_STAFF',
+        'dept-01',
+        'Procurement Department',
+        'unit-01',
+        'Procurement Unit'
+      ),
     ],
     assignee_contract: [],
     contract_no: 'CN-67006',
@@ -581,24 +646,28 @@ export const MOCK_PROJECTS: Project[] = [
     current_templates_id: 'TEMPLATE-LAB-EQUIP',
     current_step_id: 'STEP-ANNOUNCE',
     assignee_procurement: [
-      {
-        id: 'u-101',
-        username: 'procure01',
-        name: 'นายสมชาย ใจดี',
-        email: 'somchai@gmail.com',
-        role: 'GENERAL_STAFF',
-        token: 'mock-token-1',
-      },
+      createMockUser(
+        'u-101',
+        'procure01',
+        'นายสมชาย ใจดี',
+        'GENERAL_STAFF',
+        'dept-01',
+        'Procurement Department',
+        'unit-01',
+        'Procurement Unit'
+      ),
     ],
     assignee_contract: [
-      {
-        id: 'u-106',
-        username: 'contract06',
-        name: 'นางสาวสุดา มีความรู้',
-        email: 'suda@gmail.com',
-        role: 'GENERAL_STAFF',
-        token: 'mock-token-6',
-      },
+      createMockUser(
+        'u-106',
+        'contract06',
+        'นางสาวสุดา มีความรู้',
+        'GENERAL_STAFF',
+        'dept-01',
+        'Procurement Department',
+        'unit-02',
+        'Contract Unit'
+      ),
     ],
     contract_no: null,
     migo_no: null,
@@ -624,24 +693,28 @@ export const MOCK_PROJECTS: Project[] = [
     current_templates_id: 'TEMPLATE-REPAIR',
     current_step_id: 'STEP-CLOSE',
     assignee_procurement: [
-      {
-        id: 'u-102',
-        username: 'procure02',
-        name: 'นางสาวสมหญิง รักงาน',
-        email: 'somying@gmail.com',
-        role: 'GENERAL_STAFF',
-        token: 'mock-token-2',
-      },
+      createMockUser(
+        'u-102',
+        'procure02',
+        'นางสาวสมหญิง รักงาน',
+        'GENERAL_STAFF',
+        'dept-01',
+        'Procurement Department',
+        'unit-01',
+        'Procurement Unit'
+      ),
     ],
     assignee_contract: [
-      {
-        id: 'u-105',
-        username: 'contract05',
-        name: 'นายสมชาย สัญญา',
-        email: 'somchai@gmail.com',
-        role: 'GENERAL_STAFF',
-        token: 'mock-token-5',
-      },
+      createMockUser(
+        'u-105',
+        'contract05',
+        'นายสมชาย สัญญา',
+        'GENERAL_STAFF',
+        'dept-01',
+        'Procurement Department',
+        'unit-02',
+        'Contract Unit'
+      ),
     ],
     contract_no: null,
     migo_no: 'MIGO-67005',
@@ -667,24 +740,28 @@ export const MOCK_PROJECTS: Project[] = [
     current_templates_id: 'TEMPLATE-SUPPLIES',
     current_step_id: 'STEP-STOCK-CHECK',
     assignee_procurement: [
-      {
-        id: 'u-101',
-        username: 'procure01',
-        name: 'นายสมชาย ใจดี',
-        email: 'somchai@gmail.com',
-        role: 'GENERAL_STAFF',
-        token: 'mock-token-1',
-      },
+      createMockUser(
+        'u-101',
+        'procure01',
+        'นายสมชาย ใจดี',
+        'GENERAL_STAFF',
+        'dept-01',
+        'Procurement Department',
+        'unit-01',
+        'Procurement Unit'
+      ),
     ],
     assignee_contract: [
-      {
-        id: 'u-109',
-        username: 'contract02',
-        name: 'นายปัญญา รอบรู้',
-        email: 'panya@gmail.com',
-        role: 'GENERAL_STAFF',
-        token: 'mock-token-9',
-      },
+      createMockUser(
+        'u-109',
+        'contract02',
+        'นายปัญญา รอบรู้',
+        'GENERAL_STAFF',
+        'dept-01',
+        'Procurement Department',
+        'unit-02',
+        'Contract Unit'
+      ),
     ],
     contract_no: null,
     migo_no: null,
@@ -710,24 +787,28 @@ export const MOCK_PROJECTS: Project[] = [
     current_templates_id: 'TEMPLATE-SOFTWARE-DEV',
     current_step_id: 'STEP-TOR-COMMITTEE',
     assignee_procurement: [
-      {
-        id: 'u-101',
-        username: 'procure01',
-        name: 'นายสมชาย ใจดี',
-        email: 'somchai@gmail.com',
-        role: 'GENERAL_STAFF',
-        token: 'mock-token-1',
-      },
+      createMockUser(
+        'u-101',
+        'procure01',
+        'นายสมชาย ใจดี',
+        'GENERAL_STAFF',
+        'dept-01',
+        'Procurement Department',
+        'unit-01',
+        'Procurement Unit'
+      ),
     ],
     assignee_contract: [
-      {
-        id: 'u-108',
-        username: 'contract02',
-        name: 'นางสาวปรียา พัฒนา',
-        email: 'priya@gmail.com',
-        role: 'GENERAL_STAFF',
-        token: 'mock-token-8',
-      },
+      createMockUser(
+        'u-108',
+        'contract02',
+        'นางสาวปรียา พัฒนา',
+        'GENERAL_STAFF',
+        'dept-01',
+        'Procurement Department',
+        'unit-02',
+        'Contract Unit'
+      ),
     ],
     contract_no: null,
     migo_no: null,
@@ -1209,117 +1290,184 @@ export const MOCK_USER_SELECTION: UserSelectionResponse = {
 export const MOCK_USER: User = {
   id: 'user-01',
   username: 'user',
-  name: 'user',
-  email: 'user@gmail.com',
-  role: 'GENERAL_STAFF',
-  isStaff: true,
-  department: {
-    id: 'dept-01',
-    name: 'procurement',
+  full_name: 'General Staff User',
+  is_delegated: false,
+  roles: {
+    own: [
+      {
+        role: 'GENERAL_STAFF',
+        dept_id: 'dept-01',
+        dept_name: 'procurement',
+        unit_id: 'unit-01',
+        unit_name: 'procurement-1',
+      },
+    ],
+    delegated: [],
   },
-  unit: {
-    id: 'unit-01',
-    name: 'procurement-1',
-  },
-  token: 'mock-token-123',
 };
 
 export const MOCK_USERS_BY_ROLE: Record<string, User> = {
   SUPER_ADMIN: {
     id: 'user-super-admin',
     username: 'superadmin',
-    name: 'Super Admin User',
-    email: 'superadmin@example.com',
-    role: 'SUPER_ADMIN',
-    isStaff: true,
-    department: { id: 'dept-01', name: 'Administration' },
-    unit: { id: 'unit-01', name: 'Executive Office' },
-    token: 'mock-token-super-admin',
+    full_name: 'Super Admin User',
+    is_delegated: false,
+    roles: {
+      own: [
+        {
+          role: 'SUPER_ADMIN',
+          dept_id: 'dept-01',
+          dept_name: 'Administration',
+          unit_id: 'unit-01',
+          unit_name: 'Executive Office',
+        },
+      ],
+      delegated: [],
+    },
   },
   ADMIN: {
     id: 'user-admin',
     username: 'admin',
-    name: 'Admin User',
-    email: 'admin@example.com',
-    role: 'ADMIN',
-    isStaff: true,
-    department: { id: 'dept-01', name: 'Administration' },
-    unit: { id: 'unit-02', name: 'Admin Office' },
-    token: 'mock-token-admin',
+    full_name: 'Admin User',
+    is_delegated: false,
+    roles: {
+      own: [
+        {
+          role: 'ADMIN',
+          dept_id: 'dept-01',
+          dept_name: 'Administration',
+          unit_id: 'unit-02',
+          unit_name: 'Admin Office',
+        },
+      ],
+      delegated: [],
+    },
   },
   HEAD_OF_DEPARTMENT: {
     id: 'user-hod',
     username: 'hod',
-    name: 'Head of Department',
-    email: 'hod@example.com',
-    role: 'HEAD_OF_DEPARTMENT',
-    isStaff: false,
-    department: { id: 'dept-02', name: 'Procurement Department' },
-    token: 'mock-token-hod',
+    full_name: 'Head of Department',
+    is_delegated: false,
+    roles: {
+      own: [
+        {
+          role: 'HEAD_OF_DEPARTMENT',
+          dept_id: 'dept-02',
+          dept_name: 'Procurement Department',
+          unit_id: null,
+          unit_name: null,
+        },
+      ],
+      delegated: [],
+    },
   },
   HEAD_OF_UNIT: {
     id: 'user-hou',
     username: 'hou',
-    name: 'Head of Unit',
-    email: 'hou@example.com',
-    role: 'HEAD_OF_UNIT',
-    isStaff: false,
-    department: { id: 'dept-02', name: 'Procurement Department' },
-    unit: { id: 'unit-03', name: 'Procurement Unit 1' },
-    token: 'mock-token-hou',
+    full_name: 'Head of Unit',
+    is_delegated: false,
+    roles: {
+      own: [
+        {
+          role: 'HEAD_OF_UNIT',
+          dept_id: 'dept-02',
+          dept_name: 'Procurement Department',
+          unit_id: 'unit-03',
+          unit_name: 'Procurement Unit 1',
+        },
+      ],
+      delegated: [],
+    },
   },
   REPRESENTATIVE: {
     id: 'user-rep',
     username: 'representative',
-    name: 'Representative User',
-    email: 'rep@example.com',
-    role: 'REPRESENTATIVE',
-    isStaff: false,
-    department: { id: 'dept-03', name: 'Academic Department' },
-    unit: { id: 'unit-04', name: 'Academic Unit 1' },
-    token: 'mock-token-rep',
+    full_name: 'Representative User',
+    is_delegated: false,
+    roles: {
+      own: [
+        {
+          role: 'REPRESENTATIVE',
+          dept_id: 'dept-03',
+          dept_name: 'Academic Department',
+          unit_id: 'unit-04',
+          unit_name: 'Academic Unit 1',
+        },
+      ],
+      delegated: [],
+    },
   },
   DOCUMENT_STAFF: {
     id: 'user-doc',
     username: 'docstaff',
-    name: 'Document Staff',
-    email: 'docstaff@example.com',
-    role: 'DOCUMENT_STAFF',
-    isStaff: true,
-    department: { id: 'dept-01', name: 'Procurement Department' },
-    unit: { id: 'unit-05', name: 'Document Processing' },
-    token: 'mock-token-doc',
+    full_name: 'Document Staff',
+    is_delegated: false,
+    roles: {
+      own: [
+        {
+          role: 'DOCUMENT_STAFF',
+          dept_id: 'dept-01',
+          dept_name: 'Procurement Department',
+          unit_id: 'unit-05',
+          unit_name: 'Document Processing',
+        },
+      ],
+      delegated: [],
+    },
   },
   FINANCE_STAFF: {
     id: 'user-finance',
     username: 'financestaff',
-    name: 'Finance Staff',
-    email: 'finance@example.com',
-    role: 'FINANCE_STAFF',
-    isStaff: true,
-    department: { id: 'dept-04', name: 'Finance Department' },
-    unit: { id: 'unit-06', name: 'Finance Unit' },
-    token: 'mock-token-finance',
+    full_name: 'Finance Staff',
+    is_delegated: false,
+    roles: {
+      own: [
+        {
+          role: 'FINANCE_STAFF',
+          dept_id: 'dept-04',
+          dept_name: 'Finance Department',
+          unit_id: 'unit-06',
+          unit_name: 'Finance Unit',
+        },
+      ],
+      delegated: [],
+    },
   },
   GENERAL_STAFF: {
     id: 'user-general',
     username: 'generalstaff',
-    name: 'General Staff',
-    email: 'general@example.com',
-    role: 'GENERAL_STAFF',
-    isStaff: true,
-    department: { id: 'dept-01', name: 'Procurement Department' },
-    unit: { id: 'unit-07', name: 'General Services' },
-    token: 'mock-token-general',
+    full_name: 'General Staff',
+    is_delegated: false,
+    roles: {
+      own: [
+        {
+          role: 'GENERAL_STAFF',
+          dept_id: 'dept-01',
+          dept_name: 'Procurement Department',
+          unit_id: 'unit-07',
+          unit_name: 'General Services',
+        },
+      ],
+      delegated: [],
+    },
   },
   GUEST: {
     id: 'user-guest',
     username: 'guest',
-    name: 'Guest User',
-    email: 'guest@example.com',
-    role: 'GUEST',
-    isStaff: false,
-    token: 'mock-token-guest',
+    full_name: 'Guest User',
+    is_delegated: false,
+    roles: {
+      own: [
+        {
+          role: 'GUEST',
+          dept_id: null,
+          dept_name: null,
+          unit_id: null,
+          unit_name: null,
+        },
+      ],
+      delegated: [],
+    },
   },
 };
 

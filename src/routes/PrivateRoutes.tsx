@@ -1,7 +1,10 @@
 import { lazy } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 
+import PermissionGuard from '@/components/guards/ProtectedRoute';
+import { useAuth } from '@/context/AuthContext';
 import AppLayout from '@/layouts/AppLayout';
+import { hasImportProjectPermission } from '@/lib/permissions';
 
 // --- Lazy Load Pages ---
 const Home = lazy(() => import('@/pages/home/Home'));
@@ -16,6 +19,7 @@ const StaffKpi = lazy(() => import('@/pages/dashboard/StaffKpi'));
 const ProjectList = lazy(() => import('@/pages/projects/ProjectList'));
 const ProjectDetail = lazy(() => import('@/pages/projects/ProjectDetail'));
 const ProjectImport = lazy(() => import('@/pages/projects/ProjectImport'));
+const ProjectImportSuccess = lazy(() => import('@/pages/projects/ProjectImportSuccess'));
 
 // Exports
 const FinanceExportPage = lazy(() => import('@/pages/projects/FinanceExport'));
@@ -28,6 +32,11 @@ const ProcumentJobs = lazy(() => import('@/pages/assign/AssignJobs'));
 const VendorSubmission = lazy(() => import('@/pages/vendor/VendorSubmission'));
 
 export const PrivateRoutes = () => {
+  const { user } = useAuth();
+
+  // permission checks
+  const canImportProjects = user ? hasImportProjectPermission(user) : false;
+
   return (
     <AppLayout>
       <Routes>
@@ -42,7 +51,12 @@ export const PrivateRoutes = () => {
         {/* --- Projects (The Unified View) --- */}
         <Route path="/app/projects" element={<ProjectList />} />
         <Route path="/app/projects/:id" element={<ProjectDetail />} />
-        <Route path="/app/projects/import" element={<ProjectImport />} />
+        <Route
+          element={<PermissionGuard isAllowed={canImportProjects} redirectPath="/app/projects" />}
+        >
+          <Route path="/app/projects/import" element={<ProjectImport />} />
+          <Route path="/app/projects/import/success" element={<ProjectImportSuccess />} />
+        </Route>
 
         {/* --- Exports --- */}
         <Route path="/app/exports/finance" element={<FinanceExportPage />} />

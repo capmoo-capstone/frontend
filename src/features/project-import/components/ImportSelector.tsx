@@ -12,7 +12,7 @@ const optionClasses =
 
 export function ImportSelector({ onSelect }: Props) {
   return (
-    <>
+    <div className="flex h-full flex-col items-center justify-center">
       {/* Title */}
       <h1 className="h1-topic text-primary text-center">นำเข้าโครงการ</h1>
 
@@ -35,6 +35,6 @@ export function ImportSelector({ onSelect }: Props) {
           <p className="normal text-primary">กรอกข้อมูลด้วยตนเอง</p>
         </div>
       </div>
-    </>
+    </div>
   );
 }

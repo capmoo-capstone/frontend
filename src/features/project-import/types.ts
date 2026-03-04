@@ -23,7 +23,7 @@ export const ProjectImportSchema = z.object({
   department_id: z.string().min(1, 'กรุณาเลือกหน่วยงาน'),
   unit_id: z.string().min(1, 'กรุณาเลือกฝ่าย'),
   fiscal_year: z.string(),
-  budget_plan_ids: z.array(z.string()).optional(),
+  budget_plan_ids: z.array(z.string()),
 });
 
 export type ProjectImportPayload = z.infer<typeof ProjectImportSchema>;

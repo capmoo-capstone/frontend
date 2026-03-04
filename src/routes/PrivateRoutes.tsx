@@ -1,7 +1,7 @@
 import { lazy } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 
-import PermissionGuard from '@/components/guards/ProtectedRoute';
+import PermissionGuard from '@/components/guards/PermissionGuard';
 import { useAuth } from '@/context/AuthContext';
 import AppLayout from '@/layouts/AppLayout';
 import { hasImportProjectPermission } from '@/lib/permissions';

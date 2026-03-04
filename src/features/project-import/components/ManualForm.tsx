@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { differenceInDays, isBefore, startOfDay } from 'date-fns';
+import { differenceInDays } from 'date-fns';
 import { ChevronDown, X } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -44,15 +44,16 @@ export function ManualForm({ onBack, onSuccess }: Props) {
   const fiscalYears = Array.from({ length: 7 }, (_, i) => (currentYear - 3 + i).toString());
 
   const form = useForm<ProjectImportPayload>({
-    resolver: zodResolver(ProjectImportSchema),
+    resolver: zodResolver(ProjectImportSchema) as any,
     defaultValues: {
       pr_no: '',
       title: '',
       description: '',
       procurement_type: '',
       fiscal_year: currentYear.toString(),
-      department_id: '',
-      unit_id: '',
+      // Set default values if the user is not procurement
+      department_id: canSelectEveryUnits ? '' : user?.department?.id || '',
+      unit_id: canSelectEveryUnits ? '' : user?.unit?.id || '',
       budget_plan_ids: [],
       budget: 0,
     },
@@ -71,6 +72,19 @@ export function ManualForm({ onBack, onSuccess }: Props) {
     watchFiscalYear
   );
 
+  // Cascade Reset - Clear Unit and Budget Plans when Department changes
+  useEffect(() => {
+    if (canSelectEveryUnits) {
+      form.setValue('unit_id', '');
+      form.setValue('budget_plan_ids', []);
+    }
+  }, [watchDeptId, canSelectEveryUnits, form]);
+
+  // Cascade Reset - Clear Budget Plans when Unit or Year changes
+  useEffect(() => {
+    form.setValue('budget_plan_ids', []);
+  }, [watchUnitId, watchFiscalYear, form]);
+
   // Logic: Auto-calculate budget when a plan is selected
   useEffect(() => {
     if (selectedPlans.length > 0 && budgetPlans) {
@@ -81,7 +95,7 @@ export function ManualForm({ onBack, onSuccess }: Props) {
     } else {
       form.setValue('budget', 0, { shouldValidate: true });
     }
-  }, [selectedPlans, form]);
+  }, [selectedPlans, budgetPlans, form]);
 
   const onSubmit = (data: ProjectImportPayload) => {
     if (data.delivery_date && data.procurement_type) {
@@ -133,7 +147,7 @@ export function ManualForm({ onBack, onSuccess }: Props) {
                   <Select
                     onValueChange={field.onChange}
                     value={field.value ?? ''}
-                    disabled={isLoadingDepts}
+                    disabled={isLoadingDepts || !canSelectEveryUnits}
                   >
                     <SelectTrigger
                       id={field.name}
@@ -168,7 +182,7 @@ export function ManualForm({ onBack, onSuccess }: Props) {
                   <Select
                     onValueChange={field.onChange}
                     value={field.value ?? ''}
-                    disabled={isLoadingUnits || !watchDeptId}
+                    disabled={isLoadingUnits || !watchDeptId || !canSelectEveryUnits}
                   >
                     <SelectTrigger
                       id={field.name}
@@ -269,9 +283,7 @@ export function ManualForm({ onBack, onSuccess }: Props) {
                                 </div>
                               ))
                             ) : (
-                              <span className="normal-normal">
-                                กรุณาเลือกแผนงบประมาณ
-                              </span>
+                              <span className="normal-normal">กรุณาเลือกแผนงบประมาณ</span>
                             )}
                           </div>
                           <ChevronDown className="text-muted-foreground ml-2 h-4 w-4 shrink-0" />
@@ -447,14 +459,20 @@ export function ManualForm({ onBack, onSuccess }: Props) {
                     type="number"
                     placeholder="กรุณากรอกวงเงินงบประมาณ"
                     aria-invalid={fieldState.invalid}
+                    className={cn(
+                      showBudgetWarning &&
+                        !fieldState.invalid &&
+                        'border-warning focus-visible:ring-warning-light',
+                    )}
                     onChange={(e) => field.onChange(e.target.valueAsNumber || 0)}
                   />
-                  {showBudgetWarning && (
-                    <p className="mt-2 rounded bg-amber-50 p-2 text-sm text-amber-700">
-                      ⚠️ ยอดเงินน้อยกว่าแผนงบประมาณที่เลือกไว้ ({calculatedSum.toLocaleString()}{' '}
-                      บาท)
+
+                  {showBudgetWarning && !fieldState.invalid && (
+                    <p className="caption text-warning-dark">
+                      จำนวนเงินน้อยกว่าวงเงินงบประมาณที่ตั้งไว้
                     </p>
                   )}
+
                   {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                 </Field>
               )}
@@ -464,10 +482,10 @@ export function ManualForm({ onBack, onSuccess }: Props) {
 
         {/* Action Buttons */}
         <div className="flex w-full justify-end gap-4">
-          <Button form="manual-form" type="submit" variant="default" className="min-w-[100px]">
+          <Button form="manual-form" type="submit" variant="brand" className="min-w-25">
             {dateWarning ? 'ยืนยันวันส่งมอบ' : 'ยืนยัน'}
           </Button>
-          <Button type="button" variant="outline" onClick={onBack} className="min-w-[100px]">
+          <Button type="button" variant="outline" onClick={onBack} className="min-w-25">
             ยกเลิก
           </Button>
         </div>

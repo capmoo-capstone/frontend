@@ -11,15 +11,16 @@ export const PROCUREMENT_MIN_DAYS: Record<string, number> = {
 };
 
 export const ProjectImportSchema = z.object({
-  pr_no: z.string().min(1, 'กรุณากรอกเลขที่ใบขอซื้อขอจ้าง'),
+  pr_no: z.string().optional(),
   lesspaper_no: z.string().optional(),
-  title: z.string().min(1, 'กรุณากรอกชื่อโครงการ'),
-  description: z.string().optional(),
+  title: z.string().min(1, 'กรุณาระบุชื่อโครงการ'),
+  description: z.string().min(1, 'กรุณาระบุรายละเอียดโครงการ'),
   procurement_type: z.string().min(1, 'กรุณาเลือกวิธีการจัดหา'),
   delivery_date: z
     .date({ message: 'กรุณาเลือกวันที่ส่งมอบ' })
-    .refine((date) => date > new Date(), { message: 'วันที่ส่งมอบต้องเป็นวันที่ในอนาคต' }),
-  budget: z.number().positive('วงเงินงบประมาณต้องมากกว่า 0'),
+    .refine((date) => date > new Date(), { message: 'กรุณาระบุวันที่ในอนาคต' })
+    .optional(),
+  budget: z.coerce.number().positive('วงเงินงบประมาณต้องมากกว่า 0'),
   department_id: z.string().min(1, 'กรุณาเลือกหน่วยงาน'),
   unit_id: z.string().min(1, 'กรุณาเลือกฝ่าย'),
   fiscal_year: z.string(),

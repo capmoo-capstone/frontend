@@ -90,7 +90,7 @@ export function ManualForm({ onBack, onSuccess }: Props) {
         </div>
       </div>
       <ConfirmationDialog
-        open={true || showConfirmationDialog}
+        open={showConfirmationDialog}
         onOpenChange={handleCancel}
         onConfirm={handleConfirm}
         onCancel={handleCancel}

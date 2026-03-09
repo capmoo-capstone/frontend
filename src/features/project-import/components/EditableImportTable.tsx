@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { type ColumnDef, flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table';
 import { File, Trash2 } from 'lucide-react';
@@ -51,17 +51,36 @@ const EditableCell = ({ getValue, row: { index }, column: { id }, table }: any) 
   const departments = table.options.meta?.departments;
   const fiscalYears = table.options.meta?.fiscalYears;
   const errors = table.options.meta?.errors || [];
-  const value = initialValue ?? '';
+
+  // 🌟 1. Create Local State so typing is smooth without waiting for the whole table to re-render
+  const [value, setValue] = useState(initialValue ?? '');
+
+  // 🌟 2. Update Local State if data changes from outside (such as loading a new file or deleting a row)
+  useEffect(() => {
+    setValue(initialValue ?? '');
+  }, [initialValue]);
+
+  // 🌟 3. Function to update the main table, which runs only when "clicking outside the box (Blur)"
+  const onBlur = () => {
+    let finalValue = value;
+    if (id === 'budget') {
+      finalValue = value === '' ? '' : Number(value); // convert to number if it is the budget field
+    }
+    updateData(index, id, finalValue);
+  };
 
   const cellError = errors.find(
     (err: ValidationError) => err.rowIndex === index && err.field === id
   );
   const hasError = !!cellError;
 
+  // --------------------------------------------------------
+  // Dropdown and DatePicker group (no typing lag issue, so updateData can be called directly)
+  // --------------------------------------------------------
   if (id === 'procurement_type') {
     return (
       <div className="flex w-full flex-col gap-1">
-        <Select value={value} onValueChange={(val) => updateData(index, id, val)}>
+        <Select value={initialValue ?? ''} onValueChange={(val) => updateData(index, id, val)}>
           <SelectTrigger
             className={cn('bg-background h-9 w-full', hasError && 'border-destructive')}
           >
@@ -83,7 +102,7 @@ const EditableCell = ({ getValue, row: { index }, column: { id }, table }: any) 
   if (id === 'department_id') {
     return (
       <div className="flex w-full flex-col gap-1">
-        <Select value={value} onValueChange={(val) => updateData(index, id, val)}>
+        <Select value={initialValue ?? ''} onValueChange={(val) => updateData(index, id, val)}>
           <SelectTrigger
             className={cn('bg-background h-9 w-full', hasError && 'border-destructive')}
           >
@@ -106,7 +125,7 @@ const EditableCell = ({ getValue, row: { index }, column: { id }, table }: any) 
   if (id === 'fiscal_year') {
     return (
       <div className="flex w-full flex-col gap-1">
-        <Select value={value} onValueChange={(val) => updateData(index, id, val)}>
+        <Select value={initialValue ?? ''} onValueChange={(val) => updateData(index, id, val)}>
           <SelectTrigger
             className={cn('bg-background h-9 w-full', hasError && 'border-destructive')}
           >
@@ -127,7 +146,7 @@ const EditableCell = ({ getValue, row: { index }, column: { id }, table }: any) 
   }
 
   if (id === 'delivery_date_str') {
-    const dateValue = value ? new Date(value) : undefined;
+    const dateValue = initialValue ? new Date(initialValue) : undefined;
 
     return (
       <div className="flex w-full flex-col gap-1">
@@ -145,17 +164,14 @@ const EditableCell = ({ getValue, row: { index }, column: { id }, table }: any) 
     );
   }
 
-  // Handle long text fields (title, description) with Textarea
-  if (id === 'description') {
+  if (id === 'title' || id === 'description') {
     return (
       <div className="flex w-full flex-col gap-1">
         <Textarea
           value={value}
-          onChange={(e) => updateData(index, id, e.target.value)}
-          className={cn(
-            'min-h-10 w-full resize-y py-1.5',
-            hasError && 'border-destructive'
-          )}
+          onChange={(e) => setValue(e.target.value)}
+          onBlur={onBlur}
+          className={cn('min-h-10 w-full resize-y py-1.5', hasError && 'border-destructive')}
           rows={2}
         />
         {cellError && <p className="text-destructive text-xs">{cellError.message}</p>}
@@ -163,15 +179,13 @@ const EditableCell = ({ getValue, row: { index }, column: { id }, table }: any) 
     );
   }
 
-  // Handle Text and Number fields (for short fields like pr_no, budget)
   return (
     <div className="flex w-full flex-col gap-1">
       <Input
         type={id === 'budget' ? 'number' : 'text'}
         value={value}
-        onChange={(e) =>
-          updateData(index, id, id === 'budget' ? e.target.valueAsNumber : e.target.value)
-        }
+        onChange={(e) => setValue(e.target.value)}
+        onBlur={onBlur}
         className={cn('h-9 w-full', hasError && 'border-destructive')}
       />
       {cellError && <p className="text-destructive text-xs">{cellError.message}</p>}

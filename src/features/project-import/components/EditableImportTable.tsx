@@ -153,7 +153,7 @@ const EditableCell = ({ getValue, row: { index }, column: { id }, table }: any) 
           value={value}
           onChange={(e) => updateData(index, id, e.target.value)}
           className={cn(
-            'min-h-10 w-full resize-y py-1.5 text-sm',
+            'min-h-10 w-full resize-y py-1.5',
             hasError && 'border-destructive'
           )}
           rows={2}

@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
 import { useAuth } from '@/context/AuthContext';
+import { useDepartments } from '@/features/organization';
 import {
   EditableImportTable,
   type ImportMode,
@@ -9,6 +10,7 @@ import {
   ManualForm,
   useExcelImport,
 } from '@/features/project-import';
+import { getFiscalYear } from '@/lib/formatters';
 import { hasImportOptionsPermission } from '@/lib/permissions';
 
 export default function ProjectImport() {
@@ -20,6 +22,13 @@ export default function ProjectImport() {
   const mode: ImportMode = modeParam ?? 'none';
 
   const canSeeOptions = user ? hasImportOptionsPermission(user) : false;
+
+  // Fetch organization data for select fields
+  const { data: departments } = useDepartments();
+
+  // Generate fiscal years
+  const currentYear = getFiscalYear(new Date());
+  const fiscalYears = Array.from({ length: 7 }, (_, i) => (currentYear - 3 + i).toString());
 
   useEffect(() => {
     if (!canSeeOptions) {
@@ -47,16 +56,14 @@ export default function ProjectImport() {
   };
 
   return (
-    <div className="mx-auto w-full max-w-350 p-6">
+    <div className="mx-auto w-full p-6">
       {mode === 'none' && <ImportSelector onSelect={handleSelectMode} />}
 
       {mode === 'manual' && <ManualForm onBack={handleBack} onSuccess={handleSuccess} />}
 
       {(mode === 'lesspaper' || mode === 'fiori') && (
         <div className="flex flex-col gap-6">
-          <h1 className="text-xl font-bold text-[#8B3D6B]">
-            นำเข้าโครงการจาก {mode.toUpperCase()}
-          </h1>
+          <h1 className="h1-topic text-primary">นำเข้าโครงการจาก {mode.toUpperCase()}</h1>
 
           {data.length === 0 ? (
             <div className="relative flex min-h-100 cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed bg-white p-16 transition-colors hover:bg-slate-50">
@@ -83,6 +90,8 @@ export default function ProjectImport() {
               deleteRow={deleteRow}
               onSubmit={handleSuccess}
               onBack={handleBack}
+              departments={departments}
+              fiscalYears={fiscalYears}
             />
           )}
         </div>

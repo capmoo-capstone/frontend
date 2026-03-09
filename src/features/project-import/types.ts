@@ -29,6 +29,14 @@ export const ProjectImportSchema = z.object({
 
 export type ProjectImportPayload = z.infer<typeof ProjectImportSchema>;
 
+// Schema for Excel imports (no unit_id or budget_plan_ids required)
+export const ExcelImportSchema = ProjectImportSchema.omit({
+  unit_id: true,
+  budget_plan_ids: true,
+});
+
+export type ExcelImportPayload = z.infer<typeof ExcelImportSchema>;
+
 export interface EditableImportRow extends Partial<ProjectImportPayload> {
   _rowId: string;
   delivery_date_str?: string; // เก็บค่า string สำหรับ input type date

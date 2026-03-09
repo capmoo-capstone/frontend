@@ -92,6 +92,7 @@ export default function ProjectImport() {
               onBack={handleBack}
               departments={departments}
               fiscalYears={fiscalYears}
+              mode={mode}
             />
           )}
         </div>

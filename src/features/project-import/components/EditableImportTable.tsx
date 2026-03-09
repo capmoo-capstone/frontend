@@ -25,8 +25,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { RESPONSIBLE_SELECT_OPTIONS } from '@/lib/formatters';
 import { cn } from '@/lib/utils';
 
-import type { EditableImportRow } from '../types';
-import { ExcelImportSchema } from '../types';
+import type { EditableImportRow, ImportMode } from '../types';
+import { FioriImportSchema, LesspaperImportSchema } from '../types';
 
 interface Props {
   data: EditableImportRow[];
@@ -36,6 +36,7 @@ interface Props {
   onBack: () => void;
   departments: Array<{ id: string; name: string }> | undefined;
   fiscalYears: string[];
+  mode: ImportMode;
 }
 
 interface ValidationError {
@@ -52,19 +53,16 @@ const EditableCell = ({ getValue, row: { index }, column: { id }, table }: any) 
   const fiscalYears = table.options.meta?.fiscalYears;
   const errors = table.options.meta?.errors || [];
 
-  // 🌟 1. Create Local State so typing is smooth without waiting for the whole table to re-render
   const [value, setValue] = useState(initialValue ?? '');
 
-  // 🌟 2. Update Local State if data changes from outside (such as loading a new file or deleting a row)
   useEffect(() => {
     setValue(initialValue ?? '');
   }, [initialValue]);
 
-  // 🌟 3. Function to update the main table, which runs only when "clicking outside the box (Blur)"
   const onBlur = () => {
     let finalValue = value;
     if (id === 'budget') {
-      finalValue = value === '' ? '' : Number(value); // convert to number if it is the budget field
+      finalValue = value === '' ? '' : Number(value);
     }
     updateData(index, id, finalValue);
   };
@@ -74,9 +72,6 @@ const EditableCell = ({ getValue, row: { index }, column: { id }, table }: any) 
   );
   const hasError = !!cellError;
 
-  // --------------------------------------------------------
-  // Dropdown and DatePicker group (no typing lag issue, so updateData can be called directly)
-  // --------------------------------------------------------
   if (id === 'procurement_type') {
     return (
       <div className="flex w-full flex-col gap-1">
@@ -164,7 +159,7 @@ const EditableCell = ({ getValue, row: { index }, column: { id }, table }: any) 
     );
   }
 
-  if (id === 'title' || id === 'description') {
+  if (id === 'description') {
     return (
       <div className="flex w-full flex-col gap-1">
         <Textarea
@@ -201,11 +196,13 @@ export function EditableImportTable({
   onBack,
   departments,
   fiscalYears,
+  mode,
 }: Props) {
   const [validationErrors, setValidationErrors] = useState<ValidationError[]>([]);
 
   const validateData = () => {
     const errors: ValidationError[] = [];
+    const schema = mode === 'lesspaper' ? LesspaperImportSchema : FioriImportSchema;
 
     data.forEach((row, index) => {
       try {
@@ -213,7 +210,7 @@ export function EditableImportTable({
           ...row,
           delivery_date: row.delivery_date_str ? new Date(row.delivery_date_str) : undefined,
         };
-        ExcelImportSchema.parse(rowData);
+        schema.parse(rowData);
       } catch (error: any) {
         if (error.errors) {
           error.errors.forEach((err: any) => {
@@ -239,7 +236,6 @@ export function EditableImportTable({
     }
   };
 
-  // Add the `size` property to control column widths
   const columns = useMemo<ColumnDef<EditableImportRow>[]>(
     () => [
       {
@@ -250,8 +246,22 @@ export function EditableImportTable({
           </>
         ),
         cell: EditableCell,
-        size: 180, // Short
+        size: 180,
       },
+      ...(mode === 'lesspaper'
+        ? [
+            {
+              accessorKey: 'lesspaper_no' as const,
+              header: () => (
+                <>
+                  เลขที่หนังสือ Lesspaper <span className="text-destructive">*</span>
+                </>
+              ),
+              cell: EditableCell,
+              size: 180,
+            },
+          ]
+        : []),
       {
         accessorKey: 'title',
         header: () => (
@@ -260,7 +270,7 @@ export function EditableImportTable({
           </>
         ),
         cell: EditableCell,
-        size: 350, // Long
+        size: 350,
       },
       {
         accessorKey: 'description',
@@ -270,7 +280,7 @@ export function EditableImportTable({
           </>
         ),
         cell: EditableCell,
-        size: 350, // Long
+        size: 350,
       },
       {
         accessorKey: 'procurement_type',
@@ -280,7 +290,7 @@ export function EditableImportTable({
           </>
         ),
         cell: EditableCell,
-        size: 250, // Medium
+        size: 250,
       },
       {
         accessorKey: 'delivery_date_str',
@@ -316,7 +326,7 @@ export function EditableImportTable({
           </>
         ),
         cell: EditableCell,
-        size: 140, // Short
+        size: 140,
       },
       {
         id: 'actions',
@@ -331,10 +341,10 @@ export function EditableImportTable({
             <Trash2 className="h-4 w-4 text-red-400" />
           </Button>
         ),
-        size: 60, // Very Short
+        size: 60,
       },
     ],
-    [deleteRow]
+    [deleteRow, mode]
   );
 
   const table = useReactTable({
@@ -358,7 +368,6 @@ export function EditableImportTable({
         </div>
 
         <div className="overflow-x-auto pb-4">
-          {/* Added table-fixed to respect column widths */}
           <Table
             className="border-separate border-spacing-y-2"
             style={{ tableLayout: 'fixed', minWidth: table.getTotalSize() }}
@@ -367,7 +376,6 @@ export function EditableImportTable({
               {table.getHeaderGroups().map((hg) => (
                 <TableRow key={hg.id} className="border-none hover:bg-transparent">
                   {hg.headers.map((h) => (
-                    // Apply the width from TanStack to the TableHead
                     <TableHead
                       key={h.id}
                       style={{ width: h.getSize() }}
@@ -385,7 +393,6 @@ export function EditableImportTable({
               {table.getRowModel().rows.map((row) => (
                 <TableRow key={row.id} className="border-none hover:bg-transparent">
                   {row.getVisibleCells().map((cell) => (
-                    // Apply the width from TanStack to the TableCell
                     <TableCell
                       key={cell.id}
                       style={{ width: cell.column.getSize() }}

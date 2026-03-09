@@ -29,13 +29,21 @@ export const ProjectImportSchema = z.object({
 
 export type ProjectImportPayload = z.infer<typeof ProjectImportSchema>;
 
-// Schema for Excel imports (no unit_id or budget_plan_ids required)
-export const ExcelImportSchema = ProjectImportSchema.omit({
+export const FioriImportSchema = ProjectImportSchema.omit({
   unit_id: true,
   budget_plan_ids: true,
 });
 
-export type ExcelImportPayload = z.infer<typeof ExcelImportSchema>;
+export type FioriImportPayload = z.infer<typeof FioriImportSchema>;
+
+export const LesspaperImportSchema = ProjectImportSchema.omit({
+  unit_id: true,
+  budget_plan_ids: true,
+}).extend({
+  lesspaper_no: z.string().min(1, 'กรุณาระบุเลขที่หนังสือ Lesspaper'),
+});
+
+export type LesspaperImportPayload = z.infer<typeof LesspaperImportSchema>;
 
 export interface EditableImportRow extends Partial<ProjectImportPayload> {
   _rowId: string;

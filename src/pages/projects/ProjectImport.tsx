@@ -41,7 +41,11 @@ export default function ProjectImport() {
     }
   }, [mode, canSeeOptions, setSearchParams]);
 
-  const { data, handleFileUpload, updateRow, deleteRow, isParsing } = useExcelImport(mode);
+  const { data, setData, handleFileUpload, updateRow, deleteRow, isParsing } = useExcelImport(mode);
+
+  useEffect(() => {
+    setData([]);
+  }, [mode, setData]);
 
   const handleSuccess = () => {
     navigate('/app/projects/import/success?mode=' + mode);

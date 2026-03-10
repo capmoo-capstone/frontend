@@ -23,8 +23,6 @@ const ProjectImportSuccess = lazy(() => import('@/pages/projects/ProjectImportSu
 
 // Exports
 const FinanceExportPage = lazy(() => import('@/pages/projects/FinanceExport'));
-const RegistryExportPage = lazy(() => import('@/pages/projects/RegistryExport'));
-const DocExportPage = lazy(() => import('@/pages/projects/DocExport'));
 
 // Admin & Others
 const OrganizationManagement = lazy(() => import('@/pages/admin/OrganizationManagement'));
@@ -60,8 +58,6 @@ export const PrivateRoutes = () => {
 
         {/* --- Exports --- */}
         <Route path="/app/exports/finance" element={<FinanceExportPage />} />
-        <Route path="/app/exports/registry" element={<RegistryExportPage />} />
-        <Route path="/app/exports/docs" element={<DocExportPage />} />
 
         {/* --- Specific Workflows --- */}
         <Route path="/app/assign/:id" element={<ProcumentJobs />} />

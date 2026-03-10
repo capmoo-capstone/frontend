@@ -4,7 +4,6 @@ import {
   ArrowLeftToLine,
   ChartPie,
   FileSignature,
-  FileText,
   HandCoins,
   Home,
   Import,
@@ -136,16 +135,6 @@ const menuGroups: MenuGroup[] = [
     label: 'ส่งออกไปยังฝ่ายอื่น',
     allowedRoles: ['DOCUMENT_STAFF', 'FINANCE_STAFF', 'ADMIN', 'SUPER_ADMIN'],
     items: [
-      {
-        title: 'สารบรรณ',
-        url: '/app/exports/docs',
-        icon: FileText,
-      },
-      {
-        title: 'ทะเบียน',
-        url: '/app/exports/registry',
-        icon: FileText,
-      },
       {
         title: 'การเงิน',
         url: '/app/exports/finance',

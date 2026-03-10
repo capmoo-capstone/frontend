@@ -1,8 +1,11 @@
 import { z } from 'zod';
 
+// Note: This UserRecord type is for user management/listing endpoints (e.g., GET /user)
+// For the authenticated current user, see User type in @/types/auth
+
 export const UserRoleEnum = z.enum(['ADMIN', 'STAFF', 'MANAGER', 'GUEST']);
 
-export const UserSchema = z.object({
+export const UserRecordSchema = z.object({
   id: z.string(),
   unit_id: z.string().nullable(),
   username: z.string(),
@@ -19,11 +22,15 @@ export const UserListResponseSchema = z.object({
   page: z.number(),
   pageSize: z.number(),
   totalPages: z.number(),
-  data: z.array(UserSchema),
+  data: z.array(UserRecordSchema),
 });
 
-export type User = z.infer<typeof UserSchema>;
+export type UserRecord = z.infer<typeof UserRecordSchema>;
 export type UserListResponse = z.infer<typeof UserListResponseSchema>;
+
+// Legacy alias for backward compatibility
+export const UserSchema = UserRecordSchema;
+export type User = UserRecord;
 
 export const UserSelectionItemSchema = z.object({
   id: z.string(),

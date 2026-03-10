@@ -1,6 +1,6 @@
 import React, { type ReactNode, createContext, useContext, useEffect, useState } from 'react';
 
-import { type AuthContextType, type User, UserSchema } from '../types/auth';
+import { type AuthContextType, AuthUserSchema, type User, enrichUser } from '../types/auth';
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
@@ -16,8 +16,9 @@ export const AuthProvider: React.FC<{
     if (storedUser) {
       try {
         const parsed = JSON.parse(storedUser);
-        const validatedUser = UserSchema.parse(parsed);
-        setUser(validatedUser);
+        const validatedUser = AuthUserSchema.parse(parsed);
+        const enrichedUser = enrichUser(validatedUser);
+        setUser(enrichedUser);
       } catch (error) {
         console.error('Invalid user data in storage', error);
         localStorage.removeItem('nexus_user');
@@ -27,7 +28,8 @@ export const AuthProvider: React.FC<{
   }, []);
 
   const setSession = (userData: User) => {
-    setUser(userData);
+    const enrichedUser = enrichUser(userData);
+    setUser(enrichedUser);
     localStorage.setItem('nexus_user', JSON.stringify(userData));
   };
 
@@ -43,7 +45,8 @@ export const AuthProvider: React.FC<{
       console.warn('switchUser is disabled outside of development environments.');
       return;
     }
-    setUser(newUser);
+    const enrichedUser = enrichUser(newUser);
+    setUser(enrichedUser);
     localStorage.setItem('nexus_user', JSON.stringify(newUser));
   };
 

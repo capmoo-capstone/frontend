@@ -38,7 +38,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             {import.meta.env.MODE === 'development' && (
               <div className="flex items-center gap-3">
                 <Select value={user?.role} onValueChange={handleRoleChange}>
-                  <SelectTrigger className="w-[200px]">
+                  <SelectTrigger className="w-50">
                     <SelectValue placeholder="Select role" />
                   </SelectTrigger>
                   <SelectContent>

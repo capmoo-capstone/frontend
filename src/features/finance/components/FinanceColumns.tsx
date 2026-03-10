@@ -24,11 +24,11 @@ interface FinanceColumnsConfig {
 const FinanceStatusBadge = ({ status }: { status: FinanceExportItem['export_status'] }) => {
   const config = {
     NOT_EXPORTED: {
-      label: 'ยังไม่ได้ส่งออก',
+      label: 'รอส่งเบิกการเงิน',
       variant: 'secondary' as const,
     },
     EXPORTED: {
-      label: 'ส่งออกแล้ว',
+      label: 'ส่งการเงินแล้ว',
       variant: 'info' as const,
     },
     CLOSED: {
@@ -36,7 +36,7 @@ const FinanceStatusBadge = ({ status }: { status: FinanceExportItem['export_stat
       variant: 'success' as const,
     },
     WAITING_EDIT: {
-      label: 'รอการแก้ไข',
+      label: 'การเงินส่งคืน',
       variant: 'destructive' as const,
     },
   };
@@ -134,6 +134,45 @@ export const getFinanceColumns = (
       </div>
     ),
     cell: ({ row }) => <div className="normal">{row.getValue('responsible_person')}</div>,
+  },
+  {
+    accessorKey: 'department_name',
+    header: ({ column }) => (
+      <div
+        className="flex cursor-pointer items-center"
+        onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+      >
+        หน่วยงาน
+        <ArrowUpDown
+          className={cn(
+            'ml-2 h-4 w-4',
+            column.getIsSorted() ? 'text-primary' : 'text-muted-foreground'
+          )}
+        />
+      </div>
+    ),
+    cell: ({ row }) => <div className="normal">{row.getValue('department_name')}</div>,
+  },
+  {
+    accessorKey: 'budget',
+    header: ({ column }) => (
+      <div
+        className="flex cursor-pointer items-center"
+        onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+      >
+        วงเงินงบประมาณ
+        <ArrowUpDown
+          className={cn(
+            'ml-2 h-4 w-4',
+            column.getIsSorted() ? 'text-primary' : 'text-muted-foreground'
+          )}
+        />
+      </div>
+    ),
+    cell: ({ row }) => {
+      const budget = row.getValue('budget') as number;
+      return <div className="normal text-right">{budget.toLocaleString('th-TH')} บาท</div>;
+    },
   },
   {
     accessorKey: 'procurement_type',

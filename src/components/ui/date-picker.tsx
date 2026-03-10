@@ -1,5 +1,7 @@
 'use client';
 
+import type { DayPicker } from 'react-day-picker';
+
 import { Calendar as CalendarIcon } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -14,6 +16,7 @@ export interface DatePickerProps {
   className?: string;
   placeholder?: string;
   disabled?: boolean;
+  disabledDays?: React.ComponentProps<typeof DayPicker>['disabled'];
 }
 
 export function DatePicker({
@@ -22,6 +25,7 @@ export function DatePicker({
   className,
   placeholder = 'กรุณาเลือกวันที่',
   disabled = false,
+  disabledDays,
 }: DatePickerProps) {
   return (
     <Popover>
@@ -41,7 +45,13 @@ export function DatePicker({
       </PopoverTrigger>
       {!disabled && (
         <PopoverContent className="w-auto p-0" align="start">
-          <Calendar mode="single" selected={date} onSelect={setDate} initialFocus />
+          <Calendar
+            mode="single"
+            selected={date}
+            onSelect={setDate}
+            disabled={disabledDays}
+            autoFocus
+          />
         </PopoverContent>
       )}
     </Popover>

@@ -17,14 +17,14 @@ export const getResponsiblePerson = (project: Project): string => {
   // Priority: procurement assignee, then contract assignee, then creator
   if (project.assignee_procurement && project.assignee_procurement.length > 0) {
     const assignee = project.assignee_procurement[0];
-    return `${assignee.name}`;
+    return `${assignee.full_name}`;
   }
   if (project.assignee_contract && project.assignee_contract.length > 0) {
     const assignee = project.assignee_contract[0];
-    return `${assignee.name}`;
+    return `${assignee.full_name}`;
   }
   if (project.creator) {
-    return `${project.creator.name}`;
+    return `${project.creator.full_name}`;
   }
   return 'ไม่ระบุ';
 };
@@ -69,7 +69,25 @@ export const formatDateThaiShort = (date: Date | string | undefined | null) => {
   return formatDateThai(date, 'd MMM yyyy');
 };
 
+export const getFiscalYear = (date: Date | string) => {
+  const dateObj = typeof date === 'string' ? new Date(date) : date;
+  const year = dateObj.getFullYear();
+  const month = dateObj.getMonth() + 1; // getMonth is zero-based
+
+  // Fiscal year starts in October, so if month is Oct (10), Nov (11), or Dec (12), we consider it as next fiscal year
+  return month >= 10 ? year + 544 : year + 543; // Convert to BE and adjust for fiscal year
+};
+
 // ==================== RESPONSIBLE TYPE FORMATTERS ====================
+
+export const RESPONSIBLE_SELECT_OPTIONS: { value: UnitResponsibleType; label: string }[] = [
+  { value: 'LT100K', label: 'ซื้อ/จ้าง แบบเจาะจง ไม่เกิน 1 แสน' },
+  { value: 'LT500K', label: 'ซื้อ/จ้าง แบบเจาะจง 1 - 5 แสน' },
+  { value: 'MT500K', label: 'ซื้อ/จ้าง แบบเจาะจง เกิน 5 แสน' },
+  { value: 'SELECTION', label: 'ซื้อ/จ้าง แบบคัดเลือก' },
+  { value: 'EBIDDING', label: 'ซื้อ/จ้าง แบบประกาศเชิญชวนทั่วไป' },
+  { value: 'CONTRACT', label: 'ข้อ 18' },
+];
 
 export const getResponsibleTypeFormat = (type: UnitResponsibleType) => {
   switch (type) {

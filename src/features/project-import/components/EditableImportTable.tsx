@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { type ColumnDef, flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table';
 import { File, Trash2 } from 'lucide-react';
@@ -200,8 +200,7 @@ export function EditableImportTable({
 }: Props) {
   const [validationErrors, setValidationErrors] = useState<ValidationError[]>([]);
 
-  // 🌟 Main validation function using safeParse
-  const validateData = () => {
+  const validateData = useCallback(() => {
     const errors: ValidationError[] = [];
     const schema = mode === 'lesspaper' ? LesspaperImportSchema : FioriImportSchema;
 
@@ -235,13 +234,15 @@ export function EditableImportTable({
 
     setValidationErrors(errors);
     return errors.length === 0;
-  };
+  }, [data, mode]);
 
   useEffect(() => {
-    if (validationErrors.length > 0) {
+    if (data.length > 0) {
       validateData();
+    } else {
+      setValidationErrors([]);
     }
-  }, [data]);
+  }, [data, validateData]);
 
   const handleSubmit = () => {
     if (validateData()) {
@@ -249,7 +250,6 @@ export function EditableImportTable({
     }
   };
 
-  // 🌟 Add validationErrors to dependency array
   const columns = useMemo<ColumnDef<EditableImportRow>[]>(
     () => [
       {
@@ -358,7 +358,7 @@ export function EditableImportTable({
         size: 60,
       },
     ],
-    [deleteRow, mode, validationErrors]
+    [deleteRow, mode]
   );
 
   const table = useReactTable({

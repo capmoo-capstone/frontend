@@ -69,7 +69,6 @@ export function useProjectImportForm({ onSuccess }: UseProjectImportFormOptions)
     : 0;
   const showBudgetWarning = selectedPlans.length > 0 && typedBudget < calculatedSum;
 
-  // Cascade Reset - Clear Unit and Budget Plans when Department changes
   useEffect(() => {
     if (canSelectEveryUnits) {
       form.setValue('unit_id', '');
@@ -77,7 +76,6 @@ export function useProjectImportForm({ onSuccess }: UseProjectImportFormOptions)
     }
   }, [watchDeptId, canSelectEveryUnits, form]);
 
-  // Cascade Reset - Clear Budget Plans when Unit or Year changes
   useEffect(() => {
     form.setValue('budget_plan_ids', []);
   }, [watchUnitId, watchFiscalYear, form]);
@@ -95,7 +93,6 @@ export function useProjectImportForm({ onSuccess }: UseProjectImportFormOptions)
   }, [selectedPlans, budgetPlans, form]);
 
   const onSubmit = (data: ProjectImportPayload) => {
-    // Check for warnings that need confirmation
     if ((isDateEarly || showBudgetWarning) && !warningConfirmed) {
       setShowConfirmationDialog(true);
       return;
@@ -108,7 +105,6 @@ export function useProjectImportForm({ onSuccess }: UseProjectImportFormOptions)
   const handleConfirm = () => {
     setWarningConfirmed(true);
     setShowConfirmationDialog(false);
-    // Trigger submission after confirmation
     form.handleSubmit((data) => {
       console.log('Submitting after confirmation:', data);
       onSuccess();

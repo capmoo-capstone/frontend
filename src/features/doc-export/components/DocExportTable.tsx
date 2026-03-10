@@ -24,8 +24,6 @@ export function DocExportTable() {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [rowSelection, setRowSelection] = useState({});
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 15 });
-  const [searchQuery, setSearchQuery] = useState('');
-  const [globalFilter, setGlobalFilter] = useState('');
 
   // Generate columns
   const columns = getDocExportColumns();
@@ -40,20 +38,13 @@ export function DocExportTable() {
     onSortingChange: setSorting,
     onRowSelectionChange: setRowSelection,
     onPaginationChange: setPagination,
-    onGlobalFilterChange: setGlobalFilter,
     state: {
       sorting,
       rowSelection,
       pagination,
-      globalFilter,
     },
     enableRowSelection: true,
-    globalFilterFn: 'includesString',
   });
-
-  const handleSearch = () => {
-    setGlobalFilter(searchQuery);
-  };
 
   const handleBulkSubmit = () => {
     const selectedRows = table.getSelectedRowModel().rows;
@@ -116,11 +107,6 @@ export function DocExportTable() {
     }
   };
 
-  const handleClearSearch = () => {
-    setSearchQuery('');
-    setGlobalFilter('');
-  };
-
   return (
     <div className="space-y-4">
       {/* No Data State */}
@@ -141,10 +127,6 @@ export function DocExportTable() {
             columnsLength={columns.length}
             toolbar={
               <ExportTableToolbar
-                searchQuery={searchQuery}
-                onSearchChange={setSearchQuery}
-                onSearch={handleSearch}
-                onClearSearch={handleClearSearch}
                 selectedCount={selectedCount}
                 hasSelection={hasSelection}
                 onToggleSelectAll={handleToggleSelectAll}

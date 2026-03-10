@@ -26,8 +26,6 @@ export function FinanceTable() {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [rowSelection, setRowSelection] = useState({}); // Stores selected rows
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 15 });
-  const [searchQuery, setSearchQuery] = useState('');
-  const [globalFilter, setGlobalFilter] = useState('');
 
   // Dialog state
   const [itemToEdit, setItemToEdit] = useState<FinanceExportItem | null>(null);
@@ -53,20 +51,13 @@ export function FinanceTable() {
     onSortingChange: setSorting,
     onRowSelectionChange: setRowSelection,
     onPaginationChange: setPagination,
-    onGlobalFilterChange: setGlobalFilter,
     state: {
       sorting,
       rowSelection,
       pagination,
-      globalFilter,
     },
     enableRowSelection: true,
-    globalFilterFn: 'includesString',
   });
-
-  const handleSearch = () => {
-    setGlobalFilter(searchQuery);
-  };
 
   const handleRequestEdit = (reason: string) => {
     if (!itemToEdit) return;
@@ -141,11 +132,6 @@ export function FinanceTable() {
     }
   };
 
-  const handleClearSearch = () => {
-    setSearchQuery('');
-    setGlobalFilter('');
-  };
-
   return (
     <div className="space-y-4">
       {/* No Data State */}
@@ -166,10 +152,6 @@ export function FinanceTable() {
             columnsLength={columns.length}
             toolbar={
               <ExportTableToolbar
-                searchQuery={searchQuery}
-                onSearchChange={setSearchQuery}
-                onSearch={handleSearch}
-                onClearSearch={handleClearSearch}
                 selectedCount={selectedCount}
                 hasSelection={hasSelection}
                 onToggleSelectAll={handleToggleSelectAll}

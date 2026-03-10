@@ -43,6 +43,9 @@ export function useFinanceExport() {
         is_urgent: project.urgent_status !== 'NORMAL',
         responsible_person: getResponsiblePerson(project),
         procurement_type: project.procurement_type,
+        budget:
+          typeof project.budget === 'number' ? project.budget : parseFloat(project.budget || '0'),
+        department_name: (project as any).requester?.dept_name || '-',
         export_status: mapToFinanceStatus(project.status),
         project_status: project.status,
         urgent_status: project.urgent_status,

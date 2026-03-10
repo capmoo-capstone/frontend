@@ -24,8 +24,6 @@ export function RegistryExportTable() {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [rowSelection, setRowSelection] = useState({});
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 15 });
-  const [searchQuery, setSearchQuery] = useState('');
-  const [globalFilter, setGlobalFilter] = useState('');
 
   const table = useReactTable({
     data: data || [],
@@ -37,20 +35,13 @@ export function RegistryExportTable() {
     onSortingChange: setSorting,
     onRowSelectionChange: setRowSelection,
     onPaginationChange: setPagination,
-    onGlobalFilterChange: setGlobalFilter,
     state: {
       sorting,
       rowSelection,
       pagination,
-      globalFilter,
     },
     enableRowSelection: true,
-    globalFilterFn: 'includesString',
   });
-
-  const handleSearch = () => {
-    setGlobalFilter(searchQuery);
-  };
 
   const handleBulkExport = () => {
     const selectedRows = table.getSelectedRowModel().rows;
@@ -93,11 +84,6 @@ export function RegistryExportTable() {
     }
   };
 
-  const handleClearSearch = () => {
-    setSearchQuery('');
-    setGlobalFilter('');
-  };
-
   return (
     <div className="space-y-4">
       {/* No Data State */}
@@ -118,10 +104,6 @@ export function RegistryExportTable() {
             columnsLength={registryExportColumns.length}
             toolbar={
               <ExportTableToolbar
-                searchQuery={searchQuery}
-                onSearchChange={setSearchQuery}
-                onSearch={handleSearch}
-                onClearSearch={handleClearSearch}
                 selectedCount={selectedCount}
                 hasSelection={hasSelection}
                 onToggleSelectAll={handleToggleSelectAll}

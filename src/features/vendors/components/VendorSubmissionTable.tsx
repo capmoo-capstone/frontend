@@ -36,7 +36,6 @@ export function VendorSubmissionTable({
   const [sorting, setSorting] = useState<SortingState>([]);
   const [rowSelection, setRowSelection] = useState({});
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 });
-  const [searchQuery, setSearchQuery] = useState(filters.search || '');
 
   const table = useReactTable({
     data: data || [],
@@ -69,15 +68,6 @@ export function VendorSubmissionTable({
     }
   };
 
-  const handleSearch = () => {
-    onSearchChange(searchQuery);
-  };
-
-  const handleClearSearch = () => {
-    setSearchQuery('');
-    onSearchChange('');
-  };
-
   const handleExport = () => {
     const selectedRows = table.getSelectedRowModel().rows;
     const selectedIds = selectedRows.map((row) => row.original.id);
@@ -108,11 +98,6 @@ export function VendorSubmissionTable({
       columnsLength={vendorSubmissionColumns.length}
       toolbar={
         <ExportTableToolbar
-          searchQuery={searchQuery}
-          onSearchChange={setSearchQuery}
-          onSearch={handleSearch}
-          onClearSearch={handleClearSearch}
-          searchPlaceholder="ค้นหา"
           selectedCount={selectedCount}
           hasSelection={hasSelection}
           onToggleSelectAll={handleToggleSelectAll}

@@ -13,6 +13,8 @@ export interface FinanceExportItem {
   is_urgent: boolean;
   responsible_person: string;
   procurement_type: ProcurementType;
+  budget: number;
+  department_name: string;
   export_status: FinanceExportStatus;
   project_status: ProjectStatus;
   urgent_status: ProjectUrgentStatus;

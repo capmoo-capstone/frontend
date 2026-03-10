@@ -23,7 +23,7 @@ export const ProjectImportSchema = z.object({
   budget: z.coerce.number().positive('วงเงินงบประมาณต้องมากกว่า 0'),
   department_id: z.string().min(1, 'กรุณาเลือกหน่วยงาน'),
   unit_id: z.string().min(1, 'กรุณาเลือกฝ่าย'),
-  fiscal_year: z.string(),
+  fiscal_year: z.string().min(1, 'กรุณาเลือกปีงบประมาณ'),
   budget_plan_ids: z.array(z.string()),
 });
 
@@ -32,6 +32,7 @@ export type ProjectImportPayload = z.infer<typeof ProjectImportSchema>;
 export const FioriImportSchema = ProjectImportSchema.omit({
   unit_id: true,
   budget_plan_ids: true,
+  lesspaper_no: true,
 });
 
 export type FioriImportPayload = z.infer<typeof FioriImportSchema>;
@@ -39,6 +40,7 @@ export type FioriImportPayload = z.infer<typeof FioriImportSchema>;
 export const LesspaperImportSchema = ProjectImportSchema.omit({
   unit_id: true,
   budget_plan_ids: true,
+  lesspaper_no: true,
 }).extend({
   lesspaper_no: z.string().min(1, 'กรุณาระบุเลขที่หนังสือ Lesspaper'),
 });
@@ -47,7 +49,7 @@ export type LesspaperImportPayload = z.infer<typeof LesspaperImportSchema>;
 
 export interface EditableImportRow extends Partial<ProjectImportPayload> {
   _rowId: string;
-  delivery_date_str?: string; // เก็บค่า string สำหรับ input type date
+  delivery_date_str?: string;
   isValid?: boolean;
   errors?: Record<string, string>;
 }

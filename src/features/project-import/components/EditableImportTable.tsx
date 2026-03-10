@@ -200,29 +200,36 @@ export function EditableImportTable({
 }: Props) {
   const [validationErrors, setValidationErrors] = useState<ValidationError[]>([]);
 
+  // 🌟 Main validation function using safeParse
   const validateData = () => {
     const errors: ValidationError[] = [];
     const schema = mode === 'lesspaper' ? LesspaperImportSchema : FioriImportSchema;
 
     data.forEach((row, index) => {
-      try {
-        const rowData = {
-          ...row,
-          delivery_date: row.delivery_date_str ? new Date(row.delivery_date_str) : undefined,
-        };
-        schema.parse(rowData);
-      } catch (error: any) {
-        if (error.errors) {
-          error.errors.forEach((err: any) => {
-            const field = err.path[0];
-            const displayField = field === 'delivery_date' ? 'delivery_date_str' : field;
-            errors.push({
-              rowIndex: index,
-              field: displayField,
-              message: err.message,
-            });
+      const rowData = {
+        pr_no: row.pr_no ?? '',
+        lesspaper_no: row.lesspaper_no ?? '',
+        title: row.title ?? '',
+        description: row.description ?? '',
+        procurement_type: row.procurement_type ?? '',
+        budget: row.budget ?? '',
+        department_id: row.department_id ?? '',
+        fiscal_year: row.fiscal_year ?? '',
+        delivery_date: row.delivery_date_str ? new Date(row.delivery_date_str) : undefined,
+      };
+
+      const result = schema.safeParse(rowData);
+
+      if (!result.success) {
+        result.error.issues.forEach((err) => {
+          const field = err.path[0] as string;
+          const displayField = field === 'delivery_date' ? 'delivery_date_str' : field;
+          errors.push({
+            rowIndex: index,
+            field: displayField,
+            message: err.message,
           });
-        }
+        });
       }
     });
 
@@ -230,12 +237,19 @@ export function EditableImportTable({
     return errors.length === 0;
   };
 
+  useEffect(() => {
+    if (validationErrors.length > 0) {
+      validateData();
+    }
+  }, [data]);
+
   const handleSubmit = () => {
     if (validateData()) {
       onSubmit();
     }
   };
 
+  // 🌟 Add validationErrors to dependency array
   const columns = useMemo<ColumnDef<EditableImportRow>[]>(
     () => [
       {
@@ -344,7 +358,7 @@ export function EditableImportTable({
         size: 60,
       },
     ],
-    [deleteRow, mode]
+    [deleteRow, mode, validationErrors]
   );
 
   const table = useReactTable({
@@ -409,11 +423,7 @@ export function EditableImportTable({
       </div>
 
       <div className="flex justify-end gap-3">
-        <Button
-          onClick={handleSubmit}
-          disabled={data.length === 0}
-          className="bg-[#E997B2] px-8 text-white hover:bg-[#d886a1]"
-        >
+        <Button onClick={handleSubmit} disabled={data.length === 0} variant="brand">
           ยืนยันการนำเข้าโครงการ
         </Button>
         <Button variant="outline" onClick={onBack} className="border-slate-200 px-8">

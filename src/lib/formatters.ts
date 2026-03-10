@@ -17,14 +17,14 @@ export const getResponsiblePerson = (project: Project): string => {
   // Priority: procurement assignee, then contract assignee, then creator
   if (project.assignee_procurement && project.assignee_procurement.length > 0) {
     const assignee = project.assignee_procurement[0];
-    return `${assignee.name}`;
+    return `${assignee.full_name}`;
   }
   if (project.assignee_contract && project.assignee_contract.length > 0) {
     const assignee = project.assignee_contract[0];
-    return `${assignee.name}`;
+    return `${assignee.full_name}`;
   }
   if (project.creator) {
-    return `${project.creator.name}`;
+    return `${project.creator.full_name}`;
   }
   return 'ไม่ระบุ';
 };

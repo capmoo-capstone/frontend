@@ -3,38 +3,10 @@ import {
   type Project,
   type UnassignedProjectItem,
 } from '@/features/projects';
+import { createMockUser } from '@/lib/mock-utils';
 import type { Role, User } from '@/types/auth';
 import type { Department } from '@/types/department';
 import { type UserSelectionResponse } from '@/types/user';
-
-// Helper to create a simple user for mock data (e.g., assignees in projects)
-const createMockUser = (
-  id: string,
-  username: string,
-  fullName: string,
-  role: Role,
-  deptId?: string,
-  deptName?: string,
-  unitId?: string,
-  unitName?: string
-): User => ({
-  id,
-  username,
-  full_name: fullName,
-  is_delegated: false,
-  roles: {
-    own: [
-      {
-        role,
-        dept_id: deptId || null,
-        dept_name: deptName || null,
-        unit_id: unitId || null,
-        unit_name: unitName || null,
-      },
-    ],
-    delegated: [],
-  },
-});
 
 export const MOCK_PROJECTS: Project[] = [
   {

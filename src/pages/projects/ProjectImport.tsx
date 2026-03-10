@@ -18,7 +18,7 @@ export default function ProjectImport() {
   const [searchParams, setSearchParams] = useSearchParams();
   const { user } = useAuth();
 
-  const modeParam = searchParams.get('mode') as ImportMode | null;
+  const modeParam = searchParams.get('mode') as ImportMode;
   const mode: ImportMode = modeParam ?? 'none';
 
   const canSeeOptions = user ? hasImportOptionsPermission(user) : false;

@@ -2,17 +2,9 @@
 
 import { useEffect, useState } from 'react';
 
-import { Check, Loader2, X } from 'lucide-react';
 import { toast } from 'sonner';
 
-import { Button } from '@/components/ui/button';
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+import { CustomContentDialog } from '@/components/shared-dialog';
 import { UserSelect } from '@/components/user-select';
 
 import { useAssignProjects, useProjectDetail } from '../../hooks/useProjects';
@@ -67,41 +59,32 @@ export function AddAssigneeDialog({ isOpen, onClose, projectId }: AddMemberDialo
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-106.25">
-        <DialogHeader className="flex flex-col items-center text-center">
-          <DialogTitle className="h3-topic flex items-center justify-center">
-            การเพิ่มเจ้าหน้าที่ในโครงการ
-          </DialogTitle>
+    <CustomContentDialog
+      isOpen={isOpen}
+      onClose={onClose}
+      onConfirm={handleConfirm}
+      title="การเพิ่มเจ้าหน้าที่ในโครงการ"
+      confirmLabel="ตกลง"
+      cancelLabel="ยกเลิก"
+      disableConfirm={!selectedUser || isPending}
+      centered
+    >
+      <div className="flex w-full flex-col items-start space-y-2">
+        <div className="text-base font-medium">
+          ชื่อเจ้าหน้าที่ <span className="text-destructive">*</span>
+        </div>
 
-          <div className="mt-6 mb-3 flex w-full flex-col items-start space-y-2">
-            <div className="text-base font-medium">
-              ชื่อเจ้าหน้าที่ <span className="text-destructive">*</span>
-            </div>
-
-            <div className="relative w-full">
-              <UserSelect
-                value={selectedUser}
-                onChange={setSelectedUser}
-                className="normal w-full"
-                placeholder="เลือกเจ้าหน้าที่..."
-                hasClearButton={false}
-                unitId={unitId}
-              />
-            </div>
-          </div>
-        </DialogHeader>
-
-        <DialogFooter className="flex flex-row items-center justify-center sm:justify-center">
-          <Button variant="brand" onClick={handleConfirm} disabled={!selectedUser || isPending}>
-            {isPending && <Loader2 className="h-4 w-4 animate-spin" />} <Check /> ตกลง
-          </Button>
-          <Button variant="outline" className="ml-4" onClick={onClose} disabled={isPending}>
-            <X />
-            ยกเลิก
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        <div className="relative w-full">
+          <UserSelect
+            value={selectedUser}
+            onChange={setSelectedUser}
+            className="normal w-full"
+            placeholder="เลือกเจ้าหน้าที่..."
+            hasClearButton={false}
+            unitId={unitId}
+          />
+        </div>
+      </div>
+    </CustomContentDialog>
   );
 }

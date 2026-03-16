@@ -2,18 +2,10 @@
 
 import { useEffect, useState } from 'react';
 
-import { Loader2, UserCog } from 'lucide-react';
+import { UserCog } from 'lucide-react';
 import { toast } from 'sonner';
 
-import { Button } from '@/components/ui/button';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+import { CustomContentDialog } from '@/components/shared-dialog';
 import { UserSelect } from '@/components/user-select';
 
 import { useChangeProjectAssignee } from '../../hooks/useProjects';
@@ -75,40 +67,31 @@ export function ChangeAssigneeDialog({
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-106.5">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <UserCog className="h-5 w-5" />
-            เปลี่ยนผู้รับผิดชอบ
-          </DialogTitle>
-          <DialogDescription>
-            เลือกเจ้าหน้าที่คนใหม่สำหรับโครงการ{' '}
-            <span className="text-primary font-medium">"{projectTitle}"</span>
-          </DialogDescription>
-        </DialogHeader>
-
-        <div className="py-4">
-          <UserSelect
-            value={selectedUser}
-            onChange={setSelectedUser}
-            unitId={unitId}
-            className="w-full"
-            placeholder="เลือกเจ้าหน้าที่..."
-            hasClearButton={false}
-          />
-        </div>
-
-        <DialogFooter>
-          <Button variant="outline" onClick={onClose} disabled={isPending}>
-            ยกเลิก
-          </Button>
-          <Button onClick={handleConfirm} disabled={!selectedUser || isPending}>
-            {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            บันทึก
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+    <CustomContentDialog
+      isOpen={isOpen}
+      onClose={onClose}
+      onConfirm={handleConfirm}
+      title="เปลี่ยนผู้รับผิดชอบ"
+      description={
+        <>
+          เลือกเจ้าหน้าที่คนใหม่สำหรับโครงการ{' '}
+          <span className="text-primary font-medium">"{projectTitle}"</span>
+        </>
+      }
+      icon={UserCog}
+      confirmLabel="บันทึก"
+      cancelLabel="ยกเลิก"
+      disableConfirm={!selectedUser || isPending}
+      maxWidth="sm"
+    >
+      <UserSelect
+        value={selectedUser}
+        onChange={setSelectedUser}
+        unitId={unitId}
+        className="w-full"
+        placeholder="เลือกเจ้าหน้าที่..."
+        hasClearButton={false}
+      />
+    </CustomContentDialog>
   );
 }

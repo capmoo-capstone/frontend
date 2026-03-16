@@ -33,8 +33,7 @@ export function ConfirmationDialog({
       description={description}
       confirmLabel={confirmLabel}
       cancelLabel={cancelLabel}
-      variant="brand"
-      destructive
+      variant="destructive"
     />
   );
 }

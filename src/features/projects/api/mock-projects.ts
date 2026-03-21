@@ -1,4 +1,4 @@
-import type { Role } from '@/types/auth';
+import type { Role } from '@/features/auth';
 
 import type { ProjectDetail, WorkflowStepConfig } from '../types';
 

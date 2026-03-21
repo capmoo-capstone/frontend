@@ -3,10 +3,10 @@ import * as React from 'react';
 import { ChevronDown } from 'lucide-react';
 
 import { AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import type { Role } from '@/features/auth';
 import type { StepStatus } from '@/features/workflow';
 import { cn } from '@/lib/utils';
 import { getStepColor } from '@/lib/workflow-utils';
-import type { Role } from '@/types/auth';
 
 interface WorkflowStepProps {
   id: string;

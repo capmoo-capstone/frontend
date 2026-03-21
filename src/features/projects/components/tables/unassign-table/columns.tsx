@@ -9,9 +9,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { type Role } from '@/features/auth';
 import { formatDateThaiShort, getResponsibleTypeFormat } from '@/lib/formatters';
 import { ManageSelfRoles, ManageUnitRoles, SupervisorRoles } from '@/lib/permissions';
-import { type Role } from '@/types/auth';
 
 import type { UnassignedProjectItem } from '../../../types';
 import { AssigneeCell } from './AssigneeCell';

@@ -1,15 +1,35 @@
-import { type Role, type User } from '@/types/auth';
+import { type Role, type User } from '@/features/auth';
+
+const ProcurementAllowedRoles: Role[] = [
+  'SUPER_ADMIN',
+  'ADMIN',
+  'HEAD_OF_DEPARTMENT',
+  'HEAD_OF_UNIT',
+  'DOCUMENT_STAFF',
+  'FINANCE_STAFF',
+  'GENERAL_STAFF',
+];
+
+const UnitAllowedRoles: Role[] = ['SUPER_ADMIN', 'ADMIN', 'HEAD_OF_DEPARTMENT', 'HEAD_OF_UNIT'];
+
+const DepartmentAllowedRoles: Role[] = ['SUPER_ADMIN', 'ADMIN', 'HEAD_OF_DEPARTMENT'];
+
+const SettingsAllowedRoles: Role[] = ['SUPER_ADMIN', 'ADMIN'];
 
 export const hasProcurementPermission = (user: User) => {
-  return true;
+  return !!user.role && ProcurementAllowedRoles.includes(user.role);
 };
 
 export const hasUnitPermission = (user: User) => {
-  return true;
+  return !!user.role && UnitAllowedRoles.includes(user.role);
 };
 
 export const hasDepartmentPermission = (user: User) => {
-  return true;
+  return !!user.role && DepartmentAllowedRoles.includes(user.role);
+};
+
+export const hasSettingsPermission = (user: User) => {
+  return !!user.role && SettingsAllowedRoles.includes(user.role);
 };
 
 /** Supervisory roles that have department-level oversight */

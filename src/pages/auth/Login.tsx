@@ -1,21 +1,29 @@
-import { useState } from 'react';
+import { useForm } from 'react-hook-form';
 
-import { Eye, EyeOff, Loader2 } from 'lucide-react';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Loader2 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { useLogin } from '@/hooks/useAuth';
+import { type LoginRequest, LoginRequestSchema, useLogin } from '@/features/auth';
 
 export default function LoginPage() {
   const { mutate, isPending, isError, error } = useLogin();
 
-  const [cunet, setCunet] = useState('');
-  const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
+  const form = useForm<LoginRequest>({
+    resolver: zodResolver(LoginRequestSchema),
+    defaultValues: {
+      username: 'yosita.rod',
+      full_name: 'โยษิตา รอดวัฒนกุล',
+    },
+  });
 
-  const handleLogin = () => {
-    mutate({ cunet, password });
-  };
+  const handleLogin = form.handleSubmit((values) => {
+    mutate(values);
+  });
+
+  const usernameError = form.formState.errors.username?.message;
+  const fullNameError = form.formState.errors.full_name?.message;
 
   return (
     <div className="flex h-screen flex-row items-center justify-center">
@@ -31,37 +39,27 @@ export default function LoginPage() {
         </div>
         <div className="flex w-full flex-col space-y-6">
           <div>
-            <label className="normal text-dark">CU NET</label>
+            <label className="normal text-dark">Username</label>
             <Input
-              value={cunet}
-              onChange={(e) => setCunet(e.target.value)}
-              placeholder="กรุณากรอก CU NET"
+              {...form.register('username')}
+              placeholder="กรุณากรอก username"
               disabled={isPending}
             />
+            {usernameError && <div className="text-destructive mt-2 text-sm">{usernameError}</div>}
           </div>
           <div>
-            <label className="normal text-dark">รหัสผ่าน</label>
-            <div className="relative w-full">
-              <Input
-                type={showPassword ? 'text' : 'password'}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="กรุณากรอกรหัสผ่าน"
-                disabled={isPending}
-              />
-              {isError && (
-                <div className="text-destructive mt-2 text-center text-sm">
-                  {(error as Error)?.message || 'CU NET หรือรหัสผ่านไม่ถูกต้อง'}
-                </div>
-              )}
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="text-muted-foreground absolute top-1/2 right-4 -translate-y-1/2"
-              >
-                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-              </button>
-            </div>
+            <label className="normal text-dark">Full Name</label>
+            <Input
+              {...form.register('full_name')}
+              placeholder="กรุณากรอกชื่อ-นามสกุล"
+              disabled={isPending}
+            />
+            {fullNameError && <div className="text-destructive mt-2 text-sm">{fullNameError}</div>}
+            {isError && (
+              <div className="text-destructive mt-2 text-center text-sm">
+                {(error as Error)?.message || 'เข้าสู่ระบบไม่สำเร็จ'}
+              </div>
+            )}
           </div>
         </div>
         <Button variant="brand" className="mt-10" onClick={handleLogin} disabled={isPending}>

@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 // Note: This UserRecord type is for user management/listing endpoints (e.g., GET /user)
-// For the authenticated current user, see User type in @/types/auth
+// For the authenticated current user, see User type in @/features/auth
 
 export const UserRoleEnum = z.enum(['ADMIN', 'STAFF', 'MANAGER', 'GUEST']);
 

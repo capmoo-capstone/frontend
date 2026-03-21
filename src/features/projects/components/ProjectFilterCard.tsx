@@ -49,7 +49,7 @@ export function ProjectFilterCard({ filters, setFilters }: ProjectFilterCardProp
   ];
 
   const departments = useDepartments();
-  const { data: users } = useUsersForSelection({ departmentId: 'procurement' });
+  const { data: users } = useUsersForSelection({ deptId: 'procurement' });
   const generalStaff = useMemo(() => {
     if (!users?.data) return [];
 

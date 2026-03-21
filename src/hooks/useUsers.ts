@@ -1,6 +1,6 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
-import { getUsers, getUsersForSelection } from '@/api/user.api';
+import { getUsers, getUsersForSelection } from '@/features/auth';
 
 interface UseUsersProps {
   page?: number;
@@ -17,20 +17,20 @@ export const useUsers = ({ page = 1, limit = 10 }: UseUsersProps) => {
 };
 
 type UseUsersSelectionProps =
-  | { unitId: string; departmentId?: never }
-  | { unitId?: never; departmentId: string };
+  | { unitId: string; deptId?: never }
+  | { unitId?: never; deptId: string };
 
-export const useUsersForSelection = ({ unitId, departmentId }: UseUsersSelectionProps) => {
+export const useUsersForSelection = ({ unitId, deptId }: UseUsersSelectionProps) => {
   return useQuery({
-    queryKey: ['users', 'selection', { unitId, departmentId }],
+    queryKey: ['users', 'selection', { unitId, deptId }],
     queryFn: () => {
-      if (unitId) return getUsersForSelection({ unit_id: unitId });
-      if (departmentId)
+      if (unitId) return getUsersForSelection({ unitId });
+      if (deptId)
         return getUsersForSelection({
-          department_id: departmentId,
+          deptId,
         });
-      throw new Error('Either unitId or departmentId is required');
+      throw new Error('Either unitId or deptId is required');
     },
-    enabled: !!unitId || !!departmentId,
+    enabled: !!unitId || !!deptId,
   });
 };

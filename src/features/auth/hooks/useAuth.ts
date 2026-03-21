@@ -2,16 +2,21 @@ import { useNavigate } from 'react-router-dom';
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
-import { devLogin as devLoginApi, login as loginApi } from '@/api/user.api';
 import { useAuth } from '@/context/AuthContext';
+
+import { devLogin as devLoginApi, login as loginApi } from '../api';
+
+interface LoginInput {
+  username: string;
+  full_name: string;
+}
 
 export const useLogin = () => {
   const { setSession } = useAuth();
   const navigate = useNavigate();
 
   return useMutation({
-    mutationFn: ({ cunet, password }: { cunet: string; password: string }) =>
-      loginApi(cunet, password),
+    mutationFn: ({ username, full_name }: LoginInput) => loginApi(username, full_name),
 
     onSuccess: (user) => {
       setSession(user);
@@ -19,7 +24,7 @@ export const useLogin = () => {
       if (user.department?.name === 'procurement') {
         navigate('/app/me/dashboard');
       } else {
-        navigate('/app/dashboards/department');
+        navigate('/app/home');
       }
     },
   });

@@ -4,9 +4,9 @@ import { ArrowLeft, CircleCheckBig, Download, Send, SquareArrowLeft, X } from 'l
 
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
+import type { Role } from '@/features/auth';
 import type { StepStatus, Submission } from '@/features/workflow';
 import { cn } from '@/lib/utils';
-import type { Role } from '@/types/auth';
 
 interface StepActionFormProps {
   isActive?: boolean;

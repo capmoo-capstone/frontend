@@ -26,8 +26,8 @@ export const UserRolesSchema = z.object({
 });
 
 export const LoginRequestSchema = z.object({
-  username: z.string().min(1),
-  full_name: z.string().min(1),
+  username: z.string().min(1, { message: 'กรุณากรอกชื่อผู้ใช้' }),
+  full_name: z.string().min(1, { message: 'กรุณากรอกชื่อ-นามสกุล' }),
 });
 
 export const BackendDelegatedBySchema = z.object({

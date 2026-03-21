@@ -8,19 +8,13 @@ const startOfToday = () => {
 export const DelegationSchema = z
   .object({
     user_id: z.string().min(1, 'กรุณาเลือกเจ้าหน้าที่'),
-    start_date: z.date().optional(),
+    start_date: z.date({
+      error: 'กรุณาเลือกวันเริ่มต้น',
+    }),
     end_date: z.date().optional(),
     is_permanent: z.boolean().default(false),
   })
   .superRefine((data, ctx) => {
-    if (!data.start_date) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: 'กรุณาเลือกวันเริ่มต้น',
-        path: ['start_date'],
-      });
-    }
-
     if (!data.is_permanent && !data.end_date) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,

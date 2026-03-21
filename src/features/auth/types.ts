@@ -121,8 +121,24 @@ export interface GetUsersParams {
 }
 
 export type GetUsersSelectionParams =
-  | { unit_id: string; department_id?: never }
-  | { unit_id?: never; department_id: string };
+  | { unitId: string; deptId?: never }
+  | { unitId?: never; deptId: string };
+
+export const BackendUserSelectionItemSchema = z.object({
+  id: z.string(),
+  full_name: z.string(),
+  roles: z.array(z.string()),
+});
+
+export const BackendUserSelectionResponseSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  entity_type: z.enum(['unit', 'department', 'all']),
+  total: z.number().optional(),
+  data: z.array(BackendUserSelectionItemSchema),
+});
+
+export type BackendUserSelectionResponse = z.infer<typeof BackendUserSelectionResponseSchema>;
 
 export const UserSchema = AuthUserSchema;
 

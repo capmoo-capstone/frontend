@@ -24,10 +24,10 @@ export const useUsersForSelection = ({ unitId, departmentId }: UseUsersSelection
   return useQuery({
     queryKey: ['users', 'selection', { unitId, departmentId }],
     queryFn: () => {
-      if (unitId) return getUsersForSelection({ unit_id: unitId });
+      if (unitId) return getUsersForSelection({ unitId });
       if (departmentId)
         return getUsersForSelection({
-          department_id: departmentId,
+          deptId: departmentId,
         });
       throw new Error('Either unitId or departmentId is required');
     },

@@ -1,12 +1,16 @@
-import { MOCK_USER, MOCK_USERS_BY_ROLE, MOCK_USER_SELECTION } from '@/api/mock-data';
 import api from '@/lib/axios';
-import { type UserListResponse, UserListResponseSchema } from '@/types/user';
-import { type UserSelectionResponse, UserSelectionResponseSchema } from '@/types/user';
+import {
+  type UserListResponse,
+  UserListResponseSchema,
+  type UserSelectionResponse,
+  UserSelectionResponseSchema,
+} from '@/types/user';
 
 import type { User } from '../types';
 import {
   AuthUserSchema,
   BackendLoginResponseSchema,
+  BackendUserSelectionResponseSchema,
   type GetUsersParams,
   type GetUsersSelectionParams,
   LoginRequestSchema,
@@ -14,9 +18,6 @@ import {
 } from '../types';
 
 export const getMe = async (): Promise<User> => {
-  // return mock data
-  return enrichUser(MOCK_USER);
-
   const { data } = await api.get('/user/me');
 
   const validatedUser = AuthUserSchema.parse(data.data);
@@ -40,14 +41,24 @@ export const getUsers = async ({
 export const getUsersForSelection = async (
   params: GetUsersSelectionParams
 ): Promise<UserSelectionResponse> => {
-  // return mock data
-  return MOCK_USER_SELECTION;
-
-  const { data } = await api.get('/users/selection', {
+  const { data } = await api.get('/users', {
     params,
   });
 
-  return UserSelectionResponseSchema.parse(data);
+  const parsed = BackendUserSelectionResponseSchema.parse(data);
+
+  const normalized = {
+    id: parsed.id,
+    name: parsed.name,
+    entity_type: parsed.entity_type === 'all' ? 'department' : parsed.entity_type,
+    data: parsed.data.map((user) => ({
+      id: user.id,
+      full_name: user.full_name,
+      role: user.roles[0] ?? 'GUEST',
+    })),
+  };
+
+  return UserSelectionResponseSchema.parse(normalized);
 };
 
 export const login = async (username: string, full_name: string): Promise<User> => {
@@ -73,6 +84,5 @@ export const login = async (username: string, full_name: string): Promise<User> 
 };
 
 export const devLogin = async (role: string): Promise<User> => {
-  const mockUser = MOCK_USERS_BY_ROLE[role] || MOCK_USER;
-  return enrichUser(mockUser);
+  return login(role, role);
 };

@@ -52,7 +52,8 @@ export function useUpdateUnitRepresentative() {
         }
       );
 
-      queryClient.invalidateQueries({ queryKey: ['units', payload.departmentId] });
+      // Note: Once a real backend API is implemented for updating unit representatives,
+      // replace the mutationFn to call it and move the invalidateQueries back here.
     },
   });
 }

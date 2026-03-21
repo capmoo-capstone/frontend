@@ -6,7 +6,6 @@ import {
   UserSelectionResponseSchema,
 } from '@/types/user';
 
-import type { User } from '../types';
 import {
   AuthUserSchema,
   BackendLoginResponseSchema,
@@ -14,6 +13,7 @@ import {
   type GetUsersParams,
   type GetUsersSelectionParams,
   LoginRequestSchema,
+  type User,
   enrichUser,
 } from '../types';
 

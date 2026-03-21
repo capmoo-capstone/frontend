@@ -2,8 +2,8 @@ import { useState } from 'react';
 
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import type { User } from '@/features/auth';
 import { AllProjectTable } from '@/features/projects';
-import type { User } from '@/types/auth';
 
 import { myTasksColumns } from './MyTasksColumns';
 

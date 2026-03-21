@@ -1,7 +1,7 @@
-// Assuming the array you provided is exported here
+﻿// Assuming the array you provided is exported here
+import type { Role } from '@/features/auth';
 import type { ProjectDetail } from '@/features/projects';
 import { ProcurementWorkflows } from '@/features/workflow';
-import type { Role } from '@/types/auth';
 
 // Helper to get workflow by type
 const getWorkflow = (type: string) => ProcurementWorkflows.find((w) => w.type === type)!;

@@ -1,7 +1,7 @@
 import { CircleCheckBig, Clock, FileCheck, UserCheck, UserCog } from 'lucide-react';
 
+import type { Role } from '@/features/auth';
 import type { StepStatus } from '@/features/projects';
-import type { Role } from '@/types/auth';
 
 export const isActionRequired = (role: Role, status: StepStatus): boolean => {
   switch (role) {

@@ -1,5 +1,5 @@
+import type { User } from '@/features/auth';
 import { createMockUser } from '@/lib/mock-utils';
-import type { Role, User } from '@/types/auth';
 import type { Department } from '@/types/department';
 import type { UserSelectionResponse } from '@/types/user';
 

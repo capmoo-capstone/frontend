@@ -9,9 +9,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import type { Role, User } from '@/features/auth';
 import { getProjectStatusFormat, getResponsibleTypeFormat } from '@/lib/formatters';
 import { ManageSelfRoles, ManageUnitRoles } from '@/lib/permissions';
-import type { Role, User } from '@/types/auth';
 
 import type { Project } from '../../types';
 
@@ -69,8 +69,8 @@ export const baseColumns = ({
   {
     accessorKey: 'responsible_users',
     sortingFn: (rowA, rowB) => {
-      const nameA = rowA.original.assignee_procurement?.[0]?.name ?? '';
-      const nameB = rowB.original.assignee_procurement?.[0]?.name ?? '';
+      const nameA = rowA.original.assignee_procurement?.[0]?.full_name ?? '';
+      const nameB = rowB.original.assignee_procurement?.[0]?.full_name ?? '';
       return nameA.localeCompare(nameB, 'th');
     },
     header: ({ column }) => (

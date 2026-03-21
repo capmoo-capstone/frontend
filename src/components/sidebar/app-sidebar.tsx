@@ -1,7 +1,8 @@
-import { Link, useLocation } from 'react-router-dom';
+﻿import { Link, useLocation } from 'react-router-dom';
 
 import {
   ArrowLeftToLine,
+  Building2,
   ChartPie,
   FileSignature,
   HandCoins,
@@ -11,10 +12,11 @@ import {
   LogOut,
   MoreVertical,
   Package,
-  Settings,
   Star,
   Table2,
   Truck,
+  UserCog,
+  Users,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 
@@ -40,9 +42,9 @@ import {
   useSidebar,
 } from '@/components/ui/sidebar';
 import { useAuth } from '@/context/AuthContext';
-import { useLogout } from '@/hooks/useAuth';
+import { useLogout } from '@/features/auth';
+import { type Role } from '@/features/auth';
 import { cn } from '@/lib/utils';
-import { type Role } from '@/types/auth';
 
 type MenuItem = {
   title: string;
@@ -147,9 +149,19 @@ const menuGroups: MenuGroup[] = [
     allowedRoles: ['ADMIN', 'SUPER_ADMIN'],
     items: [
       {
-        title: 'ตั้งค่าระบบ',
-        url: '/app/settings',
-        icon: Settings,
+        title: 'ตั้งค่ากลุ่มงาน',
+        url: '/app/settings/work-groups',
+        icon: Users,
+      },
+      {
+        title: 'ตั้งค่าตัวแทนหน่วยงาน',
+        url: '/app/settings/department-reps',
+        icon: Building2,
+      },
+      {
+        title: 'ตั้งค่าเจ้าหน้าที่พัสดุ',
+        url: '/app/settings/procurement-staff',
+        icon: UserCog,
       },
     ],
   },

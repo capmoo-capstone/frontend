@@ -1,10 +1,10 @@
+import type { User } from '@/features/auth';
 import {
   type AssignedProjectItem,
   type Project,
   type UnassignedProjectItem,
 } from '@/features/projects';
 import { createMockUser } from '@/lib/mock-utils';
-import type { Role, User } from '@/types/auth';
 import type { Department } from '@/types/department';
 import { type UserSelectionResponse } from '@/types/user';
 

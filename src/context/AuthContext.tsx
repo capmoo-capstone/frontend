@@ -1,6 +1,6 @@
 import React, { type ReactNode, createContext, useContext, useEffect, useState } from 'react';
 
-import { type AuthContextType, AuthUserSchema, type User, enrichUser } from '../types/auth';
+import { type AuthContextType, AuthUserSchema, type User, enrichUser } from '@/features/auth';
 
 const AuthContext = createContext<AuthContextType | null>(null);
 

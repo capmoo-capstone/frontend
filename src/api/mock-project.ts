@@ -1,5 +1,5 @@
+import type { Role } from '@/features/auth';
 import type { ProjectDetail, WorkflowStepConfig } from '@/features/projects';
-import type { Role } from '@/types/auth';
 
 const WORKFLOW_STEPS: WorkflowStepConfig[] = [
   {

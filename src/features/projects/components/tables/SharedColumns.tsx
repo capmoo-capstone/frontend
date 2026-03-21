@@ -96,7 +96,7 @@ export const baseColumns = ({
             allUsers.map((u) => {
               return (
                 <div key={u.id} className="normal whitespace-nowrap">
-                  {u.name}
+                  {u.full_name ?? '-'}
                 </div>
               );
             })

@@ -1,4 +1,4 @@
-﻿import { keepPreviousData, useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
 import { getUsers, getUsersForSelection } from '@/features/auth';
 

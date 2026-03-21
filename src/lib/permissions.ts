@@ -1,4 +1,4 @@
-﻿import { type Role, type User } from '@/features/auth';
+import { type Role, type User } from '@/features/auth';
 
 export const hasProcurementPermission = (user: User) => {
   const allowedRoles: Role[] = [

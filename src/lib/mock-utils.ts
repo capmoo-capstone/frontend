@@ -1,4 +1,4 @@
-﻿import type { Role, User } from '@/features/auth';
+import type { Role, User } from '@/features/auth';
 
 /**
  * Helper to create a mock user for testing and mock data

@@ -22,7 +22,7 @@ interface UserSelectProps {
   onChange: (value: string) => void;
   onReset?: () => void;
   unitId?: string;
-  departmentId?: string;
+  deptId?: string;
   placeholder?: string;
   className?: string;
   disabled?: boolean;
@@ -34,7 +34,7 @@ export function UserSelect({
   onChange,
   onReset,
   unitId,
-  departmentId,
+  deptId,
   placeholder = 'Select user...',
   className,
   hasClearButton = true,
@@ -43,7 +43,7 @@ export function UserSelect({
   const [open, setOpen] = React.useState(false);
 
   const { data, isLoading, isError } = useUsersForSelection(
-    unitId ? { unitId } : { departmentId: departmentId || '' }
+    unitId ? { unitId } : { deptId: deptId || '' }
   );
 
   const users = data?.data || [];

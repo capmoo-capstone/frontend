@@ -16,9 +16,16 @@ export const DepartmentsApiResponseSchema = z.object({
   data: z.array(DepartmentApiItemSchema),
 });
 
+export const DepartmentDetailApiResponseSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  units: z.array(UnitApiItemSchema).optional(),
+});
+
 export type DepartmentApiItem = z.infer<typeof DepartmentApiItemSchema>;
 export type UnitApiItem = z.infer<typeof UnitApiItemSchema>;
 export type DepartmentsApiResponse = z.infer<typeof DepartmentsApiResponseSchema>;
+export type DepartmentDetailApiResponse = z.infer<typeof DepartmentDetailApiResponseSchema>;
 
 export const DepartmentSchema = z.object({
   id: z.string(),

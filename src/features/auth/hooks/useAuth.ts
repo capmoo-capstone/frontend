@@ -20,9 +20,9 @@ export const useLogin = () => {
     mutationFn: ({ username, full_name }: LoginInput) => loginApi(username, full_name),
 
     onSuccess: async (user) => {
+      setSession(user);
       await queryClient.invalidateQueries({ queryKey: ['users'] });
       await queryClient.invalidateQueries({ queryKey: ['users', 'selection'] });
-      setSession(user);
 
       if (user.department?.name === 'procurement') {
         navigate('/app/me/dashboard');
@@ -41,10 +41,6 @@ export const useLogout = () => {
   return useMutation({
     mutationFn: async () => {
       return Promise.resolve(true);
-    },
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['users'] });
-      await queryClient.invalidateQueries({ queryKey: ['users', 'selection'] });
     },
     onSettled: () => {
       clearSession();

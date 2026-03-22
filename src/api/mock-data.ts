@@ -4,9 +4,9 @@ import {
   type Project,
   type UnassignedProjectItem,
 } from '@/features/projects';
+import { type UserSelectionResponse } from '@/features/users';
 import { createMockUser } from '@/lib/mock-utils';
 import type { Department } from '@/types/department';
-import { type UserSelectionResponse } from '@/types/user';
 
 export const MOCK_PROJECTS: Project[] = [
   {

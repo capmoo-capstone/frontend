@@ -1,4 +1,4 @@
-import { UserSelect } from '@/components/user-select';
+import { UserSelect } from '@/features/users';
 
 interface AssigneeCellProps {
   rowId: string;

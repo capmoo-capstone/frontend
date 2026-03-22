@@ -14,8 +14,9 @@ import {
   CommandList,
 } from '@/components/ui/command';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { useUsersForSelection } from '@/hooks/useUsers';
 import { cn } from '@/lib/utils';
+
+import { useUsersForSelection } from '../hooks/useUsers';
 
 interface UserSelectProps {
   value?: string | null;

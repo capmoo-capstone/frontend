@@ -13,8 +13,8 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useAuth } from '@/context/AuthContext';
+import { useUsersForSelection } from '@/features/users';
 import { useDepartments } from '@/hooks/useDepartments';
-import { useUsersForSelection } from '@/hooks/useUsers';
 import { getResponsibleTypeFormat } from '@/lib/formatters';
 
 import { type ProjectFilterParams } from '../api';

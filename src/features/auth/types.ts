@@ -115,31 +115,6 @@ export type UserRoles = z.infer<typeof UserRolesSchema>;
 export type LoginRequest = z.infer<typeof LoginRequestSchema>;
 export type BackendLoginResponse = z.infer<typeof BackendLoginResponseSchema>;
 
-export interface GetUsersParams {
-  page?: number;
-  limit?: number;
-}
-
-export type GetUsersSelectionParams =
-  | { unitId: string; deptId?: never }
-  | { unitId?: never; deptId: string };
-
-export const BackendUserSelectionItemSchema = z.object({
-  id: z.string(),
-  full_name: z.string(),
-  roles: z.array(z.string()),
-});
-
-export const BackendUserSelectionResponseSchema = z.object({
-  id: z.string(),
-  name: z.string(),
-  entity_type: z.enum(['unit', 'department', 'all']),
-  total: z.number().optional(),
-  data: z.array(BackendUserSelectionItemSchema),
-});
-
-export type BackendUserSelectionResponse = z.infer<typeof BackendUserSelectionResponseSchema>;
-
 export const UserSchema = AuthUserSchema;
 
 export type AuthContextType = {
@@ -148,5 +123,4 @@ export type AuthContextType = {
   isLoading: boolean;
   setSession: (user: User) => void;
   logout: () => void;
-  switchUser: (user: User) => void;
 };

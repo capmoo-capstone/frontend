@@ -38,18 +38,6 @@ export const AuthProvider: React.FC<{
     localStorage.removeItem('nexus_user');
   };
 
-  const switchUser = (newUser: User) => {
-    // switchUser is intended only for development (e.g., testing/impersonation).
-    // In non-development environments, do not allow changing the user directly.
-    if (import.meta.env.MODE !== 'development') {
-      console.warn('switchUser is disabled outside of development environments.');
-      return;
-    }
-    const enrichedUser = enrichUser(newUser);
-    setUser(enrichedUser);
-    localStorage.setItem('nexus_user', JSON.stringify(newUser));
-  };
-
   return (
     <AuthContext.Provider
       value={{
@@ -58,7 +46,6 @@ export const AuthProvider: React.FC<{
         isLoading,
         setSession,
         logout,
-        switchUser,
       }}
     >
       {children}

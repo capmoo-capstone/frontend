@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
 import { CustomContentDialog } from '@/components/shared-dialog';
-import { UserSelect } from '@/components/user-select';
+import { UserSelect } from '@/features/users';
 
 import { useAssignProjects, useProjectDetail } from '../../hooks/useProjects';
 

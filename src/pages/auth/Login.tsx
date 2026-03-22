@@ -13,8 +13,8 @@ export default function LoginPage() {
   const form = useForm<LoginRequest>({
     resolver: zodResolver(LoginRequestSchema),
     defaultValues: {
-      username: 'yosita.rod',
-      full_name: 'โยษิตา รอดวัฒนกุล',
+      username: '',
+      full_name: '',
     },
   });
 

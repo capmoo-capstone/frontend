@@ -36,7 +36,3 @@ export const login = async (username: string, full_name: string): Promise<User> 
   const validatedUser = AuthUserSchema.parse(normalized);
   return enrichUser(validatedUser);
 };
-
-export const devLogin = async (role: string): Promise<User> => {
-  return login(role, role);
-};

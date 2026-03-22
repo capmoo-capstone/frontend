@@ -4,7 +4,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { useAuth } from '@/context/AuthContext';
 
-import { devLogin as devLoginApi, login as loginApi } from '../api';
+import { login as loginApi } from '../api';
 
 interface LoginInput {
   username: string;
@@ -14,11 +14,14 @@ interface LoginInput {
 export const useLogin = () => {
   const { setSession } = useAuth();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: ({ username, full_name }: LoginInput) => loginApi(username, full_name),
 
-    onSuccess: (user) => {
+    onSuccess: async (user) => {
+      await queryClient.invalidateQueries({ queryKey: ['users'] });
+      await queryClient.invalidateQueries({ queryKey: ['users', 'selection'] });
       setSession(user);
 
       if (user.department?.name === 'procurement') {
@@ -39,25 +42,16 @@ export const useLogout = () => {
     mutationFn: async () => {
       return Promise.resolve(true);
     },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['users'] });
+      await queryClient.invalidateQueries({ queryKey: ['users', 'selection'] });
+    },
     onSettled: () => {
       clearSession();
 
       queryClient.clear();
 
       navigate('/login', { replace: true });
-    },
-  });
-};
-
-export const useDevLogin = () => {
-  const { setSession } = useAuth();
-  const navigate = useNavigate();
-
-  return useMutation({
-    mutationFn: (role: string) => devLoginApi(role),
-    onSuccess: (user) => {
-      setSession(user);
-      navigate('/app', { replace: true });
     },
   });
 };

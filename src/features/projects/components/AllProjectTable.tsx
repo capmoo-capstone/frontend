@@ -28,6 +28,7 @@ interface AllProjectTableProps {
 export function AllProjectTable({ filters, columns: customColumns }: AllProjectTableProps) {
   const { user } = useAuth();
   if (!user) return null;
+  const viewAsRole = user.role ?? 'GUEST';
 
   const { data: projects, isLoading, isError } = useProjects(filters);
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -38,10 +39,10 @@ export function AllProjectTable({ filters, columns: customColumns }: AllProjectT
       customColumns ||
       baseColumns({
         onAddAssignee: (project) => setProjectToAddAssignee(project),
-        viewAsRole: user.role,
+        viewAsRole,
         user,
       }),
-    [customColumns, user.role, user, setProjectToAddAssignee]
+    [customColumns, viewAsRole, user, setProjectToAddAssignee]
   );
 
   const table = useReactTable({

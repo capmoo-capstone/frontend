@@ -31,6 +31,7 @@ export default function ProjectDetail() {
   const { data: project, isLoading, isError, error } = useProjectDetail(id);
 
   if (!id || !user) return null;
+  const viewAsRole = user.role ?? 'GUEST';
   if (isLoading)
     return (
       <div className="flex h-screen w-full items-center justify-center">
@@ -52,7 +53,7 @@ export default function ProjectDetail() {
         project={project}
         onEditProject={() => setIsEditDialogOpen(true)}
         onCancelProject={() => setIsCancelDialogOpen(true)}
-        viewAsRole={user.role}
+        viewAsRole={viewAsRole}
       />
 
       {/* --- Project Alerts --- */}
@@ -96,7 +97,7 @@ export default function ProjectDetail() {
           setIsCancelDialogOpen(false);
         }}
         projectTitle={project.title}
-        isAuthorized={ManageUnitRoles.includes(user.role) || SupervisorRoles.includes(user.role)}
+        isAuthorized={ManageUnitRoles.includes(viewAsRole) || SupervisorRoles.includes(viewAsRole)}
       />
     </>
   );

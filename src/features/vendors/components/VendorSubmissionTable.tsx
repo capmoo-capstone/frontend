@@ -28,7 +28,6 @@ interface VendorSubmissionTableProps {
 
 export function VendorSubmissionTable({
   filters,
-  onSearchChange,
   onDateRangeChange,
   onExport,
 }: VendorSubmissionTableProps) {

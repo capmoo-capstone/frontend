@@ -31,6 +31,7 @@ import { getColumns } from './columns';
 export function UnassignTable({ unitId }: { unitId?: string }) {
   const { user } = useAuth();
   if (!user) return null;
+  const viewAsRole = user.role ?? 'GUEST';
 
   const { data: projects, isLoading, isError } = useUnassignedProjects(unitId);
   const { mutateAsync: assignProjectsMutation } = useAssignProjects();
@@ -50,9 +51,9 @@ export function UnassignTable({ unitId }: { unitId?: string }) {
         unitId,
         onOpenCancelDialog: (project) => setProjectToCancel(project),
         onClaimProject: (project) => handleClaimProject(project),
-        viewAsRole: user.role,
+        viewAsRole,
       }),
-    [pendingChanges, unitId, user.role]
+    [pendingChanges, unitId, viewAsRole]
   );
 
   const table = useReactTable({
@@ -73,7 +74,7 @@ export function UnassignTable({ unitId }: { unitId?: string }) {
     });
 
     const actionLabel =
-      ManageUnitRoles.includes(user.role) || SupervisorRoles.includes(user.role)
+      ManageUnitRoles.includes(viewAsRole) || SupervisorRoles.includes(viewAsRole)
         ? 'ยกเลิก'
         : 'ขอยกเลิก';
 
@@ -135,14 +136,14 @@ export function UnassignTable({ unitId }: { unitId?: string }) {
 
   return (
     <>
-      {ManageUnitRoles.includes(user.role) && <WorkloadChart pendingChanges={pendingChanges} />}
+      {ManageUnitRoles.includes(viewAsRole) && <WorkloadChart pendingChanges={pendingChanges} />}
       <ProjectDataTable
         table={table}
         columnsLength={columns.length}
         toolbar={
           <div className="flex w-full items-center justify-between space-x-4">
             <TitleBar title="งานที่ยังไม่ได้มอบหมาย" />
-            {ManageUnitRoles.includes(user.role) && (
+            {ManageUnitRoles.includes(viewAsRole) && (
               <Button
                 variant="brand"
                 onClick={handleSave}
@@ -161,7 +162,7 @@ export function UnassignTable({ unitId }: { unitId?: string }) {
         onClose={() => setProjectToCancel(null)}
         onConfirm={handleConfirmCancel}
         projectTitle={projectToCancel?.title}
-        isAuthorized={ManageUnitRoles.includes(user.role) || SupervisorRoles.includes(user.role)}
+        isAuthorized={ManageUnitRoles.includes(viewAsRole) || SupervisorRoles.includes(viewAsRole)}
       />
     </>
   );

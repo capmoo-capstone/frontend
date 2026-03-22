@@ -1,1 +1,6 @@
-export { getBudgetPlans } from './budgetPlanApi';
+export {
+  getBudgetPlans,
+  importBudgetPlans,
+  linkBudgetPlanToProject,
+  removeBudgetPlan,
+} from './budgetPlanApi';

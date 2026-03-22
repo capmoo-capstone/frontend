@@ -52,10 +52,11 @@ export function useProjectImportForm({ onSuccess }: UseProjectImportFormOptions)
   // Fetch data
   const { data: departments, isLoading: isLoadingDepts } = useDepartments();
   const { data: units, isLoading: isLoadingUnits } = useUnits(watchDeptId);
-  const { data: budgetPlans, isLoading: isLoadingBudgets } = useBudgetPlans(
-    watchUnitId,
-    watchFiscalYear
-  );
+  const {
+    data: budgetPlans,
+    isLoading: isLoadingBudgets,
+    isError: isErrorBudgets,
+  } = useBudgetPlans(watchDeptId, watchFiscalYear);
 
   // Derive warnings
   const minDays = (watchProcurementType && PROCUREMENT_MIN_DAYS[watchProcurementType]) || 0;
@@ -131,6 +132,7 @@ export function useProjectImportForm({ onSuccess }: UseProjectImportFormOptions)
     isLoadingDepts,
     isLoadingUnits,
     isLoadingBudgets,
+    isErrorBudgets,
     // Watched values
     watchDeptId,
     watchUnitId,

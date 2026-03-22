@@ -22,8 +22,8 @@ export function ManualForm({ onBack, onSuccess }: ManualFormProps) {
     isLoadingDepts,
     isLoadingUnits,
     isLoadingBudgets,
+    isErrorBudgets,
     watchDeptId,
-    watchUnitId,
     watchFiscalYear,
     isDateEarly,
     minDays,
@@ -64,7 +64,8 @@ export function ManualForm({ onBack, onSuccess }: ManualFormProps) {
               control={form.control}
               budgetPlans={budgetPlans}
               isLoadingBudgets={isLoadingBudgets}
-              watchUnitId={watchUnitId}
+              isErrorBudgets={isErrorBudgets}
+              watchDepartmentId={watchDeptId}
               watchFiscalYear={watchFiscalYear}
             />
 

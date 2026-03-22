@@ -20,7 +20,7 @@ export const ProjectImportSchema = z.object({
     .date({ message: 'กรุณาเลือกวันที่ส่งมอบ' })
     .refine((date) => date > new Date(), { message: 'กรุณาระบุวันที่ในอนาคต' })
     .optional(),
-  budget: z.coerce.number().positive('วงเงินงบประมาณต้องมากกว่า 0'),
+  budget: z.number().positive('วงเงินงบประมาณต้องมากกว่า 0'),
   department_id: z.string().min(1, 'กรุณาเลือกหน่วยงาน'),
   unit_id: z.string().min(1, 'กรุณาเลือกฝ่าย'),
   fiscal_year: z.string().min(1, 'กรุณาเลือกปีงบประมาณ'),

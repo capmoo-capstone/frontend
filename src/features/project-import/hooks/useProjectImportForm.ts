@@ -26,7 +26,7 @@ export function useProjectImportForm({ onSuccess }: UseProjectImportFormOptions)
   const currentYear = getFiscalYear(new Date());
 
   const form = useForm<ProjectImportPayload>({
-    resolver: zodResolver(ProjectImportSchema) as any,
+    resolver: zodResolver(ProjectImportSchema),
     defaultValues: {
       pr_no: '',
       title: '',

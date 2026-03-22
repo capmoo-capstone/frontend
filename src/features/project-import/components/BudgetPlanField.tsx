@@ -5,15 +5,10 @@ import { ChevronDown, X } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Field, FieldError, FieldLabel } from '@/components/ui/field';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import type { BudgetPlan } from '@/features/budgets';
 import { cn } from '@/lib/utils';
 
 import type { ProjectImportPayload } from '../types';
-
-interface BudgetPlan {
-  id: string;
-  description: string;
-  amount: number;
-}
 
 interface BudgetPlanFieldProps {
   control: Control<ProjectImportPayload>;

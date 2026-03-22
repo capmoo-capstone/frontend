@@ -1,4 +1,5 @@
 import type { User } from '@/features/auth';
+import type { Department } from '@/features/organization';
 import {
   type AssignedProjectItem,
   type Project,
@@ -6,7 +7,6 @@ import {
 } from '@/features/projects';
 import { type UserSelectionResponse } from '@/features/users';
 import { createMockUser } from '@/lib/mock-utils';
-import type { Department } from '@/types/department';
 
 export const MOCK_PROJECTS: Project[] = [
   {

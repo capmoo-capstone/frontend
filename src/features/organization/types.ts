@@ -47,3 +47,12 @@ export const UnitSchema = z.object({
 });
 
 export type UnitItem = z.infer<typeof UnitSchema>;
+
+export const DepartmentWithCodeSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  code: z.string(),
+});
+
+export type Department = z.infer<typeof DepartmentWithCodeSchema>;
+export const DepartmentsWithCodeSchema = z.array(DepartmentWithCodeSchema);

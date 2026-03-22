@@ -1,3 +1,5 @@
+import { OrganizationManagementView } from '@/features/organization';
+
 export default function OrganizationManagement() {
-  return <div>Organization Management Page</div>;
+  return <OrganizationManagementView />;
 }

@@ -1,16 +1,9 @@
 import { z } from 'zod';
 
-export const UserRoleEnum = z.enum([
-  'SUPER_ADMIN',
-  'ADMIN',
-  'HEAD_OF_DEPARTMENT',
-  'HEAD_OF_UNIT',
-  'REPRESENTATIVE',
-  'DOCUMENT_STAFF',
-  'FINANCE_STAFF',
-  'GENERAL_STAFF',
-  'GUEST',
-]);
+import { type Role, RoleEnum } from '@/features/auth/types';
+
+export const UserRoleEnum = RoleEnum;
+export type UserRole = Role;
 
 export const UserRecordSchema = z.object({
   id: z.string(),

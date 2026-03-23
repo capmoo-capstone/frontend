@@ -4,13 +4,23 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { FileCard } from '@/components/ui/file-card';
 import type { ProjectDetail } from '@/features/projects';
-import type { WorkflowStepConfig } from '@/features/workflow';
+import type { SubmissionDocument, WorkflowStepConfig } from '@/features/workflow';
 import { formatDateThai } from '@/lib/formatters';
 import { cn } from '@/lib/utils';
 
 interface ProjectSummaryViewProps {
   project: ProjectDetail;
   steps: WorkflowStepConfig[];
+}
+
+interface EnrichedSubmissionDocument extends SubmissionDocument {
+  label: string;
+  type: string;
+}
+
+interface StepWithDocuments extends WorkflowStepConfig {
+  documents: EnrichedSubmissionDocument[];
+  status: string;
 }
 
 export function ProjectSummaryView({ project, steps }: ProjectSummaryViewProps) {
@@ -21,12 +31,12 @@ export function ProjectSummaryView({ project, steps }: ProjectSummaryViewProps) 
         .filter((s) => s.step_order === step.order && s.step_name === step.name)
         .sort((a, b) => b.submission_round - a.submission_round);
 
-      const approved = submissions.find((s: any) => ['APPROVED', 'ACCEPTED'].includes(s.status));
+      const approved = submissions.find((s) => ['APPROVED', 'ACCEPTED'].includes(s.status));
       const latest = submissions[0];
       const targetSubmission = approved || latest;
 
-      const enrichedDocuments = (targetSubmission?.documents || []).map((doc: any) => {
-        const docConfig = step.required_documents?.find((d: any) => d.field_key === doc.field_key);
+      const enrichedDocuments = (targetSubmission?.documents || []).map((doc) => {
+        const docConfig = step.required_documents?.find((d) => d.field_key === doc.field_key);
         return {
           ...doc,
           label: docConfig?.label || doc.field_key,
@@ -40,13 +50,13 @@ export function ProjectSummaryView({ project, steps }: ProjectSummaryViewProps) 
         status: targetSubmission?.status || 'PENDING',
       };
     })
-    .filter((step: any) => step.documents.length > 0);
+    .filter((step) => step.documents.length > 0) as StepWithDocuments[];
 
   const handleDownloadAll = () => {
     console.log('Downloading all files...');
   };
 
-  const renderValue = (doc: any) => {
+  const renderValue = (doc: EnrichedSubmissionDocument) => {
     if (!doc.value && !doc.file_path) return <span className="text-muted-foreground">-</span>;
 
     switch (doc.type) {
@@ -57,7 +67,7 @@ export function ProjectSummaryView({ project, steps }: ProjectSummaryViewProps) 
 
       case 'DATE':
       case 'DATE_WITH_CHECKBOX':
-        return <span>{formatDateThai(doc.value, 'd MMM yy')}</span>;
+        return <span>{formatDateThai(typeof doc.value === 'string' ? doc.value : undefined, 'd MMM yy')}</span>;
 
       case 'BOOLEAN':
         return doc.value ? (
@@ -71,17 +81,22 @@ export function ProjectSummaryView({ project, steps }: ProjectSummaryViewProps) 
         );
 
       case 'VENDOR_EMAIL':
-      case 'COMMITTEE_EMAIL':
-        const emails = Array.isArray(doc.value) ? doc.value : [doc.value];
+      case 'COMMITTEE_EMAIL': {
+        const emails = Array.isArray(doc.value)
+          ? doc.value.filter((email): email is string => typeof email === 'string')
+          : typeof doc.value === 'string'
+            ? [doc.value]
+            : [];
         return (
           <div className="flex flex-col gap-1">
-            {emails.map((email: string, i: number) => (
+            {emails.map((email, i) => (
               <span key={i} className="flex items-center gap-1.5">
                 <Mail className="text-muted-foreground h-3 w-3" /> {email}
               </span>
             ))}
           </div>
         );
+      }
 
       case 'GEN_CONT_NO':
         return (
@@ -120,7 +135,7 @@ export function ProjectSummaryView({ project, steps }: ProjectSummaryViewProps) 
 
       {/* Summary List Container */}
       <div className="bg-card text-card-foreground rounded-lg border shadow-sm">
-        {stepsWithDocs.map((step: any, index: number) => (
+        {stepsWithDocs.map((step, index) => (
           <div
             key={step.order}
             className={cn(
@@ -145,7 +160,7 @@ export function ProjectSummaryView({ project, steps }: ProjectSummaryViewProps) 
 
             {/* Document Data List (Compact Grid) */}
             <div className="ml-9 grid grid-cols-1 gap-x-12 gap-y-4 md:grid-cols-2 lg:grid-cols-3">
-              {step.documents.map((doc: any, idx: number) => (
+              {step.documents.map((doc, idx) => (
                 <div key={`${step.order}-${idx}`} className="flex min-w-0 flex-col gap-1">
                   <span className="text-muted-foreground normal truncate tracking-wide uppercase">
                     {doc.label}

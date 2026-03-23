@@ -1,3 +1,5 @@
+import { useState } from 'react';
+
 import { UserSelect } from '@/features/users';
 
 interface AssigneeCellProps {
@@ -18,31 +20,41 @@ export function AssigneeCell({
   const isDirty = Object.prototype.hasOwnProperty.call(pendingChanges, rowId);
 
   const currentValue = isDirty ? pendingChanges[rowId] : originalValue;
+  const [localValue, setLocalValue] = useState<string | null>(currentValue ?? null);
+
+  const removePendingChange = (prev: Record<string, string>) => {
+    const next = { ...prev };
+    delete next[rowId];
+    return next;
+  };
+
+  const handleCommit = () => {
+    setPendingChanges((prev) => {
+      const nextValue = localValue ?? '';
+      const baselineValue = originalValue ?? '';
+
+      if (nextValue === baselineValue) {
+        return removePendingChange(prev);
+      }
+
+      return {
+        ...prev,
+        [rowId]: nextValue,
+      };
+    });
+  };
 
   const handleReset = () => {
-    setPendingChanges((prev) => {
-      const { [rowId]: _, ...rest } = prev;
-      return rest;
-    });
+    setLocalValue(originalValue ?? null);
+    setPendingChanges((prev) => removePendingChange(prev));
   };
 
   return (
     <UserSelect
-      value={currentValue}
+      value={localValue}
       unitId={unitId}
-      onChange={(newId) => {
-        setPendingChanges((prev) => {
-          if (newId === originalValue || (newId === '' && originalValue === null)) {
-            const { [rowId]: _, ...rest } = prev;
-            return rest;
-          }
-
-          return {
-            ...prev,
-            [rowId]: newId,
-          };
-        });
-      }}
+      onChange={(newId) => setLocalValue(newId || null)}
+      onBlur={handleCommit}
       onReset={handleReset}
       className="h-8 w-48 flex-1 text-sm"
       hasClearButton={true}

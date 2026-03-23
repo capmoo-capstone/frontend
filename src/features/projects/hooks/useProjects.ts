@@ -15,7 +15,7 @@ import {
 } from '../api';
 import type { ProjectDetail } from '../types';
 
-export interface ProjectFilterParams {
+export type ProjectFilterParams = {
   search?: string;
   title?: string;
   dateRange?: DateRange;
@@ -26,7 +26,7 @@ export interface ProjectFilterParams {
   assignees?: string[];
   departments?: string[];
   myTasks?: boolean;
-}
+};
 export const useProjects = (filters?: ProjectFilterParams) => {
   return useQuery({
     queryKey: ['projects', filters],

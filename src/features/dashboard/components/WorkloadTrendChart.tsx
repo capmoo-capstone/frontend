@@ -11,7 +11,13 @@ import {
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
-export function WorkloadTrendChart({ data }: { data: any[] }) {
+interface WorkloadTrendRow {
+  name: string;
+  received: number;
+  completed: number;
+}
+
+export function WorkloadTrendChart({ data }: { data: WorkloadTrendRow[] }) {
   return (
     <Card className="shadow-sm lg:col-span-2">
       <CardHeader>

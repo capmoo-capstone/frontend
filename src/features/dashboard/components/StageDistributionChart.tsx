@@ -11,7 +11,12 @@ import {
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
-export function StageDistributionChart({ data }: { data: any[] }) {
+interface StageDistributionRow {
+  name: string;
+  count: number;
+}
+
+export function StageDistributionChart({ data }: { data: StageDistributionRow[] }) {
   return (
     <Card className="shadow-sm">
       <CardHeader>

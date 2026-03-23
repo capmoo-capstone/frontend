@@ -17,7 +17,7 @@ export function useExcelImport(mode: ImportMode) {
       const dataRows = rows.slice(1);
 
       const formattedData: EditableImportRow[] = dataRows.map((row) => {
-        const rowObj: Record<string, any> = {};
+        const rowObj: Record<string, unknown> = {};
         headers.forEach((header, colIndex) => {
           rowObj[header] = row[colIndex];
         });
@@ -54,7 +54,7 @@ export function useExcelImport(mode: ImportMode) {
     }
   };
 
-  const updateRow = (rowIndex: number, columnId: string, value: any) => {
+  const updateRow = (rowIndex: number, columnId: string, value: unknown) => {
     setData((old) =>
       old.map((row, index) => {
         if (index === rowIndex) {

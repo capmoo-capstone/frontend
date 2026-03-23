@@ -6,6 +6,12 @@ import { getResponsiblePerson } from '@/lib/formatters';
 
 import type { FinanceExportItem, FinanceExportStatus } from '../types';
 
+type ProjectWithRequester = Project & {
+  requester?: {
+    dept_name?: string;
+  };
+};
+
 // Map project status to finance export status
 const mapToFinanceStatus = (projectStatus: Project['status']): FinanceExportStatus => {
   switch (projectStatus) {
@@ -35,6 +41,14 @@ export function useFinanceExport() {
   const data = useMemo<FinanceExportItem[]>(() => {
     if (!projects) return [];
 
+    const getDepartmentName = (project: Project): string => {
+      const maybeProject = project as ProjectWithRequester;
+      if (typeof maybeProject.requester?.dept_name === 'string') {
+        return maybeProject.requester.dept_name;
+      }
+      return '-';
+    };
+
     return projects
       .map((project) => ({
         id: project.id,
@@ -45,7 +59,7 @@ export function useFinanceExport() {
         procurement_type: project.procurement_type,
         budget:
           typeof project.budget === 'number' ? project.budget : parseFloat(project.budget || '0'),
-        department_name: (project as any).requester?.dept_name || '-',
+        department_name: getDepartmentName(project),
         export_status: mapToFinanceStatus(project.status),
         project_status: project.status,
         urgent_status: project.urgent_status,

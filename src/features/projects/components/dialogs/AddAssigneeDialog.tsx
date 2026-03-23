@@ -1,22 +1,30 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Controller, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
+import { z } from 'zod';
 
 import { CustomContentDialog } from '@/components/shared-dialog';
 import { UserSelect } from '@/features/users';
 
 import { useAssignProjects, useProjectDetail } from '../../hooks/useProjects';
 
-interface AddMemberDialogProps {
+const AddAssigneeFormSchema = z.object({
+  userId: z.string().min(1, 'กรุณาเลือกเจ้าหน้าที่'),
+});
+
+type AddAssigneeFormValues = z.infer<typeof AddAssigneeFormSchema>;
+
+interface AddAssigneeDialogProps {
   isOpen: boolean;
   onClose: () => void;
   projectId: string;
 }
 
-export function AddAssigneeDialog({ isOpen, onClose, projectId }: AddMemberDialogProps) {
-  const [selectedUser, setSelectedUser] = useState<string | null>(null);
+export function AddAssigneeDialog({ isOpen, onClose, projectId }: AddAssigneeDialogProps) {
   const { mutateAsync: assignProjectsMutation, isPending } = useAssignProjects();
   const projectDetail = useProjectDetail(projectId);
   const data = projectDetail.data;
@@ -25,22 +33,26 @@ export function AddAssigneeDialog({ isOpen, onClose, projectId }: AddMemberDialo
       ? data?.assignee_contract?.unit_id
       : data?.assignee_procurement?.unit_id) ?? undefined;
 
+  const form = useForm<AddAssigneeFormValues>({
+    resolver: zodResolver(AddAssigneeFormSchema),
+    defaultValues: {
+      userId: '',
+    },
+  });
+
+  const selectedUserId = form.watch('userId');
+
   useEffect(() => {
     if (isOpen) {
-      setSelectedUser(null);
+      form.reset({ userId: '' });
     }
-  }, [isOpen]);
+  }, [isOpen, form]);
 
-  const handleConfirm = async () => {
-    if (!selectedUser) {
-      toast.error('กรุณาเลือกเจ้าหน้าที่');
-      return;
-    }
-
+  const handleConfirm = form.handleSubmit(async (values) => {
     const savePromise = assignProjectsMutation([
       {
         projectId,
-        userId: selectedUser,
+        userId: values.userId,
       },
     ]);
 
@@ -56,7 +68,7 @@ export function AddAssigneeDialog({ isOpen, onClose, projectId }: AddMemberDialo
     } catch (error) {
       console.error(error);
     }
-  };
+  });
 
   return (
     <CustomContentDialog
@@ -66,7 +78,7 @@ export function AddAssigneeDialog({ isOpen, onClose, projectId }: AddMemberDialo
       title="การเพิ่มเจ้าหน้าที่ในโครงการ"
       confirmLabel="ตกลง"
       cancelLabel="ยกเลิก"
-      disableConfirm={!selectedUser || isPending}
+      disableConfirm={!selectedUserId || isPending || !form.formState.isValid}
       centered
     >
       <div className="flex w-full flex-col items-start space-y-2">
@@ -75,13 +87,19 @@ export function AddAssigneeDialog({ isOpen, onClose, projectId }: AddMemberDialo
         </div>
 
         <div className="relative w-full">
-          <UserSelect
-            value={selectedUser}
-            onChange={setSelectedUser}
-            className="normal w-full"
-            placeholder="เลือกเจ้าหน้าที่..."
-            hasClearButton={false}
-            unitId={unitId}
+          <Controller
+            control={form.control}
+            name="userId"
+            render={({ field }) => (
+              <UserSelect
+                value={field.value || null}
+                onChange={(value) => field.onChange(value ?? '')}
+                className="normal w-full"
+                placeholder="เลือกเจ้าหน้าที่..."
+                hasClearButton={false}
+                unitId={unitId}
+              />
+            )}
           />
         </div>
       </div>

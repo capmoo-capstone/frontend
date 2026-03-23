@@ -3,6 +3,10 @@ import { AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { formatDateThai } from '@/lib/formatters';
 
+const NOW = new Date();
+const TWO_DAYS_MS = 2 * 24 * 60 * 60 * 1000;
+const TWO_DAYS_AGO = new Date(NOW.getTime() - TWO_DAYS_MS);
+
 interface CancellationRequestBannerProps {
   onRequestApprove: () => void;
   onRequestReject: () => void;
@@ -22,8 +26,8 @@ export function CancellationRequestBanner({
           <div>
             <h3 className="h3-topic text-destructive">คำขอยกเลิกโครงการ</h3>
             <p className="caption text-muted-foreground mt-1">
-              ส่งคำขอเมื่อ {formatDateThai(new Date())} เวลา{' '}
-              {new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' })} น.
+              ส่งคำขอเมื่อ {formatDateThai(NOW)} เวลา{' '}
+              {NOW.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' })} น.
             </p>
           </div>
           <div>
@@ -61,8 +65,8 @@ export function CancelledProjectBanner() {
           <div>
             <h3 className="h3-topic text-destructive">โครงการถูกยกเลิกแล้ว</h3>
             <p className="caption text-muted-foreground mt-1">
-              ยกเลิกเมื่อ {formatDateThai(new Date())} เวลา{' '}
-              {new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' })} น.
+              ยกเลิกเมื่อ {formatDateThai(NOW)} เวลา{' '}
+              {NOW.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' })} น.
             </p>
           </div>
           <div className="bg-background space-y-2 rounded-md p-4">
@@ -74,11 +78,8 @@ export function CancelledProjectBanner() {
             </p>
             <p className="normal text-primary">
               <span className="text-muted-foreground">วันที่ขอยกเลิก:</span>{' '}
-              {formatDateThai(new Date(Date.now() - 2 * 24 * 60 * 60 * 1000))} เวลา{' '}
-              {new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toLocaleTimeString('th-TH', {
-                hour: '2-digit',
-                minute: '2-digit',
-              })}{' '}
+              {formatDateThai(TWO_DAYS_AGO)} เวลา{' '}
+              {TWO_DAYS_AGO.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' })}{' '}
               น.
             </p>
             <div className="border-t pt-2">

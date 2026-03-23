@@ -12,7 +12,14 @@ import {
   TableRow,
 } from '@/components/ui/table';
 
-export function StaffPerformanceTable({ data }: { data: any[] }) {
+interface StaffPerformanceRow {
+  name: string;
+  total: number;
+  doing: number;
+  done: number;
+}
+
+export function StaffPerformanceTable({ data }: { data: StaffPerformanceRow[] }) {
   return (
     <Card className="shadow-sm">
       <CardHeader className="flex flex-row items-center justify-between">

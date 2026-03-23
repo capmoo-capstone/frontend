@@ -4,9 +4,18 @@ import api from '@/lib/axios';
 
 // Import ProjectFilterParams from useProjects to avoid duplication
 import type { ProjectFilterParams } from '../hooks/useProjects';
-import type { AssignedProjectItem, Project, ProjectDetail, UnassignedProjectItem } from '../types';
+import type {
+  AssignedProjectItem,
+  Project,
+  ProjectAssignmentsPayload,
+  ProjectDetail,
+  UnassignedProjectItem,
+} from '../types';
 import {
   AssignedProjectItemSchema,
+  ProjectAssignmentsPayloadSchema,
+  ProjectAssignmentSchema,
+  ProjectDetailSchema,
   ProjectListSchema,
   UnassignedProjectItemSchema,
 } from '../types';
@@ -15,7 +24,8 @@ import { mockProjects } from './mock-projects';
 
 export type { ProjectFilterParams };
 
-export const getProjects = async (_params?: ProjectFilterParams): Promise<Project[]> => {
+export const getProjects = async (params?: ProjectFilterParams): Promise<Project[]> => {
+  void params;
   // return mock data;
   return MOCK_PROJECTS;
 
@@ -28,7 +38,7 @@ export const getProjectDetail = async (id: string): Promise<ProjectDetail> => {
   return mockProjects.find((project) => project.id === id)!;
 
   const { data } = await api.get(`/projects/${id}`);
-  return data;
+  return ProjectDetailSchema.parse(data);
 };
 
 export const getAssignedProjects = async (
@@ -69,8 +79,10 @@ export const getUnassignedProjects = async (unitId: string): Promise<UnassignedP
     .parse(data).data;
 };
 
-export const assignProject = async (assignments: Array<{ projectId: string; userId: string }>) => {
+export const assignProject = async (assignments: ProjectAssignmentsPayload) => {
   // Mock response
+  ProjectAssignmentsPayloadSchema.parse(assignments);
+
   return {
     success: true,
     data: assignments,
@@ -80,7 +92,12 @@ export const assignProject = async (assignments: Array<{ projectId: string; user
     data: assignments,
   });
 
-  return data;
+  return z
+    .object({
+      success: z.boolean(),
+      data: z.array(ProjectAssignmentSchema),
+    })
+    .parse(data);
 };
 
 export const changeProjectAssignee = async (projectId: string, newUserId: string) => {

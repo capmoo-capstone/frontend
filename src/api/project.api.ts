@@ -16,7 +16,8 @@ import { MOCK_ASSIGNED_PROJECTS, MOCK_PROJECTS, MOCK_UNASSIGNED_PROJECTS } from 
 import { mockProjects } from './mock-project';
 import { mockProjects as workflow } from './mock-workflow';
 
-export const getProjects = async (_params?: ProjectFilterParams): Promise<Project[]> => {
+export const getProjects = async (params?: ProjectFilterParams): Promise<Project[]> => {
+  void params;
   // return mock data;
   return MOCK_PROJECTS;
 

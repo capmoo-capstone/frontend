@@ -29,7 +29,7 @@ export function ApproveCancelDialog({
           {projectTitle && (
             <>
               {' '}
-              <strong className="text-foreground">"{projectTitle}"</strong>
+              <strong className="text-foreground">&quot;{projectTitle}&quot;</strong>
             </>
           )}
           {requesterName && (

@@ -1,0 +1,1 @@
+export { AssignedTable } from './AssignedTable';

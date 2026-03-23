@@ -1,6 +1,12 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { type ColumnDef, flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table';
+import {
+  type CellContext,
+  type ColumnDef,
+  flexRender,
+  getCoreRowModel,
+  useReactTable,
+} from '@tanstack/react-table';
 import { File, Trash2 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -30,7 +36,7 @@ import { FioriImportSchema, LesspaperImportSchema } from '../types';
 
 interface Props {
   data: EditableImportRow[];
-  updateRow: (index: number, id: string, value: any) => void;
+  updateRow: (index: number, id: string, value: unknown) => void;
   deleteRow: (index: number) => void;
   onSubmit: () => void;
   onBack: () => void;
@@ -45,22 +51,32 @@ interface ValidationError {
   message: string;
 }
 
+interface EditableTableMeta {
+  updateData: (index: number, id: string, value: unknown) => void;
+  departments: Array<{ id: string; name: string }> | undefined;
+  fiscalYears: string[];
+  errors: ValidationError[];
+}
+
 // Editable Cell Component
-const EditableCell = ({ getValue, row: { index }, column: { id }, table }: any) => {
+const EditableCell = ({ getValue, row: { index }, column: { id }, table }: CellContext<
+  EditableImportRow,
+  unknown
+>) => {
   const initialValue = getValue();
-  const updateData = table.options.meta?.updateData;
-  const departments = table.options.meta?.departments;
-  const fiscalYears = table.options.meta?.fiscalYears;
-  const errors = table.options.meta?.errors || [];
+  const initialTextValue = initialValue == null ? '' : String(initialValue);
+  const meta = table.options.meta as EditableTableMeta | undefined;
+  const updateData = meta?.updateData;
+  const departments = meta?.departments;
+  const fiscalYears = meta?.fiscalYears;
+  const errors = meta?.errors || [];
 
-  const [value, setValue] = useState(initialValue ?? '');
-
-  useEffect(() => {
-    setValue(initialValue ?? '');
-  }, [initialValue]);
+  const [value, setValue] = useState(initialTextValue);
 
   const onBlur = () => {
-    let finalValue = value;
+    if (!updateData) return;
+
+    let finalValue: unknown = value;
     if (id === 'budget') {
       finalValue = value === '' ? '' : Number(value);
     }
@@ -75,7 +91,10 @@ const EditableCell = ({ getValue, row: { index }, column: { id }, table }: any) 
   if (id === 'procurement_type') {
     return (
       <div className="flex w-full flex-col gap-1">
-        <Select value={initialValue ?? ''} onValueChange={(val) => updateData(index, id, val)}>
+        <Select
+          value={initialTextValue}
+          onValueChange={(val) => updateData && updateData(index, id, val)}
+        >
           <SelectTrigger
             className={cn('bg-background h-9 w-full', hasError && 'border-destructive')}
           >
@@ -97,7 +116,10 @@ const EditableCell = ({ getValue, row: { index }, column: { id }, table }: any) 
   if (id === 'department_id') {
     return (
       <div className="flex w-full flex-col gap-1">
-        <Select value={initialValue ?? ''} onValueChange={(val) => updateData(index, id, val)}>
+        <Select
+          value={initialTextValue}
+          onValueChange={(val) => updateData && updateData(index, id, val)}
+        >
           <SelectTrigger
             className={cn('bg-background h-9 w-full', hasError && 'border-destructive')}
           >
@@ -120,7 +142,10 @@ const EditableCell = ({ getValue, row: { index }, column: { id }, table }: any) 
   if (id === 'fiscal_year') {
     return (
       <div className="flex w-full flex-col gap-1">
-        <Select value={initialValue ?? ''} onValueChange={(val) => updateData(index, id, val)}>
+        <Select
+          value={initialTextValue}
+          onValueChange={(val) => updateData && updateData(index, id, val)}
+        >
           <SelectTrigger
             className={cn('bg-background h-9 w-full', hasError && 'border-destructive')}
           >
@@ -141,7 +166,7 @@ const EditableCell = ({ getValue, row: { index }, column: { id }, table }: any) 
   }
 
   if (id === 'delivery_date_str') {
-    const dateValue = initialValue ? new Date(initialValue) : undefined;
+    const dateValue = initialTextValue ? new Date(initialTextValue) : undefined;
 
     return (
       <div className="flex w-full flex-col gap-1">
@@ -150,7 +175,9 @@ const EditableCell = ({ getValue, row: { index }, column: { id }, table }: any) 
           disabledDays={{ before: new Date() }}
           setDate={(date) => {
             const dateStr = date ? date.toISOString().split('T')[0] : '';
-            updateData(index, id, dateStr);
+            if (updateData) {
+              updateData(index, id, dateStr);
+            }
           }}
           className={cn('bg-background h-9 w-full', hasError && 'border-destructive')}
         />

@@ -130,7 +130,7 @@ export const getColumns = ({
   {
     accessorKey: 'status',
     header: 'สถานะ',
-    cell: ({}) => {
+    cell: () => {
       return <Badge variant={'secondary'}>{'รอการมอบหมาย'}</Badge>;
     },
   },

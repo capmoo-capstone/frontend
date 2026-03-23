@@ -28,13 +28,13 @@ export function CancelProjectDialog({
       description={
         isAuthorized ? (
           <>
-            คุณกำลังจะยกเลิกโครงการ <span className="font-medium">"{projectTitle}"</span>?
+            คุณกำลังจะยกเลิกโครงการ <span className="font-medium">&quot;{projectTitle}&quot;</span>?
             โปรดระบุเหตุผล ในการยกเลิกโครงการนี้
           </>
         ) : (
           <>
             คุณกำลังจะส่งคำขอเพื่อยกเลิกโครงการ{' '}
-            <span className="font-medium">"{projectTitle}"</span> โปรดระบุเหตุผล
+            <span className="font-medium">&quot;{projectTitle}&quot;</span> โปรดระบุเหตุผล
             ในการยกเลิกโครงการนี้ หัวหน้ากลุ่มงานจะทำการพิจารณาคำขอยกเลิกของคุณ
           </>
         )

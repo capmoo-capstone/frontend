@@ -9,8 +9,8 @@ import type {
   Project,
   ProjectAssignmentsPayload,
   ProjectDetail,
-  UpdateProjectPayload,
   UnassignedProjectItem,
+  UpdateProjectPayload,
 } from '../types';
 import {
   AssignedProjectItemSchema,
@@ -18,8 +18,8 @@ import {
   ProjectAssignmentsPayloadSchema,
   ProjectDetailSchema,
   ProjectListSchema,
-  UpdateProjectPayloadSchema,
   UnassignedProjectItemSchema,
+  UpdateProjectPayloadSchema,
 } from '../types';
 import { MOCK_ASSIGNED_PROJECTS, MOCK_PROJECTS, MOCK_UNASSIGNED_PROJECTS } from './mockData';
 import { mockProjects } from './mockProjects';

@@ -1,6 +1,6 @@
 import api from '@/lib/axios';
 
-import { ProjectImportSchema, type ProjectImportPayload } from '../types';
+import { type ProjectImportPayload, ProjectImportSchema } from '../types';
 
 interface CreateProjectRequestPayload {
   title: string;

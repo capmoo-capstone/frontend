@@ -6,11 +6,11 @@ import { useDepartments } from '@/features/organization';
 import { getFiscalYear } from '@/lib/formatters';
 import { hasImportOptionsPermission } from '@/lib/permissions';
 
+import { useExcelImport } from '../hooks/useExcelImport';
 import type { ImportMode } from '../types';
 import { EditableImportTable } from './EditableImportTable';
 import { ImportSelector } from './ImportSelector';
 import { ManualForm } from './ManualForm';
-import { useExcelImport } from '../hooks/useExcelImport';
 
 export function ProjectImportContainer() {
   const navigate = useNavigate();

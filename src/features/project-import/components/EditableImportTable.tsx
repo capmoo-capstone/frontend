@@ -59,10 +59,12 @@ interface EditableTableMeta {
 }
 
 // Editable Cell Component
-const EditableCell = ({ getValue, row: { index }, column: { id }, table }: CellContext<
-  EditableImportRow,
-  unknown
->) => {
+const EditableCell = ({
+  getValue,
+  row: { index },
+  column: { id },
+  table,
+}: CellContext<EditableImportRow, unknown>) => {
   const initialValue = getValue();
   const initialTextValue = initialValue == null ? '' : String(initialValue);
   const meta = table.options.meta as EditableTableMeta | undefined;

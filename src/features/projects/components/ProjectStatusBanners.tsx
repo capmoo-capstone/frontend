@@ -79,8 +79,7 @@ export function CancelledProjectBanner() {
             <p className="normal text-primary">
               <span className="text-muted-foreground">วันที่ขอยกเลิก:</span>{' '}
               {formatDateThai(TWO_DAYS_AGO)} เวลา{' '}
-              {TWO_DAYS_AGO.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' })}{' '}
-              น.
+              {TWO_DAYS_AGO.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' })} น.
             </p>
             <div className="border-t pt-2">
               <p className="normal text-muted-foreground">

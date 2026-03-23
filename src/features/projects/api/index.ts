@@ -13,8 +13,8 @@ import type {
 } from '../types';
 import {
   AssignedProjectItemSchema,
-  ProjectAssignmentsPayloadSchema,
   ProjectAssignmentSchema,
+  ProjectAssignmentsPayloadSchema,
   ProjectDetailSchema,
   ProjectListSchema,
   UnassignedProjectItemSchema,

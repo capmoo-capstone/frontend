@@ -67,7 +67,11 @@ export function ProjectSummaryView({ project, steps }: ProjectSummaryViewProps) 
 
       case 'DATE':
       case 'DATE_WITH_CHECKBOX':
-        return <span>{formatDateThai(typeof doc.value === 'string' ? doc.value : undefined, 'd MMM yy')}</span>;
+        return (
+          <span>
+            {formatDateThai(typeof doc.value === 'string' ? doc.value : undefined, 'd MMM yy')}
+          </span>
+        );
 
       case 'BOOLEAN':
         return doc.value ? (

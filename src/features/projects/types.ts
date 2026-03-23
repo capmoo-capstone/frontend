@@ -128,6 +128,14 @@ export type ProjectAssignment = z.infer<typeof ProjectAssignmentSchema>;
 export const ProjectAssignmentsPayloadSchema = z.array(ProjectAssignmentSchema);
 export type ProjectAssignmentsPayload = z.infer<typeof ProjectAssignmentsPayloadSchema>;
 
+export const UpdateProjectPayloadSchema = z.object({
+  title: z.string().min(1).optional(),
+  description: z.string().nullable().optional(),
+  budget: z.number().nullable().optional(),
+  is_urgent: z.boolean().optional(),
+});
+export type UpdateProjectPayload = z.infer<typeof UpdateProjectPayloadSchema>;
+
 // ============================================================================
 // Project Detail Schema
 // ============================================================================

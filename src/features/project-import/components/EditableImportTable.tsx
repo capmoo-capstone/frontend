@@ -34,7 +34,7 @@ import { cn } from '@/lib/utils';
 import type { EditableImportRow, ImportMode } from '../types';
 import { FioriImportSchema, LesspaperImportSchema } from '../types';
 
-interface Props {
+interface EditableImportTableProps {
   data: EditableImportRow[];
   updateRow: (index: number, id: string, value: unknown) => void;
   deleteRow: (index: number) => void;
@@ -226,7 +226,7 @@ export function EditableImportTable({
   departments,
   fiscalYears,
   mode,
-}: Props) {
+}: EditableImportTableProps) {
   const [validationErrors, setValidationErrors] = useState<ValidationError[]>([]);
 
   const validateData = useCallback(() => {

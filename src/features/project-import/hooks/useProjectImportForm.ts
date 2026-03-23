@@ -11,6 +11,7 @@ import { getFiscalYear } from '@/lib/formatters';
 import { hasProcurementPermission } from '@/lib/permissions';
 
 import { PROCUREMENT_MIN_DAYS, type ProjectImportPayload, ProjectImportSchema } from '../types';
+import { useCreateProject } from './useCreateProject';
 
 interface UseProjectImportFormOptions {
   onSuccess: () => void;
@@ -22,6 +23,7 @@ export function useProjectImportForm({ onSuccess }: UseProjectImportFormOptions)
 
   const [showConfirmationDialog, setShowConfirmationDialog] = useState(false);
   const [warningConfirmed, setWarningConfirmed] = useState(false);
+  const { mutateAsync: createProjectMutation, isPending: isSubmitting } = useCreateProject();
 
   const currentYear = getFiscalYear(new Date());
 
@@ -93,21 +95,21 @@ export function useProjectImportForm({ onSuccess }: UseProjectImportFormOptions)
     }
   }, [selectedPlans, budgetPlans, form]);
 
-  const onSubmit = (data: ProjectImportPayload) => {
+  const onSubmit = async (data: ProjectImportPayload) => {
     if ((isDateEarly || showBudgetWarning) && !warningConfirmed) {
       setShowConfirmationDialog(true);
       return;
     }
 
-    console.log('Submitting:', data);
+    await createProjectMutation(data);
     onSuccess();
   };
 
   const handleConfirm = () => {
     setWarningConfirmed(true);
     setShowConfirmationDialog(false);
-    form.handleSubmit((data) => {
-      console.log('Submitting after confirmation:', data);
+    form.handleSubmit(async (data) => {
+      await createProjectMutation(data);
       onSuccess();
     })();
   };
@@ -146,6 +148,7 @@ export function useProjectImportForm({ onSuccess }: UseProjectImportFormOptions)
     calculatedSum,
     // Dialog state
     showConfirmationDialog,
+    isSubmitting,
     // Handlers
     onSubmit,
     handleConfirm,

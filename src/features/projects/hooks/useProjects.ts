@@ -12,10 +12,11 @@ import {
   getProjectDetail,
   getProjects,
   getUnassignedProjects,
+  updateProject,
 } from '../api';
-import type { ProjectDetail } from '../types';
+import type { ProjectDetail, UpdateProjectPayload } from '../types';
 
-export type ProjectFilterParams = {
+export interface ProjectFilterParams {
   search?: string;
   title?: string;
   dateRange?: DateRange;
@@ -26,7 +27,7 @@ export type ProjectFilterParams = {
   assignees?: string[];
   departments?: string[];
   myTasks?: boolean;
-};
+}
 export const useProjects = (filters?: ProjectFilterParams) => {
   return useQuery({
     queryKey: ['projects', filters],
@@ -104,6 +105,24 @@ export const useCancelProject = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ['projects'],
+      });
+    },
+  });
+};
+
+export const useUpdateProject = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ projectId, payload }: { projectId: string; payload: UpdateProjectPayload }) =>
+      updateProject(projectId, payload),
+
+    onSuccess: (_, { projectId }) => {
+      queryClient.invalidateQueries({
+        queryKey: ['projects'],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ['project', projectId],
       });
     },
   });

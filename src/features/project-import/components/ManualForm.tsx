@@ -29,6 +29,7 @@ export function ManualForm({ onBack, onSuccess }: ManualFormProps) {
     minDays,
     showBudgetWarning,
     showConfirmationDialog,
+    isSubmitting,
     onSubmit,
     handleConfirm,
     handleCancel,
@@ -82,7 +83,13 @@ export function ManualForm({ onBack, onSuccess }: ManualFormProps) {
         </div>
 
         <div className="flex w-full justify-end gap-4">
-          <Button form="manual-form" type="submit" variant="brand" className="min-w-25">
+          <Button
+            form="manual-form"
+            type="submit"
+            variant="brand"
+            className="min-w-25"
+            disabled={isSubmitting}
+          >
             ยืนยัน
           </Button>
           <Button type="button" variant="outline" onClick={onBack} className="min-w-25">

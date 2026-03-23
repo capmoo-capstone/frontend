@@ -9,6 +9,7 @@ import type {
   Project,
   ProjectAssignmentsPayload,
   ProjectDetail,
+  UpdateProjectPayload,
   UnassignedProjectItem,
 } from '../types';
 import {
@@ -17,10 +18,11 @@ import {
   ProjectAssignmentsPayloadSchema,
   ProjectDetailSchema,
   ProjectListSchema,
+  UpdateProjectPayloadSchema,
   UnassignedProjectItemSchema,
 } from '../types';
-import { MOCK_ASSIGNED_PROJECTS, MOCK_PROJECTS, MOCK_UNASSIGNED_PROJECTS } from './mock-data';
-import { mockProjects } from './mock-projects';
+import { MOCK_ASSIGNED_PROJECTS, MOCK_PROJECTS, MOCK_UNASSIGNED_PROJECTS } from './mockData';
+import { mockProjects } from './mockProjects';
 
 export type { ProjectFilterParams };
 
@@ -191,6 +193,39 @@ export const claimProject = async (projectId: string) => {
         projectId: z.string(),
         status: z.literal('IN_PROGRESS'),
         assignee_procurement_id: z.string(),
+      }),
+    })
+    .parse(data);
+};
+
+export const updateProject = async (projectId: string, payload: UpdateProjectPayload) => {
+  const parsedPayload = UpdateProjectPayloadSchema.parse(payload);
+  const requestPayload = {
+    id: projectId,
+    updateData: {
+      ...parsedPayload,
+      is_urgent:
+        parsedPayload.is_urgent === undefined
+          ? undefined
+          : parsedPayload.is_urgent
+            ? 'URGENT'
+            : 'NORMAL',
+    },
+  };
+
+  // Mock response
+  return {
+    data: {
+      id: projectId,
+      ...parsedPayload,
+    },
+  };
+
+  const { data } = await api.patch(`/project/${projectId}/update`, requestPayload);
+  return z
+    .object({
+      data: z.object({
+        id: z.string(),
       }),
     })
     .parse(data);

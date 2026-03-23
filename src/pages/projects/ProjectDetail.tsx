@@ -14,7 +14,9 @@ import {
   ProjectDetailTabs,
   ProjectHeader,
   ProjectInfoGrid,
+  useCancelProject,
   useProjectDetail,
+  useUpdateProject,
 } from '@/features/projects';
 import { ProcurementWorkflows } from '@/features/workflow';
 import { ManageUnitRoles, SupervisorRoles } from '@/lib/permissions';
@@ -29,6 +31,8 @@ export default function ProjectDetail() {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
   const { data: project, isLoading, isError, error } = useProjectDetail(id);
+  const { mutateAsync: cancelProjectMutation } = useCancelProject();
+  const { mutateAsync: updateProjectMutation } = useUpdateProject();
 
   if (!id || !user) return null;
   const viewAsRole = user.role ?? 'GUEST';
@@ -42,7 +46,10 @@ export default function ProjectDetail() {
   if (!project) return null;
 
   const handleEditProject = async (data: EditProjectData) => {
-    console.log('Updating project:', data);
+    await updateProjectMutation({
+      projectId: id,
+      payload: data,
+    });
     toast.success('อัปเดตข้อมูลโครงการสำเร็จ');
     setIsEditDialogOpen(false);
   };
@@ -92,7 +99,8 @@ export default function ProjectDetail() {
       <CancelProjectDialog
         isOpen={isCancelDialogOpen}
         onClose={() => setIsCancelDialogOpen(false)}
-        onConfirm={async () => {
+        onConfirm={async (reason) => {
+          await cancelProjectMutation({ projectId: id, reason });
           toast.success('ยกเลิกโครงการสำเร็จ');
           setIsCancelDialogOpen(false);
         }}

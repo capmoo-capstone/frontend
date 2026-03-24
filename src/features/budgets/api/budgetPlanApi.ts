@@ -1,4 +1,5 @@
 import api from '@/lib/axios';
+import { z } from 'zod';
 
 import {
   type BudgetPlan,
@@ -15,12 +16,56 @@ import {
 
 const PAGE_LIMIT = 100;
 
-const normalizeBudgetPlan = (item: BudgetPlanBackend): BudgetPlan => {
+const UnitListResponseSchema = z.object({
+  totalPages: z.number(),
+  data: z.array(
+    z.object({
+      id: z.string(),
+      dept_id: z.string().optional(),
+    })
+  ),
+});
+
+const fetchUnitPage = async (page: number, limit: number) => {
+  const { data } = await api.get('/units', {
+    params: { page, limit },
+  });
+
+  return UnitListResponseSchema.parse(data);
+};
+
+const getUnitDepartmentMap = async (): Promise<Map<string, string>> => {
+  const firstPage = await fetchUnitPage(1, PAGE_LIMIT);
+  const allRows = [...firstPage.data];
+
+  if (firstPage.totalPages > 1) {
+    const restPages = await Promise.all(
+      Array.from({ length: firstPage.totalPages - 1 }, (_, index) =>
+        fetchUnitPage(index + 2, PAGE_LIMIT)
+      )
+    );
+
+    restPages.forEach((pageResult) => {
+      allRows.push(...pageResult.data);
+    });
+  }
+
+  return new Map(
+    allRows
+      .filter((unit) => Boolean(unit.dept_id))
+      .map((unit) => [unit.id, unit.dept_id as string])
+  );
+};
+
+const normalizeBudgetPlan = (
+  item: BudgetPlanBackend,
+  departmentId: string
+): BudgetPlan => {
   return BudgetPlanSchema.parse({
     id: item.id,
     fiscal_year: item.budget_year,
-    cost_center: item.cost_center_no,
-    department_id: item.department_id,
+    cost_center: item.unit_no,
+    department_id: departmentId,
     activity_type: item.activity_type,
     activity_name: item.activity_type_name,
     description: item.description ?? item.activity_type_name,
@@ -41,7 +86,10 @@ export async function getBudgetPlans(
   departmentId: string,
   fiscalYear: string
 ): Promise<BudgetPlan[]> {
-  const firstPage = await fetchBudgetPlanPage(1, PAGE_LIMIT);
+  const [firstPage, unitDepartmentMap] = await Promise.all([
+    fetchBudgetPlanPage(1, PAGE_LIMIT),
+    getUnitDepartmentMap(),
+  ]);
   const allRows = [...firstPage.data];
 
   if (firstPage.totalPages > 1) {
@@ -57,8 +105,12 @@ export async function getBudgetPlans(
   }
 
   return allRows
-    .filter((item) => item.department_id === departmentId && item.budget_year === fiscalYear)
-    .map(normalizeBudgetPlan);
+    .filter(
+      (item) =>
+        unitDepartmentMap.get(item.unit_id) === departmentId &&
+        item.budget_year === fiscalYear
+    )
+    .map((item) => normalizeBudgetPlan(item, departmentId));
 }
 
 export async function importBudgetPlans(

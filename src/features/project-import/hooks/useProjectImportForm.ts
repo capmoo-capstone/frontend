@@ -79,7 +79,7 @@ export function useProjectImportForm({ onSuccess }: UseProjectImportFormOptions)
 
   useEffect(() => {
     form.setValue('budget_plan_ids', []);
-  }, [watchUnitId, watchFiscalYear, form]);
+  }, [watchDeptId, watchFiscalYear, form]);
 
   // Auto-calculate budget when plans are selected
   useEffect(() => {

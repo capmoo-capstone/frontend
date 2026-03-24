@@ -16,6 +16,11 @@ import {
 } from '../types';
 
 const PAGE_LIMIT = 100;
+const PAGE_FETCH_CONCURRENCY = 5;
+const UNIT_DEPARTMENT_MAP_TTL_MS = 5 * 60 * 1000;
+
+let unitDepartmentMapPromise: Promise<Map<string, string>> | null = null;
+let unitDepartmentMapCachedAt = 0;
 
 interface BudgetPlanQueryParams {
   departmentId?: string;
@@ -40,25 +45,60 @@ const fetchUnitPage = async (page: number, limit: number) => {
   return UnitListResponseSchema.parse(data);
 };
 
-const getUnitDepartmentMap = async (): Promise<Map<string, string>> => {
+const fetchRemainingPages = async <T>(
+  totalPages: number,
+  fetchPage: (page: number) => Promise<{ data: T[] }>
+): Promise<T[]> => {
+  const rows: T[] = [];
+
+  for (let pageStart = 2; pageStart <= totalPages; pageStart += PAGE_FETCH_CONCURRENCY) {
+    const pageNumbers = Array.from(
+      { length: Math.min(PAGE_FETCH_CONCURRENCY, totalPages - pageStart + 1) },
+      (_, index) => pageStart + index
+    );
+
+    const batchResults = await Promise.all(pageNumbers.map((pageNumber) => fetchPage(pageNumber)));
+    batchResults.forEach((pageResult) => {
+      rows.push(...pageResult.data);
+    });
+  }
+
+  return rows;
+};
+
+const buildUnitDepartmentMap = async (): Promise<Map<string, string>> => {
   const firstPage = await fetchUnitPage(1, PAGE_LIMIT);
   const allRows = [...firstPage.data];
 
   if (firstPage.totalPages > 1) {
-    const restPages = await Promise.all(
-      Array.from({ length: firstPage.totalPages - 1 }, (_, index) =>
-        fetchUnitPage(index + 2, PAGE_LIMIT)
-      )
+    const restRows = await fetchRemainingPages(firstPage.totalPages, (pageNumber) =>
+      fetchUnitPage(pageNumber, PAGE_LIMIT)
     );
-
-    restPages.forEach((pageResult) => {
-      allRows.push(...pageResult.data);
-    });
+    allRows.push(...restRows);
   }
 
   return new Map(
     allRows.filter((unit) => Boolean(unit.dept_id)).map((unit) => [unit.id, unit.dept_id as string])
   );
+};
+
+const getUnitDepartmentMap = async (): Promise<Map<string, string>> => {
+  const isCacheValid =
+    unitDepartmentMapPromise !== null &&
+    Date.now() - unitDepartmentMapCachedAt < UNIT_DEPARTMENT_MAP_TTL_MS;
+
+  if (isCacheValid && unitDepartmentMapPromise) {
+    return unitDepartmentMapPromise;
+  }
+
+  unitDepartmentMapCachedAt = Date.now();
+  unitDepartmentMapPromise = buildUnitDepartmentMap().catch((error: unknown) => {
+    unitDepartmentMapPromise = null;
+    unitDepartmentMapCachedAt = 0;
+    throw error;
+  });
+
+  return unitDepartmentMapPromise;
 };
 
 const normalizeBudgetPlan = (item: BudgetPlanBackend, departmentId: string): BudgetPlan => {
@@ -107,15 +147,10 @@ export async function getBudgetPlans(
   const allRows = [...firstPage.data];
 
   if (firstPage.totalPages > 1) {
-    const restPages = await Promise.all(
-      Array.from({ length: firstPage.totalPages - 1 }, (_, index) =>
-        fetchBudgetPlanPage(index + 2, PAGE_LIMIT, { departmentId, fiscalYear })
-      )
+    const restRows = await fetchRemainingPages(firstPage.totalPages, (pageNumber) =>
+      fetchBudgetPlanPage(pageNumber, PAGE_LIMIT, { departmentId, fiscalYear })
     );
-
-    restPages.forEach((pageResult) => {
-      allRows.push(...pageResult.data);
-    });
+    allRows.push(...restRows);
   }
 
   return allRows

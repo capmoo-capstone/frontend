@@ -1,5 +1,6 @@
-import api from '@/lib/axios';
 import { z } from 'zod';
+
+import api from '@/lib/axios';
 
 import {
   type BudgetPlan,
@@ -15,6 +16,11 @@ import {
 } from '../types';
 
 const PAGE_LIMIT = 100;
+
+interface BudgetPlanQueryParams {
+  departmentId?: string;
+  fiscalYear?: string;
+}
 
 const UnitListResponseSchema = z.object({
   totalPages: z.number(),
@@ -51,16 +57,11 @@ const getUnitDepartmentMap = async (): Promise<Map<string, string>> => {
   }
 
   return new Map(
-    allRows
-      .filter((unit) => Boolean(unit.dept_id))
-      .map((unit) => [unit.id, unit.dept_id as string])
+    allRows.filter((unit) => Boolean(unit.dept_id)).map((unit) => [unit.id, unit.dept_id as string])
   );
 };
 
-const normalizeBudgetPlan = (
-  item: BudgetPlanBackend,
-  departmentId: string
-): BudgetPlan => {
+const normalizeBudgetPlan = (item: BudgetPlanBackend, departmentId: string): BudgetPlan => {
   return BudgetPlanSchema.parse({
     id: item.id,
     fiscal_year: item.budget_year,
@@ -74,9 +75,18 @@ const normalizeBudgetPlan = (
   });
 };
 
-const fetchBudgetPlanPage = async (page: number, limit: number) => {
+const fetchBudgetPlanPage = async (
+  page: number,
+  limit: number,
+  query: BudgetPlanQueryParams = {}
+) => {
   const { data } = await api.get('/budget-plans', {
-    params: { page, limit },
+    params: {
+      page,
+      limit,
+      ...(query.departmentId ? { department_id: query.departmentId } : {}),
+      ...(query.fiscalYear ? { fiscal_year: query.fiscalYear } : {}),
+    },
   });
 
   return BudgetPlanListResponseSchema.parse(data);
@@ -86,8 +96,12 @@ export async function getBudgetPlans(
   departmentId: string,
   fiscalYear: string
 ): Promise<BudgetPlan[]> {
+  if (!departmentId || !fiscalYear) {
+    return [];
+  }
+
   const [firstPage, unitDepartmentMap] = await Promise.all([
-    fetchBudgetPlanPage(1, PAGE_LIMIT),
+    fetchBudgetPlanPage(1, PAGE_LIMIT, { departmentId, fiscalYear }),
     getUnitDepartmentMap(),
   ]);
   const allRows = [...firstPage.data];
@@ -95,7 +109,7 @@ export async function getBudgetPlans(
   if (firstPage.totalPages > 1) {
     const restPages = await Promise.all(
       Array.from({ length: firstPage.totalPages - 1 }, (_, index) =>
-        fetchBudgetPlanPage(index + 2, PAGE_LIMIT)
+        fetchBudgetPlanPage(index + 2, PAGE_LIMIT, { departmentId, fiscalYear })
       )
     );
 
@@ -107,8 +121,7 @@ export async function getBudgetPlans(
   return allRows
     .filter(
       (item) =>
-        unitDepartmentMap.get(item.unit_id) === departmentId &&
-        item.budget_year === fiscalYear
+        unitDepartmentMap.get(item.unit_id) === departmentId && item.budget_year === fiscalYear
     )
     .map((item) => normalizeBudgetPlan(item, departmentId));
 }
@@ -126,11 +139,14 @@ export async function linkBudgetPlanToProject(
   id: string,
   projectId: string
 ): Promise<BudgetPlanProjectLinkResponse> {
-  const { data } = await api.patch(`/budget-plans/${id}/project/${projectId}`);
+  const encodedId = encodeURIComponent(id);
+  const encodedProjectId = encodeURIComponent(projectId);
+  const { data } = await api.patch(`/budget-plans/${encodedId}/project/${encodedProjectId}`);
 
   return BudgetPlanProjectLinkResponseSchema.parse(data);
 }
 
 export async function removeBudgetPlan(id: string): Promise<void> {
-  await api.delete(`/budget-plans/${id}`);
+  const encodedId = encodeURIComponent(id);
+  await api.delete(`/budget-plans/${encodedId}`);
 }

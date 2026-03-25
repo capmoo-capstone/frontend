@@ -17,8 +17,11 @@ export function ProjectImportContainer() {
   const [searchParams, setSearchParams] = useSearchParams();
   const { user } = useAuth();
 
-  const modeParam = searchParams.get('mode') as ImportMode;
-  const mode: ImportMode = modeParam ?? 'none';
+  const modeParam = searchParams.get('mode');
+  const isImportMode = (value: string | null): value is ImportMode => {
+    return value === 'none' || value === 'manual' || value === 'lesspaper' || value === 'fiori';
+  };
+  const mode: ImportMode = isImportMode(modeParam) ? modeParam : 'none';
 
   const canSeeOptions = user ? hasImportOptionsPermission(user) : false;
   const { data: departments } = useDepartments();

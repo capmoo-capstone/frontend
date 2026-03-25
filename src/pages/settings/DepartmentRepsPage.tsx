@@ -1,13 +1,6 @@
 import { useMemo, useState } from 'react';
 
-import { useQueryClient } from '@tanstack/react-query';
-
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from '@/components/ui/accordion';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Input } from '@/components/ui/input';
 import {
   InlineActionRow,
@@ -17,6 +10,7 @@ import {
   useDepartmentUnits,
   useUpdateUnitRepresentative,
 } from '@/features/settings';
+import { useQueryClient } from '@tanstack/react-query';
 
 export default function DepartmentRepsPage() {
   const { data: departments, isLoading } = useDepartmentRepData();
@@ -158,9 +152,7 @@ function UnitRepRow({ departmentId, unit }: UnitRepRowProps) {
       editContent={
         <div className="space-y-2">
           <div className="flex items-center gap-4">
-            <span className="text-muted-foreground w-40 shrink-0 text-sm">
-              ตั้งตัวแทนหน่วยงาน *
-            </span>
+            <span className="text-muted-foreground w-40 shrink-0 text-sm">ตั้งตัวแทนหน่วยงาน *</span>
             <UserSearchCombobox
               value={selectedUserId}
               departmentId={departmentId}

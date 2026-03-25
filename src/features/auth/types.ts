@@ -26,8 +26,8 @@ export const UserRolesSchema = z.object({
 });
 
 export const LoginRequestSchema = z.object({
-  username: z.string().min(1),
-  full_name: z.string().min(1),
+  username: z.string().min(1, { message: 'กรุณากรอกชื่อผู้ใช้' }),
+  full_name: z.string().min(1, { message: 'กรุณากรอกชื่อ-นามสกุล' }),
 });
 
 export const BackendDelegatedBySchema = z.object({
@@ -115,15 +115,6 @@ export type UserRoles = z.infer<typeof UserRolesSchema>;
 export type LoginRequest = z.infer<typeof LoginRequestSchema>;
 export type BackendLoginResponse = z.infer<typeof BackendLoginResponseSchema>;
 
-export interface GetUsersParams {
-  page?: number;
-  limit?: number;
-}
-
-export type GetUsersSelectionParams =
-  | { unit_id: string; department_id?: never }
-  | { unit_id?: never; department_id: string };
-
 export const UserSchema = AuthUserSchema;
 
 export type AuthContextType = {
@@ -132,5 +123,4 @@ export type AuthContextType = {
   isLoading: boolean;
   setSession: (user: User) => void;
   logout: () => void;
-  switchUser: (user: User) => void;
 };

@@ -59,7 +59,7 @@ export function useProjectImportForm({ onSuccess }: UseProjectImportFormOptions)
     data: budgetPlans,
     isLoading: isLoadingBudgets,
     isError: isErrorBudgets,
-  } = useBudgetPlans(watchDeptId, watchFiscalYear);
+  } = useBudgetPlans(watchUnitId, watchFiscalYear);
 
   // Derive warnings
   const minDays = (watchProcurementType && PROCUREMENT_MIN_DAYS[watchProcurementType]) || 0;

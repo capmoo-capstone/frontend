@@ -28,6 +28,7 @@ const FinanceExportPage = lazy(() => import('@/pages/projects/FinanceExport'));
 const OrganizationManagement = lazy(() => import('@/pages/admin/OrganizationManagement'));
 const ProcumentJobs = lazy(() => import('@/pages/assign/AssignJobs'));
 const VendorSubmission = lazy(() => import('@/pages/vendor/VendorSubmission'));
+const ApiProbe = lazy(() => import('@/pages/dev/ApiProbe'));
 
 export const PrivateRoutes = () => {
   const { user } = useAuth();
@@ -66,6 +67,7 @@ export const PrivateRoutes = () => {
         {/* --- Management / Admin --- */}
         <Route path="/app/management/employees/kpi" element={<StaffKpi />} />
         <Route path="/app/management/organization" element={<OrganizationManagement />} />
+        <Route path="/app/dev/api-probe" element={<ApiProbe />} />
 
         {/* --- Fallback --- */}
         <Route path="*" element={<PageNotFound />} />

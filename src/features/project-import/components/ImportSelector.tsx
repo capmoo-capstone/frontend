@@ -2,7 +2,7 @@ import { Pen, SquarePen } from 'lucide-react';
 
 import type { ImportMode } from '../types';
 
-interface Props {
+interface ImportSelectorProps {
   onSelect: (mode: ImportMode) => void;
 }
 
@@ -10,7 +10,7 @@ const optionClasses =
   'group border-brand-6 bg-brand-3 flex h-64 w-64 cursor-pointer flex-col items-center justify-center gap-6 rounded-md border ' +
   'transition-all duration-300 ease-in-out hover:-translate-y-0.5 hover:border-brand-6 hover:shadow-md hover:bg-brand-3/50';
 
-export function ImportSelector({ onSelect }: Props) {
+export function ImportSelector({ onSelect }: ImportSelectorProps) {
   return (
     <div className="flex h-full flex-col items-center justify-center">
       {/* Title */}

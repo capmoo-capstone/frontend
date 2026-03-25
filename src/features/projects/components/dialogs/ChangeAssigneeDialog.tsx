@@ -1,14 +1,23 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
+import { Controller, useForm } from 'react-hook-form';
 
+import { zodResolver } from '@hookform/resolvers/zod';
 import { UserCog } from 'lucide-react';
 import { toast } from 'sonner';
+import { z } from 'zod';
 
 import { CustomContentDialog } from '@/components/shared-dialog';
 import { UserSelect } from '@/features/users';
 
 import { useChangeProjectAssignee } from '../../hooks/useProjects';
+
+const ChangeAssigneeFormSchema = z.object({
+  userId: z.string().min(1, 'กรุณาเลือกผู้รับผิดชอบ'),
+});
+
+type ChangeAssigneeFormValues = z.infer<typeof ChangeAssigneeFormSchema>;
 
 interface ChangeAssigneeDialogProps {
   isOpen: boolean;
@@ -27,29 +36,33 @@ export function ChangeAssigneeDialog({
   projectTitle,
   unitId,
 }: ChangeAssigneeDialogProps) {
-  const [selectedUser, setSelectedUser] = useState<string | null>(currentAssigneeId);
   const { mutateAsync, isPending } = useChangeProjectAssignee();
+
+  const form = useForm<ChangeAssigneeFormValues>({
+    resolver: zodResolver(ChangeAssigneeFormSchema),
+    mode: 'onChange',
+    defaultValues: {
+      userId: currentAssigneeId ?? '',
+    },
+  });
+
+  const selectedUserId = form.watch('userId');
 
   useEffect(() => {
     if (isOpen) {
-      setSelectedUser(currentAssigneeId);
+      form.reset({ userId: currentAssigneeId ?? '' });
     }
-  }, [isOpen, currentAssigneeId]);
+  }, [isOpen, currentAssigneeId, form]);
 
-  const handleConfirm = async () => {
-    if (!selectedUser) {
-      toast.error('กรุณาเลือกผู้รับผิดชอบ');
-      return;
-    }
-
-    if (selectedUser === currentAssigneeId) {
+  const handleConfirm = form.handleSubmit(async (values) => {
+    if (values.userId === (currentAssigneeId ?? '')) {
       onClose();
       return;
     }
 
     const savePromise = mutateAsync({
       projectId,
-      userId: selectedUser,
+      userId: values.userId,
     });
 
     toast.promise(savePromise, {
@@ -64,7 +77,7 @@ export function ChangeAssigneeDialog({
     } catch (error) {
       console.error(error);
     }
-  };
+  });
 
   return (
     <CustomContentDialog
@@ -75,22 +88,28 @@ export function ChangeAssigneeDialog({
       description={
         <>
           เลือกเจ้าหน้าที่คนใหม่สำหรับโครงการ{' '}
-          <span className="text-primary font-medium">"{projectTitle}"</span>
+          <span className="text-primary font-medium">&quot;{projectTitle}&quot;</span>
         </>
       }
       icon={UserCog}
       confirmLabel="บันทึก"
       cancelLabel="ยกเลิก"
-      disableConfirm={!selectedUser || isPending}
+      disableConfirm={!selectedUserId || isPending || !form.formState.isValid}
       maxWidth="sm"
     >
-      <UserSelect
-        value={selectedUser}
-        onChange={setSelectedUser}
-        unitId={unitId}
-        className="w-full"
-        placeholder="เลือกเจ้าหน้าที่..."
-        hasClearButton={false}
+      <Controller
+        control={form.control}
+        name="userId"
+        render={({ field }) => (
+          <UserSelect
+            value={field.value || null}
+            onChange={(value) => field.onChange(value ?? '')}
+            unitId={unitId}
+            className="w-full"
+            placeholder="เลือกเจ้าหน้าที่..."
+            hasClearButton={false}
+          />
+        )}
       />
     </CustomContentDialog>
   );

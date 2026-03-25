@@ -64,7 +64,7 @@ export function StepHistory({
                       {formatDateThai(submission.action_at, 'd MMM yyyy HH:mm น.')}
                     </span>
                   </div>
-                  <p className="caption ml-6">"{submission.comments}"</p>
+                  <p className="caption ml-6">&quot;{submission.comments}&quot;</p>
                   <p className="text-muted-foreground caption ml-6">
                     โดย {submission.action_by || 'ไม่ทราบชื่อ'}
                   </p>

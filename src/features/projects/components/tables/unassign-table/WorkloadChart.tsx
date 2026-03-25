@@ -4,7 +4,6 @@ import { useMemo } from 'react';
 
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from 'recharts';
 
-import { MOCK_USER_PROJECT_STATS } from '@/api/mock-data';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   type ChartConfig,
@@ -14,6 +13,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from '@/components/ui/chart';
+import { MOCK_USER_PROJECT_STATS } from '@/features/projects/api/mockData';
 
 const chartConfig = {
   current: {

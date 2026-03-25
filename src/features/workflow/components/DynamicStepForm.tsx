@@ -24,8 +24,8 @@ import { MultiEmailInput } from './fields/MultiEmailInput';
 
 interface DynamicStepFormProps {
   fields: FieldConfig[];
-  formData: Record<string, any>;
-  onChange: (field_key: string, value: any) => void;
+  formData: Record<string, unknown>;
+  onChange: (field_key: string, value: unknown) => void;
   disabled?: boolean;
 }
 
@@ -33,9 +33,10 @@ export function DynamicStepForm({ fields, formData, onChange, disabled }: Dynami
   const [skippedFields, setSkippedFields] = useState<Set<string>>(new Set());
 
   // --- Helpers ---
-  const getDateValue = (value: any): Date | undefined => {
+  const getDateValue = (value: unknown): Date | undefined => {
     if (!value) return undefined;
     if (value instanceof Date) return value;
+    if (typeof value !== 'string' && typeof value !== 'number') return undefined;
     try {
       const date = new Date(value);
       return isNaN(date.getTime()) ? undefined : date;
@@ -44,10 +45,29 @@ export function DynamicStepForm({ fields, formData, onChange, disabled }: Dynami
     }
   };
 
-  const getFileValue = (value: any): (string | File)[] => {
+  const getStringValue = (value: unknown): string => {
+    if (typeof value === 'string') return value;
+    if (typeof value === 'number') return String(value);
+    return '';
+  };
+
+  const getStringArrayValue = (value: unknown): string[] => {
+    if (!Array.isArray(value)) return [];
+    return value.filter((item): item is string => typeof item === 'string');
+  };
+
+  const getNumberArrayValue = (value: unknown): number[] => {
+    if (!Array.isArray(value)) return [];
+    return value.filter((item): item is number => typeof item === 'number');
+  };
+
+  const getFileValue = (value: unknown): (string | File)[] => {
     if (!value) return [];
-    if (Array.isArray(value)) return value;
-    return [value];
+    if (Array.isArray(value)) return value as (string | File)[];
+    if (typeof value === 'string' || value instanceof File) {
+      return [value];
+    }
+    return [];
   };
 
   const handleMarkAsDone = (fieldKey: string) => {
@@ -94,7 +114,7 @@ export function DynamicStepForm({ fields, formData, onChange, disabled }: Dynami
               {field.type === 'TEXT' && (
                 <Input
                   type="text"
-                  value={formData[field.field_key] || ''}
+                  value={getStringValue(formData[field.field_key])}
                   onChange={(e) => onChange(field.field_key, e.target.value)}
                   disabled={disabled}
                   placeholder="ระบุข้อมูล..."
@@ -105,7 +125,7 @@ export function DynamicStepForm({ fields, formData, onChange, disabled }: Dynami
               {field.type === 'NUMBER' && (
                 <Input
                   type="number"
-                  value={formData[field.field_key] || ''}
+                  value={getStringValue(formData[field.field_key])}
                   onChange={(e) => onChange(field.field_key, e.target.value)}
                   disabled={disabled}
                   placeholder="0"
@@ -140,7 +160,7 @@ export function DynamicStepForm({ fields, formData, onChange, disabled }: Dynami
               {/* --- 6. GENERATE CONTRACT NO --- */}
               {field.type === 'GEN_CONT_NO' && (
                 <ContractNumberGenerator
-                  value={formData[field.field_key] || ''}
+                  value={getStringValue(formData[field.field_key])}
                   onChange={(val) => onChange(field.field_key, val)}
                   disabled={disabled}
                 />
@@ -149,7 +169,7 @@ export function DynamicStepForm({ fields, formData, onChange, disabled }: Dynami
               {/* --- 7. MULTI-EMAIL --- */}
               {(field.type === 'VENDOR_EMAIL' || field.type === 'COMMITTEE_EMAIL') && (
                 <MultiEmailInput
-                  value={formData[field.field_key] || []}
+                  value={getStringArrayValue(formData[field.field_key])}
                   onChange={(emails) => onChange(field.field_key, emails)}
                   disabled={disabled}
                   placeholder={
@@ -161,7 +181,7 @@ export function DynamicStepForm({ fields, formData, onChange, disabled }: Dynami
               {/* --- 8. DUE DATE SELECT --- */}
               {field.type === 'DUE_DATE_SELECT' && (
                 <DueDateMultiSelect
-                  value={formData[field.field_key] || []}
+                  value={getNumberArrayValue(formData[field.field_key])}
                   onChange={(val) => onChange(field.field_key, val)}
                   disabled={disabled}
                 />
@@ -170,7 +190,7 @@ export function DynamicStepForm({ fields, formData, onChange, disabled }: Dynami
               {/* --- 9. CONTRACT STATUS SELECT --- */}
               {field.type === 'SELECT_CONTRACT_STATUS' && (
                 <Select
-                  value={formData[field.field_key]}
+                  value={getStringValue(formData[field.field_key])}
                   onValueChange={(val) => onChange(field.field_key, val)}
                   disabled={disabled}
                 >
@@ -188,7 +208,7 @@ export function DynamicStepForm({ fields, formData, onChange, disabled }: Dynami
               {/* --- 10. DELIVERY STATUS SELECT --- */}
               {field.type === 'SELECT_DELIVERY_STATUS' && (
                 <Select
-                  value={formData[field.field_key]}
+                  value={getStringValue(formData[field.field_key])}
                   onValueChange={(val) => onChange(field.field_key, val)}
                   disabled={disabled}
                 >

@@ -6,7 +6,7 @@ import type { StepStatus, Submission, WorkflowStepConfig } from '../types';
 
 // Now accepts 'activeSteps' to know which workflow we are dealing with
 export function useWorkflow(project: ProjectDetail | undefined, activeSteps: WorkflowStepConfig[]) {
-  const [stepFormData, setStepFormData] = useState<Record<string, Record<string, any>>>({});
+  const [stepFormData, setStepFormData] = useState<Record<string, Record<string, unknown>>>({});
   const [viewingSubmissions, setViewingSubmissions] = useState<Record<number, Submission | null>>(
     {}
   );
@@ -63,7 +63,7 @@ export function useWorkflow(project: ProjectDetail | undefined, activeSteps: Wor
   );
 
   const getStepFormData = useCallback(
-    (stepOrder: number): Record<string, any> => {
+    (stepOrder: number): Record<string, unknown> => {
       if (stepFormData[stepOrder]) return stepFormData[stepOrder];
 
       const submissions = getStepSubmissions(stepOrder);
@@ -71,7 +71,7 @@ export function useWorkflow(project: ProjectDetail | undefined, activeSteps: Wor
 
       const targetSubmission = submissions[submissions.length - 1];
 
-      const formData: Record<string, any> = {};
+      const formData: Record<string, unknown> = {};
       targetSubmission?.documents.forEach((doc) => {
         formData[doc.field_key] = doc.file_path || doc.value;
       });
@@ -81,7 +81,7 @@ export function useWorkflow(project: ProjectDetail | undefined, activeSteps: Wor
   );
 
   const handleStepFormChange = useCallback(
-    (stepOrder: number, key: string, value: any) => {
+    (stepOrder: number, key: string, value: unknown) => {
       setStepFormData((prev) => ({
         ...prev,
         [stepOrder]: {
@@ -106,10 +106,10 @@ export function useWorkflow(project: ProjectDetail | undefined, activeSteps: Wor
   }, []);
 
   const getSubmissionFormData = useCallback(
-    (submission: Submission | null): Record<string, any> => {
+    (submission: Submission | null): Record<string, unknown> => {
       if (!submission) return {};
 
-      const formData: Record<string, any> = {};
+      const formData: Record<string, unknown> = {};
       submission.documents.forEach((doc) => {
         formData[doc.field_key] = doc.file_path || doc.value;
       });

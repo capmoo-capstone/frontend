@@ -21,6 +21,7 @@ import { useUsersForSelection } from '../hooks/useUsers';
 interface UserSelectProps {
   value?: string | null;
   onChange: (value: string) => void;
+  onBlur?: () => void;
   onReset?: () => void;
   unitId?: string;
   deptId?: string;
@@ -33,6 +34,7 @@ interface UserSelectProps {
 export function UserSelect({
   value,
   onChange,
+  onBlur,
   onReset,
   unitId,
   deptId,
@@ -53,6 +55,9 @@ export function UserSelect({
   const handleClear = (e: React.MouseEvent) => {
     e.stopPropagation();
     onChange('');
+    if (onBlur) {
+      onBlur();
+    }
     if (onReset) {
       onReset();
     }
@@ -109,6 +114,9 @@ export function UserSelect({
                   onSelect={() => {
                     onChange(user.id);
                     setOpen(false);
+                    if (onBlur) {
+                      onBlur();
+                    }
                   }}
                 >
                   <Check

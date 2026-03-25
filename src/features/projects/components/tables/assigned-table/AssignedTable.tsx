@@ -30,8 +30,7 @@ import { getColumns } from './columns';
 
 export function AssignedTable({ unitId }: { unitId?: string }) {
   const { user } = useAuth();
-  if (!user) return null;
-  const viewAsRole = user.role ?? 'GUEST';
+  const viewAsRole = user?.role ?? 'GUEST';
 
   const [date, setDate] = useState<Date | undefined>(new Date());
 
@@ -65,7 +64,7 @@ export function AssignedTable({ unitId }: { unitId?: string }) {
         onAcceptProject: handleAcceptProject,
         viewAsRole,
       }),
-    [unitId, viewAsRole, date, handleAcceptProject]
+    [viewAsRole, handleAcceptProject]
   );
 
   const table = useReactTable({

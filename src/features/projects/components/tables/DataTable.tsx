@@ -13,14 +13,14 @@ import {
 
 import { DataTablePagination } from './DataTablePagination';
 
-interface ProjectDataTableProps<TData> {
+interface ProjectDataTableProps<TData extends { id?: string }> {
   table: ReactTable<TData>;
   columnsLength: number;
   toolbar?: React.ReactNode;
   hasPagination?: boolean;
 }
 
-export function ProjectDataTable<TData>({
+export function ProjectDataTable<TData extends { id?: string }>({
   table,
   columnsLength,
   toolbar,
@@ -28,7 +28,7 @@ export function ProjectDataTable<TData>({
 }: ProjectDataTableProps<TData>) {
   const navigate = useNavigate();
 
-  const handleNavigate = (row: any) => {
+  const handleNavigate = (row: Row<TData>) => {
     const projectId = row.original.id;
     if (projectId) {
       navigate(`/app/projects/${projectId}`);

@@ -40,6 +40,7 @@ export {
   useClaimProject,
   useProjectDetail,
   useProjects,
+  useUpdateProject,
   useUnassignedProjects,
 } from './hooks/useProjects';
 
@@ -56,6 +57,7 @@ export type {
   StepStatus,
   Submission,
   SubmissionDocument,
+  UpdateProjectPayload,
   UnassignedProjectItem,
   UnitResponsibleType,
   WorkflowDocumentConfig,

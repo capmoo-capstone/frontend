@@ -97,6 +97,7 @@ export const AssignedProjectItemSchema = z.object({
   expected_approval_date: z.string().datetime().nullable(),
   created_at: z.string().datetime(),
 });
+export type AssignedProjectItem = z.infer<typeof AssignedProjectItemSchema>;
 
 export const UnassignedProjectItemSchema = z.object({
   id: z.string(),
@@ -110,11 +111,30 @@ export const UnassignedProjectItemSchema = z.object({
   expected_approval_date: z.string().datetime().nullable(),
   created_at: z.string().datetime(),
 });
+export type UnassignedProjectItem = z.infer<typeof UnassignedProjectItemSchema>;
 
 export const ProjectListResponseSchema = z.object({
   total: z.number(),
   data: z.array(z.union([AssignedProjectItemSchema, UnassignedProjectItemSchema])),
 });
+export type ProjectListResponse = z.infer<typeof ProjectListResponseSchema>;
+
+export const ProjectAssignmentSchema = z.object({
+  projectId: z.string(),
+  userId: z.string(),
+});
+export type ProjectAssignment = z.infer<typeof ProjectAssignmentSchema>;
+
+export const ProjectAssignmentsPayloadSchema = z.array(ProjectAssignmentSchema);
+export type ProjectAssignmentsPayload = z.infer<typeof ProjectAssignmentsPayloadSchema>;
+
+export const UpdateProjectPayloadSchema = z.object({
+  title: z.string().min(1).optional(),
+  description: z.string().nullable().optional(),
+  budget: z.number().nullable().optional(),
+  is_urgent: z.boolean().optional(),
+});
+export type UpdateProjectPayload = z.infer<typeof UpdateProjectPayloadSchema>;
 
 // ============================================================================
 // Project Detail Schema
@@ -192,10 +212,6 @@ export type ProjectStatus = z.infer<typeof ProjectStatusEnum>;
 export type ProjectUrgentStatus = z.infer<typeof ProjectUrgentStatusEnum>;
 export type ProcurementType = z.infer<typeof ProcurementTypeEnum>;
 export type UnitResponsibleType = z.infer<typeof UnitResponsibleTypeEnum>;
-
-export type AssignedProjectItem = z.infer<typeof AssignedProjectItemSchema>;
-export type UnassignedProjectItem = z.infer<typeof UnassignedProjectItemSchema>;
-export type ProjectListResponse = z.infer<typeof ProjectListResponseSchema>;
 
 export type ProjectDetail = z.infer<typeof ProjectDetailSchema>;
 

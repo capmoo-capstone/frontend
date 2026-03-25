@@ -2,7 +2,7 @@ import { useParams } from 'react-router-dom';
 
 import { AssignedTable, UnassignTable } from '@/features/projects/components';
 
-export default function ProcumentJobs() {
+export default function AssignJobs() {
   const { id } = useParams();
   if (!id) return null;
 

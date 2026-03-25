@@ -1,8 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
+import { Controller, useForm } from 'react-hook-form';
 
+import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader2 } from 'lucide-react';
+import { z } from 'zod';
 
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -34,43 +37,39 @@ export interface EditProjectData {
   is_urgent: boolean;
 }
 
+const EditProjectSchema = z.object({
+  title: z.string().trim().min(1, 'กรุณากรอกชื่อโครงการ'),
+  description: z.string().nullable(),
+  budget: z.number().nullable(),
+  is_urgent: z.boolean(),
+});
+
 export function EditProjectDialog({ isOpen, onClose, onConfirm, project }: EditProjectDialogProps) {
-  const [formData, setFormData] = useState<EditProjectData>({
-    title: project.title,
-    description: project.description,
-    budget: project.budget,
-    is_urgent: project.is_urgent,
+  const form = useForm<EditProjectData>({
+    resolver: zodResolver(EditProjectSchema),
+    defaultValues: {
+      title: project.title,
+      description: project.description,
+      budget: project.budget,
+      is_urgent: project.is_urgent,
+    },
   });
-  const [isLoading, setIsLoading] = useState(false);
+  const isSubmitting = form.formState.isSubmitting;
 
   // Reset form when project changes or dialog opens
   useEffect(() => {
     if (isOpen) {
-      setFormData({
+      form.reset({
         title: project.title,
         description: project.description,
         budget: project.budget,
         is_urgent: project.is_urgent,
       });
     }
-  }, [isOpen, project]);
-
-  const handleConfirm = async () => {
-    if (!formData.title.trim()) return;
-
-    setIsLoading(true);
-    try {
-      await onConfirm(formData);
-      onClose();
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  }, [isOpen, project, form]);
 
   const handleClose = () => {
-    if (!isLoading) {
+    if (!isSubmitting) {
       onClose();
     }
   };
@@ -85,62 +84,82 @@ export function EditProjectDialog({ isOpen, onClose, onConfirm, project }: EditP
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4 py-4">
+        <form onSubmit={form.handleSubmit(onConfirm)} className="space-y-4 py-4">
           {/* Project Title */}
           <div className="space-y-2">
             <Label htmlFor="title" className="required">
               ชื่อโครงการ
             </Label>
-            <Input
-              id="title"
-              value={formData.title}
-              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-              placeholder="กรุณากรอกชื่อโครงการ"
-              disabled={isLoading}
+            <Controller
+              control={form.control}
+              name="title"
+              render={({ field }) => (
+                <Input
+                  id="title"
+                  value={field.value}
+                  onChange={field.onChange}
+                  placeholder="กรุณากรอกชื่อโครงการ"
+                  disabled={isSubmitting}
+                />
+              )}
             />
+            {form.formState.errors.title && (
+              <p className="text-destructive text-sm">{form.formState.errors.title.message}</p>
+            )}
           </div>
 
           {/* Description */}
           <div className="space-y-2">
             <Label htmlFor="description">รายละเอียดโครงการ</Label>
-            <Textarea
-              id="description"
-              value={formData.description || ''}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value || null })}
-              placeholder="กรุณากรอกรายละเอียดโครงการ"
-              rows={4}
-              disabled={isLoading}
+            <Controller
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <Textarea
+                  id="description"
+                  value={field.value || ''}
+                  onChange={(e) => field.onChange(e.target.value || null)}
+                  placeholder="กรุณากรอกรายละเอียดโครงการ"
+                  rows={4}
+                  disabled={isSubmitting}
+                />
+              )}
             />
           </div>
 
           {/* Budget */}
           <div className="space-y-2">
             <Label htmlFor="budget">งบประมาณ (บาท)</Label>
-            <Input
-              id="budget"
-              type="number"
-              value={formData.budget || ''}
-              onChange={(e) =>
-                setFormData({
-                  ...formData,
-                  budget: e.target.value ? Number(e.target.value) : null,
-                })
-              }
-              placeholder="กรุณากรอกงบประมาณ"
-              disabled={isLoading}
+            <Controller
+              control={form.control}
+              name="budget"
+              render={({ field }) => (
+                <Input
+                  id="budget"
+                  type="number"
+                  value={field.value ?? ''}
+                  onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : null)}
+                  placeholder="กรุณากรอกงบประมาณ"
+                  disabled={isSubmitting}
+                />
+              )}
             />
           </div>
 
           {/* Is Urgent */}
           <div className="flex items-center justify-between space-x-2 rounded-lg border p-4">
             <div className="flex items-center space-x-2">
-              <Checkbox
-                id="is_urgent"
-                checked={formData.is_urgent}
-                onCheckedChange={(checked: boolean) =>
-                  setFormData({ ...formData, is_urgent: checked })
-                }
-                disabled={isLoading}
+              <Controller
+                control={form.control}
+                name="is_urgent"
+                render={({ field }) => (
+                  <Checkbox
+                    id="is_urgent"
+                    checked={field.value}
+                    onCheckedChange={(checked) => field.onChange(Boolean(checked))}
+                    disabled={isSubmitting}
+                  />
+                )}
               />
               <div className="space-y-0.5">
                 <Label htmlFor="is_urgent" className="cursor-pointer">
@@ -152,21 +171,17 @@ export function EditProjectDialog({ isOpen, onClose, onConfirm, project }: EditP
               </div>
             </div>
           </div>
-        </div>
 
-        <DialogFooter>
-          <Button variant="outline" onClick={handleClose} disabled={isLoading}>
-            ยกเลิก
-          </Button>
-          <Button
-            variant="brand"
-            onClick={handleConfirm}
-            disabled={isLoading || !formData.title.trim()}
-          >
-            {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            บันทึกการเปลี่ยนแปลง
-          </Button>
-        </DialogFooter>
+          <DialogFooter>
+            <Button variant="outline" onClick={handleClose} disabled={isSubmitting} type="button">
+              ยกเลิก
+            </Button>
+            <Button variant="brand" type="submit" disabled={isSubmitting}>
+              {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              บันทึกการเปลี่ยนแปลง
+            </Button>
+          </DialogFooter>
+        </form>
       </DialogContent>
     </Dialog>
   );

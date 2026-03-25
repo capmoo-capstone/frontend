@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 import {
   type SortingState,
@@ -30,8 +30,7 @@ import { getColumns } from './columns';
 
 export function UnassignTable({ unitId }: { unitId?: string }) {
   const { user } = useAuth();
-  if (!user) return null;
-  const viewAsRole = user.role ?? 'GUEST';
+  const viewAsRole = user?.role ?? 'GUEST';
 
   const { data: projects, isLoading, isError } = useUnassignedProjects(unitId);
   const { mutateAsync: assignProjectsMutation } = useAssignProjects();
@@ -43,6 +42,19 @@ export function UnassignTable({ unitId }: { unitId?: string }) {
   const [pendingChanges, setPendingChanges] = useState<Record<string, string>>({});
   const [sorting, setSorting] = useState<SortingState>([]);
 
+  const handleClaimProject = useCallback(
+    async (project: UnassignedProjectItem) => {
+      const claimPromise = claimProjectMutation(project.id);
+
+      toast.promise(claimPromise, {
+        loading: `กำลังเลือกงาน: ${project.title}...`,
+        success: 'เลือกงานสำเร็จ',
+        error: 'ไม่สามารถเลือกงานได้',
+      });
+    },
+    [claimProjectMutation]
+  );
+
   const columns = useMemo(
     () =>
       getColumns({
@@ -53,7 +65,7 @@ export function UnassignTable({ unitId }: { unitId?: string }) {
         onClaimProject: (project) => handleClaimProject(project),
         viewAsRole,
       }),
-    [pendingChanges, unitId, viewAsRole]
+    [pendingChanges, unitId, viewAsRole, handleClaimProject]
   );
 
   const table = useReactTable({
@@ -105,16 +117,6 @@ export function UnassignTable({ unitId }: { unitId?: string }) {
         return 'มอบหมายโครงการสำเร็จ';
       },
       error: 'ไม่สามารถมอบหมายโครงการได้',
-    });
-  };
-
-  const handleClaimProject = async (project: UnassignedProjectItem) => {
-    const claimPromise = claimProjectMutation(project.id);
-
-    toast.promise(claimPromise, {
-      loading: `กำลังเลือกงาน: ${project.title}...`,
-      success: 'เลือกงานสำเร็จ',
-      error: 'ไม่สามารถเลือกงานได้',
     });
   };
 

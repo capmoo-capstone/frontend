@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { differenceInDays } from 'date-fns';
+import { toast } from 'sonner';
 
 import { useAuth } from '@/context/AuthContext';
 import { useBudgetPlans } from '@/features/budgets';
@@ -11,6 +12,7 @@ import { getFiscalYear } from '@/lib/formatters';
 import { hasProcurementPermission } from '@/lib/permissions';
 
 import { PROCUREMENT_MIN_DAYS, type ProjectImportPayload, ProjectImportSchema } from '../types';
+import { useCreateProject } from './useCreateProject';
 
 interface UseProjectImportFormOptions {
   onSuccess: () => void;
@@ -22,6 +24,7 @@ export function useProjectImportForm({ onSuccess }: UseProjectImportFormOptions)
 
   const [showConfirmationDialog, setShowConfirmationDialog] = useState(false);
   const [warningConfirmed, setWarningConfirmed] = useState(false);
+  const { mutateAsync: createProjectMutation, isPending: isSubmitting } = useCreateProject();
 
   const currentYear = getFiscalYear(new Date());
 
@@ -93,22 +96,30 @@ export function useProjectImportForm({ onSuccess }: UseProjectImportFormOptions)
     }
   }, [selectedPlans, budgetPlans, form]);
 
-  const onSubmit = (data: ProjectImportPayload) => {
+  const onSubmit = async (data: ProjectImportPayload) => {
     if ((isDateEarly || showBudgetWarning) && !warningConfirmed) {
       setShowConfirmationDialog(true);
       return;
     }
 
-    console.log('Submitting:', data);
-    onSuccess();
+    try {
+      await createProjectMutation(data);
+      onSuccess();
+    } catch {
+      toast.error('ไม่สามารถสร้างโครงการได้ กรุณาลองใหม่อีกครั้ง');
+    }
   };
 
   const handleConfirm = () => {
     setWarningConfirmed(true);
     setShowConfirmationDialog(false);
-    form.handleSubmit((data) => {
-      console.log('Submitting after confirmation:', data);
-      onSuccess();
+    form.handleSubmit(async (data) => {
+      try {
+        await createProjectMutation(data);
+        onSuccess();
+      } catch {
+        toast.error('ไม่สามารถสร้างโครงการได้ กรุณาลองใหม่อีกครั้ง');
+      }
     })();
   };
 
@@ -146,6 +157,7 @@ export function useProjectImportForm({ onSuccess }: UseProjectImportFormOptions)
     calculatedSum,
     // Dialog state
     showConfirmationDialog,
+    isSubmitting,
     // Handlers
     onSubmit,
     handleConfirm,

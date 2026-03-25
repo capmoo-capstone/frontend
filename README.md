@@ -1,190 +1,108 @@
-# ระบบจัดการโครงการจัดซื้อจัดจ้าง (Procurement Management System)
+# Procurement Management System (Frontend)
 
-ระบบบริหารจัดการโครงการจัดซื้อจัดจ้างแบบครบวงจร สำหรับติดตามและบริหารจัดการโครงการตั้งแต่ขั้นตอนการรับเรื่อง การมอบหมายงาน ไปจนถึงการปิดโครงการ
+Welcome to the frontend application for our procurement workflow platform.
 
-## 🚀 Tech Stack
+This app helps teams manage project procurement from intake to assignment, tracking, and completion.
+In business terms, it gives teams one place to:
 
-- **React 18** - UI Library
-- **TypeScript** - Type Safety
-- **Vite** - Build Tool & Dev Server
-- **TanStack Query (React Query)** - Server State Management
-- **TanStack Table** - Data Table Component
-- **React Router** - Client-side Routing
-- **Recharts** - Data Visualization
-- **shadcn/ui** - UI Component Library
-- **Tailwind CSS** - Styling
-- **Zod** - Schema Validation
-- **Axios** - HTTP Client
-- **Sonner** - Toast Notifications
-- **date-fns** - Date Utilities
+- See incoming and assigned procurement work
+- Track project status and ownership
+- Support role-based workflows (who can do what)
+- Reduce manual follow-up through structured dashboards and tables
 
-## 📦 Installation
+If you are new to the project, this guide gets you running quickly. We are happy you are here.
+
+## Prerequisites
+
+Please install these first:
+
+- Node.js 20 or newer (recommended: latest LTS)
+- npm 10 or newer
+- Git
+
+Optional but recommended:
+
+- VS Code with TypeScript and ESLint extensions
+
+## Quick Start (Step by Step)
+
+1. Move into the frontend folder:
 
 ```bash
-# Install dependencies
+cd frontend
+```
+
+2. Install dependencies:
+
+```bash
 npm install
+```
 
-# Start development server
+3. Create your local environment file:
+
+```bash
+copy .env.example .env
+```
+
+4. Start the development server:
+
+```bash
 npm run dev
+```
 
-# Build for production
+5. Open the app in your browser.
+   Vite usually serves at `http://localhost:5173`.
+
+## Useful Scripts
+
+- Start dev server
+
+```bash
+npm run dev
+```
+
+- Build for production
+
+```bash
 npm run build
+```
 
-# Preview production build
+- Preview production build
+
+```bash
 npm run preview
+```
 
-# Run linter
-npm run lint
+- Format code (formats `src` only)
 
-# Format code
+```bash
 npm run format
 ```
 
-## 🏗️ Project Structure
-
-```
-src/
-├── api/              # API functions and mock data
-├── assets/           # Static assets
-├── components/       # Reusable UI components
-│   ├── guards/       # Route guards
-│   ├── project-dialog/  # Project-related dialogs
-│   ├── project-tables/  # Project table components
-│   ├── sidebar/      # Sidebar navigation
-│   └── ui/           # Base UI components (shadcn/ui)
-├── context/          # React Context providers
-├── hooks/            # Custom React hooks
-├── layouts/          # Layout components
-├── lib/              # Utility functions
-├── pages/            # Page components
-├── routes/           # Route configuration
-└── types/            # TypeScript type definitions
-```
-
-## 🎯 Key Features
-
-### Project Management
-
-- **งานที่ยังไม่ได้มอบหมาย** - View and assign unassigned projects
-- **งานที่ถูกมอบหมายแล้ว** - Track assigned projects with status filtering
-- **ภาระงานของเจ้าหน้าที่** - Workload visualization with stacked bar charts
-
-### Actions
-
-- ✅ มอบหมายงาน (Assign Projects) - Batch assignment support
-- ✅ รับทราบโครงการ (Accept Projects) - Single and batch acceptance
-- ✅ เลือกงาน (Claim Project) - Self-assignment
-- ✅ ยกเลิก/ขอยกเลิก (Cancel Project) - Role-based cancellation
-- ✅ เปลี่ยนผู้รับผิดชอบ (Change Assignee) - Reassign projects
-
-### Role-Based Access Control
-
-- **ManageUnitRoles** - Full unit management permissions
-- **SupervisorRoles** - Supervisory permissions
-- **ManageSelfRoles** - Self-management permissions
-
-### Data Features
-
-- Real-time filtering and sorting
-- Date range selection
-- Status-based filtering
-- Urgent project highlighting
-- Workload distribution charts
-
-## 🔑 Environment Variables
-
-Create a `.env` file in the root directory:
-
-```env
-VITE_API_BASE_URL=http://localhost:3000/api
-```
-
-## 📊 API Integration
-
-The application uses a mock data layer (`src/api/mock-data.ts`) for development. To connect to a real backend:
-
-1. Update API functions in `src/api/` files
-2. Uncomment axios calls and remove mock returns
-3. Configure `VITE_API_BASE_URL` in `.env`
-
-## 🎨 Styling
-
-This project uses **Tailwind CSS v4** with custom design tokens:
-
-- Custom color palette (brand colors, semantic colors)
-- Thai font support (Noto Sans Thai)
-- Dark mode ready (commented out)
-- Custom radius utilities
-- Typography utilities (h1-h4 variants)
-
-## 🧪 Development Guidelines
-
-### Adding New Components
+- Run lint rules
 
 ```bash
-# Add shadcn/ui components
-npx shadcn@latest add [component-name]
+npm run lint
 ```
 
-### Date Handling
+## Environment Variables
 
-Use `formatDateThai()` from `src/lib/date-utils.ts` for consistent Thai Buddhist Era date formatting.
+Current variables used by this frontend:
 
-### State Management
-
-- Use **TanStack Query** for server state
-- Use **React Context** for global UI state
-- Use **useState/useReducer** for local component state
-
-### Type Safety
-
-- All API responses validated with Zod schemas
-- Strict TypeScript configuration
-- No `any` types in production code
-
-## 📝 Available Scripts
-
-| Script            | Description                                               |
-| ----------------- | --------------------------------------------------------- |
-| `npm run dev`     | Start development server (default: http://localhost:5173) |
-| `npm run build`   | Build for production                                      |
-| `npm run preview` | Preview production build locally                          |
-| `npm run lint`    | Run ESLint                                                |
-| `npm run format`  | Format code with Prettier                                 |
-
-## 🔐 Authentication
-
-Authentication context available via `useAuth()` hook:
-
-```tsx
-const { user, login, logout } = useAuth();
-
-// Access user role
-if (ManageUnitRoles.includes(user.role)) {
-  // Show admin actions
-}
+```env
+VITE_API_BASE_URL=http://localhost:3000/api/v1
+VITE_USE_PROJECTS_MOCK=true
 ```
 
-## 📈 Charts
+Notes:
 
-Workload charts use Recharts with custom theming:
+- Set `VITE_USE_PROJECTS_MOCK=false` when you want real backend calls.
+- Keep `VITE_API_BASE_URL` aligned with your backend server.
 
-- Stacked bar charts for workload visualization
-- Responsive design with proper margins
-- Brand color integration
-- Interactive tooltips and legends
+## Documentation Directory
 
-## 🌐 Browser Support
-
-- Chrome (latest)
-- Firefox (latest)
-- Safari (latest)
-- Edge (latest)
-
-## 📄 License
-
-[Add your license here]
-
-## 👥 Team
-
-[Add your team information here]
+- [Architecture Guide](./docs/ARCHITECTURE.md)
+- [Development Guide](./docs/DEVELOPMENT_GUIDE.md)
+- [Project Structure Guide](./docs/PROJECT_STRUCTURE.md)
+- [Component Structure Guide](./docs/COMPONENT_STRUCTURE.md)
+- [Tech Stack Notes](./docs/tech-stack.md)

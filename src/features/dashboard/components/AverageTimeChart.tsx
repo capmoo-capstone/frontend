@@ -11,7 +11,13 @@ import {
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
-export function AverageTimeChart({ data }: { data: any[] }) {
+interface AverageTimeRow {
+  name: string;
+  days: number;
+  fill: string;
+}
+
+export function AverageTimeChart({ data }: { data: AverageTimeRow[] }) {
   return (
     <Card className="shadow-sm">
       <CardHeader>

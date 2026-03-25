@@ -12,8 +12,9 @@ import {
   getProjectDetail,
   getProjects,
   getUnassignedProjects,
+  updateProject,
 } from '../api';
-import type { ProjectDetail } from '../types';
+import type { ProjectDetail, UpdateProjectPayload } from '../types';
 
 export interface ProjectFilterParams {
   search?: string;
@@ -104,6 +105,24 @@ export const useCancelProject = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ['projects'],
+      });
+    },
+  });
+};
+
+export const useUpdateProject = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ projectId, payload }: { projectId: string; payload: UpdateProjectPayload }) =>
+      updateProject(projectId, payload),
+
+    onSuccess: (_, { projectId }) => {
+      queryClient.invalidateQueries({
+        queryKey: ['projects'],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ['project', projectId],
       });
     },
   });

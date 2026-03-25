@@ -2,7 +2,13 @@ import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from 'recharts';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
-export function ProcurementPieChart({ data }: { data: any[] }) {
+interface ProcurementPieRow {
+  name: string;
+  value: number;
+  color: string;
+}
+
+export function ProcurementPieChart({ data }: { data: ProcurementPieRow[] }) {
   return (
     <Card className="shadow-sm">
       <CardHeader>

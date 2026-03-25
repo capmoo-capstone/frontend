@@ -1,7 +1,6 @@
 import type { ColumnDef } from '@tanstack/react-table';
 import { ArrowUpDown, FileText } from 'lucide-react';
 
-import { Checkbox } from '@/components/ui/checkbox';
 import { formatDateThaiShort } from '@/lib/formatters';
 
 import type { VendorSubmission } from '../types';
@@ -13,27 +12,6 @@ const formatFileSize = (bytes: number): string => {
 };
 
 export const vendorSubmissionColumns: ColumnDef<VendorSubmission>[] = [
-  {
-    id: 'select',
-    header: ({ table }) => (
-      <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && 'indeterminate')
-        }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-      />
-    ),
-    enableSorting: false,
-    enableHiding: false,
-  },
   {
     accessorKey: 'submitted_at',
     header: ({ column }) => (
@@ -107,7 +85,7 @@ export const vendorSubmissionColumns: ColumnDef<VendorSubmission>[] = [
         className="flex cursor-pointer items-center"
         onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
       >
-        ชื่อโครงการ
+        โครงการ
         <ArrowUpDown
           className={`ml-2 h-4 w-4 ${column.getIsSorted() ? 'text-primary' : 'text-ring'}`}
         />
@@ -138,7 +116,7 @@ export const vendorSubmissionColumns: ColumnDef<VendorSubmission>[] = [
   },
   {
     accessorKey: 'attachments',
-    header: 'รายการของไฟล์แนบทั้งหมด',
+    header: 'ไฟล์แนบ',
     cell: ({ row }) => (
       <div className="flex flex-col gap-1">
         {row.original.attachments.map((attachment) => (

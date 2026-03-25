@@ -9,10 +9,10 @@ import {
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table';
-import { addDays } from 'date-fns';
-import { AlertTriangle, Loader2 } from 'lucide-react';
+import { AlertTriangle, ExternalLink, Loader2 } from 'lucide-react';
 import { Search } from 'lucide-react';
 
+import { Button } from '@/components/ui/button';
 import { DatePickerWithRange } from '@/components/ui/date-picker-with-range';
 import { Input } from '@/components/ui/input';
 import { ProjectDataTable } from '@/features/projects/components/tables/DataTable';
@@ -76,8 +76,8 @@ export function VendorSubmissionTable({ filters }: VendorSubmissionTableProps) {
       table={table}
       columnsLength={vendorSubmissionColumns.length}
       toolbar={
-        <span>
-          <div className="bg-background relative rounded-lg">
+        <div className="flex w-full items-center justify-end gap-3">
+          <div className="relative min-w-[342px]">
             <Input
               className="normal pr-10"
               placeholder={'ค้นหาจากเลขที่ PO, ชื่อผู้ค้า, เลขที่ลงรับ, ...'}
@@ -86,8 +86,14 @@ export function VendorSubmissionTable({ filters }: VendorSubmissionTableProps) {
             />
             <Search className="text-muted-foreground absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2" />
           </div>
+
           <DatePickerWithRange value={date} onChange={setDate} />
-        </span>
+
+          <Button variant="outline" className="whitespace-nowrap" onClick={() => {}}>
+            <ExternalLink className="h-4 w-4" />
+            ไปที่หน้ากรอกฟอร์มส่งใบแจ้งหนี้/ใบส่งของ/ใบวางบิล
+          </Button>
+        </div>
       }
     />
   );

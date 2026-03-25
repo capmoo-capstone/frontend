@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { type DateRange } from 'react-day-picker';
 
-import { isBefore, isValid, parse, startOfDay } from 'date-fns';
+import { isBefore, startOfDay } from 'date-fns';
 import { CalendarIcon } from 'lucide-react';
 
 import { Calendar } from '@/components/ui/calendar';
@@ -14,31 +14,35 @@ interface DatePickerWithRangeProps {
 }
 
 const MASK = 'วว/ดด/ปปปป';
+const FALLBACK = ['ว', 'ว', 'ด', 'ด', 'ป', 'ป', 'ป', 'ป'];
 
 const formatThaiDate = (date: Date) => formatDateThai(date, 'dd/MM/yyyy');
 
-function applyMask(digits: string): string {
-  const d = digits.padEnd(8, '');
-  const get = (i: number, fallback: string) =>
-    d[i] !== undefined && d[i] !== '' ? d[i] : fallback;
-  return `${get(0, 'ว')}${get(1, 'ว')}/${get(2, 'ด')}${get(3, 'ด')}/${get(4, 'ป')}${get(5, 'ป')}${get(6, 'ป')}${get(7, 'ป')}`;
+function toArr(masked: string): string[] {
+  const chars = masked.replace(/\//g, '');
+  const arr: string[] = [];
+  let ci = 0;
+  for (let i = 0; i < 8; i++) {
+    const ch = chars[ci] ?? '';
+    arr.push(/\d/.test(ch) ? ch : '');
+    ci++;
+  }
+  return arr;
 }
 
-function extractDigits(masked: string): string {
-  return masked.replace(/[^0-9]/g, '');
+function fromArr(arr: string[]): string {
+  const get = (i: number) => (arr[i] !== '' ? arr[i] : FALLBACK[i]);
+  return `${get(0)}${get(1)}/${get(2)}${get(3)}/${get(4)}${get(5)}${get(6)}${get(7)}`;
 }
 
 function parseDate(masked: string): Date | null {
   if (/[วดป]/.test(masked)) return null;
-  // masked = dd/MM/yyyy (พ.ศ.) เช่น 25/03/2568
   const parts = masked.split('/');
   if (parts.length !== 3) return null;
   const [dd, mm, yyyy] = parts;
   if (yyyy.length !== 4) return null;
-
   const yearBE = parseInt(yyyy, 10);
-  const yearAD = yearBE - 543; // แปลง พ.ศ. → ค.ศ.
-
+  const yearAD = yearBE - 543;
   const parsed = new Date(yearAD, parseInt(mm, 10) - 1, parseInt(dd, 10));
   if (isNaN(parsed.getTime())) return null;
   return startOfDay(parsed);
@@ -69,10 +73,12 @@ function useMaskedDateInput(
 ) {
   const [masked, setMasked] = useState(initial || MASK);
   const [focused, setFocused] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     setMasked(initial || MASK);
+    setError(null);
   }, [initial]);
 
   const setCursor = (pos: number) => {
@@ -87,9 +93,8 @@ function useMaskedDateInput(
     if (e.key === 'Tab') return;
     e.preventDefault();
 
-    const rawPos = el.selectionStart ?? 0;
-    const cursorPos = rawPos;
-    const digits = extractDigits(masked);
+    const cursorPos = el.selectionStart ?? 0;
+    const arr = toArr(masked);
 
     if (e.key === 'ArrowLeft') {
       const prevRaw = cursorPos - 1;
@@ -110,8 +115,9 @@ function useMaskedDateInput(
       const dIdx = cursorPosToDigitIndex(effectivePos);
       const target = dIdx - 1;
       if (target < 0) return;
-      const newDigits = digits.slice(0, target) + digits.slice(target + 1);
-      setMasked(applyMask(newDigits));
+      arr[target] = '';
+      setMasked(fromArr(arr));
+      setError(null);
       setCursor(digitIndexToCursorPos(target));
       return;
     }
@@ -120,8 +126,9 @@ function useMaskedDateInput(
       const effectivePos = snapCursor(cursorPos);
       const dIdx = cursorPosToDigitIndex(effectivePos);
       if (dIdx > 7) return;
-      const newDigits = digits.slice(0, dIdx) + digits.slice(dIdx + 1);
-      setMasked(applyMask(newDigits));
+      arr[dIdx] = '';
+      setMasked(fromArr(arr));
+      setError(null);
       setCursor(effectivePos);
       return;
     }
@@ -130,8 +137,8 @@ function useMaskedDateInput(
       const effectivePos = snapCursor(cursorPos);
       const dIdx = cursorPosToDigitIndex(effectivePos);
       if (dIdx > 7) return;
-      const newDigits = digits.slice(0, dIdx) + e.key + digits.slice(dIdx + 1);
-      const newMasked = applyMask(newDigits);
+      arr[dIdx] = e.key;
+      const newMasked = fromArr(arr);
       setMasked(newMasked);
 
       const nextPos = effectivePos + 1;
@@ -139,7 +146,10 @@ function useMaskedDateInput(
       setCursor(Math.min(10, snappedNext));
 
       const date = parseDate(newMasked);
-      if (date) onValidDate(date);
+      if (date) {
+        setError(null);
+        onValidDate(date);
+      }
       return;
     }
   };
@@ -172,6 +182,8 @@ function useMaskedDateInput(
     setMasked,
     focused,
     isEmpty,
+    error,
+    setError,
     handleKeyDown,
     handleClick,
     handleFocus,
@@ -193,6 +205,15 @@ export function DatePickerWithRange({ value, onChange }: DatePickerWithRangeProp
     fromStr,
     (date) => {
       const newRange: DateRange = { from: date, to: internalRange?.to };
+      if (
+        internalRange?.to &&
+        !isBefore(date, internalRange.to) &&
+        date.getTime() !== internalRange.to.getTime()
+      ) {
+        fromInput.setError('วันเริ่มต้นต้องอยู่ก่อนวันสิ้นสุด');
+        return;
+      }
+      fromInput.setError(null);
       setInternalRange(newRange);
       onChange?.(newRange);
       setCurrentMonth(date);
@@ -203,6 +224,17 @@ export function DatePickerWithRange({ value, onChange }: DatePickerWithRangeProp
   const toInput = useMaskedDateInput(
     toStr,
     (date) => {
+      const today = startOfDay(new Date());
+      // validate
+      if (date > today) {
+        toInput.setError('ไม่สามารถเลือกวันในอนาคตได้');
+        return;
+      }
+      if (internalRange?.from && isBefore(date, internalRange.from)) {
+        toInput.setError('วันสิ้นสุดต้องอยู่หลังวันเริ่มต้น');
+        return;
+      }
+      toInput.setError(null);
       const newRange: DateRange = { from: internalRange?.from, to: date };
       setInternalRange(newRange);
       onChange?.(newRange);
@@ -238,7 +270,9 @@ export function DatePickerWithRange({ value, onChange }: DatePickerWithRangeProp
       setInternalRange(newRange);
       onChange?.(newRange);
       fromInput.setMasked(formatThaiDate(day));
+      fromInput.setError(null);
       toInput.setMasked(MASK);
+      toInput.setError(null);
       setStep(2);
       setTimeout(() => toInput.inputRef.current?.focus(), 0);
     } else {
@@ -253,21 +287,27 @@ export function DatePickerWithRange({ value, onChange }: DatePickerWithRangeProp
       onChange?.(newRange);
       fromInput.setMasked(newRange.from ? formatThaiDate(newRange.from) : MASK);
       toInput.setMasked(newRange.to ? formatThaiDate(newRange.to) : MASK);
+      fromInput.setError(null);
+      toInput.setError(null);
       setOpen(false);
       setStep(1);
     }
   };
 
   return (
-    <div ref={containerRef} className="relative w-full">
-      <div className="focus-within:ring-primary hover:bg-accent/50 relative flex w-full cursor-text items-center gap-2 rounded-md border px-3 py-2 shadow-sm transition-colors focus-within:ring-2">
-        <CalendarIcon className="text-muted-foreground h-4 w-4 shrink-0" />
+    <div ref={containerRef} className="bg-background relative w-68">
+      <div
+        className={`focus-within:ring-primary hover:bg-accent/50 relative flex h-9 cursor-text items-center rounded-md border px-3 shadow-xs ${
+          fromInput.error || toInput.error ? 'border-destructive focus-within:ring-destructive' : ''
+        }`}
+      >
+        <CalendarIcon className="text-muted-foreground mr-2 h-4 w-4 shrink-0" />
 
         {/* Start */}
         <div className="relative flex flex-1 flex-col">
           {fromInput.isEmpty && (
-            <span className="text-muted-foreground pointer-events-none absolute inset-0 flex items-center font-mono text-sm">
-              วันที่เริ่มต้น
+            <span className="text-muted-foreground normal-normal pointer-events-none absolute inset-0 flex items-center">
+              เลือกวันที่เริ่มต้น
             </span>
           )}
           <input
@@ -279,17 +319,17 @@ export function DatePickerWithRange({ value, onChange }: DatePickerWithRangeProp
             onBlur={fromInput.handleBlur}
             onChange={() => {}}
             inputMode="numeric"
-            className="w-full cursor-text bg-transparent font-mono text-sm outline-none"
+            className="normal-normal w-full cursor-text bg-transparent font-mono outline-none"
           />
         </div>
 
-        <span className="text-muted-foreground self-center">-</span>
+        <span className="text-muted-foreground ml-1 self-center">-</span>
 
         {/* End */}
-        <div className="relative flex flex-1 flex-col">
+        <div className="relative ml-2 flex flex-1 flex-col">
           {toInput.isEmpty && (
-            <span className="text-muted-foreground pointer-events-none absolute inset-0 flex items-center font-mono text-sm">
-              วันที่สิ้นสุด
+            <span className="text-muted-foreground normal-normal pointer-events-none absolute inset-0 flex items-center">
+              สิ้นสุด
             </span>
           )}
           <input
@@ -301,10 +341,15 @@ export function DatePickerWithRange({ value, onChange }: DatePickerWithRangeProp
             onBlur={toInput.handleBlur}
             onChange={() => {}}
             inputMode="numeric"
-            className="w-full cursor-text bg-transparent font-mono text-sm outline-none"
+            className="normal-normal w-full cursor-text bg-transparent font-mono outline-none"
           />
         </div>
       </div>
+
+      {/* Error messages */}
+      {(fromInput.error || toInput.error) && (
+        <p className="text-destructive mt-1 text-xs">{fromInput.error ?? toInput.error}</p>
+      )}
 
       {open && (
         <div className="bg-popover text-popover-foreground absolute top-full left-0 z-50 mt-1 rounded-md border shadow-md">

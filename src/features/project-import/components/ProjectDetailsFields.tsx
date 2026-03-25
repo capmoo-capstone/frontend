@@ -14,10 +14,10 @@ import { Textarea } from '@/components/ui/textarea';
 import { RESPONSIBLE_SELECT_OPTIONS } from '@/lib/formatters';
 import { cn } from '@/lib/utils';
 
-import type { ProjectImportPayload } from '../types';
+import type { ProjectImportFormValues } from '../types';
 
 interface ProjectDetailsFieldsProps {
-  control: Control<ProjectImportPayload>;
+  control: Control<ProjectImportFormValues>;
   onProcurementTypeChange: (value: string) => void;
   onDeliveryDateChange: (date: Date | undefined) => void;
   isDateEarly: boolean;

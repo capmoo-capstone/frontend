@@ -8,10 +8,10 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import type { BudgetPlan } from '@/features/budgets';
 import { cn } from '@/lib/utils';
 
-import type { ProjectImportPayload } from '../types';
+import type { ProjectImportFormValues } from '../types';
 
 interface BudgetPlanFieldProps {
-  control: Control<ProjectImportPayload>;
+  control: Control<ProjectImportFormValues>;
   budgetPlans: BudgetPlan[] | undefined;
   isLoadingBudgets: boolean;
   isErrorBudgets: boolean;

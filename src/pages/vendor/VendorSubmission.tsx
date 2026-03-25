@@ -37,10 +37,7 @@ export default function VendorSubmission() {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col gap-2">
-        <h1 className="h1-topic text-primary">รายการนำส่งจากผู้ขาย (Vendor Submissions)</h1>
-        <p className="text-muted-foreground caption">
-          จัดการรายการนำส่งจากผู้ขาย ตรวจสอบสถานะ และส่งออกข้อมูลที่ต้องการ
-        </p>
+        <h1 className="h1-topic text-primary">ใบแจ้งหนี้/ใบส่งของ/ใบวางบิลจากคู่ค้า</h1>
       </div>
 
       {/* Table with integrated toolbar */}

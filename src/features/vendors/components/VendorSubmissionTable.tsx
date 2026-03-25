@@ -9,10 +9,12 @@ import {
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table';
+import { addDays } from 'date-fns';
 import { AlertTriangle, Loader2 } from 'lucide-react';
+import { Search } from 'lucide-react';
 
-import { ExportTableToolbar } from '@/components/ExportTableToolbar';
-import { DateRangeFilter } from '@/components/date-range-filter';
+import { DatePickerWithRange } from '@/components/ui/date-picker-with-range';
+import { Input } from '@/components/ui/input';
 import { ProjectDataTable } from '@/features/projects/components/tables/DataTable';
 
 import { useVendorSubmissions } from '../hooks/useVendorSubmissions';
@@ -26,15 +28,12 @@ interface VendorSubmissionTableProps {
   onExport: (selectedIds: string[]) => void;
 }
 
-export function VendorSubmissionTable({
-  filters,
-  onDateRangeChange,
-  onExport,
-}: VendorSubmissionTableProps) {
+export function VendorSubmissionTable({ filters }: VendorSubmissionTableProps) {
   const { data, isLoading, isError } = useVendorSubmissions(filters);
   const [sorting, setSorting] = useState<SortingState>([]);
   const [rowSelection, setRowSelection] = useState({});
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 });
+  const [date, setDate] = useState<DateRange | undefined>();
 
   const table = useReactTable({
     data: data || [],
@@ -54,25 +53,6 @@ export function VendorSubmissionTable({
     },
     enableRowSelection: true,
   });
-
-  const selectedCount = table.getFilteredSelectedRowModel().rows.length;
-  const hasSelection = selectedCount > 0;
-  const isAllSelected = table.getIsAllPageRowsSelected();
-
-  const handleToggleSelectAll = () => {
-    if (isAllSelected || hasSelection) {
-      table.resetRowSelection();
-    } else {
-      table.toggleAllPageRowsSelected(true);
-    }
-  };
-
-  const handleExport = () => {
-    const selectedRows = table.getSelectedRowModel().rows;
-    const selectedIds = selectedRows.map((row) => row.original.id);
-    onExport(selectedIds);
-    table.resetRowSelection();
-  };
 
   if (isLoading) {
     return (
@@ -96,20 +76,18 @@ export function VendorSubmissionTable({
       table={table}
       columnsLength={vendorSubmissionColumns.length}
       toolbar={
-        <ExportTableToolbar
-          selectedCount={selectedCount}
-          hasSelection={hasSelection}
-          onToggleSelectAll={handleToggleSelectAll}
-          dateRangeFilter={<DateRangeFilter onDateRangeChange={onDateRangeChange} />}
-          actions={[
-            {
-              label: 'ส่งออกข้อมูล',
-              onClick: handleExport,
-              disabled: !hasSelection,
-              title: !hasSelection ? 'กรุณาเลือกรายการก่อนส่งออก' : 'ส่งออกข้อมูลที่เลือก',
-            },
-          ]}
-        />
+        <span>
+          <div className="bg-background relative rounded-lg">
+            <Input
+              className="normal pr-10"
+              placeholder={'ค้นหาจากเลขที่ PO, ชื่อผู้ค้า, เลขที่ลงรับ, ...'}
+              value={filters.search}
+              onChange={(e) => setFilters((p) => ({ ...p, search: e.target.value }))}
+            />
+            <Search className="text-muted-foreground absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2" />
+          </div>
+          <DatePickerWithRange value={date} onChange={setDate} />
+        </span>
       }
     />
   );

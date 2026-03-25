@@ -11,7 +11,12 @@ import { useDepartments, useUnits } from '@/features/organization';
 import { getFiscalYear } from '@/lib/formatters';
 import { hasProcurementPermission } from '@/lib/permissions';
 
-import { PROCUREMENT_MIN_DAYS, type ProjectImportPayload, ProjectImportSchema } from '../types';
+import {
+  PROCUREMENT_MIN_DAYS,
+  type ProjectImportFormValues,
+  type ProjectImportPayload,
+  ProjectImportSchema,
+} from '../types';
 import { useCreateProject } from './useCreateProject';
 
 interface UseProjectImportFormOptions {
@@ -28,7 +33,7 @@ export function useProjectImportForm({ onSuccess }: UseProjectImportFormOptions)
 
   const currentYear = getFiscalYear(new Date());
 
-  const form = useForm<ProjectImportPayload>({
+  const form = useForm<ProjectImportFormValues, unknown, ProjectImportPayload>({
     resolver: zodResolver(ProjectImportSchema),
     defaultValues: {
       pr_no: '',
@@ -50,7 +55,8 @@ export function useProjectImportForm({ onSuccess }: UseProjectImportFormOptions)
   const watchDeliveryDate = form.watch('delivery_date');
   const watchProcurementType = form.watch('procurement_type');
   const selectedPlans = form.watch('budget_plan_ids') || [];
-  const typedBudget = form.watch('budget');
+  const watchBudget = form.watch('budget');
+  const typedBudget = typeof watchBudget === 'number' ? watchBudget : Number(watchBudget || 0);
 
   // Fetch data
   const { data: departments, isLoading: isLoadingDepts } = useDepartments();

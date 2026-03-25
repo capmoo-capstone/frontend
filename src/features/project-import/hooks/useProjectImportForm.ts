@@ -26,7 +26,7 @@ export function useProjectImportForm({ onSuccess }: UseProjectImportFormOptions)
   const currentYear = getFiscalYear(new Date());
 
   const form = useForm<ProjectImportPayload>({
-    resolver: zodResolver(ProjectImportSchema) as any,
+    resolver: zodResolver(ProjectImportSchema),
     defaultValues: {
       pr_no: '',
       title: '',
@@ -52,10 +52,11 @@ export function useProjectImportForm({ onSuccess }: UseProjectImportFormOptions)
   // Fetch data
   const { data: departments, isLoading: isLoadingDepts } = useDepartments();
   const { data: units, isLoading: isLoadingUnits } = useUnits(watchDeptId);
-  const { data: budgetPlans, isLoading: isLoadingBudgets } = useBudgetPlans(
-    watchUnitId,
-    watchFiscalYear
-  );
+  const {
+    data: budgetPlans,
+    isLoading: isLoadingBudgets,
+    isError: isErrorBudgets,
+  } = useBudgetPlans(watchDeptId, watchFiscalYear);
 
   // Derive warnings
   const minDays = (watchProcurementType && PROCUREMENT_MIN_DAYS[watchProcurementType]) || 0;
@@ -78,7 +79,7 @@ export function useProjectImportForm({ onSuccess }: UseProjectImportFormOptions)
 
   useEffect(() => {
     form.setValue('budget_plan_ids', []);
-  }, [watchUnitId, watchFiscalYear, form]);
+  }, [watchDeptId, watchFiscalYear, form]);
 
   // Auto-calculate budget when plans are selected
   useEffect(() => {
@@ -131,6 +132,7 @@ export function useProjectImportForm({ onSuccess }: UseProjectImportFormOptions)
     isLoadingDepts,
     isLoadingUnits,
     isLoadingBudgets,
+    isErrorBudgets,
     // Watched values
     watchDeptId,
     watchUnitId,

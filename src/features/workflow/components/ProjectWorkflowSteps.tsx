@@ -30,6 +30,7 @@ export function ProjectWorkflowSteps({ project, steps }: ProjectWorkflowStepsPro
   } = useWorkflow(project, steps);
 
   if (!user) return null;
+  const viewAsRole = user.role ?? 'GUEST';
 
   const sortedSteps = [...steps].sort((a, b) => a.order - b.order);
   const lastStepOrder = sortedSteps[sortedSteps.length - 1]?.order;
@@ -42,17 +43,17 @@ export function ProjectWorkflowSteps({ project, steps }: ProjectWorkflowStepsPro
         const viewSubmission = viewingSubmissions[step.order];
         const fields = step.required_documents;
 
-        const userCanAct = isActionRequired(user.role, status);
+        const userCanAct = isActionRequired(viewAsRole, status);
         const isCompleted = status === 'completed';
         const showForm = userCanAct || viewSubmission || isCompleted || status === 'not_started';
-        const isGuest = user.role === 'GUEST' || user.role === 'REPRESENTATIVE';
+        const isGuest = viewAsRole === 'GUEST' || viewAsRole === 'REPRESENTATIVE';
 
         return (
           <WorkflowStep
             key={`step-${step.order}`}
             id={`step-${step.order}`}
             index={step.order}
-            viewAsRole={user.role}
+            viewAsRole={viewAsRole}
             isLast={step.order === lastStepOrder}
             title={step.name}
             status={status}
@@ -79,7 +80,7 @@ export function ProjectWorkflowSteps({ project, steps }: ProjectWorkflowStepsPro
                     <StepActionForm
                       isActive={!viewSubmission && !isCompleted}
                       stepStatus={status}
-                      viewAsRole={user.role}
+                      viewAsRole={viewAsRole}
                       viewSubmission={viewSubmission || null}
                       onBackToEdit={() => handleBackToEdit(step.order)}
                     >
@@ -95,7 +96,7 @@ export function ProjectWorkflowSteps({ project, steps }: ProjectWorkflowStepsPro
                           isCompleted ||
                           viewSubmission !== undefined ||
                           !userCanAct ||
-                          user.role !== 'GENERAL_STAFF'
+                          viewAsRole !== 'GENERAL_STAFF'
                         }
                       />
                     </StepActionForm>

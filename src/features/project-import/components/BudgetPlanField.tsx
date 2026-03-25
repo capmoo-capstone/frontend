@@ -5,21 +5,17 @@ import { ChevronDown, X } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Field, FieldError, FieldLabel } from '@/components/ui/field';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import type { BudgetPlan } from '@/features/budgets';
 import { cn } from '@/lib/utils';
 
 import type { ProjectImportPayload } from '../types';
-
-interface BudgetPlan {
-  id: string;
-  description: string;
-  amount: number;
-}
 
 interface BudgetPlanFieldProps {
   control: Control<ProjectImportPayload>;
   budgetPlans: BudgetPlan[] | undefined;
   isLoadingBudgets: boolean;
-  watchUnitId: string;
+  isErrorBudgets: boolean;
+  watchDepartmentId: string;
   watchFiscalYear: string;
 }
 
@@ -27,7 +23,8 @@ export function BudgetPlanField({
   control,
   budgetPlans,
   isLoadingBudgets,
-  watchUnitId,
+  isErrorBudgets,
+  watchDepartmentId,
   watchFiscalYear,
 }: BudgetPlanFieldProps) {
   return (
@@ -50,7 +47,7 @@ export function BudgetPlanField({
                 <button
                   type="button"
                   role="combobox"
-                  disabled={isLoadingBudgets || !watchUnitId || !watchFiscalYear}
+                  disabled={isLoadingBudgets || !watchDepartmentId || !watchFiscalYear}
                   className={cn(
                     'border-input bg-background ring-offset-background focus:ring-ring flex min-h-9 w-full items-center justify-between rounded-lg border px-3 py-1.5 text-base focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50',
                     fieldState.invalid && 'border-destructive focus:ring-destructive',
@@ -90,7 +87,27 @@ export function BudgetPlanField({
                 align="start"
               >
                 <div className="flex max-h-64 flex-col overflow-y-auto">
-                  {budgetPlans &&
+                  {isLoadingBudgets && (
+                    <div className="text-muted-foreground px-3 py-3 text-sm">
+                      กำลังโหลดข้อมูลแผนงบประมาณ...
+                    </div>
+                  )}
+
+                  {isErrorBudgets && (
+                    <div className="text-destructive px-3 py-3 text-sm">
+                      ไม่สามารถโหลดข้อมูลแผนงบประมาณได้
+                    </div>
+                  )}
+
+                  {!isLoadingBudgets && !isErrorBudgets && budgetPlans?.length === 0 && (
+                    <div className="text-muted-foreground px-3 py-3 text-sm">
+                      ไม่พบข้อมูลแผนงบประมาณ
+                    </div>
+                  )}
+
+                  {!isLoadingBudgets &&
+                    !isErrorBudgets &&
+                    budgetPlans &&
                     budgetPlans.map((plan) => {
                       const isSelected = field.value?.includes(plan.id);
                       return (

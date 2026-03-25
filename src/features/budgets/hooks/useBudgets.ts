@@ -1,59 +1,57 @@
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
-import type { BudgetPlan } from '../types';
+import {
+  getBudgetPlans,
+  importBudgetPlans,
+  linkBudgetPlanToProject,
+  removeBudgetPlan,
+} from '../api';
+import type { ImportBudgetPlanPayload } from '../types';
 
-// import axios from '@/lib/axios';
+export const BUDGET_QUERY_KEYS = {
+  all: ['budget-plans'] as const,
+  byDepartmentAndYear: (departmentId: string, fiscalYear: string) =>
+    ['budget-plans', departmentId, fiscalYear] as const,
+};
 
-const MOCK_BUDGET_PLANS: BudgetPlan[] = [
-  {
-    id: '1',
-    fiscal_year: '2024',
-    cost_center: 'CC001',
-    department_id: 'D001',
-    unit_id: 'U001',
-    activity_type: 'กิจกรรม A',
-    activity_name: 'กิจกรรมส่งเสริมการขาย',
-    description: 'รายละเอียดกิจกรรมส่งเสริมการขาย',
-    amount: 100000,
-    department_name: 'ฝ่ายการตลาด',
-    unit_name: 'หน่วยงานส่งเสริมการขาย',
-  },
-  {
-    id: '2',
-    fiscal_year: '2024',
-    cost_center: 'CC002',
-    department_id: 'D002',
-    unit_id: 'U002',
-    activity_type: 'กิจกรรม B',
-    activity_name: 'กิจกรรมฝึกอบรม',
-    description: 'รายละเอียดกิจกรรมฝึกอบรม',
-    amount: 50000,
-    department_name: 'ฝ่ายทรัพยากรบุคคล',
-    unit_name: 'หน่วยงานฝึกอบรม',
-  },
-  {
-    id: '3',
-    fiscal_year: '2024',
-    cost_center: 'CC003',
-    department_id: 'D003',
-    unit_id: 'U003',
-    activity_type: 'กิจกรรม C',
-    activity_name: 'กิจกรรมวิจัยและพัฒนา',
-    description: 'รายละเอียดกิจกรรมวิจัยและพัฒนา',
-    amount: 200000,
-    department_name: 'ฝ่ายวิจัยและพัฒนา',
-    unit_name: 'หน่วยงานวิจัยและพัฒนา',
-  },
-];
-
-export function useBudgetPlans(unitId: string, fiscalYear: string) {
+export function useBudgetPlans(departmentId: string, fiscalYear: string) {
   return useQuery({
-    queryKey: ['budget-plans', unitId, fiscalYear],
-    queryFn: async () => {
-      // const { data } = await axios.get(`/api/budget-plans?unit_id=${unitId}&fiscal_year=${fiscalYear}`);
-      // return data;
-      return MOCK_BUDGET_PLANS;
+    queryKey: BUDGET_QUERY_KEYS.byDepartmentAndYear(departmentId, fiscalYear),
+    queryFn: () => getBudgetPlans(departmentId, fiscalYear),
+    enabled: Boolean(departmentId) && Boolean(fiscalYear),
+  });
+}
+
+export function useImportBudgetPlans() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (payload: ImportBudgetPlanPayload) => importBudgetPlans(payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: BUDGET_QUERY_KEYS.all });
     },
-    enabled: !!unitId && !!fiscalYear,
+  });
+}
+
+export function useLinkBudgetPlanToProject() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, projectId }: { id: string; projectId: string }) =>
+      linkBudgetPlanToProject(id, projectId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: BUDGET_QUERY_KEYS.all });
+    },
+  });
+}
+
+export function useDeleteBudgetPlan() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: string) => removeBudgetPlan(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: BUDGET_QUERY_KEYS.all });
+    },
   });
 }

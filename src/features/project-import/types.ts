@@ -53,8 +53,3 @@ export interface EditableImportRow extends Partial<ProjectImportPayload> {
   isValid?: boolean;
   errors?: Record<string, string>;
 }
-
-export const MOCK_BUDGET_PLANS = [
-  { id: 'BP001', name: 'กิจกรรม ก (ศูนย์ A)', amount: 500000 },
-  { id: 'BP002', name: 'กิจกรรม ข (ศูนย์ B)', amount: 300000 },
-];

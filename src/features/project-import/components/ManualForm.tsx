@@ -6,12 +6,12 @@ import { ConfirmationDialog } from './ConfirmationDialog';
 import { OrganizationFields } from './OrganizationFields';
 import { ProjectDetailsFields } from './ProjectDetailsFields';
 
-interface Props {
+interface ManualFormProps {
   onBack: () => void;
   onSuccess: () => void;
 }
 
-export function ManualForm({ onBack, onSuccess }: Props) {
+export function ManualForm({ onBack, onSuccess }: ManualFormProps) {
   const {
     form,
     canSelectEveryUnits,
@@ -22,8 +22,8 @@ export function ManualForm({ onBack, onSuccess }: Props) {
     isLoadingDepts,
     isLoadingUnits,
     isLoadingBudgets,
+    isErrorBudgets,
     watchDeptId,
-    watchUnitId,
     watchFiscalYear,
     isDateEarly,
     minDays,
@@ -62,9 +62,10 @@ export function ManualForm({ onBack, onSuccess }: Props) {
 
             <BudgetPlanField
               control={form.control}
-              budgetPlans={budgetPlans as any}
+              budgetPlans={budgetPlans}
               isLoadingBudgets={isLoadingBudgets}
-              watchUnitId={watchUnitId}
+              isErrorBudgets={isErrorBudgets}
+              watchDepartmentId={watchDeptId}
               watchFiscalYear={watchFiscalYear}
             />
 

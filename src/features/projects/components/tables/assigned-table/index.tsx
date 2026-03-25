@@ -31,6 +31,7 @@ import { getColumns } from './columns';
 export function AssignedTable({ unitId }: { unitId?: string }) {
   const { user } = useAuth();
   if (!user) return null;
+  const viewAsRole = user.role ?? 'GUEST';
 
   const [date, setDate] = useState<Date | undefined>(new Date());
 
@@ -62,9 +63,9 @@ export function AssignedTable({ unitId }: { unitId?: string }) {
         onCancelProject: (project: AssignedProjectItem) => setProjectToCancel(project),
         onChangeAssignee: (project: AssignedProjectItem) => setProjectToChangeAssignee(project),
         onAcceptProject: handleAcceptProject,
-        viewAsRole: user.role,
+        viewAsRole,
       }),
-    [unitId, user.role, date, handleAcceptProject]
+    [unitId, viewAsRole, date, handleAcceptProject]
   );
 
   const table = useReactTable({
@@ -85,7 +86,7 @@ export function AssignedTable({ unitId }: { unitId?: string }) {
     });
 
     const actionLabel =
-      ManageUnitRoles.includes(user.role) || SupervisorRoles.includes(user.role)
+      ManageUnitRoles.includes(viewAsRole) || SupervisorRoles.includes(viewAsRole)
         ? 'ยกเลิก'
         : 'ขอยกเลิก';
 
@@ -141,7 +142,7 @@ export function AssignedTable({ unitId }: { unitId?: string }) {
             <TitleBar title="งานที่ถูกมอบหมายแล้ว" variant="grey" />
             <div className="flex items-center gap-2">
               <DatePicker date={date} setDate={setDate} />
-              {ManageSelfRoles.includes(user.role) ? (
+              {ManageSelfRoles.includes(viewAsRole) ? (
                 <Button variant="outline" onClick={handleAcceptAll} disabled={false}>
                   รับทราบทั้งหมด
                 </Button>
@@ -161,7 +162,7 @@ export function AssignedTable({ unitId }: { unitId?: string }) {
         onClose={() => setProjectToCancel(null)}
         onConfirm={handleConfirmCancel}
         projectTitle={projectToCancel?.title}
-        isAuthorized={ManageUnitRoles.includes(user.role) || SupervisorRoles.includes(user.role)}
+        isAuthorized={ManageUnitRoles.includes(viewAsRole) || SupervisorRoles.includes(viewAsRole)}
       />
 
       {projectToChangeAssignee && (

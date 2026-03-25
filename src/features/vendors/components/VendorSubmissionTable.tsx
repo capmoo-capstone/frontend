@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import type { DateRange } from 'react-day-picker';
+import { useNavigate } from 'react-router-dom';
 
 import {
   type SortingState,
@@ -25,10 +26,14 @@ interface VendorSubmissionTableProps {
   filters: VendorFilterParams;
   onSearchChange: (search: string) => void;
   onDateRangeChange: (range: DateRange | undefined) => void;
-  onExport: (selectedIds: string[]) => void;
 }
 
-export function VendorSubmissionTable({ filters }: VendorSubmissionTableProps) {
+export function VendorSubmissionTable({
+  filters,
+  onSearchChange,
+  onDateRangeChange,
+}: VendorSubmissionTableProps) {
+  const navigate = useNavigate();
   const { data, isLoading, isError } = useVendorSubmissions(filters);
   const [sorting, setSorting] = useState<SortingState>([]);
   const [rowSelection, setRowSelection] = useState({});
@@ -45,6 +50,7 @@ export function VendorSubmissionTable({ filters }: VendorSubmissionTableProps) {
     onSortingChange: setSorting,
     onRowSelectionChange: setRowSelection,
     onPaginationChange: setPagination,
+    onGlobalFilterChange: onSearchChange,
     state: {
       sorting,
       rowSelection,
@@ -82,14 +88,26 @@ export function VendorSubmissionTable({ filters }: VendorSubmissionTableProps) {
               className="normal pr-10"
               placeholder={'ค้นหาจากเลขที่ PO, ชื่อผู้ค้า, เลขที่ลงรับ, ...'}
               value={filters.search}
-              onChange={(e) => setFilters((p) => ({ ...p, search: e.target.value }))}
+              onChange={(e) => onSearchChange(e.target.value)}
             />
             <Search className="text-muted-foreground absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2" />
           </div>
 
-          <DatePickerWithRange value={date} onChange={setDate} />
+          <DatePickerWithRange
+            value={date}
+            onChange={(range) => {
+              setDate(range);
+              onDateRangeChange(range);
+            }}
+          />
 
-          <Button variant="outline" className="whitespace-nowrap" onClick={() => {}}>
+          <Button
+            variant="outline"
+            className="whitespace-nowrap"
+            onClick={() => {
+              navigate('/vendor/form');
+            }}
+          >
             <ExternalLink className="h-4 w-4" />
             ไปที่หน้ากรอกฟอร์มส่งใบแจ้งหนี้/ใบส่งของ/ใบวางบิล
           </Button>

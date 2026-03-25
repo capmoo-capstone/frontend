@@ -159,34 +159,46 @@ export function ProjectDetailsFields({
       <Controller
         name="budget"
         control={control}
-        render={({ field, fieldState }) => (
-          <Field data-invalid={fieldState.invalid}>
-            <FieldLabel htmlFor={field.name}>
-              วงเงินงบประมาณ (บาท) <span className="text-destructive">*</span>
-            </FieldLabel>
-            <Input
-              {...field}
-              id={field.name}
-              type="number"
-              placeholder="กรุณากรอกวงเงินงบประมาณ"
-              aria-invalid={fieldState.invalid}
-              className={cn(
-                showBudgetWarning &&
-                  !fieldState.invalid &&
-                  'border-warning focus-visible:ring-warning-light'
+        render={({ field, fieldState }) => {
+          const numericValue =
+            typeof field.value === 'number' && Number.isFinite(field.value)
+              ? field.value
+              : Number(field.value || 0);
+
+          return (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel htmlFor={field.name}>
+                วงเงินงบประมาณ (บาท) <span className="text-destructive">*</span>
+              </FieldLabel>
+              <Input
+                id={field.name}
+                name={field.name}
+                ref={field.ref}
+                onBlur={field.onBlur}
+                value={Number.isFinite(numericValue) ? numericValue : 0}
+                type="number"
+                placeholder="กรุณากรอกวงเงินงบประมาณ"
+                aria-invalid={fieldState.invalid}
+                className={cn(
+                  showBudgetWarning &&
+                    !fieldState.invalid &&
+                    'border-warning focus-visible:ring-warning-light'
+                )}
+                onChange={(e) => {
+                  const value = e.target.valueAsNumber || 0;
+                  field.onChange(value);
+                  onBudgetChange(value);
+                }}
+              />
+              {showBudgetWarning && !fieldState.invalid && (
+                <p className="caption text-warning-dark">
+                  จำนวนเงินน้อยกว่าวงเงินงบประมาณที่ตั้งไว้
+                </p>
               )}
-              onChange={(e) => {
-                const value = e.target.valueAsNumber || 0;
-                field.onChange(value);
-                onBudgetChange(value);
-              }}
-            />
-            {showBudgetWarning && !fieldState.invalid && (
-              <p className="caption text-warning-dark">จำนวนเงินน้อยกว่าวงเงินงบประมาณที่ตั้งไว้</p>
-            )}
-            {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-          </Field>
-        )}
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          );
+        }}
       />
     </>
   );

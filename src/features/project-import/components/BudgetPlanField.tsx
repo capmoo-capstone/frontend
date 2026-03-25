@@ -8,14 +8,14 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import type { BudgetPlan } from '@/features/budgets';
 import { cn } from '@/lib/utils';
 
-import type { ProjectImportPayload } from '../types';
+import type { ProjectImportFormValues } from '../types';
 
 interface BudgetPlanFieldProps {
-  control: Control<ProjectImportPayload>;
+  control: Control<ProjectImportFormValues>;
   budgetPlans: BudgetPlan[] | undefined;
   isLoadingBudgets: boolean;
   isErrorBudgets: boolean;
-  watchDepartmentId: string;
+  watchUnitId: string;
   watchFiscalYear: string;
 }
 
@@ -24,7 +24,7 @@ export function BudgetPlanField({
   budgetPlans,
   isLoadingBudgets,
   isErrorBudgets,
-  watchDepartmentId,
+  watchUnitId,
   watchFiscalYear,
 }: BudgetPlanFieldProps) {
   return (
@@ -47,7 +47,7 @@ export function BudgetPlanField({
                 <button
                   type="button"
                   role="combobox"
-                  disabled={isLoadingBudgets || !watchDepartmentId || !watchFiscalYear}
+                  disabled={isLoadingBudgets || !watchUnitId || !watchFiscalYear}
                   className={cn(
                     'border-input bg-background ring-offset-background focus:ring-ring flex min-h-9 w-full items-center justify-between rounded-lg border px-3 py-1.5 text-base focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50',
                     fieldState.invalid && 'border-destructive focus:ring-destructive',

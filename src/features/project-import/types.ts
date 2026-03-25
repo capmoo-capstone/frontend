@@ -27,6 +27,7 @@ export const ProjectImportSchema = z.object({
   budget_plan_ids: z.array(z.string()),
 });
 
+export type ProjectImportFormValues = z.input<typeof ProjectImportSchema>;
 export type ProjectImportPayload = z.infer<typeof ProjectImportSchema>;
 
 export const FioriImportSchema = ProjectImportSchema.omit({

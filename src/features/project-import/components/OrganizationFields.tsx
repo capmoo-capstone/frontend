@@ -9,10 +9,10 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 
-import type { ProjectImportPayload } from '../types';
+import type { ProjectImportFormValues } from '../types';
 
 interface OrganizationFieldsProps {
-  control: Control<ProjectImportPayload>;
+  control: Control<ProjectImportFormValues>;
   departments: Array<{ id: string; name: string }> | undefined;
   units: Array<{ id: string; name: string }> | undefined;
   fiscalYears: string[];

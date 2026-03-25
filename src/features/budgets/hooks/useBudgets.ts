@@ -10,15 +10,15 @@ import type { ImportBudgetPlanPayload } from '../types';
 
 export const BUDGET_QUERY_KEYS = {
   all: ['budget-plans'] as const,
-  byDepartmentAndYear: (departmentId: string, fiscalYear: string) =>
-    ['budget-plans', departmentId, fiscalYear] as const,
+  byUnitAndYear: (unitId: string, fiscalYear: string) =>
+    ['budget-plans', unitId, fiscalYear] as const,
 };
 
-export function useBudgetPlans(departmentId: string, fiscalYear: string) {
+export function useBudgetPlans(unitId: string, fiscalYear: string) {
   return useQuery({
-    queryKey: BUDGET_QUERY_KEYS.byDepartmentAndYear(departmentId, fiscalYear),
-    queryFn: () => getBudgetPlans(departmentId, fiscalYear),
-    enabled: Boolean(departmentId) && Boolean(fiscalYear),
+    queryKey: BUDGET_QUERY_KEYS.byUnitAndYear(unitId, fiscalYear),
+    queryFn: () => getBudgetPlans(unitId, fiscalYear),
+    enabled: Boolean(unitId) && Boolean(fiscalYear),
   });
 }
 

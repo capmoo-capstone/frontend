@@ -40,6 +40,7 @@ export function ChangeAssigneeDialog({
 
   const form = useForm<ChangeAssigneeFormValues>({
     resolver: zodResolver(ChangeAssigneeFormSchema),
+    mode: 'onChange',
     defaultValues: {
       userId: currentAssigneeId ?? '',
     },

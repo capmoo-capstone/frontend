@@ -14,7 +14,6 @@ import type {
 } from '../types';
 import {
   AssignedProjectItemSchema,
-  ProjectAssignmentSchema,
   ProjectAssignmentsPayloadSchema,
   ProjectDetailSchema,
   ProjectListSchema,
@@ -26,18 +25,22 @@ import { mockProjects } from './mockProjects';
 
 export type { ProjectFilterParams };
 
+const USE_PROJECTS_MOCK = import.meta.env.VITE_USE_PROJECTS_MOCK === 'true';
+
 export const getProjects = async (params?: ProjectFilterParams): Promise<Project[]> => {
-  void params;
-  // return mock data;
-  return MOCK_PROJECTS;
+  if (USE_PROJECTS_MOCK) {
+    void params;
+    return MOCK_PROJECTS;
+  }
 
   const { data } = await api.get('/projects');
   return ProjectListSchema.parse(data);
 };
 
 export const getProjectDetail = async (id: string): Promise<ProjectDetail> => {
-  // return mock data
-  return mockProjects.find((project) => project.id === id)!;
+  if (USE_PROJECTS_MOCK) {
+    return mockProjects.find((project) => project.id === id)!;
+  }
 
   const { data } = await api.get(`/projects/${id}`);
   return ProjectDetailSchema.parse(data);
@@ -47,8 +50,9 @@ export const getAssignedProjects = async (
   unitId: string,
   date: Date
 ): Promise<AssignedProjectItem[]> => {
-  // return mock data
-  return MOCK_ASSIGNED_PROJECTS;
+  if (USE_PROJECTS_MOCK) {
+    return MOCK_ASSIGNED_PROJECTS;
+  }
 
   const { data } = await api.get('/projects/assigned', {
     params: {
@@ -66,8 +70,9 @@ export const getAssignedProjects = async (
 };
 
 export const getUnassignedProjects = async (unitId: string): Promise<UnassignedProjectItem[]> => {
-  // return mock data
-  return MOCK_UNASSIGNED_PROJECTS;
+  if (USE_PROJECTS_MOCK) {
+    return MOCK_UNASSIGNED_PROJECTS;
+  }
 
   const { data } = await api.get('/projects/unassigned', {
     params: { unit_id: unitId },
@@ -82,56 +87,51 @@ export const getUnassignedProjects = async (unitId: string): Promise<UnassignedP
 };
 
 export const assignProject = async (assignments: ProjectAssignmentsPayload) => {
-  // Mock response
   ProjectAssignmentsPayloadSchema.parse(assignments);
 
-  return {
-    success: true,
-    data: assignments,
-  };
+  if (USE_PROJECTS_MOCK) {
+    return {
+      success: true,
+      data: assignments,
+    };
+  }
 
-  const { data } = await api.patch(`/projects/assign`, {
-    data: assignments,
-  });
+  const { data } = await api.patch(
+    `/projects/assign`,
+    assignments.map((item) => ({ id: item.projectId, userId: item.userId }))
+  );
 
-  return z
-    .object({
-      success: z.boolean(),
-      data: z.array(ProjectAssignmentSchema),
-    })
-    .parse(data);
+  return data;
 };
 
 export const changeProjectAssignee = async (projectId: string, newUserId: string) => {
-  // Mock response
-  return {
-    success: true,
-    projectId,
-    newUserId,
-  };
+  if (USE_PROJECTS_MOCK) {
+    return {
+      success: true,
+      projectId,
+      newUserId,
+    };
+  }
 
-  const { data } = await api.patch(`/project/${projectId}/change-assignee/${newUserId}`);
+  const { data } = await api.patch(`/projects/${projectId}/change-assignee`, {
+    userId: newUserId,
+  });
 
-  return z
-    .object({
-      success: z.boolean(),
-      projectId: z.string(),
-      newUserId: z.string(),
-    })
-    .parse(data);
+  return data;
 };
 
 export const cancelProject = async (projectId: string, reason: string) => {
-  // Mock response
-  return {
-    data: {
-      id: projectId,
-      status: 'WAITING_CANCEL' as const,
-      reason,
-    },
-  };
+  if (USE_PROJECTS_MOCK) {
+    return {
+      data: {
+        id: projectId,
+        status: 'WAITING_CANCEL' as const,
+        reason,
+      },
+    };
+  }
 
-  const { data } = await api.patch(`/project/${projectId}/cancel`, {
+  const { data } = await api.patch(`/projects/${projectId}/cancel`, {
     reason,
   });
 
@@ -147,81 +147,63 @@ export const cancelProject = async (projectId: string, reason: string) => {
 };
 
 export const acceptProjects = async (projectIds: string[]) => {
-  // Mock response
-  return {
-    total: projectIds.length,
-    data: projectIds.map((projectId) => ({
-      projectId,
-      status: 'IN_PROGRESS' as const,
-      userId: 'current-user-id',
-    })),
-  };
+  if (USE_PROJECTS_MOCK) {
+    return {
+      total: projectIds.length,
+      data: projectIds.map((projectId) => ({
+        projectId,
+        status: 'IN_PROGRESS' as const,
+        userId: 'current-user-id',
+      })),
+    };
+  }
 
-  const { data } = await api.patch(`/project/accept`, {
-    data: projectIds,
-  });
+  const { data } = await api.patch(
+    `/projects/accept`,
+    projectIds.map((id) => ({ id }))
+  );
 
-  return z
-    .object({
-      total: z.number(),
-      data: z.array(
-        z.object({
-          projectId: z.string(),
-          status: z.literal('IN_PROGRESS'),
-          userId: z.string(),
-        })
-      ),
-    })
-    .parse(data);
+  return data;
 };
 
 export const claimProject = async (projectId: string) => {
-  // Mock response
-  return {
-    data: {
-      projectId,
-      status: 'IN_PROGRESS' as const,
-      assignee_procurement_id: 'current-user-id',
-    },
-  };
+  if (USE_PROJECTS_MOCK) {
+    return {
+      data: {
+        projectId,
+        status: 'IN_PROGRESS' as const,
+        assignee_procurement_id: 'current-user-id',
+      },
+    };
+  }
 
-  const { data } = await api.patch(`/project/${projectId}/claim`);
+  const { data } = await api.patch(`/projects/${projectId}/claim`);
 
-  return z
-    .object({
-      data: z.object({
-        projectId: z.string(),
-        status: z.literal('IN_PROGRESS'),
-        assignee_procurement_id: z.string(),
-      }),
-    })
-    .parse(data);
+  return data;
 };
 
 export const updateProject = async (projectId: string, payload: UpdateProjectPayload) => {
   const parsedPayload = UpdateProjectPayloadSchema.parse(payload);
   const requestPayload = {
-    id: projectId,
-    updateData: {
-      ...parsedPayload,
-      is_urgent:
-        parsedPayload.is_urgent === undefined
-          ? undefined
-          : parsedPayload.is_urgent
-            ? 'URGENT'
-            : 'NORMAL',
-    },
+    ...parsedPayload,
+    is_urgent:
+      parsedPayload.is_urgent === undefined
+        ? undefined
+        : parsedPayload.is_urgent
+          ? 'URGENT'
+          : 'NORMAL',
   };
 
-  // Mock response
-  return {
-    data: {
-      id: projectId,
-      ...parsedPayload,
-    },
-  };
+  if (USE_PROJECTS_MOCK) {
+    return {
+      data: {
+        id: projectId,
+        ...parsedPayload,
+      },
+    };
+  }
 
-  const { data } = await api.patch(`/project/${projectId}/update`, requestPayload);
+  const { data } = await api.patch(`/projects/${projectId}/update`, requestPayload);
   return z
     .object({
       data: z.object({

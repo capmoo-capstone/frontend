@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { differenceInDays } from 'date-fns';
+import { toast } from 'sonner';
 
 import { useAuth } from '@/context/AuthContext';
 import { useBudgetPlans } from '@/features/budgets';
@@ -101,16 +102,24 @@ export function useProjectImportForm({ onSuccess }: UseProjectImportFormOptions)
       return;
     }
 
-    await createProjectMutation(data);
-    onSuccess();
+    try {
+      await createProjectMutation(data);
+      onSuccess();
+    } catch {
+      toast.error('ไม่สามารถสร้างโครงการได้ กรุณาลองใหม่อีกครั้ง');
+    }
   };
 
   const handleConfirm = () => {
     setWarningConfirmed(true);
     setShowConfirmationDialog(false);
     form.handleSubmit(async (data) => {
-      await createProjectMutation(data);
-      onSuccess();
+      try {
+        await createProjectMutation(data);
+        onSuccess();
+      } catch {
+        toast.error('ไม่สามารถสร้างโครงการได้ กรุณาลองใหม่อีกครั้ง');
+      }
     })();
   };
 

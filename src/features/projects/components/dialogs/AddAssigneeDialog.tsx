@@ -35,6 +35,7 @@ export function AddAssigneeDialog({ isOpen, onClose, projectId }: AddAssigneeDia
 
   const form = useForm<AddAssigneeFormValues>({
     resolver: zodResolver(AddAssigneeFormSchema),
+    mode: 'onChange',
     defaultValues: {
       userId: '',
     },

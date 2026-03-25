@@ -75,6 +75,10 @@ const EditableCell = ({
 
   const [value, setValue] = useState(initialTextValue);
 
+  useEffect(() => {
+    setValue(initialTextValue);
+  }, [initialTextValue]);
+
   const onBlur = () => {
     if (!updateData) return;
 

@@ -46,12 +46,16 @@ export default function ProjectDetail() {
   if (!project) return null;
 
   const handleEditProject = async (data: EditProjectData) => {
-    await updateProjectMutation({
-      projectId: id,
-      payload: data,
-    });
-    toast.success('อัปเดตข้อมูลโครงการสำเร็จ');
-    setIsEditDialogOpen(false);
+    try {
+      await updateProjectMutation({
+        projectId: id,
+        payload: data,
+      });
+      toast.success('อัปเดตข้อมูลโครงการสำเร็จ');
+      setIsEditDialogOpen(false);
+    } catch {
+      toast.error('ไม่สามารถอัปเดตข้อมูลโครงการได้ กรุณาลองใหม่อีกครั้ง');
+    }
   };
 
   return (
@@ -100,9 +104,13 @@ export default function ProjectDetail() {
         isOpen={isCancelDialogOpen}
         onClose={() => setIsCancelDialogOpen(false)}
         onConfirm={async (reason) => {
-          await cancelProjectMutation({ projectId: id, reason });
-          toast.success('ยกเลิกโครงการสำเร็จ');
-          setIsCancelDialogOpen(false);
+          try {
+            await cancelProjectMutation({ projectId: id, reason });
+            toast.success('ยกเลิกโครงการสำเร็จ');
+            setIsCancelDialogOpen(false);
+          } catch {
+            toast.error('ไม่สามารถยกเลิกโครงการได้ กรุณาลองใหม่อีกครั้ง');
+          }
         }}
         projectTitle={project.title}
         isAuthorized={ManageUnitRoles.includes(viewAsRole) || SupervisorRoles.includes(viewAsRole)}

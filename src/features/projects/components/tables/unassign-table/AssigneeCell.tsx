@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { UserSelect } from '@/features/users';
 
@@ -21,6 +21,10 @@ export function AssigneeCell({
 
   const currentValue = isDirty ? pendingChanges[rowId] : originalValue;
   const [localValue, setLocalValue] = useState<string | null>(currentValue ?? null);
+
+  useEffect(() => {
+    setLocalValue(currentValue ?? null);
+  }, [currentValue]);
 
   const removePendingChange = (prev: Record<string, string>) => {
     const next = { ...prev };

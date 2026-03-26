@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { type DateRange } from 'react-day-picker';
 
-import { isBefore, startOfDay } from 'date-fns';
+import { isAfter, isBefore, startOfDay } from 'date-fns';
 import { CalendarIcon } from 'lucide-react';
 
 import { Calendar } from '@/components/ui/calendar';
@@ -21,11 +21,9 @@ const formatThaiDate = (date: Date) => formatDateThai(date, 'dd/MM/yyyy');
 function toArr(masked: string): string[] {
   const chars = masked.replace(/\//g, '');
   const arr: string[] = [];
-  let ci = 0;
   for (let i = 0; i < 8; i++) {
-    const ch = chars[ci] ?? '';
+    const ch = chars[i] ?? '';
     arr.push(/\d/.test(ch) ? ch : '');
-    ci++;
   }
   return arr;
 }
@@ -34,17 +32,35 @@ function fromArr(arr: string[]): string {
   const get = (i: number) => (arr[i] !== '' ? arr[i] : FALLBACK[i]);
   return `${get(0)}${get(1)}/${get(2)}${get(3)}/${get(4)}${get(5)}${get(6)}${get(7)}`;
 }
-
 function parseDate(masked: string): Date | null {
   if (/[วดป]/.test(masked)) return null;
+
   const parts = masked.split('/');
   if (parts.length !== 3) return null;
+
   const [dd, mm, yyyy] = parts;
   if (yyyy.length !== 4) return null;
+
+  const day = parseInt(dd, 10);
+  const month = parseInt(mm, 10);
   const yearBE = parseInt(yyyy, 10);
   const yearAD = yearBE - 543;
-  const parsed = new Date(yearAD, parseInt(mm, 10) - 1, parseInt(dd, 10));
+
+  if (month < 1 || month > 12) return null;
+  if (day < 1 || day > 31) return null;
+  if (yearAD < 1) return null;
+
+  const parsed = new Date(yearAD, month - 1, day);
   if (isNaN(parsed.getTime())) return null;
+
+  if (
+    parsed.getFullYear() !== yearAD ||
+    parsed.getMonth() !== month - 1 ||
+    parsed.getDate() !== day
+  ) {
+    return null;
+  }
+
   return startOfDay(parsed);
 }
 
@@ -68,7 +84,7 @@ function snapCursor(pos: number): number {
 
 function useMaskedDateInput(
   initial: string,
-  onValidDate: (date: Date) => void,
+  onValidDate: (date: Date) => string | null,
   onFocusOpen: () => void
 ) {
   const [masked, setMasked] = useState(initial || MASK);
@@ -77,8 +93,12 @@ function useMaskedDateInput(
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    setMasked(initial || MASK);
-    setError(null);
+    if (initial) {
+      setMasked(initial);
+      setError(null);
+    } else {
+      setMasked(MASK);
+    }
   }, [initial]);
 
   const setCursor = (pos: number) => {
@@ -147,8 +167,8 @@ function useMaskedDateInput(
 
       const date = parseDate(newMasked);
       if (date) {
-        setError(null);
-        onValidDate(date);
+        const validationError = onValidDate(date);
+        setError(validationError);
       }
       return;
     }
@@ -174,7 +194,7 @@ function useMaskedDateInput(
     setFocused(false);
   };
 
-  const isEmpty = /[วดป]/.test(masked) && !focused;
+  const isEmpty = masked === MASK && !focused;
 
   return {
     inputRef,
@@ -203,41 +223,32 @@ export function DatePickerWithRange({ value, onChange }: DatePickerWithRangeProp
 
   const fromInput = useMaskedDateInput(
     fromStr,
-    (date) => {
-      const newRange: DateRange = { from: date, to: internalRange?.to };
-      if (
-        internalRange?.to &&
-        !isBefore(date, internalRange.to) &&
-        date.getTime() !== internalRange.to.getTime()
-      ) {
-        fromInput.setError('วันเริ่มต้นต้องอยู่ก่อนวันสิ้นสุด');
-        return;
-      }
-      fromInput.setError(null);
-      setInternalRange(newRange);
-      onChange?.(newRange);
+    (date): string | null => {
+      const today = startOfDay(new Date());
+      if (date > today) return 'ไม่สามารถเลือกวันในอนาคตได้';
+      const range = internalRange;
+      if (range?.to && isAfter(date, range.to))
+        return 'วันเริ่มต้นต้องอยู่ก่อนหรือเป็นวันเดียวกับวันสิ้นสุด';
+      setInternalRange({ from: date, to: range?.to });
+      onChange?.({ from: date, to: range?.to });
       setCurrentMonth(date);
+      return null;
     },
     () => setOpen(true)
   );
 
   const toInput = useMaskedDateInput(
     toStr,
-    (date) => {
+    (date): string | null => {
       const today = startOfDay(new Date());
-      // validate
-      if (date > today) {
-        toInput.setError('ไม่สามารถเลือกวันในอนาคตได้');
-        return;
+      if (date > today) return 'ไม่สามารถเลือกวันในอนาคตได้';
+      const range = internalRange;
+      if (range?.from && isBefore(date, range.from)) {
+        return 'วันสิ้นสุดต้องอยู่หลังหรือเป็นวันเดียวกับวันเริ่มต้น';
       }
-      if (internalRange?.from && isBefore(date, internalRange.from)) {
-        toInput.setError('วันสิ้นสุดต้องอยู่หลังวันเริ่มต้น');
-        return;
-      }
-      toInput.setError(null);
-      const newRange: DateRange = { from: internalRange?.from, to: date };
-      setInternalRange(newRange);
-      onChange?.(newRange);
+      setInternalRange({ from: range?.from, to: date });
+      onChange?.({ from: range?.from, to: date });
+      return null;
     },
     () => setOpen(true)
   );
@@ -265,30 +276,42 @@ export function DatePickerWithRange({ value, onChange }: DatePickerWithRangeProp
 
   const handleDayClick = (selectedDay: Date) => {
     const day = startOfDay(selectedDay);
+
     if (step === 1) {
       const newRange: DateRange = { from: day, to: undefined };
       setInternalRange(newRange);
       onChange?.(newRange);
+
       fromInput.setMasked(formatThaiDate(day));
       fromInput.setError(null);
+
       toInput.setMasked(MASK);
       toInput.setError(null);
+
       setStep(2);
       setTimeout(() => toInput.inputRef.current?.focus(), 0);
     } else {
       const startDate = internalRange?.from;
+
       let newRange: DateRange;
-      if (startDate && isBefore(day, startDate)) {
+
+      if (!startDate) {
+        newRange = { from: day, to: day };
+      } else if (isBefore(day, startDate)) {
         newRange = { from: day, to: startDate };
       } else {
         newRange = { from: startDate, to: day };
       }
+
       setInternalRange(newRange);
       onChange?.(newRange);
-      fromInput.setMasked(newRange.from ? formatThaiDate(newRange.from) : MASK);
-      toInput.setMasked(newRange.to ? formatThaiDate(newRange.to) : MASK);
+
+      fromInput.setMasked(formatThaiDate(newRange.from!));
+      toInput.setMasked(formatThaiDate(newRange.to!));
+
       fromInput.setError(null);
       toInput.setError(null);
+
       setOpen(false);
       setStep(1);
     }
@@ -346,7 +369,6 @@ export function DatePickerWithRange({ value, onChange }: DatePickerWithRangeProp
         </div>
       </div>
 
-      {/* Error messages */}
       {(fromInput.error || toInput.error) && (
         <p className="text-destructive mt-1 text-xs">{fromInput.error ?? toInput.error}</p>
       )}

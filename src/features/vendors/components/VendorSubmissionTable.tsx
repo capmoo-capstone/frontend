@@ -38,7 +38,6 @@ export function VendorSubmissionTable({
   const [sorting, setSorting] = useState<SortingState>([]);
   const [rowSelection, setRowSelection] = useState({});
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 });
-  const [date, setDate] = useState<DateRange | undefined>();
 
   const table = useReactTable({
     data: data || [],
@@ -93,13 +92,7 @@ export function VendorSubmissionTable({
             <Search className="text-muted-foreground absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2" />
           </div>
 
-          <DatePickerWithRange
-            value={date}
-            onChange={(range) => {
-              setDate(range);
-              onDateRangeChange(range);
-            }}
-          />
+          <DatePickerWithRange value={filters.dateRange} onChange={onDateRangeChange} />
 
           <Button
             variant="outline"

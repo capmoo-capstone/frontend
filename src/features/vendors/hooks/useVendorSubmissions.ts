@@ -1,5 +1,7 @@
 import { useMemo } from 'react';
 
+import { endOfDay, startOfDay } from 'date-fns';
+
 import { MOCK_SUBMISSIONS } from '../api/mock-data';
 import type { VendorFilterParams } from '../types';
 
@@ -19,8 +21,8 @@ export function useVendorSubmissions(filters: VendorFilterParams) {
     if (filters.dateRange?.from) {
       result = result.filter((submission) => {
         const submittedDate = new Date(submission.submitted_at);
-        const fromDate = filters.dateRange!.from!;
-        const toDate = filters.dateRange!.to || filters.dateRange!.from!;
+        const fromDate = startOfDay(filters.dateRange!.from!);
+        const toDate = endOfDay(filters.dateRange!.to || filters.dateRange!.from!);
 
         return submittedDate >= fromDate && submittedDate <= toDate;
       });

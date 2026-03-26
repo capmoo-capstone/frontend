@@ -371,7 +371,10 @@ export function DatePickerWithRange({ value, onChange }: DatePickerWithRangeProp
               range_end: 'rdp-day_range_end',
               range_middle: 'rdp-day_range_middle',
             }}
-            onSelect={(day) => day && handleDayClick(day)}
+            onDayClick={(day, modifiers) => {
+              if (modifiers.disabled) return;
+              handleDayClick(day);
+            }}
             numberOfMonths={2}
             disabled={(date) => date > new Date()}
             initialFocus={false}

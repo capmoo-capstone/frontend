@@ -111,6 +111,8 @@ function useMaskedDateInput(
     const el = inputRef.current;
     if (!el) return;
     if (e.key === 'Tab') return;
+    if (e.ctrlKey || e.metaKey || e.altKey) return;
+    if (e.nativeEvent.isComposing || e.key === 'Process') return;
     e.preventDefault();
 
     const cursorPos = el.selectionStart ?? 0;
@@ -160,6 +162,7 @@ function useMaskedDateInput(
       arr[dIdx] = e.key;
       const newMasked = fromArr(arr);
       setMasked(newMasked);
+      setError(null);
 
       const nextPos = effectivePos + 1;
       const snappedNext = nextPos === 2 ? 3 : nextPos === 5 ? 6 : nextPos;
@@ -172,6 +175,29 @@ function useMaskedDateInput(
       }
       return;
     }
+  };
+
+  const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    const pasted = e.clipboardData.getData('text');
+    const digits = pasted.replace(/\D/g, '').slice(0, 8);
+    if (digits.length !== 8) {
+      setError('รูปแบบวันที่ไม่ถูกต้อง');
+      return;
+    }
+
+    const newMasked = `${digits.slice(0, 2)}/${digits.slice(2, 4)}/${digits.slice(4, 8)}`;
+    setMasked(newMasked);
+
+    const date = parseDate(newMasked);
+    if (!date) {
+      setError('รูปแบบวันที่ไม่ถูกต้อง');
+      return;
+    }
+
+    const validationError = onValidDate(date);
+    setError(validationError);
+    setCursor(10);
   };
 
   const handleClick = () => {
@@ -205,6 +231,7 @@ function useMaskedDateInput(
     error,
     setError,
     handleKeyDown,
+    handlePaste,
     handleClick,
     handleFocus,
     handleBlur,
@@ -349,7 +376,7 @@ export function DatePickerWithRange({ value, onChange }: DatePickerWithRangeProp
   return (
     <div
       ref={containerRef}
-      className="bg-background relative w-68"
+      className="bg-background relative w-[17rem]"
       onBlurCapture={handleContainerBlurCapture}
       onKeyDownCapture={handleContainerKeyDownCapture}
     >
@@ -384,6 +411,7 @@ export function DatePickerWithRange({ value, onChange }: DatePickerWithRangeProp
             value={fromInput.isEmpty ? '' : fromInput.masked}
             aria-label="วันที่เริ่มต้น"
             onKeyDown={fromInput.handleKeyDown}
+            onPaste={fromInput.handlePaste}
             onClick={fromInput.handleClick}
             onFocus={fromInput.handleFocus}
             onBlur={fromInput.handleBlur}
@@ -407,6 +435,7 @@ export function DatePickerWithRange({ value, onChange }: DatePickerWithRangeProp
             value={toInput.isEmpty ? '' : toInput.masked}
             aria-label="วันที่สิ้นสุด"
             onKeyDown={toInput.handleKeyDown}
+            onPaste={toInput.handlePaste}
             onClick={toInput.handleClick}
             onFocus={toInput.handleFocus}
             onBlur={toInput.handleBlur}

@@ -19,11 +19,11 @@ export function useVendorSubmissions(filters: VendorFilterParams) {
 
     // Apply date range filter (server-side)
     if (filters.dateRange?.from) {
+      const fromDate = startOfDay(filters.dateRange.from);
+      const toDate = endOfDay(filters.dateRange.to || filters.dateRange.from);
+
       result = result.filter((submission) => {
         const submittedDate = new Date(submission.submitted_at);
-        const fromDate = startOfDay(filters.dateRange!.from!);
-        const toDate = endOfDay(filters.dateRange!.to || filters.dateRange!.from!);
-
         return submittedDate >= fromDate && submittedDate <= toDate;
       });
     }

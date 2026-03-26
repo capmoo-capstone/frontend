@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 
 import {
   type SortingState,
+  type Updater,
   getCoreRowModel,
   getFilteredRowModel,
   getPaginationRowModel,
@@ -37,6 +38,12 @@ export function VendorSubmissionTable({
   const [sorting, setSorting] = useState<SortingState>([]);
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 });
 
+  const handleGlobalFilterChange = (updater: Updater<string>) => {
+    const nextValue =
+      typeof updater === 'function' ? updater(filters.search ?? '') : (updater ?? filters.search);
+    onSearchChange(String(nextValue ?? ''));
+  };
+
   const table = useReactTable({
     data: data || [],
     columns: vendorSubmissionColumns,
@@ -46,7 +53,7 @@ export function VendorSubmissionTable({
     getSortedRowModel: getSortedRowModel(),
     onSortingChange: setSorting,
     onPaginationChange: setPagination,
-    onGlobalFilterChange: onSearchChange,
+    onGlobalFilterChange: handleGlobalFilterChange,
     state: {
       sorting,
       pagination,

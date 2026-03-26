@@ -10,8 +10,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table';
-import { AlertTriangle, ExternalLink, Loader2 } from 'lucide-react';
-import { Search } from 'lucide-react';
+import { AlertTriangle, ExternalLink, Loader2, Search } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { DatePickerWithRange } from '@/components/ui/date-picker-with-range';
@@ -36,7 +35,6 @@ export function VendorSubmissionTable({
   const navigate = useNavigate();
   const { data, isLoading, isError } = useVendorSubmissions(filters);
   const [sorting, setSorting] = useState<SortingState>([]);
-  const [rowSelection, setRowSelection] = useState({});
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 });
 
   const table = useReactTable({
@@ -47,17 +45,21 @@ export function VendorSubmissionTable({
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     onSortingChange: setSorting,
-    onRowSelectionChange: setRowSelection,
     onPaginationChange: setPagination,
     onGlobalFilterChange: onSearchChange,
     state: {
       sorting,
-      rowSelection,
       pagination,
       globalFilter: filters.search,
     },
-    enableRowSelection: true,
   });
+
+  const handleDateRangeFilterChange = (range: DateRange | undefined) => {
+    onDateRangeChange(range);
+    if (!range?.from) {
+      table.getColumn('submitted_at')?.setFilterValue(undefined);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -92,7 +94,7 @@ export function VendorSubmissionTable({
             <Search className="text-muted-foreground absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2" />
           </div>
 
-          <DatePickerWithRange value={filters.dateRange} onChange={onDateRangeChange} />
+          <DatePickerWithRange value={filters.dateRange} onChange={handleDateRangeFilterChange} />
 
           <Button
             variant="outline"

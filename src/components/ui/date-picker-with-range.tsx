@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import { type DateRange } from 'react-day-picker';
 
 import { isAfter, isBefore, startOfDay } from 'date-fns';
-import { CalendarIcon } from 'lucide-react';
+import { CalendarIcon, CircleX } from 'lucide-react';
 
 import { Calendar } from '@/components/ui/calendar';
 import { formatDateThai } from '@/lib/formatters';
@@ -220,6 +220,7 @@ export function DatePickerWithRange({ value, onChange }: DatePickerWithRangeProp
 
   const fromStr = value?.from ? formatThaiDate(value.from) : '';
   const toStr = value?.to ? formatThaiDate(value.to) : '';
+  const hasSelection = Boolean(value?.from ?? internalRange?.from);
 
   const fromInput = useMaskedDateInput(
     fromStr,
@@ -254,11 +255,14 @@ export function DatePickerWithRange({ value, onChange }: DatePickerWithRangeProp
   );
 
   useEffect(() => {
-    if (open) {
-      setStep(1);
-      setInternalRange(value);
-    }
+    if (!open) return;
+    setStep(1);
   }, [open]);
+
+  useEffect(() => {
+    if (!open) return;
+    setInternalRange(value);
+  }, [open, value]);
 
   useEffect(() => {
     if (value?.from && !open) setCurrentMonth(value.from);
@@ -317,14 +321,56 @@ export function DatePickerWithRange({ value, onChange }: DatePickerWithRangeProp
     }
   };
 
+  const handleContainerBlurCapture = (e: React.FocusEvent<HTMLDivElement>) => {
+    const nextFocused = e.relatedTarget as Node | null;
+    if (!containerRef.current?.contains(nextFocused)) {
+      setOpen(false);
+      setStep(1);
+    }
+  };
+
+  const handleContainerKeyDownCapture = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (e.key !== 'Escape') return;
+    setOpen(false);
+    setStep(1);
+  };
+
+  const handleClearRange = () => {
+    setInternalRange(undefined);
+    onChange?.(undefined);
+    fromInput.setMasked(MASK);
+    toInput.setMasked(MASK);
+    fromInput.setError(null);
+    toInput.setError(null);
+    setStep(1);
+    setOpen(false);
+  };
+
   return (
-    <div ref={containerRef} className="bg-background relative w-68">
+    <div
+      ref={containerRef}
+      className="bg-background relative w-68"
+      onBlurCapture={handleContainerBlurCapture}
+      onKeyDownCapture={handleContainerKeyDownCapture}
+    >
       <div
         className={`focus-within:ring-primary hover:bg-accent/50 relative flex h-9 cursor-text items-center rounded-md border px-3 shadow-xs ${
           fromInput.error || toInput.error ? 'border-destructive focus-within:ring-destructive' : ''
         }`}
       >
-        <CalendarIcon className="text-muted-foreground mr-2 h-4 w-4 shrink-0" />
+        {hasSelection ? (
+          <button
+            type="button"
+            aria-label="ล้างช่วงวันที่"
+            title="ล้างช่วงวันที่"
+            onClick={handleClearRange}
+            className="text-muted-foreground hover:text-foreground mr-2 inline-flex h-6 w-6 shrink-0 cursor-pointer items-center justify-center rounded-sm"
+          >
+            <CircleX className="h-4 w-4" />
+          </button>
+        ) : (
+          <CalendarIcon className="text-muted-foreground mr-2 h-4 w-4 shrink-0" />
+        )}
 
         {/* Start */}
         <div className="relative flex flex-1 flex-col">
@@ -336,6 +382,7 @@ export function DatePickerWithRange({ value, onChange }: DatePickerWithRangeProp
           <input
             ref={fromInput.inputRef}
             value={fromInput.isEmpty ? '' : fromInput.masked}
+            aria-label="วันที่เริ่มต้น"
             onKeyDown={fromInput.handleKeyDown}
             onClick={fromInput.handleClick}
             onFocus={fromInput.handleFocus}
@@ -358,6 +405,7 @@ export function DatePickerWithRange({ value, onChange }: DatePickerWithRangeProp
           <input
             ref={toInput.inputRef}
             value={toInput.isEmpty ? '' : toInput.masked}
+            aria-label="วันที่สิ้นสุด"
             onKeyDown={toInput.handleKeyDown}
             onClick={toInput.handleClick}
             onFocus={toInput.handleFocus}

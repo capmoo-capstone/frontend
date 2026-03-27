@@ -8,8 +8,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { DatePicker } from '@/components/ui/date-picker';
 import type { SettingsPerson } from '@/features/settings/mock-data';
 import { type DelegationPayload, DelegationWithFutureDateSchema } from '@/features/settings/types';
-
-import { UserSearchCombobox } from './UserSearchCombobox';
+import { UserSelect } from '@/features/users/components/UserSelect';
 
 interface DelegationFormSectionProps {
   value: DelegationPayload | null;
@@ -69,13 +68,14 @@ export function DelegationFormSection({
           control={form.control}
           name="user_id"
           render={({ field }) => (
-            <UserSearchCombobox
+            <UserSelect
               value={field.value || ''}
-              departmentId="procurement"
+              deptId="procurement"
               options={people}
               placeholder="กรุณาเลือกเจ้าหน้าที่"
               onChange={(id) => field.onChange(id)}
               className="max-w-[320px]"
+              hasClearButton={false}
             />
           )}
         />

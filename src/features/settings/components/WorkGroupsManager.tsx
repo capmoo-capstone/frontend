@@ -12,11 +12,11 @@ import {
   getPersonNameById,
 } from '@/features/settings/mock-data';
 import { createWorkGroupValidationSchema } from '@/features/settings/types';
+import { UserSelect } from '@/features/users/components/UserSelect';
 import { RESPONSIBLE_SELECT_OPTIONS } from '@/lib/formatters';
 import { cn } from '@/lib/utils';
 
 import { DelegationFormSection } from './DelegationFormSection';
-import { UserSearchCombobox } from './UserSearchCombobox';
 import { WorkflowTags } from './WorkflowTags';
 
 export function WorkGroupsManager() {
@@ -223,12 +223,13 @@ function WorkGroupCard({ group, groups, onSave }: WorkGroupCardProps) {
           <span className="min-w-27.5 pt-2 text-sm font-semibold">หัวหน้ากลุ่มงาน *</span>
           <div className="flex-1 space-y-2">
             {isEditing ? (
-              <UserSearchCombobox
+              <UserSelect
                 value={draft.head_id}
-                departmentId="procurement"
+                deptId="procurement"
                 options={PROCUREMENT_PEOPLE.filter((person) => person.id !== DIRECTOR_USER_ID)}
                 onChange={(id) => setDraft((prev) => ({ ...prev, head_id: id }))}
                 className="max-w-95"
+                hasClearButton={false}
               />
             ) : (
               <p className="pt-2 text-sm text-slate-700">
@@ -282,12 +283,13 @@ function WorkGroupCard({ group, groups, onSave }: WorkGroupCardProps) {
             <div className="space-y-2">
               {isEditing && (
                 <div className="mb-3 flex flex-wrap items-center gap-2">
-                  <UserSearchCombobox
+                  <UserSelect
                     value={memberToAdd}
-                    departmentId="procurement"
+                    deptId="procurement"
                     options={availableMembers}
                     onChange={(id) => setMemberToAdd(id)}
                     className="max-w-[320px]"
+                    hasClearButton={false}
                   />
                   <Button
                     type="button"
@@ -441,11 +443,12 @@ function CreateGroupPanel({ groups, onCancel, onCreate }: CreateGroupPanelProps)
 
         <div className="space-y-1">
           <label className="text-sm font-semibold">หัวหน้ากลุ่มงาน *</label>
-          <UserSearchCombobox
+          <UserSelect
             value={draft.head_id}
-            departmentId="procurement"
+            deptId="procurement"
             options={PROCUREMENT_PEOPLE.filter((person) => person.id !== DIRECTOR_USER_ID)}
             onChange={(id) => setDraft((prev) => ({ ...prev, head_id: id }))}
+            hasClearButton={false}
           />
         </div>
 

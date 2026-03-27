@@ -2,8 +2,7 @@ import { useForm } from 'react-hook-form';
 
 import { DelegationForm } from '@/features/settings/components/DelegationForm';
 import { type DelegationPayload, DelegationSchema } from '@/features/settings/types';
-
-import { UserSearchCombobox } from './UserSearchCombobox';
+import { UserSelect } from '@/features/users/components/UserSelect';
 
 interface DelegateEditorProps {
   defaultValues?: Partial<DelegationPayload>;
@@ -50,11 +49,12 @@ export function DelegateEditor({
     <form onSubmit={submit} className="space-y-3">
       <div className="space-y-1">
         <label className="text-sm font-medium">ผู้รับมอบหมาย *</label>
-        <UserSearchCombobox
+        <UserSelect
           value={form.watch('user_id')}
-          departmentId={departmentId}
+          deptId={departmentId}
           unitId={unitId}
           onChange={(id) => form.setValue('user_id', id, { shouldValidate: true })}
+          hasClearButton={false}
         />
         {form.formState.errors.user_id?.message && (
           <p className="text-xs text-red-500">{form.formState.errors.user_id.message}</p>

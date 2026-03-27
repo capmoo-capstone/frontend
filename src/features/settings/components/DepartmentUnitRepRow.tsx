@@ -1,6 +1,7 @@
+import { UserSelect } from '@/features/users/components/UserSelect';
+
 import { type UnitItem, useUnitRepresentativeEditor } from '../hooks/useUnitRepresentativeEditor';
 import { InlineActionRow } from './InlineActionRow';
-import { UserSearchCombobox } from './UserSearchCombobox';
 
 interface DepartmentUnitRepRowProps {
   departmentId: string;
@@ -33,12 +34,15 @@ export function DepartmentUnitRepRow({ departmentId, unit }: DepartmentUnitRepRo
             <span className="text-muted-foreground w-40 shrink-0 text-sm">
               ตั้งตัวแทนหน่วยงาน *
             </span>
-            <UserSearchCombobox
+            <UserSelect
               value={selectedUserId}
-              departmentId={departmentId}
+              deptId={departmentId}
               unitId={unit.id}
-              onChange={handleSelectUser}
-              className="max-w-md"
+              onChange={(userId) => handleSelectUser(userId)}
+              onSelectUser={(user) => handleSelectUser(user.id, user.full_name)}
+              className="w-full max-w-xs"
+              placeholder="กรุณาเลือกเจ้าหน้าที่"
+              hasClearButton={false}
             />
           </div>
           {error && <p className="text-xs text-red-500">{error}</p>}

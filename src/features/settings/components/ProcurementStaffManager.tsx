@@ -10,10 +10,10 @@ import {
   getPersonNameById,
 } from '@/features/settings/mock-data';
 import { type DelegationPayload, createProcurementRoleSchema } from '@/features/settings/types';
+import { UserSelect } from '@/features/users/components/UserSelect';
 
 import { DelegationFormSection } from './DelegationFormSection';
 import { InlineActionRow } from './InlineActionRow';
-import { UserSearchCombobox } from './UserSearchCombobox';
 
 const DIRECTOR_ROLE_ID = 'director';
 
@@ -152,16 +152,17 @@ function RoleRow({ role, allRoles, onSave }: RoleRowProps) {
         editContent={
           <div className="space-y-3 py-1">
             <div className="flex flex-wrap items-center gap-2">
-              <UserSearchCombobox
+              <UserSelect
                 value={memberToAdd}
-                departmentId="procurement"
+                deptId="procurement"
                 options={PROCUREMENT_PEOPLE}
                 placeholder="กรุณาเลือกเจ้าหน้าที่"
-                onChange={(id, label) => {
+                onChange={(id) => {
                   setMemberToAdd(id);
-                  setMemberToAddLabel(label);
                 }}
+                onSelectUser={(user) => setMemberToAddLabel(user.full_name)}
                 className="w-full max-w-[320px]"
+                hasClearButton={false}
               />
               <Button
                 type="button"

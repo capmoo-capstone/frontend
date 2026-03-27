@@ -21,6 +21,8 @@ import { useUsersForSelection } from '../hooks/useUsers';
 interface UserSelectProps {
   value?: string | null;
   onChange: (value: string) => void;
+  onSelectUser?: (user: { id: string; full_name: string }) => void;
+  options?: Array<{ id: string; full_name: string; role?: string }>;
   onBlur?: () => void;
   onReset?: () => void;
   unitId?: string;
@@ -34,6 +36,8 @@ interface UserSelectProps {
 export function UserSelect({
   value,
   onChange,
+  onSelectUser,
+  options,
   onBlur,
   onReset,
   unitId,
@@ -49,7 +53,7 @@ export function UserSelect({
     unitId ? { unitId } : { deptId: deptId || '' }
   );
 
-  const users = data?.data || [];
+  const users = options ?? data?.data ?? [];
   const selectedUser = users.find((user) => user.id === value);
 
   const handleClear = (e: React.MouseEvent) => {
@@ -110,9 +114,10 @@ export function UserSelect({
               {users.map((user) => (
                 <CommandItem
                   key={user.id}
-                  value={user.full_name}
+                  value={`${user.full_name} ${user.role ?? ''}`}
                   onSelect={() => {
                     onChange(user.id);
+                    onSelectUser?.({ id: user.id, full_name: user.full_name });
                     setOpen(false);
                     if (onBlur) {
                       onBlur();

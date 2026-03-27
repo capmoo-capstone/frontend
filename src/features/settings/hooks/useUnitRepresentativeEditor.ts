@@ -71,9 +71,12 @@ export function useUnitRepresentativeEditor({
     );
   };
 
-  const handleSelectUser = (userId: string, userName: string) => {
+  const handleSelectUser = (userId: string, userName?: string) => {
     setSelectedUserId(userId);
-    setSelectedUserName(userName);
+
+    if (typeof userName === 'string') {
+      setSelectedUserName(userName);
+    }
   };
 
   return {

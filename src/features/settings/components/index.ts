@@ -6,6 +6,5 @@ export { DepartmentUnitList } from './DepartmentUnitList';
 export { DepartmentUnitRepRow } from './DepartmentUnitRepRow';
 export { InlineActionRow } from './InlineActionRow';
 export { ProcurementStaffManager } from './ProcurementStaffManager';
-export { UserSearchCombobox } from './UserSearchCombobox';
 export { WorkGroupsManager } from './WorkGroupsManager';
 export { WorkflowTags } from './WorkflowTags';

@@ -1,6 +1,14 @@
 import { useMemo, useState } from 'react';
 
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { useQueryClient } from '@tanstack/react-query';
+import { Search, Users } from 'lucide-react';
+
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/ui/accordion';
 import { Input } from '@/components/ui/input';
 import {
   InlineActionRow,
@@ -10,7 +18,6 @@ import {
   useDepartmentUnits,
   useUpdateUnitRepresentative,
 } from '@/features/settings';
-import { useQueryClient } from '@tanstack/react-query';
 
 export default function DepartmentRepsPage() {
   const { data: departments, isLoading } = useDepartmentRepData();
@@ -31,29 +38,39 @@ export default function DepartmentRepsPage() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-[1280px] space-y-5 p-6">
-      <header className="space-y-3">
-        <h1 className="text-3xl font-bold text-slate-900">ตั้งค่าตัวแทนหน่วยงาน</h1>
+    <>
+      {/* Title */}
+      <header className="flex flex-row flex-wrap items-center justify-between space-y-3">
+        <h1 className="text-primary text-3xl font-bold">ตั้งค่าตัวแทนหน่วยงาน</h1>
+
+        <div className="relative w-sm">
+          <Input
+            className="normal pr-10"
+            placeholder={'ค้นหาชื่อเจ้าหน้าที่, หน่วยงาน, ฝ่าย...'}
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+          <Search className="text-muted-foreground absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2" />
+        </div>
       </header>
 
-      <div className="flex justify-end">
-        <Input
-          value={searchTerm}
-          onChange={(event) => setSearchTerm(event.target.value)}
-          placeholder="ค้นหาชื่อเจ้าหน้าที่, หน่วยงาน, ฝ่าย..."
-          className="w-full max-w-md"
-        />
-      </div>
-
-      <Accordion type="multiple" className="space-y-4">
+      {/* Department List */}
+      <Accordion
+        type="multiple"
+        className="space-y-4"
+        defaultValue={filteredDepartments.map((dept) => dept.id)}
+      >
         {filteredDepartments.map((dept) => (
           <AccordionItem
             key={dept.id}
             value={dept.id}
-            className="rounded-lg border border-slate-200 bg-white px-4"
+            className="border-border rounded-md border bg-white px-6"
           >
-            <AccordionTrigger className="text-lg font-semibold hover:no-underline">
-              {dept.name}
+            <AccordionTrigger className="h2-topic font-semibold hover:no-underline">
+              <div className="flex items-center">
+                <Users className="mr-2 h-6 w-6" />
+                {dept.name}
+              </div>
             </AccordionTrigger>
             <AccordionContent className="pb-2">
               <UnitList departmentId={dept.id} />
@@ -61,7 +78,7 @@ export default function DepartmentRepsPage() {
           </AccordionItem>
         ))}
       </Accordion>
-    </div>
+    </>
   );
 }
 
@@ -152,7 +169,9 @@ function UnitRepRow({ departmentId, unit }: UnitRepRowProps) {
       editContent={
         <div className="space-y-2">
           <div className="flex items-center gap-4">
-            <span className="text-muted-foreground w-40 shrink-0 text-sm">ตั้งตัวแทนหน่วยงาน *</span>
+            <span className="text-muted-foreground w-40 shrink-0 text-sm">
+              ตั้งตัวแทนหน่วยงาน *
+            </span>
             <UserSearchCombobox
               value={selectedUserId}
               departmentId={departmentId}

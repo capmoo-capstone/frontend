@@ -1,6 +1,3 @@
-import { useMemo, useState } from 'react';
-
-import { useQueryClient } from '@tanstack/react-query';
 import { Search, Users } from 'lucide-react';
 
 import {
@@ -11,26 +8,11 @@ import {
 } from '@/components/ui/accordion';
 import { Input } from '@/components/ui/input';
 
-import {
-  useDepartmentRepData,
-  useDepartmentUnits,
-  useUpdateUnitRepresentative,
-} from '../hooks/useDepartmentReps';
-import { createDepartmentRepresentativeSchema } from '../types';
-import { InlineActionRow } from './InlineActionRow';
-import { UserSearchCombobox } from './UserSearchCombobox';
+import { useDepartmentRepsManager } from '../hooks/useDepartmentRepsManager';
+import { DepartmentUnitList } from './DepartmentUnitList';
 
 export function DepartmentRepsManager() {
-  const { data: departments, isLoading } = useDepartmentRepData();
-  const [searchTerm, setSearchTerm] = useState('');
-
-  const filteredDepartments = useMemo(() => {
-    if (!searchTerm.trim()) return departments ?? [];
-    const keyword = searchTerm.trim().toLowerCase();
-    return (departments ?? []).filter((department) =>
-      department.name.toLowerCase().includes(keyword)
-    );
-  }, [departments, searchTerm]);
+  const { isLoading, searchTerm, setSearchTerm, filteredDepartments } = useDepartmentRepsManager();
 
   if (isLoading) {
     return (
@@ -74,124 +56,11 @@ export function DepartmentRepsManager() {
               </div>
             </AccordionTrigger>
             <AccordionContent className="pb-2">
-              <UnitList departmentId={department.id} />
+              <DepartmentUnitList departmentId={department.id} />
             </AccordionContent>
           </AccordionItem>
         ))}
       </Accordion>
     </>
-  );
-}
-
-interface UnitListProps {
-  departmentId: string;
-}
-
-function UnitList({ departmentId }: UnitListProps) {
-  const { data: units } = useDepartmentUnits(departmentId);
-
-  return (
-    <div className="divide-y">
-      {units?.map((unit) => (
-        <UnitRepRow key={unit.id} departmentId={departmentId} unit={unit} />
-      ))}
-    </div>
-  );
-}
-
-interface UnitItem {
-  id: string;
-  name: string;
-  representative?: { id: string; name: string } | null;
-}
-
-interface UnitRepRowProps {
-  departmentId: string;
-  unit: UnitItem;
-}
-
-function UnitRepRow({ departmentId, unit }: UnitRepRowProps) {
-  const queryClient = useQueryClient();
-  const [isEditing, setIsEditing] = useState(false);
-  const [selectedUserId, setSelectedUserId] = useState(unit.representative?.id || '');
-  const [selectedUserName, setSelectedUserName] = useState(unit.representative?.name || '');
-  const [error, setError] = useState('');
-
-  const updateRepresentative = useUpdateUnitRepresentative();
-
-  const handleCancel = () => {
-    setSelectedUserId(unit.representative?.id || '');
-    setSelectedUserName(unit.representative?.name || '');
-    setError('');
-    setIsEditing(false);
-  };
-
-  const handleSave = () => {
-    if (!selectedUserId || !selectedUserName) return;
-
-    const allUnits = queryClient
-      .getQueriesData<Array<UnitItem>>({ queryKey: ['units'] })
-      .flatMap(([, units]) => units ?? [])
-      .map((item) => ({ unitId: item.id, userId: item.representative?.id }));
-
-    const schema = createDepartmentRepresentativeSchema({
-      currentUnitId: unit.id,
-      allAssignments: allUnits,
-    });
-
-    const parsed = schema.safeParse({ user_id: selectedUserId });
-    if (!parsed.success) {
-      setError(parsed.error.issues[0]?.message || 'ข้อมูลไม่ถูกต้อง');
-      return;
-    }
-
-    setError('');
-
-    updateRepresentative.mutate(
-      {
-        departmentId,
-        unitId: unit.id,
-        userId: selectedUserId,
-        userName: selectedUserName,
-      },
-      {
-        onSuccess: () => {
-          setIsEditing(false);
-        },
-      }
-    );
-  };
-
-  return (
-    <InlineActionRow
-      label={unit.name}
-      isEditing={isEditing}
-      viewContent={unit.representative?.name || 'ยังไม่ระบุตัวแทน'}
-      editContent={
-        <div className="space-y-2">
-          <div className="flex items-center gap-4">
-            <span className="text-muted-foreground w-40 shrink-0 text-sm">
-              ตั้งตัวแทนหน่วยงาน *
-            </span>
-            <UserSearchCombobox
-              value={selectedUserId}
-              departmentId={departmentId}
-              unitId={unit.id}
-              onChange={(id, name) => {
-                setSelectedUserId(id);
-                setSelectedUserName(name);
-              }}
-              className="max-w-md"
-            />
-          </div>
-          {error && <p className="text-xs text-red-500">{error}</p>}
-        </div>
-      }
-      onEdit={() => setIsEditing(true)}
-      onSave={handleSave}
-      onCancel={handleCancel}
-      disableSave={!selectedUserId}
-      isSaving={updateRepresentative.isPending}
-    />
   );
 }

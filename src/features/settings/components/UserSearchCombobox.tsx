@@ -38,7 +38,7 @@ export function UserSearchCombobox({
 }: UserSearchComboboxProps) {
   const [open, setOpen] = React.useState(false);
 
-  const query = unitId ? { unitId } : { departmentId: departmentId || '' };
+  const query = unitId ? { unitId } : { deptId: departmentId || '' };
   const { data, isLoading, isError } = useUsersForSelection(query);
 
   const users = options ?? data?.data ?? [];

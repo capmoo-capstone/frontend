@@ -24,7 +24,7 @@ export function useUpdateUnitRepresentative() {
     mutationFn: async (payload: UpdateUnitRepresentativeInput) => {
       return payload;
     },
-    onSuccess: (payload) => {
+    onSuccess: async (payload) => {
       queryClient.setQueryData(
         ['units', payload.departmentId],
         (
@@ -52,8 +52,9 @@ export function useUpdateUnitRepresentative() {
         }
       );
 
-      // Note: Once a real backend API is implemented for updating unit representatives,
-      // replace the mutationFn to call it and move the invalidateQueries back here.
+      await queryClient.invalidateQueries({
+        queryKey: ['units', payload.departmentId],
+      });
     },
   });
 }

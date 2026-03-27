@@ -71,16 +71,16 @@ export const WorkGroupSchema = z.object({
 
 export type WorkGroupPayload = z.infer<typeof WorkGroupSchema>;
 
-export type WorkGroupValidationInput = {
+export interface WorkGroupValidationInput {
   id?: string;
   name: string;
   workflow_types: string[];
   head_id: string;
   member_ids: string[];
   delegation?: DelegationPayload | null;
-};
+}
 
-type WorkGroupValidationContext = {
+interface WorkGroupValidationContext {
   currentGroupId?: string;
   existingGroups: Array<{
     id: string;
@@ -89,7 +89,7 @@ type WorkGroupValidationContext = {
     member_ids: string[];
   }>;
   directorUserId: string;
-};
+}
 
 export const createWorkGroupValidationSchema = (context: WorkGroupValidationContext) => {
   return WorkGroupSchema.superRefine((data, ctx) => {
@@ -159,10 +159,10 @@ export const createWorkGroupValidationSchema = (context: WorkGroupValidationCont
   });
 };
 
-type DepartmentRepresentativeContext = {
+interface DepartmentRepresentativeContext {
   currentUnitId: string;
   allAssignments: Array<{ unitId: string; userId?: string | null }>;
-};
+}
 
 export const createDepartmentRepresentativeSchema = (context: DepartmentRepresentativeContext) => {
   return z
@@ -187,10 +187,10 @@ export const createDepartmentRepresentativeSchema = (context: DepartmentRepresen
     });
 };
 
-type ProcurementRoleValidationContext = {
+interface ProcurementRoleValidationContext {
   allowMultiple: boolean;
   isDirectorRole: boolean;
-};
+}
 
 export const createProcurementRoleSchema = (context: ProcurementRoleValidationContext) => {
   return z

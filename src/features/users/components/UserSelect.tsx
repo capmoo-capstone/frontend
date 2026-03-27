@@ -76,7 +76,7 @@ export function UserSelect({
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className={cn('group w-55 justify-between px-3', className)}
+          className={cn('group w-full min-w-0 justify-between px-3 sm:w-55', className)}
           disabled={disabled || isLoading}
         >
           {isLoading ? (
@@ -105,7 +105,10 @@ export function UserSelect({
           </div>
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-60 p-0" align="start">
+      <PopoverContent
+        className="w-(--radix-popover-trigger-width) max-w-[calc(100vw-2rem)] p-0 sm:max-w-none"
+        align="start"
+      >
         <Command>
           <CommandInput placeholder="Search user..." />
           <CommandList>

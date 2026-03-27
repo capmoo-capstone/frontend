@@ -29,7 +29,7 @@ export function InlineActionRow({
 }: InlineActionRowProps) {
   if (isEditing) {
     return (
-      <div className="flex items-start justify-between gap-4 py-3">
+      <div className="flex items-start justify-between gap-4 py-1">
         <div className="w-full max-w-72 pt-2 text-sm font-medium">{label}</div>
         <div className="flex-1">{editContent}</div>
         <div className="flex items-center gap-1">
@@ -59,18 +59,11 @@ export function InlineActionRow({
   }
 
   return (
-    <div className="group flex items-center justify-between gap-4 py-3">
-      <div className="w-full max-w-72 text-sm">{label}</div>
-      <div className="flex-1 text-sm text-slate-600">{viewContent}</div>
-      <Button
-        type="button"
-        size="icon"
-        variant="ghost"
-        onClick={onEdit}
-        className="opacity-0 transition-opacity group-hover:opacity-100"
-        aria-label="edit"
-      >
-        <Pencil className="h-4 w-4 text-slate-400 hover:text-slate-600" />
+    <div className="flex items-center justify-between gap-4 py-1">
+      <div className="normal-b w-full max-w-72">{label}</div>
+      <div className="normal text-primary flex-1">{viewContent}</div>
+      <Button type="button" size="icon" variant="ghost" onClick={onEdit} aria-label="edit">
+        <Pencil className="h-4 w-4" />
       </Button>
     </div>
   );

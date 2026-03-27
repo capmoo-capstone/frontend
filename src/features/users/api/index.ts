@@ -1,6 +1,10 @@
 import api from '@/lib/axios';
 
 import {
+  type AddUsersToUnitRequest,
+  AddUsersToUnitSchema,
+  type BackendUserDetailResponse,
+  BackendUserDetailResponseSchema,
   BackendUserSelectionResponseSchema,
   type GetUsersParams,
   type GetUsersSelectionParams,
@@ -45,4 +49,18 @@ export const getUsersForSelection = async (
   };
 
   return UserSelectionResponseSchema.parse(normalized);
+};
+
+export const getUserById = async (userId: string): Promise<BackendUserDetailResponse> => {
+  const { data } = await api.get(`/users/${userId}`);
+  const parsed = BackendUserDetailResponseSchema.parse(data);
+  return parsed;
+};
+
+export const addUsersToUnit = async ({ unitId, userId }: AddUsersToUnitRequest) => {
+  const data = AddUsersToUnitSchema.parse({ unitId, userId });
+  const response = await api.patch(`/users/add-unit/${data.unitId}`, {
+    users: data.userId,
+  });
+  return response;
 };

@@ -70,3 +70,39 @@ export const BackendUserSelectionResponseSchema = z.object({
 });
 
 export type BackendUserSelectionResponse = z.infer<typeof BackendUserSelectionResponseSchema>;
+
+export const Roles = z.object({
+  role: UserRoleEnum,
+  department: z.object({
+    id: z.string(),
+    name: z.string(),
+  }),
+  unit: z
+    .object({
+      id: z.string(),
+      name: z.string(),
+    })
+    .nullable(),
+});
+
+export const BackendUserDetailResponseSchema = z.object({
+  id: z.string(),
+  username: z.string(),
+  email: z.string().nullable(),
+  full_name: z.string(),
+  created_at: z.iso.datetime(),
+  role_updated_at: z.iso.datetime(),
+  roles: z.array(Roles),
+});
+
+export type BackendUserDetailResponse = z.infer<typeof BackendUserDetailResponseSchema>;
+
+export type AddUsersToUnitRequest = {
+  unitId: string;
+  userId: string[];
+};
+
+export const AddUsersToUnitSchema = z.object({
+  unitId: z.string(),
+  userId: z.array(z.string()),
+});

@@ -31,8 +31,8 @@ export function DepartmentUnitRepRow({ departmentId, unit }: DepartmentUnitRepRo
       editContent={
         <div className="space-y-2">
           <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
-            <span className="text-muted-foreground w-full shrink-0 text-sm sm:w-40">
-              ตั้งตัวแทนหน่วยงาน *
+            <span className="text-primary w-full shrink-0 normal sm:w-40">
+              ตั้งตัวแทนหน่วยงาน <span className="text-error">*</span>
             </span>
             <div className="w-full min-w-0 sm:flex-1">
               <UserSelect

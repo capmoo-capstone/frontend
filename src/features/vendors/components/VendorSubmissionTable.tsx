@@ -63,9 +63,6 @@ export function VendorSubmissionTable({
 
   const handleDateRangeFilterChange = (range: DateRange | undefined) => {
     onDateRangeChange(range);
-    if (!range?.from) {
-      table.getColumn('submitted_at')?.setFilterValue(undefined);
-    }
   };
 
   if (isLoading) {

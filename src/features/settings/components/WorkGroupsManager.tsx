@@ -1,8 +1,8 @@
 import { useState } from 'react';
 
 import { Button } from '@/components/ui/button';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { WORK_GROUP_SETTINGS, type WorkGroupSetting } from '@/features/settings/mock-data';
-import { cn } from '@/lib/utils';
 
 import { CreateGroupPanel } from './CreateGroupPanel';
 import { WorkGroupCard } from './WorkGroupCard';
@@ -18,37 +18,34 @@ export function WorkGroupsManager() {
           <h1 className="h1-topic text-primary">ตั้งค่ากลุ่มงาน</h1>
         </div>
 
-        <Button type="button" onClick={() => setIsCreateVisible((prev) => !prev)}>
-          + สร้างกลุ่มงานใหม่
-        </Button>
-      </header>
-
-      <div
-        className={cn('grid gap-4', isCreateVisible ? 'lg:grid-cols-[1.8fr_1fr]' : 'grid-cols-1')}
-      >
-        <div className="space-y-4">
-          {groups.map((group) => (
-            <WorkGroupCard
-              key={group.id}
-              group={group}
+        <Popover open={isCreateVisible} onOpenChange={setIsCreateVisible}>
+          <PopoverTrigger asChild>
+            <Button type="button">+ สร้างกลุ่มงานใหม่</Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-[min(42rem,calc(100vw-1rem))] p-0" align="end">
+            <CreateGroupPanel
               groups={groups}
-              onSave={(updated) => {
-                setGroups((prev) => prev.map((item) => (item.id === updated.id ? updated : item)));
+              onCancel={() => setIsCreateVisible(false)}
+              onCreate={(newGroup) => {
+                setGroups((prev) => [newGroup, ...prev]);
+                setIsCreateVisible(false);
               }}
             />
-          ))}
-        </div>
+          </PopoverContent>
+        </Popover>
+      </header>
 
-        {isCreateVisible && (
-          <CreateGroupPanel
+      <div className="space-y-4">
+        {groups.map((group) => (
+          <WorkGroupCard
+            key={group.id}
+            group={group}
             groups={groups}
-            onCancel={() => setIsCreateVisible(false)}
-            onCreate={(newGroup) => {
-              setGroups((prev) => [newGroup, ...prev]);
-              setIsCreateVisible(false);
+            onSave={(updated) => {
+              setGroups((prev) => prev.map((item) => (item.id === updated.id ? updated : item)));
             }}
           />
-        )}
+        ))}
       </div>
     </>
   );

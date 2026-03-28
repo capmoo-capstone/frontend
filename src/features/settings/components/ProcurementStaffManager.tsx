@@ -25,12 +25,10 @@ export function ProcurementStaffManager() {
         <h1 className="h1-topic text-primary">ตั้งค่าเจ้าหน้าที่พัสดุ</h1>
       </header>
 
-      <section className="rounded-lg border border-slate-200 bg-white p-5">
-        <div className="text-primary mb-4 flex items-center gap-2 text-lg font-semibold">
-          <div className="h2-topic flex items-center">
-            <Users className="mr-2 h-6 w-6" />
-            เจ้าหน้าที่พัสดุ
-          </div>
+      <section className="border-border rounded-lg border bg-white p-5">
+        <div className="h2-topic flex items-center">
+          <Users className="mr-2 h-6 w-6" />
+          เจ้าหน้าที่พัสดุ
         </div>
 
         <div className="divide-y">
@@ -143,9 +141,8 @@ function RoleRow({ role, allRoles, onSave }: RoleRowProps) {
                           </p>
                           <Button
                             type="button"
-                            variant="outline"
+                            variant="destructive"
                             onClick={() => handleRemoveDelegation(index)}
-                            className="text-red-600 hover:text-red-700"
                           >
                             <Trash2 className="mr-1 h-4 w-4" /> ลบการมอบหมาย
                           </Button>

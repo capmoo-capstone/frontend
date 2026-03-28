@@ -54,9 +54,11 @@ export function WorkGroupCard({ group, groups, onSave }: WorkGroupCardProps) {
     reset,
     watch,
     setValue,
-    formState: { errors: formErrors },
+    formState: { errors: formErrors, isDirty },
   } = useForm<WorkGroupFormInput>({
     resolver: zodResolver(workGroupValidationSchema),
+    mode: 'onBlur',
+    reValidateMode: 'onBlur',
     defaultValues: {
       name: group.name,
       workflow_types: group.workflow_types,
@@ -106,6 +108,13 @@ export function WorkGroupCard({ group, groups, onSave }: WorkGroupCardProps) {
     );
   }, [group.id, groups]);
 
+  const availableWorkflowOptions = useMemo(() => {
+    return RESPONSIBLE_SELECT_OPTIONS.filter(
+      (option) =>
+        !draft.workflow_types.includes(option.value) && !usedWorkflowByOtherGroups.has(option.value)
+    );
+  }, [draft.workflow_types, usedWorkflowByOtherGroups]);
+
   const handleSave = handleSubmit((values) => {
     if (values.delegation?.user_id) {
       const isHeadElsewhere = groups
@@ -147,7 +156,7 @@ export function WorkGroupCard({ group, groups, onSave }: WorkGroupCardProps) {
 
   return (
     <section className="border-border flex flex-col gap-6 rounded-md border bg-white p-6">
-      <div className="flex items-center justify-between gap-3">
+      <div className="flex flex-wrap-reverse items-start justify-between gap-3">
         {!isEditing ? (
           <div className="h2-topic flex items-center">
             <Users className="mr-2 h-6 w-6" />
@@ -158,12 +167,17 @@ export function WorkGroupCard({ group, groups, onSave }: WorkGroupCardProps) {
             control={control}
             name="name"
             render={({ field }) => (
-              <Input
-                value={field.value}
-                onChange={field.onChange}
-                placeholder="ชื่อกลุ่มงาน"
-                className="max-w-115"
-              />
+              <div className="space-y-1">
+                <Input
+                  {...field}
+                  placeholder="ชื่อกลุ่มงาน"
+                  className="min-w-115"
+                  aria-invalid={Boolean(formErrors.name)}
+                />
+                {formErrors.name?.message && (
+                  <p className="caption text-error">{formErrors.name.message}</p>
+                )}
+              </div>
             )}
           />
         )}
@@ -171,7 +185,13 @@ export function WorkGroupCard({ group, groups, onSave }: WorkGroupCardProps) {
         <div className="flex items-center gap-2">
           {isEditing ? (
             <>
-              <Button type="button" size="sm" variant="brand" onClick={handleSave}>
+              <Button
+                type="button"
+                size="sm"
+                variant="brand"
+                onClick={handleSave}
+                disabled={!isDirty}
+              >
                 <Save className="mr-1 h-4 w-4" /> บันทึก
               </Button>
               <Button type="button" size="sm" variant="outline" onClick={handleCancel}>
@@ -200,30 +220,15 @@ export function WorkGroupCard({ group, groups, onSave }: WorkGroupCardProps) {
                 { shouldDirty: true }
               )
             }
+            availableOptions={availableWorkflowOptions}
+            onAddMany={(typesToAdd) => {
+              const nextTypes = Array.from(new Set([...draft.workflow_types, ...typesToAdd]));
+              setValue('workflow_types', nextTypes, {
+                shouldDirty: true,
+                shouldValidate: true,
+              });
+            }}
           />
-          {isEditing && (
-            <div className="flex flex-wrap gap-2">
-              {RESPONSIBLE_SELECT_OPTIONS.filter(
-                (option) =>
-                  !draft.workflow_types.includes(option.value) &&
-                  !usedWorkflowByOtherGroups.has(option.value)
-              ).map((option) => (
-                <Button
-                  key={option.value}
-                  type="button"
-                  size="sm"
-                  variant="outline"
-                  onClick={() => {
-                    setValue('workflow_types', [...draft.workflow_types, option.value], {
-                      shouldDirty: true,
-                    });
-                  }}
-                >
-                  + {option.label}
-                </Button>
-              ))}
-            </div>
-          )}
         </div>
       </div>
 

@@ -22,7 +22,6 @@ export function DelegateEditor({
       user_id: defaultValues?.user_id || '',
       start_date: defaultValues?.start_date,
       end_date: defaultValues?.end_date,
-      is_permanent: defaultValues?.is_permanent ?? false,
     },
   });
 

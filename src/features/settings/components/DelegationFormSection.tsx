@@ -31,7 +31,6 @@ export function DelegationFormSection({
       user_id: value?.user_id ?? '',
       start_date: value?.start_date,
       end_date: value?.end_date,
-      is_permanent: false,
     },
   });
 
@@ -43,7 +42,6 @@ export function DelegationFormSection({
         user_id: '',
         start_date: undefined,
         end_date: undefined,
-        is_permanent: false,
       },
       { keepValues: false }
     );
@@ -56,13 +54,11 @@ export function DelegationFormSection({
       user_id: formValue.user_id ?? '',
       start_date: formValue.start_date,
       end_date: formValue.end_date,
-      is_permanent: formValue.is_permanent ?? false,
     });
 
     onChange(parsed.success ? parsed.data : null);
   }, [
     formValue.end_date,
-    formValue.is_permanent,
     formValue.start_date,
     formValue.user_id,
     onChange,
@@ -71,7 +67,7 @@ export function DelegationFormSection({
   return (
     <div className="space-y-2">
       <div className="flex flex-wrap items-center gap-3">
-        <span className="w-29.5 text-sm">ตั้งผู้แทน</span>
+        <span className="w-20 normal">ตั้งผู้แทน</span>
         <Controller
           control={form.control}
           name="user_id"
@@ -82,7 +78,7 @@ export function DelegationFormSection({
               options={people}
               placeholder="กรุณาเลือกเจ้าหน้าที่"
               onChange={(id) => field.onChange(id)}
-              className="max-w-[320px]"
+              className="min-w-[320px]"
               hasClearButton={false}
             />
           )}
@@ -90,7 +86,7 @@ export function DelegationFormSection({
       </div>
 
       <div className="flex flex-wrap items-center gap-3">
-        <span className="w-29.5 text-sm text-red-500">ตั้งแต่วันที่ *</span>
+        <span className="w-20 normal">ตั้งแต่วันที่</span>
         <Controller
           control={form.control}
           name="start_date"
@@ -104,7 +100,7 @@ export function DelegationFormSection({
             />
           )}
         />
-        <span className="text-sm">ถึง</span>
+        <span className="normal">ถึง</span>
         <Controller
           control={form.control}
           name="end_date"

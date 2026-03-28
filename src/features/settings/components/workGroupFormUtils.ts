@@ -9,7 +9,6 @@ export const normalizeDelegation = (
 
   return {
     ...delegation,
-    is_permanent: delegation.is_permanent ?? false,
   };
 };
 

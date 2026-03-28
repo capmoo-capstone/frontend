@@ -10,17 +10,8 @@ export const DelegationSchema = z
     user_id: z.string().min(1, 'กรุณาเลือกเจ้าหน้าที่'),
     start_date: z.date({ message: 'กรุณาเลือกวันเริ่มต้น' }),
     end_date: z.date().optional(),
-    is_permanent: z.boolean().default(false),
   })
   .superRefine((data, ctx) => {
-    if (!data.is_permanent && !data.end_date) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: "กรุณาเลือกวันสิ้นสุด หรือ เลือก 'ไม่กำหนดวันที่สิ้นสุด'",
-        path: ['end_date'],
-      });
-    }
-
     if (data.start_date && data.end_date && data.end_date < data.start_date) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
@@ -43,7 +34,7 @@ export const DelegationWithFutureDateSchema = DelegationSchema.superRefine((data
     });
   }
 
-  if (!data.is_permanent && data.end_date) {
+  if (data.end_date) {
     if (data.end_date < today) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,

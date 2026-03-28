@@ -90,10 +90,10 @@ function RoleRow({ role, allRoles, onSave }: RoleRowProps) {
             <p>{selectedNames}</p>
             {isDirectorRole &&
               role.delegation.map((delegation, index) => (
-                <p key={`${delegation.user_id}-${index}`} className="text-muted-foreground text-xs">
+                <p key={`${delegation.user_id}-${index}`} className="text-muted-foreground caption">
                   รักษาการโดย {getPersonNameById(delegation.user_id)} เริ่ม{' '}
                   {formatDateThaiShort(delegation.start_date)}
-                  {!delegation.is_permanent && delegation.end_date
+                  {delegation.end_date
                     ? ` สิ้นสุด ${formatDateThaiShort(delegation.end_date)}`
                     : ''}
                 </p>
@@ -115,7 +115,7 @@ function RoleRow({ role, allRoles, onSave }: RoleRowProps) {
                     options={PROCUREMENT_PEOPLE}
                     placeholder="กรุณาเลือกหัวหน้าพัสดุ"
                     onChange={handleSetDirectorMember}
-                    className="w-full"
+                    className="w-xs max-w-xs min-w-xs"
                     hasClearButton={false}
                   />
                 </div>
@@ -124,7 +124,7 @@ function RoleRow({ role, allRoles, onSave }: RoleRowProps) {
                   {draftDelegations.length > 0 && (
                     <>
                       <div className="flex flex-wrap items-center justify-between gap-2">
-                        <p className="text-primary text-sm font-semibold">การมอบหมายรักษาการ</p>
+                        <p className="text-primary normal-b">การมอบหมายรักษาการ</p>
                       </div>
 
                       {draftDelegations.map((delegation, index) => (
@@ -132,12 +132,12 @@ function RoleRow({ role, allRoles, onSave }: RoleRowProps) {
                           key={`${delegation.user_id}-${index}`}
                           className="border-border space-y-2 rounded-md border bg-white p-3"
                         >
-                          <p className="text-primary text-sm">
+                          <p className="text-primary normal">
                             ผู้แทนปัจจุบัน: {getPersonNameById(delegation.user_id)}
                           </p>
-                          <p className="text-muted-foreground text-xs">
+                          <p className="text-muted-foreground caption">
                             เริ่ม {formatDateThaiShort(delegation.start_date)}
-                            {!delegation.is_permanent && delegation.end_date
+                            {delegation.end_date
                               ? ` สิ้นสุด ${formatDateThaiShort(delegation.end_date)}`
                               : ' (ไม่กำหนดวันที่สิ้นสุด)'}
                           </p>
@@ -157,7 +157,7 @@ function RoleRow({ role, allRoles, onSave }: RoleRowProps) {
                   {draftDelegations.length === 0 && (
                     <>
                       <div className="flex flex-wrap items-center justify-between gap-2">
-                        <p className="text-primary text-sm font-semibold">สร้างการมอบหมาย</p>
+                        <p className="text-primary normal-b">สร้างการมอบหมาย</p>
                       </div>
 
                       <DelegationFormSection
@@ -223,7 +223,7 @@ function RoleRow({ role, allRoles, onSave }: RoleRowProps) {
               </>
             )}
 
-            {error && <p className="text-xs text-red-500">{error}</p>}
+            {error && <p className="caption text-red-500">{error}</p>}
           </div>
         }
         onEdit={handleEdit}

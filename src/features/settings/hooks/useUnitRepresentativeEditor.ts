@@ -38,6 +38,7 @@ export function useUnitRepresentativeEditor({
   const handleSave = () => {
     if (!selectedUserId || !selectedUserName) return;
 
+    // TODO (BACKEND MIGRATION): Representative uniqueness checks across units should be enforced on the backend to prevent cross-client conflicts.
     const allUnits = queryClient
       .getQueriesData<Array<UnitItem>>({ queryKey: ['units'] })
       .flatMap(([, units]) => units ?? [])

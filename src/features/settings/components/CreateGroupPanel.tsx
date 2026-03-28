@@ -1,7 +1,5 @@
-import { useMemo, useState } from 'react';
-import { Controller, useForm } from 'react-hook-form';
+import { Controller } from 'react-hook-form';
 
-import { zodResolver } from '@hookform/resolvers/zod';
 import { Check, X } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -11,15 +9,10 @@ import {
   PROCUREMENT_PEOPLE,
   type WorkGroupSetting,
 } from '@/features/settings/mock-data';
-import {
-  type WorkGroupFormInput,
-  createWorkGroupValidationSchema,
-} from '@/features/settings/types';
 import { UserSelect } from '@/features/users/components/UserSelect';
-import { RESPONSIBLE_SELECT_OPTIONS } from '@/lib/formatters';
 import { cn } from '@/lib/utils';
 
-import { normalizeDelegation } from './workGroupFormUtils';
+import { useCreateGroupForm } from '../hooks/useCreateGroupForm';
 
 interface CreateGroupPanelProps {
   groups: WorkGroupSetting[];
@@ -28,55 +21,20 @@ interface CreateGroupPanelProps {
 }
 
 export function CreateGroupPanel({ groups, onCancel, onCreate }: CreateGroupPanelProps) {
-  const createGroupValidationSchema = useMemo(
-    () =>
-      createWorkGroupValidationSchema({
-        currentGroupId: undefined,
-        existingGroups: groups,
-        directorUserId: DIRECTOR_USER_ID,
-      }),
-    [groups]
-  );
+  const {
+    draft,
+    form,
+    availableWorkflowOptions,
+    duplicateHeadWarning,
+    submitCreate,
+    toggleWorkflowType,
+    isSubmitDisabled,
+  } = useCreateGroupForm({ groups, onCreate });
 
   const {
     control,
-    handleSubmit,
-    watch,
-    setValue,
     formState: { errors: formErrors, touchedFields },
-  } = useForm<WorkGroupFormInput>({
-    resolver: zodResolver(createGroupValidationSchema),
-    defaultValues: {
-      name: '',
-      workflow_types: [],
-      head_id: '',
-      member_ids: [],
-      delegation: null,
-    },
-  });
-
-  const draft = watch();
-  const [newGroupId] = useState(() => `wg-${Date.now()}`);
-
-  const usedWorkflowTypes = useMemo(
-    () => new Set(groups.flatMap((group) => group.workflow_types)),
-    [groups]
-  );
-
-  const duplicateHeadWarning = useMemo(() => {
-    if (!draft.head_id) return undefined;
-    const isDuplicate = groups.some((group) => group.head_id === draft.head_id);
-    return isDuplicate ? 'หัวหน้างานที่เลือกซ้ำกับกลุ่มงานอื่น' : undefined;
-  }, [draft.head_id, groups]);
-
-  const handleCreate = handleSubmit((values) => {
-    onCreate({
-      id: newGroupId,
-      ...values,
-      member_ids: values.member_ids ?? [],
-      delegation: normalizeDelegation(values.delegation),
-    });
-  });
+  } = form;
 
   return (
     <aside className="rounded-md bg-white">
@@ -112,9 +70,7 @@ export function CreateGroupPanel({ groups, onCancel, onCreate }: CreateGroupPane
             <span className="text-error">*</span>
           </label>
           <div className="flex flex-wrap gap-2">
-            {RESPONSIBLE_SELECT_OPTIONS.filter(
-              (option) => !usedWorkflowTypes.has(option.value)
-            ).map((option) => {
+            {availableWorkflowOptions.map((option) => {
               const isSelected = draft.workflow_types.includes(option.value);
               return (
                 <button
@@ -126,15 +82,7 @@ export function CreateGroupPanel({ groups, onCancel, onCreate }: CreateGroupPane
                       ? 'border-brand-6 bg-brand-3 text-brand-11'
                       : 'border-border text-primary bg-white'
                   )}
-                  onClick={() => {
-                    setValue(
-                      'workflow_types',
-                      isSelected
-                        ? draft.workflow_types.filter((item) => item !== option.value)
-                        : [...draft.workflow_types, option.value],
-                      { shouldDirty: true }
-                    );
-                  }}
+                  onClick={() => toggleWorkflowType(option.value)}
                 >
                   {option.label}
                 </button>
@@ -171,12 +119,7 @@ export function CreateGroupPanel({ groups, onCancel, onCreate }: CreateGroupPane
         </div>
 
         <div className="flex items-center justify-end gap-2">
-          <Button
-            type="button"
-            variant="brand"
-            onClick={handleCreate}
-            disabled={Object.keys(formErrors).length > 0}
-          >
+          <Button type="button" variant="brand" onClick={submitCreate} disabled={isSubmitDisabled}>
             <Check className="mr-1 h-4 w-4" /> สร้างกลุ่มงาน
           </Button>
           <Button type="button" variant="outline" onClick={onCancel}>

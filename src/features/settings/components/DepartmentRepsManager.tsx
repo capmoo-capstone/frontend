@@ -16,14 +16,15 @@ export function DepartmentRepsManager() {
 
   if (isLoading) {
     return (
-      <div className="mx-auto w-full max-w-[1280px] p-6">
+      <main className="mx-auto w-full max-w-[1280px] p-6">
         <p className="text-muted-foreground normal">กำลังโหลดข้อมูลหน่วยงาน...</p>
-      </div>
+      </main>
     );
   }
 
+  // TODO (BACKEND MIGRATION): Department search/filter and expansion defaults should be computed by the API for large datasets and pagination consistency.
   return (
-    <>
+    <main>
       <header className="flex flex-row flex-wrap items-center justify-between space-y-3">
         <h1 className="text-primary h1-topic">ตั้งค่าตัวแทนหน่วยงาน</h1>
 
@@ -55,10 +56,10 @@ export function DepartmentRepsManager() {
               className="border-border rounded-md border bg-white px-6 last:border"
             >
               <AccordionTrigger className="h2-topic hover:no-underline">
-                <div className="h2-topic flex items-center">
+                <span className="h2-topic flex items-center">
                   <Users className="mr-2 h-6 w-6" />
                   {department.name}
-                </div>
+                </span>
               </AccordionTrigger>
               <AccordionContent className="pb-2">
                 <DepartmentUnitList departmentId={department.id} />
@@ -67,6 +68,6 @@ export function DepartmentRepsManager() {
           ))}
         </Accordion>
       )}
-    </>
+    </main>
   );
 }

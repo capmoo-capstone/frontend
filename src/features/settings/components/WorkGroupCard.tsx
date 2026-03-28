@@ -1,7 +1,5 @@
-import { useEffect, useMemo, useState } from 'react';
-import { Controller, useForm } from 'react-hook-form';
+import { Controller } from 'react-hook-form';
 
-import { zodResolver } from '@hookform/resolvers/zod';
 import { ChevronDown, Pencil, Save, Trash2, UserPlus, Users, X } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -12,18 +10,13 @@ import {
   type WorkGroupSetting,
   getPersonNameById,
 } from '@/features/settings/mock-data';
-import {
-  type DelegationPayload,
-  type WorkGroupFormInput,
-  createWorkGroupValidationSchema,
-} from '@/features/settings/types';
 import { UserSelect } from '@/features/users/components/UserSelect';
-import { RESPONSIBLE_SELECT_OPTIONS, formatDateThaiShort } from '@/lib/formatters';
+import { formatDateThaiShort } from '@/lib/formatters';
 import { cn } from '@/lib/utils';
 
+import { useWorkGroupCardEditor } from '../hooks/useWorkGroupCardEditor';
 import { DelegationFormSection } from './DelegationFormSection';
 import { WorkflowTags } from './WorkflowTags';
-import { getFormErrorMessages, normalizeDelegation } from './workGroupFormUtils';
 
 interface WorkGroupCardProps {
   group: WorkGroupSetting;
@@ -32,131 +25,41 @@ interface WorkGroupCardProps {
 }
 
 export function WorkGroupCard({ group, groups, onSave }: WorkGroupCardProps) {
-  const [isEditing, setIsEditing] = useState(false);
-  const [isExpanded, setIsExpanded] = useState(true);
-  const [memberToAdd, setMemberToAdd] = useState('');
-  const [delegationToAdd, setDelegationToAdd] = useState<DelegationPayload | null>(null);
-  const [delegationFormResetKey, setDelegationFormResetKey] = useState(0);
-
-  const workGroupValidationSchema = useMemo(
-    () =>
-      createWorkGroupValidationSchema({
-        currentGroupId: group.id,
-        existingGroups: groups,
-        directorUserId: DIRECTOR_USER_ID,
-      }),
-    [group.id, groups]
-  );
+  const {
+    draft,
+    form,
+    isEditing,
+    isExpanded,
+    memberToAdd,
+    delegationToAdd,
+    delegationFormResetKey,
+    draftMemberIds,
+    draftDelegation,
+    availableMembers,
+    availableWorkflowOptions,
+    validationErrors,
+    setIsEditing,
+    setIsExpanded,
+    setMemberToAdd,
+    setDelegationToAdd,
+    addDraftMember,
+    removeDraftMember,
+    addDelegation,
+    removeDelegation,
+    addWorkflowTypes,
+    removeWorkflowType,
+    handleSave,
+    handleCancel,
+  } = useWorkGroupCardEditor({ group, groups, onSave });
 
   const {
     control,
-    handleSubmit,
-    reset,
-    watch,
-    setValue,
     formState: { errors: formErrors, isDirty },
-  } = useForm<WorkGroupFormInput>({
-    resolver: zodResolver(workGroupValidationSchema),
-    mode: 'onBlur',
-    reValidateMode: 'onBlur',
-    defaultValues: {
-      name: group.name,
-      workflow_types: group.workflow_types,
-      head_id: group.head_id,
-      member_ids: group.member_ids,
-      delegation: group.delegation,
-    },
-  });
-
-  const draft = watch();
-  const draftMemberIds = draft.member_ids ?? [];
-
-  const validationErrors = useMemo(() => getFormErrorMessages(formErrors), [formErrors]);
-
-  useEffect(() => {
-    reset({
-      name: group.name,
-      workflow_types: group.workflow_types,
-      head_id: group.head_id,
-      member_ids: group.member_ids,
-      delegation: group.delegation,
-    });
-    setDelegationToAdd(null);
-    setDelegationFormResetKey((prev) => prev + 1);
-  }, [group, reset]);
-
-  const availableMembers = useMemo(() => {
-    const headsFromOtherGroups = new Set(
-      groups.filter((item) => item.id !== group.id).map((item) => item.head_id)
-    );
-
-    const membersFromOtherGroups = new Set(
-      groups.filter((item) => item.id !== group.id).flatMap((item) => item.member_ids)
-    );
-
-    return PROCUREMENT_PEOPLE.filter((person) => {
-      if (person.id === DIRECTOR_USER_ID) return false;
-      if (headsFromOtherGroups.has(person.id)) return false;
-      if (membersFromOtherGroups.has(person.id)) return false;
-      return true;
-    });
-  }, [group.id, groups]);
-
-  const usedWorkflowByOtherGroups = useMemo(() => {
-    return new Set(
-      groups.filter((item) => item.id !== group.id).flatMap((item) => item.workflow_types)
-    );
-  }, [group.id, groups]);
-
-  const availableWorkflowOptions = useMemo(() => {
-    return RESPONSIBLE_SELECT_OPTIONS.filter(
-      (option) =>
-        !draft.workflow_types.includes(option.value) && !usedWorkflowByOtherGroups.has(option.value)
-    );
-  }, [draft.workflow_types, usedWorkflowByOtherGroups]);
-
-  const handleSave = handleSubmit((values) => {
-    if (values.delegation?.user_id) {
-      const isHeadElsewhere = groups
-        .filter((item) => item.id !== group.id)
-        .some((item) => item.head_id === values.delegation?.user_id);
-
-      if (isHeadElsewhere) {
-        const ok = window.confirm(
-          'ผู้แทนที่เลือกเป็นหัวหน้ากลุ่มงานอื่นอยู่แล้ว ต้องการยืนยันการแต่งตั้งหรือไม่?'
-        );
-        if (!ok) return;
-      }
-    }
-
-    onSave({
-      ...group,
-      ...values,
-      member_ids: values.member_ids ?? [],
-      delegation: normalizeDelegation(values.delegation),
-    });
-    setIsEditing(false);
-  });
-
-  const handleCancel = () => {
-    reset({
-      name: group.name,
-      workflow_types: group.workflow_types,
-      head_id: group.head_id,
-      member_ids: group.member_ids,
-      delegation: group.delegation,
-    });
-    setDelegationToAdd(null);
-    setDelegationFormResetKey((prev) => prev + 1);
-    setMemberToAdd('');
-    setIsEditing(false);
-  };
-
-  const draftDelegation = normalizeDelegation(draft.delegation);
+  } = form;
 
   return (
     <section className="border-border flex flex-col gap-6 rounded-md border bg-white p-6">
-      <div className="flex flex-wrap-reverse items-start justify-between gap-3">
+      <div className="flex flex-wrap-reverse items-end justify-between gap-3">
         {!isEditing ? (
           <div className="h2-topic flex items-center">
             <Users className="mr-2 h-6 w-6" />
@@ -213,21 +116,9 @@ export function WorkGroupCard({ group, groups, onSave }: WorkGroupCardProps) {
           <WorkflowTags
             types={draft.workflow_types}
             isEditing={isEditing}
-            onRemove={(type) =>
-              setValue(
-                'workflow_types',
-                draft.workflow_types.filter((item) => item !== type),
-                { shouldDirty: true }
-              )
-            }
+            onRemove={removeWorkflowType}
             availableOptions={availableWorkflowOptions}
-            onAddMany={(typesToAdd) => {
-              const nextTypes = Array.from(new Set([...draft.workflow_types, ...typesToAdd]));
-              setValue('workflow_types', nextTypes, {
-                shouldDirty: true,
-                shouldValidate: true,
-              });
-            }}
+            onAddMany={addWorkflowTypes}
           />
         </div>
       </div>
@@ -278,15 +169,7 @@ export function WorkGroupCard({ group, groups, onSave }: WorkGroupCardProps) {
                           ? ` สิ้นสุด ${formatDateThaiShort(draftDelegation.end_date)}`
                           : ' (ไม่กำหนดวันที่สิ้นสุด)'}
                       </p>
-                      <Button
-                        type="button"
-                        variant="destructive"
-                        onClick={() => {
-                          setValue('delegation', null, { shouldDirty: true });
-                          setDelegationToAdd(null);
-                          setDelegationFormResetKey((prev) => prev + 1);
-                        }}
-                      >
+                      <Button type="button" variant="destructive" onClick={removeDelegation}>
                         <Trash2 className="mr-1 h-4 w-4" /> ลบการมอบหมาย
                       </Button>
                     </div>
@@ -306,12 +189,7 @@ export function WorkGroupCard({ group, groups, onSave }: WorkGroupCardProps) {
                     <Button
                       type="button"
                       variant="outline"
-                      onClick={() => {
-                        if (!delegationToAdd) return;
-                        setValue('delegation', delegationToAdd, { shouldDirty: true });
-                        setDelegationToAdd(null);
-                        setDelegationFormResetKey((prev) => prev + 1);
-                      }}
+                      onClick={addDelegation}
                       disabled={!delegationToAdd}
                     >
                       <UserPlus className="mr-1 h-4 w-4" /> เพิ่มการมอบหมาย
@@ -364,16 +242,7 @@ export function WorkGroupCard({ group, groups, onSave }: WorkGroupCardProps) {
                   disabled={
                     !memberToAdd || !availableMembers.some((person) => person.id === memberToAdd)
                   }
-                  onClick={() => {
-                    if (!memberToAdd) return;
-                    if (!availableMembers.some((person) => person.id === memberToAdd)) return;
-                    if (draftMemberIds.includes(memberToAdd)) return;
-
-                    setValue('member_ids', [...draftMemberIds, memberToAdd], {
-                      shouldDirty: true,
-                    });
-                    setMemberToAdd('');
-                  }}
+                  onClick={addDraftMember}
                 >
                   <UserPlus className="h-4 w-4" /> เพิ่มเจ้าหน้าที่เข้ากลุ่มงาน
                 </Button>
@@ -388,15 +257,7 @@ export function WorkGroupCard({ group, groups, onSave }: WorkGroupCardProps) {
                     <button
                       type="button"
                       className="text-red-500 hover:text-red-700"
-                      onClick={() => {
-                        setValue(
-                          'member_ids',
-                          draftMemberIds.filter((id) => id !== memberId),
-                          {
-                            shouldDirty: true,
-                          }
-                        );
-                      }}
+                      onClick={() => removeDraftMember(memberId)}
                     >
                       ลบสมาชิก
                     </button>

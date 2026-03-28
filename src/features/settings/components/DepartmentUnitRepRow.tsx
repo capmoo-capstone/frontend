@@ -29,12 +29,12 @@ export function DepartmentUnitRepRow({ departmentId, unit }: DepartmentUnitRepRo
       isEditing={isEditing}
       viewContent={unit.representative?.name || 'ยังไม่ระบุตัวแทน'}
       editContent={
-        <div className="space-y-2">
-          <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
+        <section className="space-y-2">
+          <section className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
             <span className="text-primary normal w-full shrink-0 sm:w-40">
               ตั้งตัวแทนหน่วยงาน <span className="text-error">*</span>
             </span>
-            <div className="w-full min-w-0 sm:flex-1">
+            <section className="w-full min-w-0 sm:flex-1">
               <UserSelect
                 value={selectedUserId}
                 deptId={departmentId}
@@ -45,10 +45,10 @@ export function DepartmentUnitRepRow({ departmentId, unit }: DepartmentUnitRepRo
                 placeholder="กรุณาเลือกเจ้าหน้าที่"
                 hasClearButton={false}
               />
-            </div>
-          </div>
+            </section>
+          </section>
           {error && <p className="caption text-red-500">{error}</p>}
-        </div>
+        </section>
       }
       onEdit={() => setIsEditing(true)}
       onSave={handleSave}

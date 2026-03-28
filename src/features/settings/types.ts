@@ -99,14 +99,6 @@ export const createWorkGroupValidationSchema = (context: WorkGroupValidationCont
       });
     }
 
-    if (data.member_ids.length === 0) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: 'กรุณาเลือกเจ้าหน้าที่อย่างน้อย 1 คน',
-        path: ['member_ids'],
-      });
-    }
-
     const otherGroupHeads = new Set(otherGroups.map((group) => group.head_id));
     const otherGroupMembers = new Set(otherGroups.flatMap((group) => group.member_ids));
 

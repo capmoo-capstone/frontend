@@ -12,6 +12,7 @@ export function useDepartmentRepsManager() {
   const [searchTerm, setSearchTerm] = useState('');
 
   const filteredDepartments = useMemo(() => {
+    // TODO (BACKEND MIGRATION): Department filtering and search ranking should be handled by query params in the backend for scalability.
     if (!searchTerm.trim()) return departments ?? [];
 
     const keyword = searchTerm.trim().toLowerCase();

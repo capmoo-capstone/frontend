@@ -10,17 +10,17 @@ export function DepartmentUnitList({ departmentId }: DepartmentUnitListProps) {
 
   if (!isLoading && (!units || units.length === 0)) {
     return (
-      <div className="text-muted-foreground normal py-4 text-center">
+      <section className="text-muted-foreground normal py-4 text-center">
         ยังไม่มีฝ่ายงานในหน่วยงานนี้
-      </div>
+      </section>
     );
   }
 
   return (
-    <div className="divide-y">
+    <section className="divide-y">
       {units?.map((unit) => (
         <DepartmentUnitRepRow key={unit.id} departmentId={departmentId} unit={unit} />
       ))}
-    </div>
+    </section>
   );
 }

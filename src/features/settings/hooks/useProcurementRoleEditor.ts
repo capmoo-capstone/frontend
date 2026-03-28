@@ -98,6 +98,7 @@ export function useProcurementRoleEditor({
     }
 
     if (isDirectorRole && draftDelegations.length > 0) {
+      // TODO (BACKEND MIGRATION): Cross-role conflict validation and confirmation workflow should be validated by backend business rules.
       const otherRoles = allRoles.filter((item) => item.id !== role.id);
       const delegatedUserIds = new Set(draftDelegations.map((item) => item.user_id));
       const isHeadElsewhere = otherRoles.some((item) =>

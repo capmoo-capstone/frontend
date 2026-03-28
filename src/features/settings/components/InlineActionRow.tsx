@@ -29,10 +29,10 @@ export function InlineActionRow({
 }: InlineActionRowProps) {
   if (isEditing) {
     return (
-      <div className="flex flex-col gap-3 py-1 xl:flex-row xl:items-start xl:justify-between xl:gap-4">
-        <div className="normal-b w-full pt-0 wrap-break-word xl:max-w-72 xl:pt-2">{label}</div>
+      <div className="flex flex-col gap-3 py-1 lg:flex-row lg:items-start lg:justify-between lg:gap-4">
+        <div className="normal-b w-full pt-0 wrap-break-word lg:max-w-72 lg:pt-2">{label}</div>
         <div className="min-w-0 flex-1">{editContent}</div>
-        <div className="flex shrink-0 items-center gap-1 self-end xl:self-auto">
+        <div className="flex shrink-0 items-center gap-1 self-end lg:self-auto">
           <Button
             type="button"
             size="icon"

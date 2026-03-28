@@ -38,29 +38,35 @@ export function DepartmentRepsManager() {
         </div>
       </header>
 
-      <Accordion
-        type="multiple"
-        className="space-y-4"
-        defaultValue={filteredDepartments.map((department) => department.id)}
-      >
-        {filteredDepartments.map((department) => (
-          <AccordionItem
-            key={department.id}
-            value={department.id}
-            className="border-border rounded-md border bg-white px-6"
-          >
-            <AccordionTrigger className="h2-topic font-semibold hover:no-underline">
-              <div className="flex items-center">
-                <Users className="mr-2 h-6 w-6" />
-                {department.name}
-              </div>
-            </AccordionTrigger>
-            <AccordionContent className="pb-2">
-              <DepartmentUnitList departmentId={department.id} />
-            </AccordionContent>
-          </AccordionItem>
-        ))}
-      </Accordion>
+      {filteredDepartments.length === 0 ? (
+        <div className="border-border text-muted-foreground rounded-md border border-dashed bg-white p-8 text-center text-sm">
+          ไม่พบข้อมูลหน่วยงาน
+        </div>
+      ) : (
+        <Accordion
+          type="multiple"
+          className="space-y-4"
+          defaultValue={filteredDepartments.map((department) => department.id)}
+        >
+          {filteredDepartments.map((department) => (
+            <AccordionItem
+              key={department.id}
+              value={department.id}
+              className="border-border rounded-md border bg-white px-6"
+            >
+              <AccordionTrigger className="h2-topic font-semibold hover:no-underline">
+                <div className="flex items-center">
+                  <Users className="mr-2 h-6 w-6" />
+                  {department.name}
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="pb-2">
+                <DepartmentUnitList departmentId={department.id} />
+              </AccordionContent>
+            </AccordionItem>
+          ))}
+        </Accordion>
+      )}
     </>
   );
 }

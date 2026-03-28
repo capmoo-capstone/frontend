@@ -268,7 +268,6 @@ export function WorkGroupCard({ group, groups, onSave }: WorkGroupCardProps) {
                       })
                     }
                     people={PROCUREMENT_PEOPLE}
-                    roleContext="group-head"
                   />
                 )}
               </div>

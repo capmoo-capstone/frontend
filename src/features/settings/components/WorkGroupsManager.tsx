@@ -15,7 +15,7 @@ export function WorkGroupsManager() {
     <>
       <header className="flex flex-wrap items-start justify-between gap-3">
         <div className="space-y-3">
-          <h1 className="text-3xl font-bold text-slate-900">ตั้งค่ากลุ่มงาน</h1>
+          <h1 className="h1-topic text-primary">ตั้งค่ากลุ่มงาน</h1>
         </div>
 
         <Button type="button" onClick={() => setIsCreateVisible((prev) => !prev)}>

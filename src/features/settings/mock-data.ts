@@ -11,7 +11,7 @@ export interface ProcurementRoleSetting {
   label: string;
   member_ids: string[];
   allow_multiple: boolean;
-  delegation: DelegationPayload | null;
+  delegation: DelegationPayload[];
 }
 
 export interface WorkGroupSetting {
@@ -46,28 +46,28 @@ export const PROCUREMENT_ROLE_SETTINGS: ProcurementRoleSetting[] = [
     label: 'ผู้อำนวยการฝ่ายการพัสดุ',
     member_ids: [DIRECTOR_USER_ID],
     allow_multiple: false,
-    delegation: null,
+    delegation: [],
   },
   {
     id: 'document',
     label: 'เจ้าหน้าที่สารบรรณ',
     member_ids: ['u-201'],
     allow_multiple: true,
-    delegation: null,
+    delegation: [],
   },
   {
     id: 'finance',
     label: 'เจ้าหน้าที่ติดต่อการเงิน',
     member_ids: ['u-202'],
     allow_multiple: true,
-    delegation: null,
+    delegation: [],
   },
   {
     id: 'admin',
     label: 'Admin',
     member_ids: [DIRECTOR_USER_ID, 'u-202'],
     allow_multiple: true,
-    delegation: null,
+    delegation: [],
   },
 ];
 

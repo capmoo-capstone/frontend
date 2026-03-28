@@ -35,19 +35,19 @@ export type DelegationPayload = z.infer<typeof DelegationSchema>;
 export const DelegationWithFutureDateSchema = DelegationSchema.superRefine((data, ctx) => {
   const today = startOfToday();
 
-  if (data.start_date && data.start_date <= today) {
+  if (data.start_date && data.start_date < today) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
-      message: 'วันที่เริ่มต้นต้องเป็นวันในอนาคต',
+      message: 'วันที่เริ่มต้นต้องเป็นวันนี้หรือในอนาคต',
       path: ['start_date'],
     });
   }
 
   if (!data.is_permanent && data.end_date) {
-    if (data.end_date <= today) {
+    if (data.end_date < today) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: 'วันที่สิ้นสุดต้องเป็นวันในอนาคต',
+        message: 'วันที่สิ้นสุดต้องเป็นวันนี้หรือในอนาคต',
         path: ['end_date'],
       });
     }
@@ -197,7 +197,7 @@ export const createProcurementRoleSchema = (context: ProcurementRoleValidationCo
   return z
     .object({
       member_ids: z.array(z.string()).min(1, 'กรุณาเลือกเจ้าหน้าที่อย่างน้อย 1 คน'),
-      delegation: DelegationWithFutureDateSchema.nullable().optional(),
+      delegations: z.array(DelegationWithFutureDateSchema).default([]),
     })
     .superRefine((data, ctx) => {
       if (!context.allowMultiple && data.member_ids.length > 1) {
@@ -213,6 +213,14 @@ export const createProcurementRoleSchema = (context: ProcurementRoleValidationCo
           code: z.ZodIssueCode.custom,
           message: 'ตำแหน่งผู้อำนวยการกำหนดได้เพียง 1 คนเท่านั้น',
           path: ['member_ids'],
+        });
+      }
+
+      if (context.isDirectorRole && data.delegations.length > 1) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'ตำแหน่งผู้อำนวยการกำหนดผู้รักษาการได้เพียง 1 รายการเท่านั้น',
+          path: ['delegations'],
         });
       }
     });

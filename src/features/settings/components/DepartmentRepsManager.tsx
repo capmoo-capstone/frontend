@@ -25,7 +25,7 @@ export function DepartmentRepsManager() {
   return (
     <>
       <header className="flex flex-row flex-wrap items-center justify-between space-y-3">
-        <h1 className="text-primary text-3xl font-bold">ตั้งค่าตัวแทนหน่วยงาน</h1>
+        <h1 className="text-primary h1-topic">ตั้งค่าตัวแทนหน่วยงาน</h1>
 
         <div className="relative w-sm">
           <Input

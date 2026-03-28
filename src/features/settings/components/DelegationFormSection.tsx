@@ -1,10 +1,9 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect } from 'react';
 import { Controller, useForm, useWatch } from 'react-hook-form';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 
-import { Checkbox } from '@/components/ui/checkbox';
 import { DatePicker } from '@/components/ui/date-picker';
 import type { SettingsPerson } from '@/features/settings/mock-data';
 import { type DelegationPayload, DelegationWithFutureDateSchema } from '@/features/settings/types';
@@ -14,7 +13,7 @@ interface DelegationFormSectionProps {
   value: DelegationPayload | null;
   onChange: (payload: DelegationPayload | null) => void;
   people: SettingsPerson[];
-  roleContext: 'director' | 'group-head';
+  resetKey?: number;
 }
 
 type DelegationFormInput = z.input<typeof DelegationWithFutureDateSchema>;
@@ -23,7 +22,7 @@ export function DelegationFormSection({
   value,
   onChange,
   people,
-  roleContext,
+  resetKey,
 }: DelegationFormSectionProps) {
   const form = useForm<DelegationFormInput>({
     resolver: zodResolver(DelegationWithFutureDateSchema),
@@ -32,9 +31,23 @@ export function DelegationFormSection({
       user_id: value?.user_id ?? '',
       start_date: value?.start_date,
       end_date: value?.end_date,
-      is_permanent: value?.is_permanent ?? false,
+      is_permanent: false,
     },
   });
+
+  useEffect(() => {
+    if (resetKey === undefined) return;
+
+    form.reset(
+      {
+        user_id: '',
+        start_date: undefined,
+        end_date: undefined,
+        is_permanent: false,
+      },
+      { keepValues: false }
+    );
+  }, [form, resetKey]);
 
   const formValue = useWatch({ control: form.control });
 
@@ -54,11 +67,6 @@ export function DelegationFormSection({
     formValue.user_id,
     onChange,
   ]);
-
-  const selectedUserName = useMemo(() => {
-    if (!formValue.user_id) return '';
-    return people.find((person) => person.id === formValue.user_id)?.full_name || '';
-  }, [formValue.user_id, people]);
 
   return (
     <div className="space-y-2">
@@ -92,6 +100,7 @@ export function DelegationFormSection({
               setDate={field.onChange}
               className="w-44 bg-white"
               placeholder="Pick a date"
+              disabledDays={{ before: new Date() }}
             />
           )}
         />
@@ -99,35 +108,19 @@ export function DelegationFormSection({
         <Controller
           control={form.control}
           name="end_date"
-          render={({ field }) => (
-            <DatePicker
-              date={field.value}
-              setDate={field.onChange}
-              disabled={formValue.is_permanent}
-              className="w-44 bg-white"
-              placeholder="Pick a date"
-            />
-          )}
-        />
-        <div className="ml-1 flex items-center gap-2">
-          <Controller
-            control={form.control}
-            name="is_permanent"
-            render={({ field }) => (
-              <Checkbox
-                checked={field.value || false}
-                onCheckedChange={(checked) => {
-                  const nextValue = checked === true;
-                  field.onChange(nextValue);
-                  if (nextValue) {
-                    form.setValue('end_date', undefined, { shouldValidate: true });
-                  }
-                }}
+          render={({ field }) => {
+            const minEndDate = formValue.start_date ? new Date(formValue.start_date) : new Date();
+            return (
+              <DatePicker
+                date={field.value}
+                setDate={field.onChange}
+                className="w-44 bg-white"
+                placeholder="Pick a date"
+                disabledDays={{ before: minEndDate }}
               />
-            )}
-          />
-          <span className="text-sm text-slate-600">ไม่กำหนดวันที่สิ้นสุด</span>
-        </div>
+            );
+          }}
+        />
       </div>
 
       {(form.formState.errors.user_id ||
@@ -142,14 +135,6 @@ export function DelegationFormSection({
             <p>{form.formState.errors.end_date.message}</p>
           )}
         </div>
-      )}
-
-      {formValue.is_permanent && selectedUserName && (
-        <p className="text-xs text-amber-700">
-          เมื่อถึงเวลา 00:00 ของวันที่เริ่มต้น ระบบจะอัปเดต
-          {roleContext === 'director' ? 'ผู้อำนวยการคนใหม่' : 'หัวหน้ากลุ่มงานคนใหม่'} เป็น{' '}
-          {selectedUserName} โดยอัตโนมัติ
-        </p>
       )}
     </div>
   );

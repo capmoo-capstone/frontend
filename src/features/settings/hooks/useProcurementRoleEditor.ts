@@ -20,12 +20,13 @@ export function useProcurementRoleEditor({
   const [isEditing, setIsEditing] = useState(false);
   const [draftMemberIds, setDraftMemberIds] = useState<string[]>(role.member_ids);
   const [memberToAdd, setMemberToAdd] = useState('');
-  const [memberToAddLabel, setMemberToAddLabel] = useState('');
-  const [showDelegation, setShowDelegation] = useState(false);
-  const [delegation, setDelegation] = useState<DelegationPayload | null>(role.delegation);
+  const [draftDelegations, setDraftDelegations] = useState<DelegationPayload[]>(role.delegation);
+  const [delegationToAdd, setDelegationToAdd] = useState<DelegationPayload | null>(null);
+  const [delegationFormResetKey, setDelegationFormResetKey] = useState(0);
   const [error, setError] = useState('');
 
   const isDirectorRole = role.id === DIRECTOR_ROLE_ID;
+  const directorMemberId = draftMemberIds[0] ?? '';
 
   const selectedNames = useMemo(
     () => draftMemberIds.map((memberId) => getPersonNameById(memberId)).join(', '),
@@ -44,15 +45,35 @@ export function useProcurementRoleEditor({
     }
 
     setMemberToAdd('');
-    setMemberToAddLabel('');
   };
 
   const handleRemoveMember = (memberId: string) => {
     setDraftMemberIds((prev) => prev.filter((id) => id !== memberId));
   };
 
-  const handleToggleDelegation = () => {
-    setShowDelegation((prev) => !prev);
+  const handleSetDirectorMember = (memberId: string) => {
+    setDraftMemberIds(memberId ? [memberId] : []);
+  };
+
+  const handleAddDelegation = () => {
+    if (!delegationToAdd) {
+      setError('กรุณากรอกข้อมูลการมอบหมายให้ครบถ้วน');
+      return;
+    }
+
+    if (isDirectorRole && draftDelegations.length >= 1) {
+      setError('ตำแหน่งผู้อำนวยการกำหนดผู้รักษาการได้เพียง 1 รายการเท่านั้น');
+      return;
+    }
+
+    setDraftDelegations((prev) => [...prev, delegationToAdd]);
+    setDelegationToAdd(null);
+    setDelegationFormResetKey((prev) => prev + 1);
+    setError('');
+  };
+
+  const handleRemoveDelegation = (index: number) => {
+    setDraftDelegations((prev) => prev.filter((_, currentIndex) => currentIndex !== index));
   };
 
   const handleEdit = () => {
@@ -68,7 +89,7 @@ export function useProcurementRoleEditor({
     });
     const parsed = schema.safeParse({
       member_ids: draftMemberIds,
-      delegation: showDelegation ? delegation : null,
+      delegations: draftDelegations,
     });
 
     if (!parsed.success) {
@@ -76,10 +97,11 @@ export function useProcurementRoleEditor({
       return;
     }
 
-    if (isDirectorRole && delegation?.user_id) {
+    if (isDirectorRole && draftDelegations.length > 0) {
       const otherRoles = allRoles.filter((item) => item.id !== role.id);
+      const delegatedUserIds = new Set(draftDelegations.map((item) => item.user_id));
       const isHeadElsewhere = otherRoles.some((item) =>
-        item.member_ids.includes(delegation.user_id)
+        item.member_ids.some((memberId) => delegatedUserIds.has(memberId))
       );
       if (isHeadElsewhere) {
         const confirmed = window.confirm(
@@ -92,39 +114,40 @@ export function useProcurementRoleEditor({
     onSave({
       ...role,
       member_ids: draftMemberIds,
-      delegation: showDelegation ? delegation : null,
+      delegation: draftDelegations,
     });
     setIsEditing(false);
   };
 
   const handleCancel = () => {
     setDraftMemberIds(role.member_ids);
-    setDelegation(role.delegation);
-    setShowDelegation(!!role.delegation);
+    setDraftDelegations(role.delegation);
+    setDelegationToAdd(null);
     setMemberToAdd('');
-    setMemberToAddLabel('');
     setError('');
     setIsEditing(false);
   };
 
   return {
-    delegation,
+    delegationToAdd,
+    delegationFormResetKey,
+    directorMemberId,
+    draftDelegations,
     draftMemberIds,
     error,
     isDirectorRole,
     isEditing,
     memberToAdd,
-    memberToAddLabel,
     selectedNames,
-    setDelegation,
+    setDelegationToAdd,
     setMemberToAdd,
-    setMemberToAddLabel,
-    showDelegation,
     handleAddMember,
+    handleAddDelegation,
     handleCancel,
     handleEdit,
+    handleRemoveDelegation,
     handleRemoveMember,
+    handleSetDirectorMember,
     handleSave,
-    handleToggleDelegation,
   };
 }

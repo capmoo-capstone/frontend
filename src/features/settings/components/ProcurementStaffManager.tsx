@@ -90,10 +90,8 @@ function RoleRow({ role, allRoles, onSave }: RoleRowProps) {
               role.delegation.map((delegation, index) => (
                 <p key={`${delegation.user_id}-${index}`} className="text-muted-foreground caption">
                   รักษาการโดย {getPersonNameById(delegation.user_id)} เริ่ม{' '}
-                  {formatDateThaiShort(delegation.start_date)}
-                  {delegation.end_date
-                    ? ` สิ้นสุด ${formatDateThaiShort(delegation.end_date)}`
-                    : ''}
+                  {formatDateThaiShort(delegation.start_date)} สิ้นสุด{' '}
+                  {formatDateThaiShort(delegation.end_date)}
                 </p>
               ))}
           </div>

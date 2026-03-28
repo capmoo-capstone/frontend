@@ -20,9 +20,11 @@ export function WorkGroupsManager() {
 
         <Popover open={isCreateVisible} onOpenChange={setIsCreateVisible}>
           <PopoverTrigger asChild>
-            <Button type="button">+ สร้างกลุ่มงานใหม่</Button>
+            <Button variant="secondary" type="button">
+              + สร้างกลุ่มงานใหม่
+            </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-[min(42rem,calc(100vw-1rem))] p-0" align="end">
+          <PopoverContent className="w-lg" align="end">
             <CreateGroupPanel
               groups={groups}
               onCancel={() => setIsCreateVisible(false)}

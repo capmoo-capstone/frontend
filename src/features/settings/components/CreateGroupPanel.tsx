@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Save, X } from 'lucide-react';
+import { Check, X } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -19,7 +19,7 @@ import { UserSelect } from '@/features/users/components/UserSelect';
 import { RESPONSIBLE_SELECT_OPTIONS } from '@/lib/formatters';
 import { cn } from '@/lib/utils';
 
-import { getFormErrorMessages, normalizeDelegation } from './workGroupFormUtils';
+import { normalizeDelegation } from './workGroupFormUtils';
 
 interface CreateGroupPanelProps {
   groups: WorkGroupSetting[];
@@ -43,7 +43,7 @@ export function CreateGroupPanel({ groups, onCancel, onCreate }: CreateGroupPane
     handleSubmit,
     watch,
     setValue,
-    formState: { errors: formErrors },
+    formState: { errors: formErrors, touchedFields },
   } = useForm<WorkGroupFormInput>({
     resolver: zodResolver(createGroupValidationSchema),
     defaultValues: {
@@ -58,12 +58,16 @@ export function CreateGroupPanel({ groups, onCancel, onCreate }: CreateGroupPane
   const draft = watch();
   const [newGroupId] = useState(() => `wg-${Date.now()}`);
 
-  const validationErrors = useMemo(() => getFormErrorMessages(formErrors), [formErrors]);
-
   const usedWorkflowTypes = useMemo(
     () => new Set(groups.flatMap((group) => group.workflow_types)),
     [groups]
   );
+
+  const duplicateHeadWarning = useMemo(() => {
+    if (!draft.head_id) return undefined;
+    const isDuplicate = groups.some((group) => group.head_id === draft.head_id);
+    return isDuplicate ? 'หัวหน้างานที่เลือกซ้ำกับกลุ่มงานอื่น' : undefined;
+  }, [draft.head_id, groups]);
 
   const handleCreate = handleSubmit((values) => {
     onCreate({
@@ -75,12 +79,15 @@ export function CreateGroupPanel({ groups, onCancel, onCreate }: CreateGroupPane
   });
 
   return (
-    <aside className="rounded-lg border border-slate-200 bg-white p-4">
-      <h3 className="mb-4 text-xl font-semibold text-slate-900">เพิ่มกลุ่มงาน</h3>
+    <aside className="rounded-md bg-white">
+      <h3 className="text-primary h2-topic mb-4">เพิ่มกลุ่มงาน</h3>
 
       <div className="space-y-4">
         <div className="space-y-1">
-          <label className="normal font-semibold">ชื่อกลุ่มงาน *</label>
+          <label className="normal font-semibold">
+            ชื่อกลุ่มงาน
+            <span className="text-error">*</span>
+          </label>
           <Controller
             control={control}
             name="name"
@@ -88,15 +95,23 @@ export function CreateGroupPanel({ groups, onCancel, onCreate }: CreateGroupPane
               <Input
                 value={field.value}
                 onChange={field.onChange}
+                onBlur={field.onBlur}
                 placeholder="กรุณากรอกชื่อกลุ่มงาน"
+                className={cn(formErrors.name && touchedFields.name && 'border-error')}
               />
             )}
           />
+          {formErrors.name && touchedFields.name && (
+            <p className="caption text-error">กรุณากรอกชื่อกลุ่มงาน</p>
+          )}
         </div>
 
         <div className="space-y-1">
-          <label className="normal font-semibold">ประเภทวิธีการจัดหา *</label>
-          <div className="flex flex-wrap gap-2 rounded-md border border-slate-200 p-2">
+          <label className="normal font-semibold">
+            ประเภทวิธีการจัดหา
+            <span className="text-error">*</span>
+          </label>
+          <div className="flex flex-wrap gap-2">
             {RESPONSIBLE_SELECT_OPTIONS.filter(
               (option) => !usedWorkflowTypes.has(option.value)
             ).map((option) => {
@@ -106,10 +121,10 @@ export function CreateGroupPanel({ groups, onCancel, onCreate }: CreateGroupPane
                   key={option.value}
                   type="button"
                   className={cn(
-                    'normal rounded-md border px-2.5 py-1',
+                    'normal cursor-pointer rounded-md border px-2.5 py-1',
                     isSelected
-                      ? 'border-pink-300 bg-pink-50 text-pink-700'
-                      : 'border-slate-200 bg-white text-slate-700'
+                      ? 'border-brand-6 bg-brand-3 text-brand-11'
+                      : 'border-border text-primary bg-white'
                   )}
                   onClick={() => {
                     setValue(
@@ -128,8 +143,11 @@ export function CreateGroupPanel({ groups, onCancel, onCreate }: CreateGroupPane
           </div>
         </div>
 
-        <div className="space-y-1">
-          <label className="normal font-semibold">หัวหน้ากลุ่มงาน *</label>
+        <div className="flex flex-col space-y-1">
+          <label className="normal font-semibold">
+            หัวหน้ากลุ่มงาน
+            <span className="text-error">*</span>
+          </label>
           <Controller
             control={control}
             name="head_id"
@@ -140,27 +158,31 @@ export function CreateGroupPanel({ groups, onCancel, onCreate }: CreateGroupPane
                 options={PROCUREMENT_PEOPLE.filter((person) => person.id !== DIRECTOR_USER_ID)}
                 onChange={field.onChange}
                 hasClearButton={false}
+                placeholder="กรุณาเลือกหัวหน้ากลุ่มงาน"
+                className={cn('min-w-full', formErrors.head_id && 'border-error')}
               />
             )}
           />
+          {duplicateHeadWarning && (
+            <p className="caption flex items-center gap-1 text-yellow-600">
+              {duplicateHeadWarning}
+            </p>
+          )}
         </div>
 
         <div className="flex items-center justify-end gap-2">
-          <Button type="button" onClick={handleCreate}>
-            <Save className="mr-1 h-4 w-4" /> สร้างกลุ่มงาน
+          <Button
+            type="button"
+            variant="brand"
+            onClick={handleCreate}
+            disabled={Object.keys(formErrors).length > 0}
+          >
+            <Check className="mr-1 h-4 w-4" /> สร้างกลุ่มงาน
           </Button>
           <Button type="button" variant="outline" onClick={onCancel}>
             <X className="mr-1 h-4 w-4" /> ยกเลิก
           </Button>
         </div>
-
-        {validationErrors.length > 0 && (
-          <div className="caption space-y-1 text-red-500">
-            {validationErrors.map((error) => (
-              <p key={error}>{error}</p>
-            ))}
-          </div>
-        )}
       </div>
     </aside>
   );

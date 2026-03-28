@@ -86,7 +86,8 @@ export const RESPONSIBLE_SELECT_OPTIONS: { value: UnitResponsibleType; label: st
   { value: 'MT500K', label: 'ซื้อ/จ้าง แบบเจาะจง เกิน 5 แสน' },
   { value: 'SELECTION', label: 'ซื้อ/จ้าง แบบคัดเลือก' },
   { value: 'EBIDDING', label: 'ซื้อ/จ้าง แบบประกาศเชิญชวนทั่วไป' },
-  { value: 'CONTRACT', label: 'ข้อ 18' },
+  { value: 'CONTRACT', label: 'บริหารสัญญา' },
+  { value: 'NO18', label: 'ข้อ 18' },
 ];
 
 export const getResponsibleTypeFormat = (type: UnitResponsibleType) => {
@@ -130,6 +131,12 @@ export const getResponsibleTypeFormat = (type: UnitResponsibleType) => {
         label: 'บริหารสัญญา',
         indicator: 'var(--chart-6-dark)',
         bg: 'var(--chart-6-light)',
+      };
+    case 'NO18':
+      return {
+        label: 'ข้อ 18',
+        indicator: 'var(--chart-7-dark)',
+        bg: 'var(--chart-7-light)',
       };
 
     default:

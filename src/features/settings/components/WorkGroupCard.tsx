@@ -321,12 +321,13 @@ export function WorkGroupCard({ group, groups, onSave }: WorkGroupCardProps) {
               </div>
             </div>
           ) : (
-            <p className="normal pt-2 text-slate-700">
+            <p className="normal text-primary pt-2">
               {getPersonNameById(group.head_id)}
               {group.delegation?.user_id && group.delegation.start_date && (
-                <span className="caption ml-2 text-slate-500">
-                  (รักษาการแทนโดย {getPersonNameById(group.delegation.user_id)} เริ่ม
-                  {formatDateThaiShort(group.delegation.start_date)})
+                <span className="caption text-muted-foreground ml-2">
+                  ( รักษาการโดย {getPersonNameById(group.delegation.user_id)} เริ่ม{' '}
+                  {formatDateThaiShort(group.delegation.start_date)} สิ้นสุด{' '}
+                  {formatDateThaiShort(group.delegation.end_date)} )
                 </span>
               )}
             </p>

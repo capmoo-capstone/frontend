@@ -17,7 +17,7 @@ import {
   createWorkGroupValidationSchema,
 } from '@/features/settings/types';
 import { UserSelect } from '@/features/users/components/UserSelect';
-import { RESPONSIBLE_SELECT_OPTIONS } from '@/lib/formatters';
+import { RESPONSIBLE_SELECT_OPTIONS, formatDateThaiShort } from '@/lib/formatters';
 import { cn } from '@/lib/utils';
 
 import { DelegationFormSection } from './DelegationFormSection';
@@ -242,7 +242,7 @@ export function WorkGroupCard({ group, groups, onSave }: WorkGroupCardProps) {
                 {group.delegation?.user_id && group.delegation.start_date && (
                   <span className="ml-2 text-xs text-slate-500">
                     (รักษาการแทนโดย {getPersonNameById(group.delegation.user_id)} เริ่ม
-                    {formatThaiDate(group.delegation.start_date)})
+                    {formatDateThaiShort(group.delegation.start_date)})
                   </span>
                 )}
               </p>
@@ -364,12 +364,3 @@ export function WorkGroupCard({ group, groups, onSave }: WorkGroupCardProps) {
     </section>
   );
 }
-
-const formatThaiDate = (date?: Date) => {
-  if (!date) return '-';
-  return new Intl.DateTimeFormat('th-TH', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-  }).format(date);
-};

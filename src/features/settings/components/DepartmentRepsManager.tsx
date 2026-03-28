@@ -45,14 +45,14 @@ export function DepartmentRepsManager() {
       ) : (
         <Accordion
           type="multiple"
-          className="space-y-4"
+          className="space-y-4 pb-4"
           defaultValue={filteredDepartments.map((department) => department.id)}
         >
           {filteredDepartments.map((department) => (
             <AccordionItem
               key={department.id}
               value={department.id}
-              className="border-border rounded-md border bg-white px-6"
+              className="border-border rounded-md border bg-white px-6 last:border"
             >
               <AccordionTrigger className="h2-topic font-semibold hover:no-underline">
                 <div className="flex items-center">

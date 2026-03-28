@@ -70,6 +70,7 @@ export const WorkGroupSchema = z.object({
 });
 
 export type WorkGroupPayload = z.infer<typeof WorkGroupSchema>;
+export type WorkGroupFormInput = z.input<typeof WorkGroupSchema>;
 
 export interface WorkGroupValidationInput {
   id?: string;

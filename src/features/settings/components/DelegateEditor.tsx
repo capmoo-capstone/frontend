@@ -47,7 +47,7 @@ export function DelegateEditor({
   return (
     <form onSubmit={submit} className="space-y-3">
       <div className="space-y-1">
-        <label className="text-sm font-medium">ผู้รับมอบหมาย *</label>
+        <label className="normal font-medium">ผู้รับมอบหมาย *</label>
         <UserSelect
           value={form.watch('user_id')}
           deptId={departmentId}
@@ -56,7 +56,7 @@ export function DelegateEditor({
           hasClearButton={false}
         />
         {form.formState.errors.user_id?.message && (
-          <p className="text-xs text-red-500">{form.formState.errors.user_id.message}</p>
+          <p className="caption text-red-500">{form.formState.errors.user_id.message}</p>
         )}
       </div>
 

@@ -57,17 +57,12 @@ export function DelegationFormSection({
     });
 
     onChange(parsed.success ? parsed.data : null);
-  }, [
-    formValue.end_date,
-    formValue.start_date,
-    formValue.user_id,
-    onChange,
-  ]);
+  }, [formValue.end_date, formValue.start_date, formValue.user_id, onChange]);
 
   return (
     <div className="space-y-2">
       <div className="flex flex-wrap items-center gap-3">
-        <span className="w-20 normal">ตั้งผู้แทน</span>
+        <span className="normal w-20">ตั้งผู้แทน</span>
         <Controller
           control={form.control}
           name="user_id"
@@ -86,7 +81,7 @@ export function DelegationFormSection({
       </div>
 
       <div className="flex flex-wrap items-center gap-3">
-        <span className="w-20 normal">ตั้งแต่วันที่</span>
+        <span className="normal w-20">ตั้งแต่วันที่</span>
         <Controller
           control={form.control}
           name="start_date"
@@ -122,7 +117,7 @@ export function DelegationFormSection({
       {(form.formState.errors.user_id ||
         form.formState.errors.start_date ||
         form.formState.errors.end_date) && (
-        <div className="space-y-1 text-xs text-red-500">
+        <div className="caption space-y-1 text-red-500">
           {form.formState.errors.user_id?.message && <p>{form.formState.errors.user_id.message}</p>}
           {form.formState.errors.start_date?.message && (
             <p>{form.formState.errors.start_date.message}</p>

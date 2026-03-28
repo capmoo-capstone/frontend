@@ -31,7 +31,7 @@ export function DepartmentUnitRepRow({ departmentId, unit }: DepartmentUnitRepRo
       editContent={
         <div className="space-y-2">
           <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
-            <span className="text-primary w-full shrink-0 normal sm:w-40">
+            <span className="text-primary normal w-full shrink-0 sm:w-40">
               ตั้งตัวแทนหน่วยงาน <span className="text-error">*</span>
             </span>
             <div className="w-full min-w-0 sm:flex-1">
@@ -41,13 +41,13 @@ export function DepartmentUnitRepRow({ departmentId, unit }: DepartmentUnitRepRo
                 unitId={unit.id}
                 onChange={(userId) => handleSelectUser(userId)}
                 onSelectUser={(user) => handleSelectUser(user.id, user.full_name)}
-                className="w-full max-w-full min-w-0 sm:max-w-xs"
+                className="min-w-[320px]"
                 placeholder="กรุณาเลือกเจ้าหน้าที่"
                 hasClearButton={false}
               />
             </div>
           </div>
-          {error && <p className="text-xs text-red-500">{error}</p>}
+          {error && <p className="caption text-red-500">{error}</p>}
         </div>
       }
       onEdit={() => setIsEditing(true)}

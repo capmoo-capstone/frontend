@@ -80,7 +80,7 @@ export function CreateGroupPanel({ groups, onCancel, onCreate }: CreateGroupPane
 
       <div className="space-y-4">
         <div className="space-y-1">
-          <label className="text-sm font-semibold">ชื่อกลุ่มงาน *</label>
+          <label className="normal font-semibold">ชื่อกลุ่มงาน *</label>
           <Controller
             control={control}
             name="name"
@@ -95,7 +95,7 @@ export function CreateGroupPanel({ groups, onCancel, onCreate }: CreateGroupPane
         </div>
 
         <div className="space-y-1">
-          <label className="text-sm font-semibold">ประเภทวิธีการจัดหา *</label>
+          <label className="normal font-semibold">ประเภทวิธีการจัดหา *</label>
           <div className="flex flex-wrap gap-2 rounded-md border border-slate-200 p-2">
             {RESPONSIBLE_SELECT_OPTIONS.filter(
               (option) => !usedWorkflowTypes.has(option.value)
@@ -106,7 +106,7 @@ export function CreateGroupPanel({ groups, onCancel, onCreate }: CreateGroupPane
                   key={option.value}
                   type="button"
                   className={cn(
-                    'rounded-md border px-2.5 py-1 text-sm',
+                    'normal rounded-md border px-2.5 py-1',
                     isSelected
                       ? 'border-pink-300 bg-pink-50 text-pink-700'
                       : 'border-slate-200 bg-white text-slate-700'
@@ -129,7 +129,7 @@ export function CreateGroupPanel({ groups, onCancel, onCreate }: CreateGroupPane
         </div>
 
         <div className="space-y-1">
-          <label className="text-sm font-semibold">หัวหน้ากลุ่มงาน *</label>
+          <label className="normal font-semibold">หัวหน้ากลุ่มงาน *</label>
           <Controller
             control={control}
             name="head_id"
@@ -155,7 +155,7 @@ export function CreateGroupPanel({ groups, onCancel, onCreate }: CreateGroupPane
         </div>
 
         {validationErrors.length > 0 && (
-          <div className="space-y-1 text-xs text-red-500">
+          <div className="caption space-y-1 text-red-500">
             {validationErrors.map((error) => (
               <p key={error}>{error}</p>
             ))}

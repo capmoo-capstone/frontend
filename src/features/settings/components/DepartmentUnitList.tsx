@@ -10,7 +10,7 @@ export function DepartmentUnitList({ departmentId }: DepartmentUnitListProps) {
 
   if (!isLoading && (!units || units.length === 0)) {
     return (
-      <div className="text-muted-foreground py-4 text-center text-sm">
+      <div className="text-muted-foreground normal py-4 text-center">
         ยังไม่มีฝ่ายงานในหน่วยงานนี้
       </div>
     );

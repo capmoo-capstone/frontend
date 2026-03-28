@@ -179,7 +179,7 @@ export function WorkGroupCard({ group, groups, onSave }: WorkGroupCardProps) {
 
       <div className="space-y-4">
         <div className="flex flex-wrap items-start gap-3">
-          <span className="min-w-27.5 pt-1 text-sm font-semibold">ประเภทวิธีการจัดหา *</span>
+          <span className="normal min-w-27.5 pt-1 font-semibold">ประเภทวิธีการจัดหา *</span>
           <div className="flex-1 space-y-2">
             <WorkflowTags
               types={draft.workflow_types}
@@ -219,7 +219,7 @@ export function WorkGroupCard({ group, groups, onSave }: WorkGroupCardProps) {
         </div>
 
         <div className="flex flex-wrap items-start gap-3">
-          <span className="min-w-27.5 pt-2 text-sm font-semibold">หัวหน้ากลุ่มงาน *</span>
+          <span className="normal min-w-27.5 pt-2 font-semibold">หัวหน้ากลุ่มงาน *</span>
           <div className="flex-1 space-y-2">
             {isEditing ? (
               <Controller
@@ -237,10 +237,10 @@ export function WorkGroupCard({ group, groups, onSave }: WorkGroupCardProps) {
                 )}
               />
             ) : (
-              <p className="pt-2 text-sm text-slate-700">
+              <p className="normal pt-2 text-slate-700">
                 {getPersonNameById(group.head_id)}
                 {group.delegation?.user_id && group.delegation.start_date && (
-                  <span className="ml-2 text-xs text-slate-500">
+                  <span className="caption ml-2 text-slate-500">
                     (รักษาการแทนโดย {getPersonNameById(group.delegation.user_id)} เริ่ม
                     {formatDateThaiShort(group.delegation.start_date)})
                   </span>
@@ -278,7 +278,7 @@ export function WorkGroupCard({ group, groups, onSave }: WorkGroupCardProps) {
         <div>
           <button
             type="button"
-            className="mb-2 flex items-center gap-2 text-sm font-semibold"
+            className="normal mb-2 flex items-center gap-2 font-semibold"
             onClick={() => setIsExpanded((prev) => !prev)}
           >
             เจ้าหน้าที่ ({draftMemberIds.length})
@@ -323,10 +323,7 @@ export function WorkGroupCard({ group, groups, onSave }: WorkGroupCardProps) {
 
               <ul className="divide-y rounded-md border border-slate-200">
                 {draftMemberIds.map((memberId) => (
-                  <li
-                    key={memberId}
-                    className="flex items-center justify-between px-3 py-2 text-sm"
-                  >
+                  <li key={memberId} className="normal flex items-center justify-between px-3 py-2">
                     <span>{getPersonNameById(memberId)}</span>
                     {isEditing && (
                       <button
@@ -353,7 +350,7 @@ export function WorkGroupCard({ group, groups, onSave }: WorkGroupCardProps) {
         </div>
 
         {validationErrors.length > 0 && (
-          <div className="space-y-1 text-xs text-red-500">
+          <div className="caption space-y-1 text-red-500">
             {validationErrors.map((error) => (
               <p key={error}>{error}</p>
             ))}

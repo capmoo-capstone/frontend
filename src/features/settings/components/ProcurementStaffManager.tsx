@@ -27,7 +27,7 @@ export function ProcurementStaffManager() {
 
       <section className="rounded-lg border border-slate-200 bg-white p-5">
         <div className="text-primary mb-4 flex items-center gap-2 text-lg font-semibold">
-          <div className="flex items-center">
+          <div className="h2-topic flex items-center">
             <Users className="mr-2 h-6 w-6" />
             เจ้าหน้าที่พัสดุ
           </div>
@@ -189,7 +189,7 @@ function RoleRow({ role, allRoles, onSave }: RoleRowProps) {
                     onChange={(id) => {
                       setMemberToAdd(id);
                     }}
-                    className="w-full max-w-[320px]"
+                    className="min-w-[320px]"
                     hasClearButton={false}
                   />
                   <Button
@@ -223,7 +223,7 @@ function RoleRow({ role, allRoles, onSave }: RoleRowProps) {
               </>
             )}
 
-            {error && <p className="caption text-red-500">{error}</p>}
+            {error && <p className="caption text-error">{error}</p>}
           </div>
         }
         onEdit={handleEdit}

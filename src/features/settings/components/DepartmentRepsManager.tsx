@@ -17,7 +17,7 @@ export function DepartmentRepsManager() {
   if (isLoading) {
     return (
       <div className="mx-auto w-full max-w-[1280px] p-6">
-        <p className="text-muted-foreground text-sm">กำลังโหลดข้อมูลหน่วยงาน...</p>
+        <p className="text-muted-foreground normal">กำลังโหลดข้อมูลหน่วยงาน...</p>
       </div>
     );
   }
@@ -39,7 +39,7 @@ export function DepartmentRepsManager() {
       </header>
 
       {filteredDepartments.length === 0 ? (
-        <div className="border-border text-muted-foreground rounded-md border border-dashed bg-white p-8 text-center text-sm">
+        <div className="border-border text-muted-foreground normal rounded-md border border-dashed bg-white p-8 text-center">
           ไม่พบข้อมูลหน่วยงาน
         </div>
       ) : (
@@ -54,8 +54,8 @@ export function DepartmentRepsManager() {
               value={department.id}
               className="border-border rounded-md border bg-white px-6 last:border"
             >
-              <AccordionTrigger className="h2-topic font-semibold hover:no-underline">
-                <div className="flex items-center">
+              <AccordionTrigger className="h2-topic hover:no-underline">
+                <div className="h2-topic flex items-center">
                   <Users className="mr-2 h-6 w-6" />
                   {department.name}
                 </div>

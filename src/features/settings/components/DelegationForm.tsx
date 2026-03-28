@@ -20,7 +20,7 @@ export function DelegationForm({
   return (
     <div className={className}>
       <div className="flex flex-wrap items-center gap-3 rounded-md bg-slate-50 p-3">
-        <span className="w-full text-sm font-medium text-red-500 sm:w-auto">{startLabel}</span>
+        <span className="normal w-full font-medium text-red-500 sm:w-auto">{startLabel}</span>
 
         <Controller
           name="start_date"
@@ -35,7 +35,7 @@ export function DelegationForm({
           )}
         />
 
-        <span className="text-sm font-medium text-slate-600">{endLabel}</span>
+        <span className="normal font-medium text-slate-600">{endLabel}</span>
 
         <Controller
           name="end_date"
@@ -55,7 +55,7 @@ export function DelegationForm({
         />
       </div>
 
-      <div className="mt-2 flex flex-col gap-1 text-xs text-red-500">
+      <div className="caption mt-2 flex flex-col gap-1 text-red-500">
         {form.formState.errors.start_date?.message && (
           <span>{form.formState.errors.start_date.message}</span>
         )}

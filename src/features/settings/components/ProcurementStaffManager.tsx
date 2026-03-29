@@ -25,7 +25,7 @@ export function ProcurementStaffManager() {
   };
 
   return (
-    <main>
+    <>
       <header className="space-y-3">
         <h1 className="h1-topic text-primary">ตั้งค่าเจ้าหน้าที่พัสดุ</h1>
       </header>
@@ -42,7 +42,7 @@ export function ProcurementStaffManager() {
           ))}
         </div>
       </section>
-    </main>
+    </>
   );
 }
 

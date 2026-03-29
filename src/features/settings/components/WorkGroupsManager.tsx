@@ -22,7 +22,7 @@ export function WorkGroupsManager() {
   }, []);
 
   return (
-    <main>
+    <>
       <header className="flex flex-wrap items-start justify-between gap-3">
         <h1 className="h1-topic text-primary">ตั้งค่ากลุ่มงาน</h1>
 
@@ -47,6 +47,6 @@ export function WorkGroupsManager() {
           <WorkGroupCard key={group.id} group={group} groups={groups} onSave={handleSaveGroup} />
         ))}
       </section>
-    </main>
+    </>
   );
 }

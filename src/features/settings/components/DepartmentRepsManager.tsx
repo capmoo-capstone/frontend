@@ -24,7 +24,7 @@ export function DepartmentRepsManager() {
 
   // TODO (BACKEND MIGRATION): Department search/filter and expansion defaults should be computed by the API for large datasets and pagination consistency.
   return (
-    <main>
+    <>
       <header className="flex flex-row flex-wrap items-center justify-between space-y-3">
         <h1 className="text-primary h1-topic">ตั้งค่าตัวแทนหน่วยงาน</h1>
 
@@ -68,6 +68,6 @@ export function DepartmentRepsManager() {
           ))}
         </Accordion>
       )}
-    </main>
+    </>
   );
 }

@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import { startOfToday } from 'date-fns';
 import { z } from 'zod';
 
 import { type DelegationPayload, DelegationWithFutureDateSchema } from '@/features/settings/types';
@@ -54,7 +55,7 @@ export function useDelegationFormSectionState({
     onChange(parsed.success ? parsed.data : null);
   }, [formValue.end_date, formValue.start_date, formValue.user_id, onChange]);
 
-  const minEndDate = formValue.start_date ? new Date(formValue.start_date) : new Date();
+  const minEndDate = formValue.start_date ? new Date(formValue.start_date) : startOfToday();
 
   return {
     form,

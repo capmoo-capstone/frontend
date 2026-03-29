@@ -9,10 +9,10 @@ export const DelegationSchema = z
   .object({
     user_id: z.string().min(1, 'กรุณาเลือกเจ้าหน้าที่'),
     start_date: z.date({ message: 'กรุณาเลือกวันเริ่มต้น' }),
-    end_date: z.date().optional(),
+    end_date: z.date({ message: 'กรุณาเลือกวันสิ้นสุด' }),
   })
   .superRefine((data, ctx) => {
-    if (data.start_date && data.end_date && data.end_date < data.start_date) {
+    if (data.start_date && data.end_date < data.start_date) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         message: 'วันสิ้นสุดต้องไม่น้อยกว่าวันเริ่มต้น',
@@ -34,21 +34,19 @@ export const DelegationWithFutureDateSchema = DelegationSchema.superRefine((data
     });
   }
 
-  if (data.end_date) {
-    if (data.end_date < today) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: 'วันที่สิ้นสุดต้องเป็นวันนี้หรือในอนาคต',
-        path: ['end_date'],
-      });
-    }
-    if (data.start_date && data.end_date <= data.start_date) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: 'วันที่สิ้นสุดต้องอยู่หลังวันที่เริ่มต้น',
-        path: ['end_date'],
-      });
-    }
+  if (data.end_date < today) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: 'วันที่สิ้นสุดต้องเป็นวันนี้หรือในอนาคต',
+      path: ['end_date'],
+    });
+  }
+  if (data.start_date && data.end_date <= data.start_date) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: 'วันที่สิ้นสุดต้องอยู่หลังวันที่เริ่มต้น',
+      path: ['end_date'],
+    });
   }
 });
 

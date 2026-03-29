@@ -12,7 +12,10 @@ export const useUsers = ({ page = 1, limit = 10 }: GetUsersParams) => {
   });
 };
 
-export const useUsersForSelection = ({ unitId, deptId }: GetUsersSelectionParams) => {
+export const useUsersForSelection = (
+  { unitId, deptId }: GetUsersSelectionParams,
+  options?: { enabled?: boolean }
+) => {
   return useQuery({
     queryKey: ['users', 'selection', { unitId, deptId }],
     queryFn: () => {
@@ -20,6 +23,6 @@ export const useUsersForSelection = ({ unitId, deptId }: GetUsersSelectionParams
       if (deptId) return getUsersForSelection({ deptId });
       throw new Error('Either unitId or deptId is required');
     },
-    enabled: !!unitId || !!deptId,
+    enabled: (options?.enabled ?? true) && (!!unitId || !!deptId),
   });
 };

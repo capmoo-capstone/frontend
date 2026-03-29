@@ -1,5 +1,7 @@
 import { Controller } from 'react-hook-form';
 
+import { startOfToday } from 'date-fns';
+
 import { DatePicker } from '@/components/ui/date-picker';
 import type { SettingsPerson } from '@/features/settings/mock-data';
 import { type DelegationPayload } from '@/features/settings/types';
@@ -58,7 +60,7 @@ export function DelegationFormSection({
               setDate={field.onChange}
               className="w-44 bg-white"
               placeholder="Pick a date"
-              disabledDays={{ before: new Date() }}
+              disabledDays={{ before: startOfToday() }}
             />
           )}
         />

@@ -201,9 +201,7 @@ function DirectorRoleEditContent({
                 </p>
                 <p className="text-muted-foreground caption">
                   เริ่ม {formatDateThaiShort(delegation.start_date)}
-                  {delegation.end_date
-                    ? ` สิ้นสุด ${formatDateThaiShort(delegation.end_date)}`
-                    : ' (ไม่กำหนดวันที่สิ้นสุด)'}
+                  {` สิ้นสุด ${formatDateThaiShort(delegation.end_date)}`}
                 </p>
                 <Button
                   type="button"

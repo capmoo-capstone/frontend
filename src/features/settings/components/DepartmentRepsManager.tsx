@@ -47,7 +47,7 @@ export function DepartmentRepsManager() {
         <Accordion
           type="multiple"
           className="space-y-4 pb-4"
-          defaultValue={filteredDepartments.map((department) => department.id)}
+          value={filteredDepartments.map((department) => department.id)}
         >
           {filteredDepartments.map((department) => (
             <AccordionItem

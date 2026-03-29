@@ -165,9 +165,7 @@ export function WorkGroupCard({ group, groups, onSave }: WorkGroupCardProps) {
                       </p>
                       <p className="text-muted-foreground caption">
                         เริ่ม {formatDateThaiShort(draftDelegation.start_date)}
-                        {draftDelegation.end_date
-                          ? ` สิ้นสุด ${formatDateThaiShort(draftDelegation.end_date)}`
-                          : ' (ไม่กำหนดวันที่สิ้นสุด)'}
+                        {` สิ้นสุด ${formatDateThaiShort(draftDelegation.end_date)}`}
                       </p>
                       <Button type="button" variant="destructive" onClick={removeDelegation}>
                         <Trash2 className="mr-1 h-4 w-4" /> ลบการมอบหมาย

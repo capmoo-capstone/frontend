@@ -48,9 +48,11 @@ export function UserSelect({
   disabled = false,
 }: UserSelectProps) {
   const [open, setOpen] = React.useState(false);
+  const shouldFetchUsers = !options;
 
   const { data, isLoading, isError } = useUsersForSelection(
-    unitId ? { unitId } : { deptId: deptId || '' }
+    unitId ? { unitId } : { deptId: deptId || '' },
+    { enabled: shouldFetchUsers }
   );
 
   const users = options ?? data?.data ?? [];

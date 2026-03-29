@@ -3,8 +3,9 @@ import { useEffect, useRef, useState } from 'react';
 import { type DateRange } from 'react-day-picker';
 
 import { isAfter, isBefore, startOfDay } from 'date-fns';
-import { CalendarIcon, CircleX } from 'lucide-react';
+import { CalendarIcon, X } from 'lucide-react';
 
+import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import { formatDateThai } from '@/lib/formatters';
 
@@ -376,7 +377,7 @@ export function DatePickerWithRange({ value, onChange }: DatePickerWithRangeProp
   return (
     <div
       ref={containerRef}
-      className="bg-background relative w-[17rem]"
+      className="bg-background relative w-[17rem] rounded-lg"
       onBlurCapture={handleContainerBlurCapture}
       onKeyDownCapture={handleContainerKeyDownCapture}
     >
@@ -385,20 +386,6 @@ export function DatePickerWithRange({ value, onChange }: DatePickerWithRangeProp
           fromInput.error || toInput.error ? 'border-destructive focus-within:ring-destructive' : ''
         }`}
       >
-        {hasSelection ? (
-          <button
-            type="button"
-            aria-label="ล้างช่วงวันที่"
-            title="ล้างช่วงวันที่"
-            onClick={handleClearRange}
-            className="text-muted-foreground hover:text-foreground mr-2 inline-flex h-6 w-6 shrink-0 cursor-pointer items-center justify-center rounded-sm"
-          >
-            <CircleX className="h-4 w-4" />
-          </button>
-        ) : (
-          <CalendarIcon className="text-muted-foreground mr-2 h-4 w-4 shrink-0" />
-        )}
-
         {/* Start */}
         <div className="relative flex flex-1 flex-col">
           {fromInput.isEmpty && (
@@ -443,6 +430,16 @@ export function DatePickerWithRange({ value, onChange }: DatePickerWithRangeProp
             inputMode="numeric"
             className="normal-normal w-full cursor-text bg-transparent font-mono outline-none"
           />
+        </div>
+
+        <div className="flex h-4 w-4 shrink-0 items-center justify-center">
+          {hasSelection ? (
+            <Button variant="ghost" onClick={handleClearRange}>
+              <X className="h-4 w-4" />
+            </Button>
+          ) : (
+            <CalendarIcon className="text-muted-foreground h-4 w-4" />
+          )}
         </div>
       </div>
 

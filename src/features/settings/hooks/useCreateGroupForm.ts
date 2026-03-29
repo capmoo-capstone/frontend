@@ -10,23 +10,22 @@ import {
 } from '@/features/settings/types';
 import { RESPONSIBLE_SELECT_OPTIONS } from '@/lib/formatters';
 
-import { normalizeDelegation } from '../components/workGroupFormUtils';
-
 interface UseCreateGroupFormParams {
   groups: WorkGroupSetting[];
+  directorUserId?: string;
   onCreate: (group: WorkGroupSetting) => void;
 }
 
-export function useCreateGroupForm({ groups, onCreate }: UseCreateGroupFormParams) {
+export function useCreateGroupForm({ groups, directorUserId, onCreate }: UseCreateGroupFormParams) {
   // TODO (BACKEND MIGRATION): Group creation validation and uniqueness constraints should be validated server-side to prevent race conditions across clients.
   const createGroupValidationSchema = useMemo(
     () =>
       createWorkGroupValidationSchema({
         currentGroupId: undefined,
         existingGroups: groups,
-        directorUserId: DIRECTOR_USER_ID,
+        directorUserId: directorUserId ?? DIRECTOR_USER_ID,
       }),
-    [groups]
+    [directorUserId, groups]
   );
 
   const form = useForm<WorkGroupFormInput>({
@@ -75,7 +74,7 @@ export function useCreateGroupForm({ groups, onCreate }: UseCreateGroupFormParam
       id: newGroupId,
       ...values,
       member_ids: values.member_ids ?? [],
-      delegation: normalizeDelegation(values.delegation),
+      delegation: values.delegation ?? null,
     });
   });
 

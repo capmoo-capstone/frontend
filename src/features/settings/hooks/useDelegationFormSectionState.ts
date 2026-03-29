@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -30,10 +30,13 @@ export function useDelegationFormSectionState({
     },
   });
 
+  const lastEmittedPayloadRef = useRef<DelegationPayload | null>(null);
+  const { reset, control } = form;
+
   useEffect(() => {
     if (resetKey === undefined) return;
 
-    form.reset(
+    reset(
       {
         user_id: '',
         start_date: undefined,
@@ -41,9 +44,9 @@ export function useDelegationFormSectionState({
       },
       { keepValues: false }
     );
-  }, [form, resetKey]);
+  }, [resetKey, reset]);
 
-  const formValue = useWatch({ control: form.control });
+  const formValue = useWatch({ control });
 
   useEffect(() => {
     const parsed = DelegationWithFutureDateSchema.safeParse({
@@ -52,7 +55,18 @@ export function useDelegationFormSectionState({
       end_date: formValue.end_date,
     });
 
-    onChange(parsed.success ? parsed.data : null);
+    const nextPayload = parsed.success ? parsed.data : null;
+    const prevPayload = lastEmittedPayloadRef.current;
+
+    const isSamePayload =
+      prevPayload?.user_id === nextPayload?.user_id &&
+      prevPayload?.start_date?.getTime() === nextPayload?.start_date?.getTime() &&
+      prevPayload?.end_date?.getTime() === nextPayload?.end_date?.getTime();
+
+    if (isSamePayload) return;
+
+    lastEmittedPayloadRef.current = nextPayload;
+    onChange(nextPayload);
   }, [formValue.end_date, formValue.start_date, formValue.user_id, onChange]);
 
   const minEndDate = formValue.start_date ? new Date(formValue.start_date) : startOfToday();

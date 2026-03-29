@@ -1,10 +1,8 @@
-export { DelegationForm } from './DelegationForm';
 export { DelegationFormSection } from './DelegationFormSection';
-export { DelegateEditor } from './DelegateEditor';
-export { DepartmentRepsManager } from './DepartmentRepsManager';
-export { DepartmentUnitList } from './DepartmentUnitList';
-export { DepartmentUnitRepRow } from './DepartmentUnitRepRow';
+export { DepartmentRepsManager } from './reps/DepartmentRepsManager';
+export { DepartmentUnitList } from './reps/DepartmentUnitList';
+export { DepartmentUnitRepRow } from './reps/DepartmentUnitRepRow';
 export { InlineActionRow } from './InlineActionRow';
-export { ProcurementStaffManager } from './ProcurementStaffManager';
-export { WorkGroupsManager } from './WorkGroupsManager';
-export { WorkflowTags } from './WorkflowTags';
+export { ProcurementStaffManager } from './p-staff/ProcurementStaffManager';
+export { WorkGroupsManager } from './work-group/WorkGroupsManager';
+export { WorkflowTags } from './work-group/WorkflowTags';

@@ -1,8 +1,5 @@
 import { useState } from 'react';
 
-import { useQueryClient } from '@tanstack/react-query';
-
-import { createDepartmentRepresentativeSchema } from '../types';
 import { useUpdateUnitRepresentative } from './useDepartmentReps';
 
 export interface UnitItem {
@@ -20,7 +17,6 @@ export function useUnitRepresentativeEditor({
   departmentId,
   unit,
 }: UseUnitRepresentativeEditorParams) {
-  const queryClient = useQueryClient();
   const updateRepresentative = useUpdateUnitRepresentative();
 
   const [isEditing, setIsEditing] = useState(false);
@@ -38,23 +34,6 @@ export function useUnitRepresentativeEditor({
   const handleSave = () => {
     if (!selectedUserId || !selectedUserName) return;
 
-    // TODO (BACKEND MIGRATION): Representative uniqueness checks across units should be enforced on the backend to prevent cross-client conflicts.
-    const allUnits = queryClient
-      .getQueriesData<Array<UnitItem>>({ queryKey: ['units'] })
-      .flatMap(([, units]) => units ?? [])
-      .map((item) => ({ unitId: item.id, userId: item.representative?.id }));
-
-    const schema = createDepartmentRepresentativeSchema({
-      currentUnitId: unit.id,
-      allAssignments: allUnits,
-    });
-
-    const parsed = schema.safeParse({ user_id: selectedUserId });
-    if (!parsed.success) {
-      setError(parsed.error.issues[0]?.message || 'ข้อมูลไม่ถูกต้อง');
-      return;
-    }
-
     setError('');
 
     updateRepresentative.mutate(
@@ -67,6 +46,9 @@ export function useUnitRepresentativeEditor({
       {
         onSuccess: () => {
           setIsEditing(false);
+        },
+        onError: () => {
+          setError('ยังไม่สามารถบันทึกได้ กรุณาลองใหม่อีกครั้ง');
         },
       }
     );

@@ -1,4 +1,4 @@
-import { keepPreviousData, useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQueries, useQuery } from '@tanstack/react-query';
 
 import { getUsers, getUsersForSelection } from '../api';
 import type { GetUsersParams, GetUsersSelectionParams } from '../types';
@@ -24,5 +24,15 @@ export const useUsersForSelection = (
       throw new Error('Either unitId or deptId is required');
     },
     enabled: (options?.enabled ?? true) && (!!unitId || !!deptId),
+  });
+};
+
+export const useUsersForUnitsSelection = (unitIds: string[]) => {
+  return useQueries({
+    queries: unitIds.map((unitId) => ({
+      queryKey: ['users', 'selection', { unitId }],
+      queryFn: () => getUsersForSelection({ unitId }),
+      enabled: !!unitId,
+    })),
   });
 };

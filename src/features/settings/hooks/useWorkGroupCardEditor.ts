@@ -3,48 +3,48 @@ import { useForm } from 'react-hook-form';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 
-import {
-  DIRECTOR_USER_ID,
-  PROCUREMENT_PEOPLE,
-  type WorkGroupSetting,
-} from '@/features/settings/mock-data';
+import { type WorkGroupSetting } from '@/features/settings/mock-data';
 import {
   type DelegationPayload,
+  type SettingsUserOption,
   type WorkGroupFormInput,
   createWorkGroupValidationSchema,
 } from '@/features/settings/types';
 import { RESPONSIBLE_SELECT_OPTIONS } from '@/lib/formatters';
 
-import { getFormErrorMessages, normalizeDelegation } from '../components/workGroupFormUtils';
+import { getFormErrorMessages } from '../components/work-group/workGroupFormUtils';
+import { useDelegationFormReset } from './useDelegationFormReset';
 
 interface UseWorkGroupCardEditorParams {
   group: WorkGroupSetting;
   groups: WorkGroupSetting[];
-  onSave: (group: WorkGroupSetting) => void;
+  procurementUsers: SettingsUserOption[];
+  directorUserId?: string;
+  onSave: (group: WorkGroupSetting) => void | Promise<void>;
 }
 
-export function useWorkGroupCardEditor({ group, groups, onSave }: UseWorkGroupCardEditorParams) {
-  // TODO (BACKEND MIGRATION): Group membership, workflow assignments, and delegation conflict checks should be enforced by backend transactions.
+export function useWorkGroupCardEditor({
+  group,
+  groups,
+  procurementUsers,
+  directorUserId,
+  onSave,
+}: UseWorkGroupCardEditorParams) {
   const [isEditing, setIsEditing] = useState(false);
   const [isExpanded, setIsExpanded] = useState(true);
   const [memberToAdd, setMemberToAdd] = useState('');
   const [delegationToAdd, setDelegationToAdd] = useState<DelegationPayload | null>(null);
-  const [delegationFormResetKey, setDelegationFormResetKey] = useState(0);
+  const { delegationFormResetKey, bumpDelegationFormResetKey } = useDelegationFormReset();
 
-  const workGroupValidationSchema = useMemo(
-    () =>
+  const form = useForm<WorkGroupFormInput>({
+    resolver: zodResolver(
       createWorkGroupValidationSchema({
         currentGroupId: group.id,
         existingGroups: groups,
-        directorUserId: DIRECTOR_USER_ID,
-      }),
-    [group.id, groups]
-  );
-
-  const form = useForm<WorkGroupFormInput>({
-    resolver: zodResolver(workGroupValidationSchema),
+        directorUserId: directorUserId ?? '',
+      })
+    ),
     mode: 'onBlur',
-    reValidateMode: 'onBlur',
     defaultValues: {
       name: group.name,
       workflow_types: group.workflow_types,
@@ -55,58 +55,36 @@ export function useWorkGroupCardEditor({ group, groups, onSave }: UseWorkGroupCa
   });
 
   const draft = form.watch();
-  const draftMemberIds = draft.member_ids ?? [];
-  const draftDelegation = normalizeDelegation(draft.delegation);
-
   const validationErrors = useMemo(
     () => getFormErrorMessages(form.formState.errors),
     [form.formState.errors]
   );
 
-  const resetToGroup = () => {
-    form.reset({
-      name: group.name,
-      workflow_types: group.workflow_types,
-      head_id: group.head_id,
-      member_ids: group.member_ids,
-      delegation: group.delegation,
-    });
+  const resetFormToGroupData = () => {
+    form.reset({ ...group });
     setDelegationToAdd(null);
-    setDelegationFormResetKey((prev) => prev + 1);
+    bumpDelegationFormResetKey();
   };
 
   useEffect(() => {
-    resetToGroup();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    group.id,
-    group.name,
-    group.head_id,
-    group.delegation,
-    group.member_ids,
-    group.workflow_types,
-  ]);
+    resetFormToGroupData();
+  }, [group]);
 
+  // Enforce staff uniqueness: Cannot be director, cannot be in ANY other group
   const availableMembers = useMemo(() => {
-    const headsFromOtherGroups = new Set(
-      groups.filter((item) => item.id !== group.id).map((item) => item.head_id)
+    const assignedElsewhereIds = new Set(
+      groups.filter((g) => g.id !== group.id).flatMap((g) => [g.head_id, ...g.member_ids])
     );
 
-    const membersFromOtherGroups = new Set(
-      groups.filter((item) => item.id !== group.id).flatMap((item) => item.member_ids)
-    );
-
-    return PROCUREMENT_PEOPLE.filter((person) => {
-      if (person.id === DIRECTOR_USER_ID) return false;
-      if (headsFromOtherGroups.has(person.id)) return false;
-      if (membersFromOtherGroups.has(person.id)) return false;
+    return procurementUsers.filter((person) => {
+      if (person.role === 'DIRECTOR' || person.id === directorUserId) return false;
+      if (assignedElsewhereIds.has(person.id)) return false;
       return true;
     });
-  }, [group.id, groups]);
+  }, [directorUserId, group.id, groups, procurementUsers]);
 
   const usedWorkflowByOtherGroups = useMemo(
-    () =>
-      new Set(groups.filter((item) => item.id !== group.id).flatMap((item) => item.workflow_types)),
+    () => new Set(groups.filter((g) => g.id !== group.id).flatMap((g) => g.workflow_types)),
     [group.id, groups]
   );
 
@@ -120,25 +98,24 @@ export function useWorkGroupCardEditor({ group, groups, onSave }: UseWorkGroupCa
     [draft.workflow_types, usedWorkflowByOtherGroups]
   );
 
+  const addWorkflowTypes = (typesToAdd: string[]) => {
+    form.setValue('workflow_types', Array.from(new Set([...draft.workflow_types, ...typesToAdd])), {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
+  };
+
   const removeWorkflowType = (type: string) => {
     form.setValue(
       'workflow_types',
-      draft.workflow_types.filter((item) => item !== type),
+      draft.workflow_types.filter((t) => t !== type),
       { shouldDirty: true, shouldValidate: true }
     );
   };
 
-  const addWorkflowTypes = (typesToAdd: string[]) => {
-    const nextTypes = Array.from(new Set([...draft.workflow_types, ...typesToAdd]));
-    form.setValue('workflow_types', nextTypes, { shouldDirty: true, shouldValidate: true });
-  };
-
   const addDraftMember = () => {
-    if (!memberToAdd) return;
-    if (!availableMembers.some((person) => person.id === memberToAdd)) return;
-    if (draftMemberIds.includes(memberToAdd)) return;
-
-    form.setValue('member_ids', [...draftMemberIds, memberToAdd], {
+    if (!memberToAdd || draft.member_ids?.includes(memberToAdd)) return;
+    form.setValue('member_ids', [...(draft.member_ids ?? []), memberToAdd], {
       shouldDirty: true,
       shouldValidate: true,
     });
@@ -148,50 +125,51 @@ export function useWorkGroupCardEditor({ group, groups, onSave }: UseWorkGroupCa
   const removeDraftMember = (memberId: string) => {
     form.setValue(
       'member_ids',
-      draftMemberIds.filter((id) => id !== memberId),
+      (draft.member_ids ?? []).filter((id) => id !== memberId),
       { shouldDirty: true, shouldValidate: true }
     );
   };
 
-  const removeDelegation = () => {
-    form.setValue('delegation', null, { shouldDirty: true, shouldValidate: true });
+  const handleDelegationAction = (action: 'add' | 'remove') => {
+    form.setValue('delegation', action === 'add' ? delegationToAdd : null, {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
     setDelegationToAdd(null);
-    setDelegationFormResetKey((prev) => prev + 1);
+    bumpDelegationFormResetKey();
   };
 
-  const addDelegation = () => {
-    if (!delegationToAdd) return;
-    form.setValue('delegation', delegationToAdd, { shouldDirty: true, shouldValidate: true });
-    setDelegationToAdd(null);
-    setDelegationFormResetKey((prev) => prev + 1);
-  };
-
-  const handleSave = form.handleSubmit((values) => {
+  const handleSave = form.handleSubmit(async (values) => {
+    // Cross-group acting head validation
     if (values.delegation?.user_id) {
-      const isHeadElsewhere = groups
-        .filter((item) => item.id !== group.id)
-        .some((item) => item.head_id === values.delegation?.user_id);
-
-      if (isHeadElsewhere) {
-        const ok = window.confirm(
+      const isHeadElsewhere = groups.some(
+        (g) => g.id !== group.id && g.head_id === values.delegation?.user_id
+      );
+      if (
+        isHeadElsewhere &&
+        !window.confirm(
           'ผู้แทนที่เลือกเป็นหัวหน้ากลุ่มงานอื่นอยู่แล้ว ต้องการยืนยันการแต่งตั้งหรือไม่?'
-        );
-        if (!ok) return;
+        )
+      ) {
+        return;
       }
     }
 
-    onSave({
-      ...group,
-      ...values,
-      member_ids: values.member_ids ?? [],
-      delegation: normalizeDelegation(values.delegation),
-    });
-
-    setIsEditing(false);
+    try {
+      await onSave({
+        ...group,
+        ...values,
+        member_ids: values.member_ids ?? [],
+        delegation: values.delegation ?? null,
+      });
+      setIsEditing(false);
+    } catch {
+      // Intentional empty catch to allow retry
+    }
   });
 
   const handleCancel = () => {
-    resetToGroup();
+    resetFormToGroupData();
     setMemberToAdd('');
     setIsEditing(false);
   };
@@ -204,8 +182,6 @@ export function useWorkGroupCardEditor({ group, groups, onSave }: UseWorkGroupCa
     memberToAdd,
     delegationToAdd,
     delegationFormResetKey,
-    draftMemberIds,
-    draftDelegation,
     availableMembers,
     availableWorkflowOptions,
     validationErrors,
@@ -215,8 +191,8 @@ export function useWorkGroupCardEditor({ group, groups, onSave }: UseWorkGroupCa
     setDelegationToAdd,
     addDraftMember,
     removeDraftMember,
-    addDelegation,
-    removeDelegation,
+    addDelegation: () => handleDelegationAction('add'),
+    removeDelegation: () => handleDelegationAction('remove'),
     addWorkflowTypes,
     removeWorkflowType,
     handleSave,

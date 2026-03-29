@@ -1,66 +1,47 @@
+import { useMemo } from 'react';
 import { Controller } from 'react-hook-form';
 
 import { ChevronDown, Pencil, Save, Trash2, UserPlus, Users, X } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import {
-  DIRECTOR_USER_ID,
-  PROCUREMENT_PEOPLE,
-  type WorkGroupSetting,
-  getPersonNameById,
-} from '@/features/settings/mock-data';
+import { type WorkGroupSetting } from '@/features/settings/mock-data';
+import { type SettingsUserOption } from '@/features/settings/types';
 import { UserSelect } from '@/features/users/components/UserSelect';
 import { formatDateThaiShort } from '@/lib/formatters';
 import { cn } from '@/lib/utils';
 
-import { useWorkGroupCardEditor } from '../hooks/useWorkGroupCardEditor';
-import { DelegationFormSection } from './DelegationFormSection';
+import { useWorkGroupCardEditor } from '../../hooks/useWorkGroupCardEditor';
+import { DelegationFormSection } from '../DelegationFormSection';
 import { WorkflowTags } from './WorkflowTags';
 
 interface WorkGroupCardProps {
   group: WorkGroupSetting;
   groups: WorkGroupSetting[];
-  onSave: (group: WorkGroupSetting) => void;
+  procurementUsers: SettingsUserOption[];
+  directorUserId?: string;
+  onSave: (group: WorkGroupSetting) => void | Promise<void>;
 }
 
-export function WorkGroupCard({ group, groups, onSave }: WorkGroupCardProps) {
-  const {
-    draft,
-    form,
-    isEditing,
-    isExpanded,
-    memberToAdd,
-    delegationToAdd,
-    delegationFormResetKey,
-    draftMemberIds,
-    draftDelegation,
-    availableMembers,
-    availableWorkflowOptions,
-    validationErrors,
-    setIsEditing,
-    setIsExpanded,
-    setMemberToAdd,
-    setDelegationToAdd,
-    addDraftMember,
-    removeDraftMember,
-    addDelegation,
-    removeDelegation,
-    addWorkflowTypes,
-    removeWorkflowType,
-    handleSave,
-    handleCancel,
-  } = useWorkGroupCardEditor({ group, groups, onSave });
+export function WorkGroupCard(props: WorkGroupCardProps) {
+  const editor = useWorkGroupCardEditor(props);
+  const { group, procurementUsers } = props;
+
+  const getDisplayName = useMemo(() => {
+    return (id: string) =>
+      procurementUsers.find((user) => user.id === id)?.full_name ?? 'ไม่พบข้อมูล';
+  }, [procurementUsers]);
 
   const {
     control,
-    formState: { errors: formErrors, isDirty },
-  } = form;
+    formState: { errors, isDirty },
+  } = editor.form;
+  const draftMemberIds = editor.draft.member_ids ?? [];
 
   return (
     <section className="border-border flex flex-col gap-6 rounded-md border bg-white p-6">
       <div className="flex flex-wrap-reverse items-end justify-between gap-3">
-        {!isEditing ? (
+        {!editor.isEditing ? (
           <div className="h2-topic flex items-center">
             <Users className="mr-2 h-6 w-6" />
             {group.name}
@@ -75,10 +56,10 @@ export function WorkGroupCard({ group, groups, onSave }: WorkGroupCardProps) {
                   {...field}
                   placeholder="ชื่อกลุ่มงาน"
                   className="min-w-115"
-                  aria-invalid={Boolean(formErrors.name)}
+                  aria-invalid={Boolean(errors.name)}
                 />
-                {formErrors.name?.message && (
-                  <p className="caption text-error">{formErrors.name.message}</p>
+                {errors.name?.message && (
+                  <p className="caption text-error">{errors.name.message}</p>
                 )}
               </div>
             )}
@@ -86,23 +67,28 @@ export function WorkGroupCard({ group, groups, onSave }: WorkGroupCardProps) {
         )}
 
         <div className="flex items-center gap-2">
-          {isEditing ? (
+          {editor.isEditing ? (
             <>
               <Button
                 type="button"
                 size="sm"
                 variant="brand"
-                onClick={handleSave}
+                onClick={editor.handleSave}
                 disabled={!isDirty}
               >
                 <Save className="mr-1 h-4 w-4" /> บันทึก
               </Button>
-              <Button type="button" size="sm" variant="outline" onClick={handleCancel}>
+              <Button type="button" size="sm" variant="outline" onClick={editor.handleCancel}>
                 <X className="mr-1 h-4 w-4" /> ยกเลิก
               </Button>
             </>
           ) : (
-            <Button type="button" size="sm" variant="outline" onClick={() => setIsEditing(true)}>
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              onClick={() => editor.setIsEditing(true)}
+            >
               <Pencil className="mr-1 h-4 w-4" /> แก้ไขกลุ่มงาน
             </Button>
           )}
@@ -114,25 +100,25 @@ export function WorkGroupCard({ group, groups, onSave }: WorkGroupCardProps) {
         <span className="normal-b min-w-27.5 pt-1">ประเภทวิธีการจัดหา</span>
         <div className="flex-1 space-y-2">
           <WorkflowTags
-            types={draft.workflow_types}
-            isEditing={isEditing}
-            onRemove={removeWorkflowType}
-            availableOptions={availableWorkflowOptions}
-            onAddMany={addWorkflowTypes}
+            types={editor.draft.workflow_types}
+            isEditing={editor.isEditing}
+            onRemove={editor.removeWorkflowType}
+            availableOptions={editor.availableWorkflowOptions}
+            onAddMany={editor.addWorkflowTypes}
           />
         </div>
       </div>
 
-      {/* Head */}
+      {/* Head & Delegation */}
       <div className="flex flex-wrap items-start gap-3">
         <span className="normal-b min-w-27.5 pt-2">หัวหน้ากลุ่มงาน</span>
         <div className="flex-1 space-y-2">
-          {isEditing ? (
+          {editor.isEditing ? (
             <div className="space-y-3 py-1">
               <div className="space-y-1">
                 <p className="text-primary normal-b">หัวหน้ากลุ่มงาน</p>
                 <p className="text-muted-foreground caption">
-                  ปัจจุบัน: {getPersonNameById(group.head_id)}
+                  ปัจจุบัน: {getDisplayName(group.head_id)}
                 </p>
                 <Controller
                   control={control}
@@ -141,9 +127,7 @@ export function WorkGroupCard({ group, groups, onSave }: WorkGroupCardProps) {
                     <UserSelect
                       value={field.value}
                       deptId="procurement"
-                      options={PROCUREMENT_PEOPLE.filter(
-                        (person) => person.id !== DIRECTOR_USER_ID
-                      )}
+                      options={procurementUsers.filter((p) => p.role !== 'DIRECTOR')}
                       onChange={field.onChange}
                       className="min-w-[320px]"
                       hasClearButton={false}
@@ -153,42 +137,36 @@ export function WorkGroupCard({ group, groups, onSave }: WorkGroupCardProps) {
               </div>
 
               <div className="space-y-2">
-                {draftDelegation ? (
+                {editor.draft.delegation ? (
                   <>
-                    <div className="flex flex-wrap items-center justify-between gap-2">
-                      <p className="text-primary normal-b">การมอบหมายรักษาการ</p>
-                    </div>
-
+                    <p className="text-primary normal-b">การมอบหมายรักษาการ</p>
                     <div className="border-border space-y-2 rounded-md border bg-white p-3">
                       <p className="text-primary normal">
-                        ผู้แทนปัจจุบัน: {getPersonNameById(draftDelegation.user_id)}
+                        ผู้แทนปัจจุบัน: {getDisplayName(editor.draft.delegation.user_id)}
                       </p>
                       <p className="text-muted-foreground caption">
-                        เริ่ม {formatDateThaiShort(draftDelegation.start_date)}
-                        {` สิ้นสุด ${formatDateThaiShort(draftDelegation.end_date)}`}
+                        เริ่ม {formatDateThaiShort(editor.draft.delegation.start_date)}
+                        {` สิ้นสุด ${formatDateThaiShort(editor.draft.delegation.end_date)}`}
                       </p>
-                      <Button type="button" variant="destructive" onClick={removeDelegation}>
+                      <Button type="button" variant="destructive" onClick={editor.removeDelegation}>
                         <Trash2 className="mr-1 h-4 w-4" /> ลบการมอบหมาย
                       </Button>
                     </div>
                   </>
                 ) : (
                   <>
-                    <div className="flex flex-wrap items-center justify-between gap-2">
-                      <p className="text-primary normal-b">สร้างการมอบหมาย</p>
-                    </div>
-
+                    <p className="text-primary normal-b">สร้างการมอบหมาย</p>
                     <DelegationFormSection
-                      value={delegationToAdd}
-                      onChange={setDelegationToAdd}
-                      people={PROCUREMENT_PEOPLE}
-                      resetKey={delegationFormResetKey}
+                      value={editor.delegationToAdd}
+                      onChange={editor.setDelegationToAdd}
+                      people={procurementUsers}
+                      resetKey={editor.delegationFormResetKey}
                     />
                     <Button
                       type="button"
                       variant="outline"
-                      onClick={addDelegation}
-                      disabled={!delegationToAdd}
+                      onClick={editor.addDelegation}
+                      disabled={!editor.delegationToAdd}
                     >
                       <UserPlus className="mr-1 h-4 w-4" /> เพิ่มการมอบหมาย
                     </Button>
@@ -198,10 +176,10 @@ export function WorkGroupCard({ group, groups, onSave }: WorkGroupCardProps) {
             </div>
           ) : (
             <p className="normal text-primary pt-2">
-              {getPersonNameById(group.head_id)}
+              {getDisplayName(group.head_id)}
               {group.delegation?.user_id && group.delegation.start_date && (
                 <span className="caption text-muted-foreground ml-2">
-                  ( รักษาการโดย {getPersonNameById(group.delegation.user_id)} เริ่ม{' '}
+                  ( รักษาการโดย {getDisplayName(group.delegation.user_id)} เริ่ม{' '}
                   {formatDateThaiShort(group.delegation.start_date)} สิ้นสุด{' '}
                   {formatDateThaiShort(group.delegation.end_date)} )
                 </span>
@@ -216,21 +194,23 @@ export function WorkGroupCard({ group, groups, onSave }: WorkGroupCardProps) {
         <button
           type="button"
           className="normal-b mb-2 flex items-center gap-2"
-          onClick={() => setIsExpanded((prev) => !prev)}
+          onClick={() => editor.setIsExpanded(!editor.isExpanded)}
         >
           เจ้าหน้าที่ ({draftMemberIds.length})
-          <ChevronDown className={cn('h-4 w-4 transition-transform', isExpanded && 'rotate-180')} />
+          <ChevronDown
+            className={cn('h-4 w-4 transition-transform', editor.isExpanded && 'rotate-180')}
+          />
         </button>
 
-        {isExpanded && (
+        {editor.isExpanded && (
           <div className="space-y-2">
-            {isEditing && (
+            {editor.isEditing && (
               <div className="mb-3 flex flex-wrap items-center gap-2">
                 <UserSelect
-                  value={memberToAdd}
+                  value={editor.memberToAdd}
                   deptId="procurement"
-                  options={availableMembers}
-                  onChange={(id) => setMemberToAdd(id)}
+                  options={editor.availableMembers}
+                  onChange={(id) => editor.setMemberToAdd(id)}
                   className="min-w-[320px]"
                   hasClearButton={false}
                 />
@@ -238,9 +218,10 @@ export function WorkGroupCard({ group, groups, onSave }: WorkGroupCardProps) {
                   type="button"
                   variant="brand"
                   disabled={
-                    !memberToAdd || !availableMembers.some((person) => person.id === memberToAdd)
+                    !editor.memberToAdd ||
+                    !editor.availableMembers.some((p) => p.id === editor.memberToAdd)
                   }
-                  onClick={addDraftMember}
+                  onClick={editor.addDraftMember}
                 >
                   <UserPlus className="h-4 w-4" /> เพิ่มเจ้าหน้าที่เข้ากลุ่มงาน
                 </Button>
@@ -250,14 +231,14 @@ export function WorkGroupCard({ group, groups, onSave }: WorkGroupCardProps) {
             <ul className="divide-y rounded-md border border-slate-200">
               {draftMemberIds.map((memberId) => (
                 <li key={memberId} className="normal flex items-center justify-between px-3 py-2">
-                  <span>{getPersonNameById(memberId)}</span>
-                  {isEditing && (
+                  <span>{getDisplayName(memberId)}</span>
+                  {editor.isEditing && (
                     <button
                       type="button"
                       className="text-red-500 hover:text-red-700"
-                      onClick={() => removeDraftMember(memberId)}
+                      onClick={() => editor.removeDraftMember(memberId)}
                     >
-                      ลบสมาชิก
+                      นำออก
                     </button>
                   )}
                 </li>
@@ -267,9 +248,9 @@ export function WorkGroupCard({ group, groups, onSave }: WorkGroupCardProps) {
         )}
       </div>
 
-      {validationErrors.length > 0 && (
+      {editor.validationErrors.length > 0 && (
         <div className="caption space-y-1 text-red-500">
-          {validationErrors.map((error) => (
+          {editor.validationErrors.map((error) => (
             <p key={error}>{error}</p>
           ))}
         </div>

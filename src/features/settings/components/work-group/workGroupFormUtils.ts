@@ -1,16 +1,6 @@
 import type { FieldErrors } from 'react-hook-form';
 
-import type { DelegationPayload, WorkGroupFormInput } from '@/features/settings/types';
-
-export const normalizeDelegation = (
-  delegation: WorkGroupFormInput['delegation']
-): DelegationPayload | null => {
-  if (!delegation) return null;
-
-  return {
-    ...delegation,
-  };
-};
+import type { WorkGroupFormInput } from '@/features/settings/types';
 
 export const getFormErrorMessages = (errors: FieldErrors<WorkGroupFormInput>) => {
   const messages = new Set<string>();

@@ -1,27 +1,29 @@
-import { useState } from 'react';
-
 import { Trash2, UserPlus, Users, X } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import {
-  PROCUREMENT_PEOPLE,
   PROCUREMENT_ROLE_SETTINGS,
   type ProcurementRoleSetting,
-  getPersonNameById,
 } from '@/features/settings/mock-data';
+import { type SettingsUserOption } from '@/features/settings/types';
 import { UserSelect } from '@/features/users/components/UserSelect';
+import { useUsersForSelection } from '@/features/users/hooks/useUsers';
 import { formatDateThaiShort } from '@/lib/formatters';
 
-import { useProcurementRoleEditor } from '../hooks/useProcurementRoleEditor';
-import { DelegationFormSection } from './DelegationFormSection';
-import { InlineActionRow } from './InlineActionRow';
+import { SUPPLY_OPERATION_DEPARTMENT_ID } from '../../constants';
+import { useProcurementRoleEditor } from '../../hooks/useProcurementRoleEditor';
+import { DelegationFormSection } from '../DelegationFormSection';
+import { InlineActionRow } from '../InlineActionRow';
 
 export function ProcurementStaffManager() {
-  // TODO (BACKEND MIGRATION): Procurement role membership and delegation assignment currently rely on mutable client-side mock data and should be persisted and validated by backend APIs.
-  const [roles, setRoles] = useState<ProcurementRoleSetting[]>(PROCUREMENT_ROLE_SETTINGS);
+  const procurementRoles = PROCUREMENT_ROLE_SETTINGS;
+  const { data: procurementUsersResponse } = useUsersForSelection({
+    deptId: SUPPLY_OPERATION_DEPARTMENT_ID,
+  });
+  const procurementUsers = procurementUsersResponse?.data ?? [];
 
-  const updateRole = (updated: ProcurementRoleSetting) => {
-    setRoles((prev) => prev.map((item) => (item.id === updated.id ? updated : item)));
+  const submitRoleChanges = (_updatedRole: ProcurementRoleSetting) => {
+    // TODO (BACKEND): Connect this UI action to the corresponding API endpoint for Save Procurement Role Changes.
   };
 
   return (
@@ -37,8 +39,14 @@ export function ProcurementStaffManager() {
         </h2>
 
         <div className="divide-y">
-          {roles.map((role) => (
-            <RoleRow key={role.id} role={role} allRoles={roles} onSave={updateRole} />
+          {procurementRoles.map((role) => (
+            <RoleRow
+              key={role.id}
+              role={role}
+              allRoles={procurementRoles}
+              people={procurementUsers}
+              onSave={submitRoleChanges}
+            />
           ))}
         </div>
       </section>
@@ -49,10 +57,14 @@ export function ProcurementStaffManager() {
 interface RoleRowProps {
   role: ProcurementRoleSetting;
   allRoles: ProcurementRoleSetting[];
+  people: SettingsUserOption[];
   onSave: (role: ProcurementRoleSetting) => void;
 }
 
-function RoleRow({ role, allRoles, onSave }: RoleRowProps) {
+function RoleRow({ role, allRoles, people, onSave }: RoleRowProps) {
+  const getPersonNameById = (id: string) =>
+    people.find((person) => person.id === id)?.full_name || '-';
+
   const {
     delegationToAdd,
     delegationFormResetKey,
@@ -74,7 +86,7 @@ function RoleRow({ role, allRoles, onSave }: RoleRowProps) {
     handleRemoveMember,
     handleSetDirectorMember,
     handleSave,
-  } = useProcurementRoleEditor({ role, allRoles, onSave });
+  } = useProcurementRoleEditor({ role, allRoles, getPersonNameById, onSave });
 
   return (
     <article className="py-1">
@@ -86,6 +98,7 @@ function RoleRow({ role, allRoles, onSave }: RoleRowProps) {
             selectedNames={selectedNames}
             isDirectorRole={isDirectorRole}
             delegations={role.delegation}
+            getPersonNameById={getPersonNameById}
           />
         }
         editContent={
@@ -97,6 +110,8 @@ function RoleRow({ role, allRoles, onSave }: RoleRowProps) {
                 draftDelegations={draftDelegations}
                 delegationToAdd={delegationToAdd}
                 delegationFormResetKey={delegationFormResetKey}
+                people={people}
+                getPersonNameById={getPersonNameById}
                 onSetDirectorMember={handleSetDirectorMember}
                 onSetDelegationToAdd={setDelegationToAdd}
                 onAddDelegation={handleAddDelegation}
@@ -106,6 +121,8 @@ function RoleRow({ role, allRoles, onSave }: RoleRowProps) {
               <MemberRoleEditContent
                 memberToAdd={memberToAdd}
                 draftMemberIds={draftMemberIds}
+                people={people}
+                getPersonNameById={getPersonNameById}
                 onSetMemberToAdd={setMemberToAdd}
                 onAddMember={handleAddMember}
                 onRemoveMember={handleRemoveMember}
@@ -127,9 +144,15 @@ interface RoleViewContentProps {
   selectedNames: string;
   isDirectorRole: boolean;
   delegations: ProcurementRoleSetting['delegation'];
+  getPersonNameById: (id: string) => string;
 }
 
-function RoleViewContent({ selectedNames, isDirectorRole, delegations }: RoleViewContentProps) {
+function RoleViewContent({
+  selectedNames,
+  isDirectorRole,
+  delegations,
+  getPersonNameById,
+}: RoleViewContentProps) {
   return (
     <section className="space-y-2 py-1">
       <p>{selectedNames}</p>
@@ -151,6 +174,8 @@ interface DirectorRoleEditContentProps {
   draftDelegations: ProcurementRoleSetting['delegation'];
   delegationToAdd: ProcurementRoleSetting['delegation'][number] | null;
   delegationFormResetKey: number;
+  people: SettingsUserOption[];
+  getPersonNameById: (id: string) => string;
   onSetDirectorMember: (id: string) => void;
   onSetDelegationToAdd: (delegation: ProcurementRoleSetting['delegation'][number] | null) => void;
   onAddDelegation: () => void;
@@ -163,6 +188,8 @@ function DirectorRoleEditContent({
   draftDelegations,
   delegationToAdd,
   delegationFormResetKey,
+  people,
+  getPersonNameById,
   onSetDirectorMember,
   onSetDelegationToAdd,
   onAddDelegation,
@@ -178,7 +205,7 @@ function DirectorRoleEditContent({
         <UserSelect
           value={directorMemberId}
           deptId="procurement"
-          options={PROCUREMENT_PEOPLE}
+          options={people}
           placeholder="กรุณาเลือกหัวหน้าพัสดุ"
           onChange={onSetDirectorMember}
           className="w-xs max-w-xs min-w-xs"
@@ -220,7 +247,7 @@ function DirectorRoleEditContent({
             <DelegationFormSection
               value={delegationToAdd}
               onChange={onSetDelegationToAdd}
-              people={PROCUREMENT_PEOPLE}
+              people={people}
               resetKey={delegationFormResetKey}
             />
             <Button
@@ -241,6 +268,8 @@ function DirectorRoleEditContent({
 interface MemberRoleEditContentProps {
   memberToAdd: string;
   draftMemberIds: string[];
+  people: SettingsUserOption[];
+  getPersonNameById: (id: string) => string;
   onSetMemberToAdd: (id: string) => void;
   onAddMember: () => void;
   onRemoveMember: (memberId: string) => void;
@@ -249,6 +278,8 @@ interface MemberRoleEditContentProps {
 function MemberRoleEditContent({
   memberToAdd,
   draftMemberIds,
+  people,
+  getPersonNameById,
   onSetMemberToAdd,
   onAddMember,
   onRemoveMember,
@@ -259,7 +290,7 @@ function MemberRoleEditContent({
         <UserSelect
           value={memberToAdd}
           deptId="procurement"
-          options={PROCUREMENT_PEOPLE}
+          options={people}
           placeholder="กรุณาเลือกเจ้าหน้าที่"
           onChange={onSetMemberToAdd}
           className="min-w-[320px]"

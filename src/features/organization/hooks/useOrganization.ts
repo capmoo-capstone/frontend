@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueries, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import {
   createDepartment,
@@ -6,6 +6,7 @@ import {
   deleteDepartment,
   deleteUnit,
   getDepartments,
+  getUnitById,
   getUnits,
   getUnitsByDepartment,
   updateDepartment,
@@ -45,6 +46,16 @@ export function useUnitsList({ page = 1, limit = 20 }: Partial<UnitListParams> =
   return useQuery({
     queryKey: ORGANIZATION_QUERY_KEYS.unitsList(page, limit),
     queryFn: () => getUnits({ page, limit }),
+  });
+}
+
+export function useUnitDetailsByIds(unitIds: string[]) {
+  return useQueries({
+    queries: unitIds.map((unitId) => ({
+      queryKey: ['units', 'detail', unitId],
+      queryFn: () => getUnitById(unitId),
+      enabled: !!unitId,
+    })),
   });
 }
 

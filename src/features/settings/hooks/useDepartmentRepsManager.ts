@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 
-import { useDepartmentRepData } from './useDepartmentReps';
+import { useDepartments } from '@/features/organization';
 
 interface DepartmentItem {
   id: string;
@@ -8,7 +8,7 @@ interface DepartmentItem {
 }
 
 export function useDepartmentRepsManager() {
-  const { data: departments, isLoading } = useDepartmentRepData();
+  const { data: departments, isLoading } = useDepartments();
   const [searchTerm, setSearchTerm] = useState('');
 
   const filteredDepartments = useMemo(() => {

@@ -1,7 +1,10 @@
 import { UserSelect } from '@/features/users/components/UserSelect';
 
-import { type UnitItem, useUnitRepresentativeEditor } from '../hooks/useUnitRepresentativeEditor';
-import { InlineActionRow } from './InlineActionRow';
+import {
+  type UnitItem,
+  useUnitRepresentativeEditor,
+} from '../../hooks/useUnitRepresentativeEditor';
+import { InlineActionRow } from '../InlineActionRow';
 
 interface DepartmentUnitRepRowProps {
   departmentId: string;

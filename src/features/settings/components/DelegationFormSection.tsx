@@ -3,8 +3,7 @@ import { Controller } from 'react-hook-form';
 import { startOfToday } from 'date-fns';
 
 import { DatePicker } from '@/components/ui/date-picker';
-import type { SettingsPerson } from '@/features/settings/mock-data';
-import { type DelegationPayload } from '@/features/settings/types';
+import { type DelegationPayload, type SettingsUserOption } from '@/features/settings/types';
 import { UserSelect } from '@/features/users/components/UserSelect';
 
 import { useDelegationFormSectionState } from '../hooks/useDelegationFormSectionState';
@@ -12,7 +11,7 @@ import { useDelegationFormSectionState } from '../hooks/useDelegationFormSection
 interface DelegationFormSectionProps {
   value: DelegationPayload | null;
   onChange: (payload: DelegationPayload | null) => void;
-  people: SettingsPerson[];
+  people: SettingsUserOption[];
   resetKey?: number;
 }
 

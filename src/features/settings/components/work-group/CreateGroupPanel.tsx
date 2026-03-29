@@ -4,23 +4,28 @@ import { Check, X } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import {
-  DIRECTOR_USER_ID,
-  PROCUREMENT_PEOPLE,
-  type WorkGroupSetting,
-} from '@/features/settings/mock-data';
+import { type WorkGroupSetting } from '@/features/settings/mock-data';
+import { type SettingsUserOption } from '@/features/settings/types';
 import { UserSelect } from '@/features/users/components/UserSelect';
 import { cn } from '@/lib/utils';
 
-import { useCreateGroupForm } from '../hooks/useCreateGroupForm';
+import { useCreateGroupForm } from '../../hooks/useCreateGroupForm';
 
 interface CreateGroupPanelProps {
   groups: WorkGroupSetting[];
+  procurementUsers: SettingsUserOption[];
+  directorUserId?: string;
   onCancel: () => void;
   onCreate: (group: WorkGroupSetting) => void;
 }
 
-export function CreateGroupPanel({ groups, onCancel, onCreate }: CreateGroupPanelProps) {
+export function CreateGroupPanel({
+  groups,
+  procurementUsers,
+  directorUserId,
+  onCancel,
+  onCreate,
+}: CreateGroupPanelProps) {
   const {
     draft,
     form,
@@ -29,7 +34,7 @@ export function CreateGroupPanel({ groups, onCancel, onCreate }: CreateGroupPane
     submitCreate,
     toggleWorkflowType,
     isSubmitDisabled,
-  } = useCreateGroupForm({ groups, onCreate });
+  } = useCreateGroupForm({ groups, onCreate, directorUserId });
 
   const {
     control,
@@ -103,7 +108,7 @@ export function CreateGroupPanel({ groups, onCancel, onCreate }: CreateGroupPane
               <UserSelect
                 value={field.value}
                 deptId="procurement"
-                options={PROCUREMENT_PEOPLE.filter((person) => person.id !== DIRECTOR_USER_ID)}
+                options={procurementUsers.filter((person) => person.role !== 'DIRECTOR')}
                 onChange={field.onChange}
                 hasClearButton={false}
                 placeholder="กรุณาเลือกหัวหน้ากลุ่มงาน"

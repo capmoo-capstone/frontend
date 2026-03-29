@@ -14,7 +14,7 @@ export const DelegationSchema = z
   .superRefine((data, ctx) => {
     if (data.start_date && data.end_date < data.start_date) {
       ctx.addIssue({
-        code: z.ZodIssueCode.custom,
+        code: 'custom',
         message: 'วันสิ้นสุดต้องไม่น้อยกว่าวันเริ่มต้น',
         path: ['end_date'],
       });
@@ -28,7 +28,7 @@ export const DelegationWithFutureDateSchema = DelegationSchema.superRefine((data
 
   if (data.start_date && data.start_date < today) {
     ctx.addIssue({
-      code: z.ZodIssueCode.custom,
+      code: 'custom',
       message: 'วันที่เริ่มต้นต้องเป็นวันนี้หรือในอนาคต',
       path: ['start_date'],
     });
@@ -36,14 +36,14 @@ export const DelegationWithFutureDateSchema = DelegationSchema.superRefine((data
 
   if (data.end_date < today) {
     ctx.addIssue({
-      code: z.ZodIssueCode.custom,
+      code: 'custom',
       message: 'วันที่สิ้นสุดต้องเป็นวันนี้หรือในอนาคต',
       path: ['end_date'],
     });
   }
   if (data.start_date && data.end_date <= data.start_date) {
     ctx.addIssue({
-      code: z.ZodIssueCode.custom,
+      code: 'custom',
       message: 'วันที่สิ้นสุดต้องอยู่หลังวันที่เริ่มต้น',
       path: ['end_date'],
     });
@@ -91,7 +91,7 @@ export const createWorkGroupValidationSchema = (context: WorkGroupValidationCont
     const duplicatedWorkflow = data.workflow_types.find((type) => usedWorkflowTypes.has(type));
     if (duplicatedWorkflow) {
       ctx.addIssue({
-        code: z.ZodIssueCode.custom,
+        code: 'custom',
         message: 'ประเภทวิธีการจัดหาห้ามซ้ำกับกลุ่มงานอื่น',
         path: ['workflow_types'],
       });
@@ -103,7 +103,7 @@ export const createWorkGroupValidationSchema = (context: WorkGroupValidationCont
     data.member_ids.forEach((memberId) => {
       if (memberId === context.directorUserId) {
         ctx.addIssue({
-          code: z.ZodIssueCode.custom,
+          code: 'custom',
           message: 'ไม่สามารถเพิ่มผู้อำนวยการ สบง. เป็นเจ้าหน้าที่กลุ่มงานได้',
           path: ['member_ids'],
         });
@@ -111,7 +111,7 @@ export const createWorkGroupValidationSchema = (context: WorkGroupValidationCont
 
       if (otherGroupHeads.has(memberId)) {
         ctx.addIssue({
-          code: z.ZodIssueCode.custom,
+          code: 'custom',
           message: 'ไม่สามารถเพิ่มผู้ที่เป็นหัวหน้ากลุ่มงานอื่นเป็นเจ้าหน้าที่กลุ่มงานได้',
           path: ['member_ids'],
         });
@@ -119,7 +119,7 @@ export const createWorkGroupValidationSchema = (context: WorkGroupValidationCont
 
       if (otherGroupMembers.has(memberId)) {
         ctx.addIssue({
-          code: z.ZodIssueCode.custom,
+          code: 'custom',
           message: 'เจ้าหน้าที่ 1 คน สามารถอยู่ได้เพียง 1 กลุ่มงานเท่านั้น',
           path: ['member_ids'],
         });
@@ -131,7 +131,7 @@ export const createWorkGroupValidationSchema = (context: WorkGroupValidationCont
       if (!parsed.success) {
         parsed.error.issues.forEach((issue) => {
           ctx.addIssue({
-            code: z.ZodIssueCode.custom,
+            code: 'custom',
             message: issue.message,
             path: ['delegation', ...(issue.path ?? [])],
           });
@@ -161,7 +161,7 @@ export const createDepartmentRepresentativeSchema = (context: DepartmentRepresen
 
       if (duplicate) {
         ctx.addIssue({
-          code: z.ZodIssueCode.custom,
+          code: 'custom',
           message: 'เจ้าหน้าที่ 1 คน เป็นตัวแทนได้เพียง 1 หน่วยงานเท่านั้น',
           path: ['user_id'],
         });
@@ -183,7 +183,7 @@ export const createProcurementRoleSchema = (context: ProcurementRoleValidationCo
     .superRefine((data, ctx) => {
       if (!context.allowMultiple && data.member_ids.length > 1) {
         ctx.addIssue({
-          code: z.ZodIssueCode.custom,
+          code: 'custom',
           message: 'ตำแหน่งนี้กำหนดได้เพียง 1 คน',
           path: ['member_ids'],
         });
@@ -191,7 +191,7 @@ export const createProcurementRoleSchema = (context: ProcurementRoleValidationCo
 
       if (context.isDirectorRole && data.member_ids.length !== 1) {
         ctx.addIssue({
-          code: z.ZodIssueCode.custom,
+          code: 'custom',
           message: 'ตำแหน่งผู้อำนวยการกำหนดได้เพียง 1 คนเท่านั้น',
           path: ['member_ids'],
         });
@@ -199,7 +199,7 @@ export const createProcurementRoleSchema = (context: ProcurementRoleValidationCo
 
       if (context.isDirectorRole && data.delegations.length > 1) {
         ctx.addIssue({
-          code: z.ZodIssueCode.custom,
+          code: 'custom',
           message: 'ตำแหน่งผู้อำนวยการกำหนดผู้รักษาการได้เพียง 1 รายการเท่านั้น',
           path: ['delegations'],
         });

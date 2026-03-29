@@ -8,11 +8,13 @@ import {
 } from '@/components/ui/accordion';
 import { Input } from '@/components/ui/input';
 
-import { useDepartmentRepsManager } from '../hooks/useDepartmentRepsManager';
+import { useDepartmentRepsManager } from '../../hooks/useDepartmentRepsManager';
 import { DepartmentUnitList } from './DepartmentUnitList';
 
 export function DepartmentRepsManager() {
   const { isLoading, searchTerm, setSearchTerm, filteredDepartments } = useDepartmentRepsManager();
+  const hasDepartments = filteredDepartments.length > 0;
+  const expandedDepartmentIds = filteredDepartments.map((department) => department.id);
 
   if (isLoading) {
     return (
@@ -39,16 +41,12 @@ export function DepartmentRepsManager() {
         </div>
       </header>
 
-      {filteredDepartments.length === 0 ? (
+      {!hasDepartments ? (
         <div className="border-border text-muted-foreground normal rounded-md border border-dashed bg-white p-8 text-center">
           ไม่พบข้อมูลหน่วยงาน
         </div>
       ) : (
-        <Accordion
-          type="multiple"
-          className="space-y-4 pb-4"
-          value={filteredDepartments.map((department) => department.id)}
-        >
+        <Accordion type="multiple" className="space-y-4 pb-4" value={expandedDepartmentIds}>
           {filteredDepartments.map((department) => (
             <AccordionItem
               key={department.id}

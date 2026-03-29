@@ -1,20 +1,24 @@
 import { useMemo, useState } from 'react';
 
 import type { ProcurementRoleSetting } from '@/features/settings/mock-data';
-import { getPersonNameById } from '@/features/settings/mock-data';
 import { type DelegationPayload, createProcurementRoleSchema } from '@/features/settings/types';
+
+import { hasDelegatedRoleMemberConflict } from './delegationConflictUtils';
+import { useDelegationFormReset } from './useDelegationFormReset';
 
 const DIRECTOR_ROLE_ID = 'director';
 
 interface UseProcurementRoleEditorParams {
   role: ProcurementRoleSetting;
   allRoles: ProcurementRoleSetting[];
+  getPersonNameById: (id: string) => string;
   onSave: (role: ProcurementRoleSetting) => void;
 }
 
 export function useProcurementRoleEditor({
   role,
   allRoles,
+  getPersonNameById,
   onSave,
 }: UseProcurementRoleEditorParams) {
   const [isEditing, setIsEditing] = useState(false);
@@ -22,15 +26,23 @@ export function useProcurementRoleEditor({
   const [memberToAdd, setMemberToAdd] = useState('');
   const [draftDelegations, setDraftDelegations] = useState<DelegationPayload[]>(role.delegation);
   const [delegationToAdd, setDelegationToAdd] = useState<DelegationPayload | null>(null);
-  const [delegationFormResetKey, setDelegationFormResetKey] = useState(0);
+  const { delegationFormResetKey, bumpDelegationFormResetKey } = useDelegationFormReset();
   const [error, setError] = useState('');
 
   const isDirectorRole = role.id === DIRECTOR_ROLE_ID;
   const directorMemberId = draftMemberIds[0] ?? '';
 
+  const resetEditorState = () => {
+    setDraftMemberIds(role.member_ids);
+    setDraftDelegations(role.delegation);
+    setDelegationToAdd(null);
+    setMemberToAdd('');
+    setError('');
+  };
+
   const selectedNames = useMemo(
     () => draftMemberIds.map((memberId) => getPersonNameById(memberId)).join(', '),
-    [draftMemberIds]
+    [draftMemberIds, getPersonNameById]
   );
 
   const handleAddMember = () => {
@@ -68,7 +80,7 @@ export function useProcurementRoleEditor({
 
     setDraftDelegations((prev) => [...prev, delegationToAdd]);
     setDelegationToAdd(null);
-    setDelegationFormResetKey((prev) => prev + 1);
+    bumpDelegationFormResetKey();
     setError('');
   };
 
@@ -99,11 +111,8 @@ export function useProcurementRoleEditor({
 
     if (isDirectorRole && draftDelegations.length > 0) {
       // TODO (BACKEND MIGRATION): Cross-role conflict validation and confirmation workflow should be validated by backend business rules.
-      const otherRoles = allRoles.filter((item) => item.id !== role.id);
       const delegatedUserIds = new Set(draftDelegations.map((item) => item.user_id));
-      const isHeadElsewhere = otherRoles.some((item) =>
-        item.member_ids.some((memberId) => delegatedUserIds.has(memberId))
-      );
+      const isHeadElsewhere = hasDelegatedRoleMemberConflict(delegatedUserIds, allRoles, role.id);
       if (isHeadElsewhere) {
         const confirmed = window.confirm(
           'ผู้ที่เลือกเป็นผู้รักษาการมีตำแหน่งในบทบาทอื่นอยู่แล้ว ต้องการยืนยันการแต่งตั้งหรือไม่?'
@@ -112,6 +121,7 @@ export function useProcurementRoleEditor({
       }
     }
 
+    // TODO (BACKEND): Connect this UI action to the corresponding API endpoint for Save Procurement Role Changes.
     onSave({
       ...role,
       member_ids: draftMemberIds,
@@ -121,11 +131,7 @@ export function useProcurementRoleEditor({
   };
 
   const handleCancel = () => {
-    setDraftMemberIds(role.member_ids);
-    setDraftDelegations(role.delegation);
-    setDelegationToAdd(null);
-    setMemberToAdd('');
-    setError('');
+    resetEditorState();
     setIsEditing(false);
   };
 

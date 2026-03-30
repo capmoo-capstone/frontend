@@ -157,6 +157,7 @@ export function VendorForm({ onSubmit }: VendorFormProps) {
                     <button
                       onClick={() => removeFile(index)}
                       className="text-muted-foreground hover:text-destructive p-2 transition-colors"
+                      aria-label={`ลบไฟล์ ${file.name}`}
                     >
                       <X className="text-destructive h-6 w-6" />
                     </button>

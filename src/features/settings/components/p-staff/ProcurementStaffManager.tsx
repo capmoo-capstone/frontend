@@ -38,7 +38,6 @@ export function ProcurementStaffManager() {
   }, [procurementUsers]);
 
   const submitRoleChanges = (_updatedRole: ProcurementRoleSetting) => {
-    console.log(procurementRoles);
     // TODO (BACKEND): Connect this UI action to the corresponding API endpoint.
     // Example: await updateUserRolesMutation.mutateAsync({ roleId: _updatedRole.id, userIds: _updatedRole.member_ids });
   };

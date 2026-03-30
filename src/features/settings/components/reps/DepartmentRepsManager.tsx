@@ -1,3 +1,5 @@
+import { useEffect, useState } from 'react';
+
 import { Search, Users } from 'lucide-react';
 
 import {
@@ -14,7 +16,12 @@ import { DepartmentUnitList } from './DepartmentUnitList';
 export function DepartmentRepsManager() {
   const { isLoading, searchTerm, setSearchTerm, filteredDepartments } = useDepartmentRepsManager();
   const hasDepartments = filteredDepartments.length > 0;
-  const expandedDepartmentIds = filteredDepartments.map((department) => department.id);
+
+  const [expandedItems, setExpandedItems] = useState<string[]>([]);
+
+  useEffect(() => {
+    setExpandedItems(filteredDepartments.map((department) => department.id));
+  }, [filteredDepartments]);
 
   if (isLoading) {
     return (
@@ -24,7 +31,6 @@ export function DepartmentRepsManager() {
     );
   }
 
-  // TODO (BACKEND MIGRATION): Department search/filter and expansion defaults should be computed by the API for large datasets and pagination consistency.
   return (
     <>
       <header className="flex flex-row flex-wrap items-center justify-between space-y-3">
@@ -46,7 +52,12 @@ export function DepartmentRepsManager() {
           ไม่พบข้อมูลหน่วยงาน
         </div>
       ) : (
-        <Accordion type="multiple" className="space-y-4 pb-4" value={expandedDepartmentIds}>
+        <Accordion
+          type="multiple"
+          className="space-y-4 pb-4"
+          value={expandedItems}
+          onValueChange={setExpandedItems}
+        >
           {filteredDepartments.map((department) => (
             <AccordionItem
               key={department.id}

@@ -3,8 +3,7 @@ import { useMemo } from 'react';
 import { Trash2, UserPlus, Users, X } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
-import { type ProcurementRoleSetting } from '@/features/settings/mock-data';
-import { type SettingsUserOption } from '@/features/settings/types';
+import { type ProcurementRoleSetting, type SettingsUserOption } from '@/features/settings/types';
 import { UserSelect } from '@/features/users/components/UserSelect';
 import { useUsersForSelection } from '@/features/users/hooks/useUsers';
 import { formatDateThaiShort } from '@/lib/formatters';

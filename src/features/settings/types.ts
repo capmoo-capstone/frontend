@@ -212,3 +212,26 @@ export interface SettingsUserOption {
   full_name: string;
   role?: string;
 }
+
+export interface SettingsPerson {
+  id: string;
+  full_name: string;
+  role: string;
+}
+
+export interface ProcurementRoleSetting {
+  id: string;
+  label: string;
+  member_ids: string[];
+  allow_multiple: boolean;
+  delegation: DelegationPayload[];
+}
+
+export interface WorkGroupSetting {
+  id: string;
+  name: string;
+  workflow_types: string[];
+  head_id: string;
+  member_ids: string[];
+  delegation: DelegationPayload | null;
+}

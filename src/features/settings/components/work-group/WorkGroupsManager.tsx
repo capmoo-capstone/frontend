@@ -5,7 +5,7 @@ import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { useUnitDetailsByIds, useUnits, useUpdateUnit } from '@/features/organization';
-import { type WorkGroupSetting } from '@/features/settings/mock-data';
+import { type WorkGroupSetting } from '@/features/settings/types';
 import { useUsersForSelection, useUsersForUnitsSelection } from '@/features/users';
 
 import {

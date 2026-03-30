@@ -4,7 +4,7 @@ import { Check, X } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { type WorkGroupSetting } from '@/features/settings/mock-data';
+import { type WorkGroupSetting } from '@/features/settings/types';
 import { type SettingsUserOption } from '@/features/settings/types';
 import { UserSelect } from '@/features/users/components/UserSelect';
 import { cn } from '@/lib/utils';

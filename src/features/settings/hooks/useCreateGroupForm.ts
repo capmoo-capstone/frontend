@@ -3,9 +3,9 @@ import { useForm } from 'react-hook-form';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 
-import { DIRECTOR_USER_ID, type WorkGroupSetting } from '@/features/settings/mock-data';
 import {
   type WorkGroupFormInput,
+  type WorkGroupSetting,
   createWorkGroupValidationSchema,
 } from '@/features/settings/types';
 import { RESPONSIBLE_SELECT_OPTIONS } from '@/lib/formatters';
@@ -23,7 +23,7 @@ export function useCreateGroupForm({ groups, directorUserId, onCreate }: UseCrea
       createWorkGroupValidationSchema({
         currentGroupId: undefined,
         existingGroups: groups,
-        directorUserId: directorUserId ?? DIRECTOR_USER_ID,
+        directorUserId: directorUserId ?? '',
       }),
     [directorUserId, groups]
   );

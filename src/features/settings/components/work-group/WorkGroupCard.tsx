@@ -5,12 +5,13 @@ import { ChevronDown, Pencil, Save, Trash2, UserPlus, Users, X } from 'lucide-re
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { type WorkGroupSetting } from '@/features/settings/mock-data';
+import { type WorkGroupSetting } from '@/features/settings/types';
 import { type SettingsUserOption } from '@/features/settings/types';
 import { UserSelect } from '@/features/users/components/UserSelect';
 import { formatDateThaiShort } from '@/lib/formatters';
 import { cn } from '@/lib/utils';
 
+import { DIRECTOR_ROLE_ID } from '../../constants';
 import { useWorkGroupCardEditor } from '../../hooks/useWorkGroupCardEditor';
 import { DelegationFormSection } from '../DelegationFormSection';
 import { WorkflowTags } from './WorkflowTags';
@@ -127,7 +128,7 @@ export function WorkGroupCard(props: WorkGroupCardProps) {
                     <UserSelect
                       value={field.value}
                       deptId="procurement"
-                      options={procurementUsers.filter((p) => p.role !== 'DIRECTOR')}
+                      options={procurementUsers.filter((p) => p.role !== DIRECTOR_ROLE_ID)}
                       onChange={field.onChange}
                       className="min-w-[320px]"
                       hasClearButton={false}

@@ -1,12 +1,11 @@
 import { useMemo, useState } from 'react';
 
-import type { ProcurementRoleSetting } from '@/features/settings/mock-data';
+import type { ProcurementRoleSetting } from '@/features/settings/types';
 import { type DelegationPayload, createProcurementRoleSchema } from '@/features/settings/types';
 
+import { DIRECTOR_ROLE_ID } from '../constants';
 import { hasDelegatedRoleMemberConflict } from './delegationConflictUtils';
 import { useDelegationFormReset } from './useDelegationFormReset';
-
-const DIRECTOR_ROLE_ID = 'director';
 
 interface UseProcurementRoleEditorParams {
   role: ProcurementRoleSetting;

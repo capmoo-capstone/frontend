@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 
-import { type WorkGroupSetting } from '@/features/settings/mock-data';
+import { type WorkGroupSetting } from '@/features/settings/types';
 import {
   type DelegationPayload,
   type SettingsUserOption,

@@ -3,10 +3,20 @@ import { useNavigate } from 'react-router-dom';
 import { LockKeyhole } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
+import { useAuth } from '@/context/AuthContext';
 import { VendorForm } from '@/features/vendors';
 
 export default function VendorFormPage() {
+  const { user } = useAuth();
   const navigate = useNavigate();
+
+  const handleButtonClick = () => {
+    if (user) {
+      navigate('/app/home');
+    } else {
+      navigate('/login');
+    }
+  };
   return (
     <div className="flex min-h-screen w-full flex-col overflow-x-hidden bg-white lg:flex-row">
       <div className="relative h-[250px] w-full lg:fixed lg:inset-y-0 lg:left-0 lg:h-screen lg:w-1/2">
@@ -23,9 +33,9 @@ export default function VendorFormPage() {
       </div>
       <div className="hidden lg:block lg:w-1/2" />
 
-      <div className="relative flex flex-1 flex-col items-center justify-center px-6 py-12 lg:h-screen lg:px-20">
+      <div className="relative flex flex-1 flex-col items-center justify-center bg-white px-6 py-12 lg:h-screen lg:px-20">
         <div className="absolute top-25 right-16 z-10 hidden lg:block">
-          <Button variant="secondary" className="normal-b" onClick={() => navigate('/login')}>
+          <Button variant="secondary" className="normal-b" onClick={handleButtonClick}>
             <LockKeyhole className="h-4 w-4" />
             เข้าสู่ระบบสำหรับเจ้าหน้าที่
           </Button>

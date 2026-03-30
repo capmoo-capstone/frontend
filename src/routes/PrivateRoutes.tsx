@@ -32,6 +32,7 @@ const ProcurementStaffPage = lazy(() => import('@/pages/settings/ProcurementStaf
 const ProcumentJobs = lazy(() => import('@/pages/assign/AssignJobs'));
 const VendorSubmission = lazy(() => import('@/pages/vendor/VendorSubmission'));
 const ApiProbe = lazy(() => import('@/pages/dev/ApiProbe'));
+const VendorForm = lazy(() => import('@/pages/vendor/VendorForm'));
 
 export const PrivateRoutes = () => {
   const { user } = useAuth();
@@ -41,50 +42,63 @@ export const PrivateRoutes = () => {
   const canManageSettings = user ? hasSettingsPermission(user) : false;
 
   return (
-    <AppLayout>
-      <Routes>
-        {/* --- Redirect Root to Home --- */}
-        <Route path="/" element={<Navigate to="/app/home" replace />} />
+    <Routes>
+      {/* --- Vendor Form --- */}
+      <Route path="/vendor/form" element={<VendorForm />} />
+      <Route
+        path="*"
+        element={
+          <AppLayout>
+            <Routes>
+              {/* --- Redirect Root to Home --- */}
+              <Route path="/" element={<Navigate to="/app/home" replace />} />
 
-        {/* --- Main Entry Points --- */}
-        <Route path="/app/home" element={<Home />} />
-        <Route path="/app/dashboards/overview" element={<OverallDashboard />} />
-        <Route path="/app/me/dashboard" element={<MyToDoDashboard />} />
+              {/* --- Main Entry Points --- */}
+              <Route path="/app/home" element={<Home />} />
+              <Route path="/app/dashboards/overview" element={<OverallDashboard />} />
+              <Route path="/app/me/dashboard" element={<MyToDoDashboard />} />
 
-        {/* --- Projects (The Unified View) --- */}
-        <Route path="/app/projects" element={<ProjectList />} />
-        <Route path="/app/projects/:id" element={<ProjectDetail />} />
-        <Route
-          element={<PermissionGuard isAllowed={canImportProjects} redirectPath="/app/projects" />}
-        >
-          <Route path="/app/projects/import" element={<ProjectImport />} />
-          <Route path="/app/projects/import/success" element={<ProjectImportSuccess />} />
-        </Route>
+              {/* --- Projects (The Unified View) --- */}
+              <Route path="/app/projects" element={<ProjectList />} />
+              <Route path="/app/projects/:id" element={<ProjectDetail />} />
+              <Route
+                element={
+                  <PermissionGuard isAllowed={canImportProjects} redirectPath="/app/projects" />
+                }
+              >
+                <Route path="/app/projects/import" element={<ProjectImport />} />
+                <Route path="/app/projects/import/success" element={<ProjectImportSuccess />} />
+              </Route>
 
-        {/* --- Exports --- */}
-        <Route path="/app/exports/finance" element={<FinanceExportPage />} />
+              {/* --- Exports --- */}
+              <Route path="/app/exports/finance" element={<FinanceExportPage />} />
 
-        {/* --- Specific Workflows --- */}
-        <Route path="/app/assign/:id" element={<ProcumentJobs />} />
-        <Route path="/app/vendor-response" element={<VendorSubmission />} />
+              {/* --- Specific Workflows --- */}
+              <Route path="/app/assign/:id" element={<ProcumentJobs />} />
+              <Route path="/app/vendor-response" element={<VendorSubmission />} />
 
-        {/* --- Management / Admin --- */}
-        <Route path="/app/management/employees/kpi" element={<StaffKpi />} />
-        <Route path="/app/management/organization" element={<OrganizationManagement />} />
-        <Route path="/app/dev/api-probe" element={<ApiProbe />} />
-        <Route element={<PermissionGuard isAllowed={canManageSettings} redirectPath="/app/home" />}>
-          <Route
-            path="/app/settings"
-            element={<Navigate to="/app/settings/work-groups" replace />}
-          />
-          <Route path="/app/settings/work-groups" element={<WorkGroupsPage />} />
-          <Route path="/app/settings/department-reps" element={<DepartmentRepsPage />} />
-          <Route path="/app/settings/procurement-staff" element={<ProcurementStaffPage />} />
-        </Route>
+              {/* --- Management / Admin --- */}
+              <Route path="/app/management/employees/kpi" element={<StaffKpi />} />
+              <Route path="/app/management/organization" element={<OrganizationManagement />} />
+              <Route path="/app/dev/api-probe" element={<ApiProbe />} />
+              <Route
+                element={<PermissionGuard isAllowed={canManageSettings} redirectPath="/app/home" />}
+              >
+                <Route
+                  path="/app/settings"
+                  element={<Navigate to="/app/settings/work-groups" replace />}
+                />
+                <Route path="/app/settings/work-groups" element={<WorkGroupsPage />} />
+                <Route path="/app/settings/department-reps" element={<DepartmentRepsPage />} />
+                <Route path="/app/settings/procurement-staff" element={<ProcurementStaffPage />} />
+              </Route>
 
-        {/* --- Fallback --- */}
-        <Route path="*" element={<PageNotFound />} />
-      </Routes>
-    </AppLayout>
+              {/* --- Fallback --- */}
+              <Route path="*" element={<PageNotFound />} />
+            </Routes>
+          </AppLayout>
+        }
+      />
+    </Routes>
   );
 };

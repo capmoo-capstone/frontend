@@ -58,11 +58,36 @@ export function WorkGroupsManager() {
   const handleSaveGroup = useCallback(
     async (updated: WorkGroupSetting) => {
       try {
-        await updateUnitMutation.mutateAsync({
+        const currentGroup = groups.find((group) => group.id === updated.id);
+        if (!currentGroup) {
+          throw new Error('GROUP_NOT_FOUND');
+        }
+
+        const changedPayload: {
+          id: string;
+          name?: string;
+          type?: string[];
+        } = {
           id: updated.id,
-          name: updated.name,
-          type: updated.workflow_types,
-        });
+        };
+
+        if (updated.name !== currentGroup.name) {
+          changedPayload.name = updated.name;
+        }
+
+        const isWorkflowTypeChanged =
+          updated.workflow_types.length !== currentGroup.workflow_types.length ||
+          updated.workflow_types.some((workflowType, index) => {
+            return workflowType !== currentGroup.workflow_types[index];
+          });
+
+        if (isWorkflowTypeChanged) {
+          changedPayload.type = updated.workflow_types;
+        }
+
+        if (changedPayload.name !== undefined || changedPayload.type !== undefined) {
+          await updateUnitMutation.mutateAsync(changedPayload);
+        }
 
         // TODO: Backend Migration required here.
         // We need endpoints to handle the member assignments, head updates, and delegations.
@@ -75,10 +100,10 @@ export function WorkGroupsManager() {
         throw error;
       }
     },
-    [updateUnitMutation]
+    [groups, updateUnitMutation]
   );
 
-  const handleCreateGroup = useCallback((newGroup: WorkGroupSetting) => {
+  const handleCreateGroup = useCallback((_newGroup: WorkGroupSetting) => {
     // TODO: Connect to actual create unit endpoint
     setIsCreateVisible(false);
   }, []);

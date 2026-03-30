@@ -4,8 +4,7 @@ import { Trash2, UserPlus, Users, X } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { type ProcurementRoleSetting, type SettingsUserOption } from '@/features/settings/types';
-import { UserSelect } from '@/features/users/components/UserSelect';
-import { useUsersForSelection } from '@/features/users/hooks/useUsers';
+import { UserSelect, useUsersForSelection } from '@/features/users';
 import { formatDateThaiShort } from '@/lib/formatters';
 
 import { SUPPLY_OPERATION_DEPARTMENT_ID } from '../../constants';

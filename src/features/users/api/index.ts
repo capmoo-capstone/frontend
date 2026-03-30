@@ -14,7 +14,7 @@ export const getUsers = async ({
   page = 1,
   limit = 10,
 }: GetUsersParams): Promise<UserListResponse> => {
-  const { data } = await api.get('/user', {
+  const { data } = await api.get('/users', {
     params: {
       page,
       limit,

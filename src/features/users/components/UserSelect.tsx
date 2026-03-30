@@ -21,6 +21,8 @@ import { useUsersForSelection } from '../hooks/useUsers';
 interface UserSelectProps {
   value?: string | null;
   onChange: (value: string) => void;
+  onSelectUser?: (user: { id: string; full_name: string }) => void;
+  options?: Array<{ id: string; full_name: string; role?: string }>;
   onBlur?: () => void;
   onReset?: () => void;
   unitId?: string;
@@ -34,6 +36,8 @@ interface UserSelectProps {
 export function UserSelect({
   value,
   onChange,
+  onSelectUser,
+  options,
   onBlur,
   onReset,
   unitId,
@@ -44,12 +48,14 @@ export function UserSelect({
   disabled = false,
 }: UserSelectProps) {
   const [open, setOpen] = React.useState(false);
+  const shouldFetchUsers = !options;
 
   const { data, isLoading, isError } = useUsersForSelection(
-    unitId ? { unitId } : { deptId: deptId || '' }
+    unitId ? { unitId } : { deptId: deptId || '' },
+    { enabled: shouldFetchUsers }
   );
 
-  const users = data?.data || [];
+  const users = options ?? data?.data ?? [];
   const selectedUser = users.find((user) => user.id === value);
 
   const handleClear = (e: React.MouseEvent) => {
@@ -72,7 +78,7 @@ export function UserSelect({
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className={cn('group w-55 justify-between px-3', className)}
+          className={cn('group w-full min-w-0 justify-between px-3 sm:w-55', className)}
           disabled={disabled || isLoading}
         >
           {isLoading ? (
@@ -101,7 +107,10 @@ export function UserSelect({
           </div>
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-60 p-0" align="start">
+      <PopoverContent
+        className="w-(--radix-popover-trigger-width) max-w-[calc(100vw-2rem)] p-0 sm:max-w-none"
+        align="start"
+      >
         <Command>
           <CommandInput placeholder="Search user..." />
           <CommandList>
@@ -110,9 +119,10 @@ export function UserSelect({
               {users.map((user) => (
                 <CommandItem
                   key={user.id}
-                  value={user.full_name}
+                  value={`${user.full_name} ${user.role ?? ''}`}
                   onSelect={() => {
                     onChange(user.id);
+                    onSelectUser?.({ id: user.id, full_name: user.full_name });
                     setOpen(false);
                     if (onBlur) {
                       onBlur();

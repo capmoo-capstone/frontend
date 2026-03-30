@@ -4,7 +4,7 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import PermissionGuard from '@/components/guards/PermissionGuard';
 import { useAuth } from '@/context/AuthContext';
 import AppLayout from '@/layouts/AppLayout';
-import { hasImportProjectPermission } from '@/lib/permissions';
+import { hasImportProjectPermission, hasSettingsPermission } from '@/lib/permissions';
 
 // --- Lazy Load Pages ---
 const Home = lazy(() => import('@/pages/home/Home'));
@@ -26,6 +26,9 @@ const FinanceExportPage = lazy(() => import('@/pages/projects/FinanceExport'));
 
 // Admin & Others
 const OrganizationManagement = lazy(() => import('@/pages/admin/OrganizationManagement'));
+const DepartmentRepsPage = lazy(() => import('@/pages/settings/DepartmentRepsPage'));
+const WorkGroupsPage = lazy(() => import('@/pages/settings/WorkGroupsPage'));
+const ProcurementStaffPage = lazy(() => import('@/pages/settings/ProcurementStaffPage'));
 const ProcumentJobs = lazy(() => import('@/pages/assign/AssignJobs'));
 const VendorSubmission = lazy(() => import('@/pages/vendor/VendorSubmission'));
 const ApiProbe = lazy(() => import('@/pages/dev/ApiProbe'));
@@ -35,6 +38,7 @@ export const PrivateRoutes = () => {
 
   // permission checks
   const canImportProjects = user ? hasImportProjectPermission(user) : false;
+  const canManageSettings = user ? hasSettingsPermission(user) : false;
 
   return (
     <AppLayout>
@@ -68,6 +72,15 @@ export const PrivateRoutes = () => {
         <Route path="/app/management/employees/kpi" element={<StaffKpi />} />
         <Route path="/app/management/organization" element={<OrganizationManagement />} />
         <Route path="/app/dev/api-probe" element={<ApiProbe />} />
+        <Route element={<PermissionGuard isAllowed={canManageSettings} redirectPath="/app/home" />}>
+          <Route
+            path="/app/settings"
+            element={<Navigate to="/app/settings/work-groups" replace />}
+          />
+          <Route path="/app/settings/work-groups" element={<WorkGroupsPage />} />
+          <Route path="/app/settings/department-reps" element={<DepartmentRepsPage />} />
+          <Route path="/app/settings/procurement-staff" element={<ProcurementStaffPage />} />
+        </Route>
 
         {/* --- Fallback --- */}
         <Route path="*" element={<PageNotFound />} />

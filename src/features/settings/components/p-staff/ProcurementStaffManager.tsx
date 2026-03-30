@@ -1,30 +1,54 @@
+import { useMemo } from 'react';
+
 import { Trash2, UserPlus, Users, X } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
-import {
-  PROCUREMENT_ROLE_SETTINGS,
-  type ProcurementRoleSetting,
-} from '@/features/settings/mock-data';
+import { type ProcurementRoleSetting } from '@/features/settings/mock-data';
 import { type SettingsUserOption } from '@/features/settings/types';
 import { UserSelect } from '@/features/users/components/UserSelect';
 import { useUsersForSelection } from '@/features/users/hooks/useUsers';
 import { formatDateThaiShort } from '@/lib/formatters';
 
 import { SUPPLY_OPERATION_DEPARTMENT_ID } from '../../constants';
+import { PROCUREMENT_ROLES_CONFIG } from '../../constants';
 import { useProcurementRoleEditor } from '../../hooks/useProcurementRoleEditor';
 import { DelegationFormSection } from '../DelegationFormSection';
 import { InlineActionRow } from '../InlineActionRow';
 
 export function ProcurementStaffManager() {
-  const procurementRoles = PROCUREMENT_ROLE_SETTINGS;
-  const { data: procurementUsersResponse } = useUsersForSelection({
+  const { data: procurementUsersResponse, isPending } = useUsersForSelection({
     deptId: SUPPLY_OPERATION_DEPARTMENT_ID,
   });
+
   const procurementUsers = procurementUsersResponse?.data ?? [];
 
+  const procurementRoles = useMemo<ProcurementRoleSetting[]>(() => {
+    return PROCUREMENT_ROLES_CONFIG.map((config) => {
+      // NOTE: Make sure this matches your JSON! In the previous data you shared,
+      // "roles" was an array. If so, this should be: user.roles?.includes(config.role)
+      const membersWithRole = procurementUsers.filter((user) => user.role === config.role);
+
+      return {
+        id: config.role,
+        label: config.label,
+        member_ids: membersWithRole.map((u) => u.id),
+        allow_multiple: config.allowMultiple,
+        delegation: [],
+      };
+    });
+  }, [procurementUsers]);
+
   const submitRoleChanges = (_updatedRole: ProcurementRoleSetting) => {
-    // TODO (BACKEND): Connect this UI action to the corresponding API endpoint for Save Procurement Role Changes.
+    console.log(procurementRoles);
+    // TODO (BACKEND): Connect this UI action to the corresponding API endpoint.
+    // Example: await updateUserRolesMutation.mutateAsync({ roleId: _updatedRole.id, userIds: _updatedRole.member_ids });
   };
+
+  if (isPending) {
+    return (
+      <div className="text-muted-foreground p-5 text-center">กำลังโหลดข้อมูลเจ้าหน้าที่...</div>
+    );
+  }
 
   return (
     <>

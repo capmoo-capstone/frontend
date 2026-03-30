@@ -35,7 +35,7 @@ export default function LoginPage() {
       <div className="flex h-screen flex-col items-center justify-center px-20 lg:w-1/2">
         <div className="max-w-md">
           <div className="mb-20 flex flex-col items-end">
-            <div className="flex flex-row items-center">
+            <div className="flex flex-row items-end">
               <img src="/chula.svg" alt="Chula Logo" className="mr-4 h-20 w-auto" />
               <h1 className="text-brand-9 mt-9 text-5xl">NexusProcure</h1>
             </div>

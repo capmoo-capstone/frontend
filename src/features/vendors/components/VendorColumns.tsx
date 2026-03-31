@@ -1,15 +1,10 @@
 import type { ColumnDef } from '@tanstack/react-table';
-import { ArrowUpDown, FileText } from 'lucide-react';
+import { ArrowUpDown } from 'lucide-react';
 
+import { FileCard } from '@/components/ui/file-card';
 import { formatDateThaiShort } from '@/lib/formatters';
 
 import type { VendorSubmission } from '../types';
-
-const formatFileSize = (bytes: number): string => {
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-};
 
 export const vendorSubmissionColumns: ColumnDef<VendorSubmission>[] = [
   {
@@ -121,10 +116,7 @@ export const vendorSubmissionColumns: ColumnDef<VendorSubmission>[] = [
       <div className="flex flex-col gap-1">
         {row.original.attachments.map((attachment) => (
           <div key={attachment.id} className="flex items-center gap-2">
-            <FileText className="text-muted-foreground h-3.5 w-3.5" />
-            <span className="caption text-muted-foreground">
-              {attachment.filename} ({formatFileSize(attachment.size)})
-            </span>
+            <FileCard file={attachment.filename} />
           </div>
         ))}
       </div>

@@ -46,6 +46,15 @@ export const getUnits = async ({ page = 1, limit = 20 }: Partial<UnitListParams>
   return PaginatedUnitsApiResponseSchema.parse(data);
 };
 
+export const getUnitById = async (unitId: string): Promise<UnitItem> => {
+  const { data } = await api.get(`/units/${encodeURIComponent(unitId)}`);
+
+  return UnitSchema.parse({
+    ...data,
+    representative: null,
+  });
+};
+
 export const createDepartment = async (payload: CreateDepartmentPayload) => {
   const { data } = await api.post('/departments/create', payload);
   return DepartmentSchema.parse(data);

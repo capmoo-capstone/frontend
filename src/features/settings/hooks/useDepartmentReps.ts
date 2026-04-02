@@ -1,6 +1,6 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 
-import { useDepartments, useUnits } from '@/features/organization';
+import { useUnits } from '@/features/organization';
 
 interface UpdateUnitRepresentativeInput {
   departmentId: string;
@@ -9,51 +9,15 @@ interface UpdateUnitRepresentativeInput {
   userName: string;
 }
 
-export function useDepartmentRepData() {
-  return useDepartments();
-}
-
 export function useDepartmentUnits(departmentId: string) {
   return useUnits(departmentId);
 }
 
 export function useUpdateUnitRepresentative() {
-  const queryClient = useQueryClient();
-
   return useMutation({
-    mutationFn: async (payload: UpdateUnitRepresentativeInput) => {
-      return payload;
-    },
-    onSuccess: (payload) => {
-      queryClient.setQueryData(
-        ['units', payload.departmentId],
-        (
-          oldData:
-            | Array<{
-                id: string;
-                name: string;
-                representative?: { id: string; name: string } | null;
-              }>
-            | undefined
-        ) => {
-          if (!oldData) return oldData;
-
-          return oldData.map((unit) =>
-            unit.id === payload.unitId
-              ? {
-                  ...unit,
-                  representative: {
-                    id: payload.userId,
-                    name: payload.userName,
-                  },
-                }
-              : unit
-          );
-        }
-      );
-
-      // Note: Once a real backend API is implemented for updating unit representatives,
-      // replace the mutationFn to call it and move the invalidateQueries back here.
+    mutationFn: async (_payload: UpdateUnitRepresentativeInput) => {
+      // TODO (BACKEND): Connect this UI action to the corresponding API endpoint for Update Unit Representative.
+      throw new Error('BACKEND_ENDPOINT_NOT_READY');
     },
   });
 }

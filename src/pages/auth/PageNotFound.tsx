@@ -26,7 +26,7 @@ export default function PageNotFound() {
               navigate(`/app/dashboards/department`);
             }
           } else {
-            navigate('/vendor/form');
+            navigate('/vendor-form');
           }
         }}
       >

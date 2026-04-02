@@ -90,10 +90,7 @@ export function WorkflowTags({
             style={{ backgroundColor: presentation.backgroundColor }}
           >
             <span
-              className={cn(
-                'h-3 w-3 rounded',
-                !presentation.indicatorColor && 'bg-current'
-              )}
+              className={cn('h-3 w-3 rounded', !presentation.indicatorColor && 'bg-current')}
               style={{ backgroundColor: presentation.indicatorColor }}
             />
             {presentation.label}

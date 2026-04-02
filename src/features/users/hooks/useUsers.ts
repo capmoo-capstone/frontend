@@ -1,4 +1,10 @@
-import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import {
+  keepPreviousData,
+  useMutation,
+  useQueries,
+  useQuery,
+  useQueryClient,
+} from '@tanstack/react-query';
 
 import {
   addDelegation,
@@ -60,10 +66,8 @@ export const useUserById = (userId: string) => {
 };
 
 export const useAddUserToUnit = () => {
-  const queryClient = useQueryClient();
-
   return useMutation({
-    mutationFn: (data: { unitId: string; userId: string[] }) => addUsersToUnit(data),
+    mutationFn: (data: { unitId: string; userIds: string[] }) => addUsersToUnit(data),
     onError: (error) => {
       throw new Error('Failed to add users to unit:' + error.message);
     },
@@ -71,8 +75,6 @@ export const useAddUserToUnit = () => {
 };
 
 export const useUpdateUserRole = () => {
-  const queryClient = useQueryClient();
-
   return useMutation({
     mutationFn: (data: { userId: string; role: UserRole; deptId: string; unitId?: string }) =>
       updateUserRole(data),
@@ -83,8 +85,6 @@ export const useUpdateUserRole = () => {
 };
 
 export const useAddRepresentativeToUnit = () => {
-  const queryClient = useQueryClient();
-
   return useMutation({
     mutationFn: (data: { userId: string; unitId: string }) =>
       addRepresentativeToUnit(data.userId, data.unitId),
@@ -95,19 +95,12 @@ export const useAddRepresentativeToUnit = () => {
 };
 
 export const useRemoveUser = () => {
-  const queryClient = useQueryClient();
-
   return useMutation({
     mutationFn: (data: { userId: string }) => removeUser(data.userId),
-    onError: (error) => {
-      throw new Error('Failed to remove user:' + error.message);
-    },
   });
 };
 
 export const useAddDelegation = () => {
-  const queryClient = useQueryClient();
-
   return useMutation({
     mutationFn: (data: {
       delegatorId: string;
@@ -121,9 +114,6 @@ export const useAddDelegation = () => {
         start_date: data.startDate,
         end_date: data.endDate,
       }),
-    onError: (error) => {
-      throw new Error('Failed to add delegation:' + error.message);
-    },
   });
 };
 
@@ -145,9 +135,6 @@ export const useCancelDelegation = () => {
 
   return useMutation({
     mutationFn: (data: { delegationId: string }) => cancelDelegation(data.delegationId),
-    onError: (error) => {
-      throw new Error('Failed to cancel delegation:' + error.message);
-    },
     onSuccess: (_, { delegationId }) => {
       queryClient.invalidateQueries({ queryKey: ['delegations', delegationId] });
     },

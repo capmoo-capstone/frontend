@@ -8,7 +8,9 @@ import {
   type BackendUpdateUserRoleResponse,
   BackendUpdateUserRoleResponseSchema,
   type BackendUserDelegationDetailResponse,
+  BackendUserDelegationDetailResponseSchema,
   type BackendUserDelegationResponse,
+  BackendUserDelegationResponseSchema,
   type BackendUserDetailResponse,
   BackendUserDetailResponseSchema,
   BackendUserSelectionResponseSchema,
@@ -68,7 +70,7 @@ export const getUserById = async (userId: string): Promise<BackendUserDetailResp
 export const addUsersToUnit = async (request: AddUsersToUnitRequest): Promise<any> => {
   const requestData = AddUsersToUnitSchema.parse(request);
   const { data } = await api.patch(`/users/add-unit/${requestData.unitId}`, {
-    users: requestData.userId,
+    users: requestData.userIds,
   });
   return data;
 };
@@ -104,19 +106,22 @@ export const addDelegation = async (
 ): Promise<BackendUserDelegationResponse> => {
   const requestData = AddDelegationSchema.parse(request);
   const { data } = await api.post(`/delegations`, requestData);
-  return data;
+  const parsed = BackendUserDelegationResponseSchema.parse(data);
+  return parsed;
 };
 
 export const cancelDelegation = async (
   delegationId: string
 ): Promise<BackendUserDelegationResponse> => {
   const { data } = await api.patch(`/delegations/${delegationId}`);
-  return data;
+  const parsed = BackendUserDelegationResponseSchema.parse(data);
+  return parsed;
 };
 
 export const getDelegationById = async (
   delegationId: string
 ): Promise<BackendUserDelegationDetailResponse> => {
   const { data } = await api.get(`/delegations/${delegationId}`);
-  return data;
+  const parsed = BackendUserDelegationDetailResponseSchema.parse(data);
+  return parsed;
 };

@@ -1,7 +1,24 @@
-import { keepPreviousData, useQueries, useQuery } from '@tanstack/react-query';
+import {
+  keepPreviousData,
+  useMutation,
+  useQueries,
+  useQuery,
+  useQueryClient,
+} from '@tanstack/react-query';
 
-import { getUsers, getUsersForSelection } from '../api';
-import type { GetUsersParams, GetUsersSelectionParams } from '../types';
+import {
+  addDelegation,
+  addRepresentativeToUnit,
+  addUsersToUnit,
+  cancelDelegation,
+  getDelegationById,
+  getUserById,
+  getUsers,
+  getUsersForSelection,
+  removeUser,
+  updateUserRole,
+} from '../api';
+import type { GetUsersParams, GetUsersSelectionParams, UserRole } from '../types';
 
 export const useUsers = ({ page = 1, limit = 10 }: GetUsersParams) => {
   return useQuery({
@@ -34,5 +51,92 @@ export const useUsersForUnitsSelection = (unitIds: string[]) => {
       queryFn: () => getUsersForSelection({ unitId }),
       enabled: !!unitId,
     })),
+  });
+};
+
+export const useUserById = (userId: string) => {
+  return useQuery({
+    queryKey: ['users', userId],
+    queryFn: () => {
+      if (userId) return getUserById(userId);
+      throw new Error('userId is required');
+    },
+    enabled: !!userId,
+  });
+};
+
+export const useAddUserToUnit = () => {
+  return useMutation({
+    mutationFn: (data: { unitId: string; userIds: string[] }) => addUsersToUnit(data),
+    onError: (error) => {
+      throw new Error('Failed to add users to unit:' + error.message);
+    },
+  });
+};
+
+export const useUpdateUserRole = () => {
+  return useMutation({
+    mutationFn: (data: { userId: string; role: UserRole; deptId: string; unitId?: string }) =>
+      updateUserRole(data),
+    onError: (error) => {
+      throw new Error('Failed to update user role:' + error.message);
+    },
+  });
+};
+
+export const useAddRepresentativeToUnit = () => {
+  return useMutation({
+    mutationFn: (data: { userId: string; unitId: string }) =>
+      addRepresentativeToUnit(data.userId, data.unitId),
+    onError: (error) => {
+      throw new Error('Failed to add representative to unit:' + error.message);
+    },
+  });
+};
+
+export const useRemoveUser = () => {
+  return useMutation({
+    mutationFn: (data: { userId: string }) => removeUser(data.userId),
+  });
+};
+
+export const useAddDelegation = () => {
+  return useMutation({
+    mutationFn: (data: {
+      delegatorId: string;
+      delegateeId: string;
+      startDate: Date;
+      endDate?: Date;
+    }) =>
+      addDelegation({
+        delegator_id: data.delegatorId,
+        delegatee_id: data.delegateeId,
+        start_date: data.startDate,
+        end_date: data.endDate,
+      }),
+  });
+};
+
+export const useUserDelegationDetail = (delegationId: string) => {
+  return useQuery({
+    queryKey: ['delegation', delegationId],
+    queryFn: () => {
+      if (delegationId) {
+        return getDelegationById(delegationId);
+      }
+      throw new Error('delegationId is required');
+    },
+    enabled: !!delegationId,
+  });
+};
+
+export const useCancelDelegation = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: { delegationId: string }) => cancelDelegation(data.delegationId),
+    onSuccess: (_, { delegationId }) => {
+      queryClient.invalidateQueries({ queryKey: ['delegations', delegationId] });
+    },
   });
 };

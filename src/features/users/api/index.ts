@@ -1,9 +1,23 @@
 import api from '@/lib/axios';
 
 import {
+  type AddDelegationRequest,
+  AddDelegationSchema,
+  type AddUsersToUnitRequest,
+  AddUsersToUnitSchema,
+  type BackendUpdateUserRoleResponse,
+  BackendUpdateUserRoleResponseSchema,
+  type BackendUserDelegationDetailResponse,
+  BackendUserDelegationDetailResponseSchema,
+  type BackendUserDelegationResponse,
+  BackendUserDelegationResponseSchema,
+  type BackendUserDetailResponse,
+  BackendUserDetailResponseSchema,
   BackendUserSelectionResponseSchema,
   type GetUsersParams,
   type GetUsersSelectionParams,
+  type UpdateUserRoleRequest,
+  UpdateUserRoleSchema,
   type UserListResponse,
   UserListResponseSchema,
   type UserSelectionResponse,
@@ -45,4 +59,69 @@ export const getUsersForSelection = async (
   };
 
   return UserSelectionResponseSchema.parse(normalized);
+};
+
+export const getUserById = async (userId: string): Promise<BackendUserDetailResponse> => {
+  const { data } = await api.get(`/users/${userId}`);
+  const parsed = BackendUserDetailResponseSchema.parse(data);
+  return parsed;
+};
+
+export const addUsersToUnit = async (request: AddUsersToUnitRequest): Promise<any> => {
+  const requestData = AddUsersToUnitSchema.parse(request);
+  const { data } = await api.patch(`/users/add-unit/${requestData.unitId}`, {
+    users: requestData.userIds,
+  });
+  return data;
+};
+
+export const addRepresentativeToUnit = async (
+  userId: string,
+  unitId: string
+): Promise<BackendUpdateUserRoleResponse> => {
+  const { data } = await api.patch(`/users/${userId}/rep/${unitId}`);
+  const parsed = BackendUpdateUserRoleResponseSchema.parse(data);
+  return parsed;
+};
+
+export const updateUserRole = async (
+  request: UpdateUserRoleRequest
+): Promise<BackendUpdateUserRoleResponse> => {
+  const requestData = UpdateUserRoleSchema.parse(request);
+  const { data } = await api.patch(`/users/${requestData.userId}/role`, {
+    role: requestData.role,
+    dept_id: requestData.deptId,
+    unit_id: requestData.unitId,
+  });
+  const parsed = BackendUpdateUserRoleResponseSchema.parse(data);
+  return parsed;
+};
+
+export const removeUser = async (userId: string): Promise<void> => {
+  await api.delete(`/users/${userId}`);
+};
+
+export const addDelegation = async (
+  request: AddDelegationRequest
+): Promise<BackendUserDelegationResponse> => {
+  const requestData = AddDelegationSchema.parse(request);
+  const { data } = await api.post(`/delegations`, requestData);
+  const parsed = BackendUserDelegationResponseSchema.parse(data);
+  return parsed;
+};
+
+export const cancelDelegation = async (
+  delegationId: string
+): Promise<BackendUserDelegationResponse> => {
+  const { data } = await api.patch(`/delegations/${delegationId}`);
+  const parsed = BackendUserDelegationResponseSchema.parse(data);
+  return parsed;
+};
+
+export const getDelegationById = async (
+  delegationId: string
+): Promise<BackendUserDelegationDetailResponse> => {
+  const { data } = await api.get(`/delegations/${delegationId}`);
+  const parsed = BackendUserDelegationDetailResponseSchema.parse(data);
+  return parsed;
 };

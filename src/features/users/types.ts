@@ -70,3 +70,106 @@ export const BackendUserSelectionResponseSchema = z.object({
 });
 
 export type BackendUserSelectionResponse = z.infer<typeof BackendUserSelectionResponseSchema>;
+
+export const UserRoleSchema = z.object({
+  role: UserRoleEnum,
+  department: z.object({
+    id: z.string(),
+    name: z.string(),
+  }),
+  unit: z
+    .object({
+      id: z.string(),
+      name: z.string(),
+    })
+    .optional(),
+});
+
+export const BackendUserDetailResponseSchema = z.object({
+  id: z.string(),
+  username: z.string(),
+  email: z.email().nullable(),
+  full_name: z.string(),
+  created_at: z.iso.datetime(),
+  role_updated_at: z.iso.datetime(),
+  roles: z.array(UserRoleSchema),
+});
+
+export type BackendUserDetailResponse = z.infer<typeof BackendUserDetailResponseSchema>;
+
+export const AddUsersToUnitSchema = z.object({
+  unitId: z.string(),
+  userIds: z.array(z.string()),
+});
+
+export type AddUsersToUnitRequest = z.infer<typeof AddUsersToUnitSchema>;
+
+export const UpdateUserRoleSchema = z.object({
+  userId: z.string(),
+  deptId: z.string(),
+  unitId: z.string().optional(),
+  role: UserRoleEnum,
+});
+
+export type UpdateUserRoleRequest = z.infer<typeof UpdateUserRoleSchema>;
+
+export const BackendUpdateUserRoleResponseSchema = z.object({
+  id: z.string(),
+  role: UserRoleEnum,
+  dept_id: z.string(),
+  unit_id: z.string().optional(),
+});
+
+export type BackendUpdateUserRoleResponse = z.infer<typeof BackendUpdateUserRoleResponseSchema>;
+
+export const AddDelegationSchema = z.object({
+  delegator_id: z.uuid(),
+  delegatee_id: z.uuid(),
+  start_date: z.coerce.date(),
+  end_date: z.coerce.date().optional(),
+});
+
+export type AddDelegationRequest = z.infer<typeof AddDelegationSchema>;
+
+export const BackendUserDelegationResponseSchema = z.object({
+  id: z.string(),
+  delegator_id: z.string(),
+  delegatee_id: z.string(),
+  start_date: z.string(),
+  end_date: z.string().optional(),
+  created_at: z.iso.datetime(),
+  updated_at: z.iso.datetime(),
+});
+
+export type BackendUserDelegationResponse = z.infer<typeof BackendUserDelegationResponseSchema>;
+
+export const BackendUserDelegationDetailResponseSchema = BackendUserDelegationResponseSchema.extend(
+  {
+    delegator: z.object({
+      id: z.string(),
+      full_name: z.string(),
+      roles: z.array(
+        z.object({
+          role: z.string(),
+          dept_id: z.string(),
+          unit_id: z.string().nullable(),
+        })
+      ),
+    }),
+    delegatee: z.object({
+      id: z.string(),
+      full_name: z.string(),
+      roles: z.array(
+        z.object({
+          role: z.string(),
+          dept_id: z.string(),
+          unit_id: z.string().nullable(),
+        })
+      ),
+    }),
+  }
+);
+
+export type BackendUserDelegationDetailResponse = z.infer<
+  typeof BackendUserDelegationDetailResponseSchema
+>;

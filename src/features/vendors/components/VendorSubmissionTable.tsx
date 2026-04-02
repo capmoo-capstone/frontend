@@ -104,7 +104,7 @@ export function VendorSubmissionTable({
             variant="outline"
             className="whitespace-nowrap"
             onClick={() => {
-              navigate('/vendor/form');
+              navigate('/app/vendor-form');
             }}
           >
             <ExternalLink className="h-4 w-4" />

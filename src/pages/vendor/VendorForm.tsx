@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 import { LockKeyhole } from 'lucide-react';
 
@@ -9,6 +9,27 @@ import { VendorForm } from '@/features/vendors';
 export default function VendorFormPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const isInAppRoute = location.pathname.startsWith('/app/');
+
+  if (isInAppRoute) {
+    return (
+      <div className="mx-auto w-full max-w-3xl px-4 py-8 sm:px-6 lg:px-8">
+        <div className="mb-8">
+          <h1 className="text-brand-9 text-2xl font-semibold sm:text-3xl">
+            Vendor Bill Submission
+          </h1>
+          <p className="text-muted-foreground mt-2 text-sm sm:text-base">
+            กรุณาระบุเลขที่ใบสั่งซื้อและอัปโหลดเอกสารที่เกี่ยวข้อง
+          </p>
+        </div>
+
+        <div className="rounded-xl border bg-white p-5 shadow-sm sm:p-6">
+          <VendorForm />
+        </div>
+      </div>
+    );
+  }
 
   const handleButtonClick = () => {
     if (user) {

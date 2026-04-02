@@ -43,8 +43,6 @@ export const PrivateRoutes = () => {
 
   return (
     <Routes>
-      {/* --- Vendor Form --- */}
-      <Route path="/vendor/form" element={<VendorForm />} />
       <Route
         path="*"
         element={
@@ -75,7 +73,11 @@ export const PrivateRoutes = () => {
 
               {/* --- Specific Workflows --- */}
               <Route path="/app/assign/:id" element={<ProcumentJobs />} />
+
+              {/* --- Vendor Management --- */}
               <Route path="/app/vendor-response" element={<VendorSubmission />} />
+              <Route path="/app/vendor-form" element={<VendorForm />} />
+              <Route path="/vendor-form" element={<Navigate to="/app/vendor-form" replace />} />
 
               {/* --- Management / Admin --- */}
               <Route path="/app/management/employees/kpi" element={<StaffKpi />} />

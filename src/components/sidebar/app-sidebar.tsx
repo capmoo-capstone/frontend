@@ -122,13 +122,18 @@ const menuGroups: MenuGroup[] = [
     ],
     items: [
       {
-        title: 'งานจัดซื้อ',
-        url: '/app/assign/procurements',
+        title: 'งานจัดซื้อ 1',
+        url: '/app/assign/UNIT-PROC-1',
+        icon: Package,
+      },
+      {
+        title: 'งานจัดซื้อ 2',
+        url: '/app/assign/UNIT-PROC-2',
         icon: Package,
       },
       {
         title: 'งานบริหารสัญญา',
-        url: '/app/assign/contracts',
+        url: '/app/assign/UNIT-CONT',
         icon: FileSignature,
       },
     ],

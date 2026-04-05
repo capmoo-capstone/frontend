@@ -5,6 +5,7 @@ import type {
   Project,
   ProjectDetail,
   UnassignedProjectItem,
+  WaitingCancelProjectItem,
 } from '../types/index';
 import {
   AssignedProjectItemSchema,
@@ -13,6 +14,7 @@ import {
   ProjectSchema,
   type ProjectWorklistApiItemSchema,
   UnassignedProjectItemSchema,
+  WaitingCancelProjectItemSchema,
 } from '../types/index';
 
 type ProjectListApiItem = z.infer<typeof ProjectListApiItemSchema>;
@@ -100,6 +102,37 @@ export const mapUnassignedProjectItem = (item: ProjectWorklistApiItem): Unassign
     procurement_type: item.procurement_type,
     template_type: item.current_workflow_type,
     urgent_status: item.is_urgent,
+    expected_approval_date: item.expected_approval_date,
+    created_at: item.created_at,
+  });
+
+export const mapWaitingCancelProjectItem = (
+  item: ProjectWorklistApiItem
+): WaitingCancelProjectItem =>
+  WaitingCancelProjectItemSchema.parse({
+    id: item.id,
+    receive_no: item.receive_no,
+    title: item.title,
+    status: item.status,
+    request_unit: {
+      name: item.requesting_unit?.name ?? '-',
+      department: {
+        id: item.requesting_unit?.department.id,
+        name: item.requesting_unit?.department.name ?? '-',
+      },
+    },
+    procurement_type: item.procurement_type,
+    template_type: item.current_workflow_type,
+    assignee_id:
+      item.current_workflow_type === 'CONTRACT'
+        ? (item.assignee_contract?.[0]?.id ?? null)
+        : (item.assignee_procurement?.[0]?.id ?? null),
+    assignee_full_name:
+      item.current_workflow_type === 'CONTRACT'
+        ? (item.assignee_contract?.[0]?.full_name ?? null)
+        : (item.assignee_procurement?.[0]?.full_name ?? null),
+    urgent_status: item.is_urgent,
+    cancel_reason: null,
     expected_approval_date: item.expected_approval_date,
     created_at: item.created_at,
   });

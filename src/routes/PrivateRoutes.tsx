@@ -72,6 +72,7 @@ export const PrivateRoutes = () => {
               <Route path="/app/exports/finance" element={<FinanceExportPage />} />
 
               {/* --- Specific Workflows --- */}
+              <Route path="/app/assign" element={<ProcumentJobs />} />
               <Route path="/app/assign/:id" element={<ProcumentJobs />} />
 
               {/* --- Vendor Management --- */}

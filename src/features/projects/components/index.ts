@@ -30,6 +30,7 @@ export { DataTablePagination } from './tables/DataTablePagination';
 export { baseColumns } from './tables/SharedColumns';
 export { AssignedTable } from './tables/assigned-table/index';
 export { UnassignTable } from './tables/unassign-table/index';
+export { WaitingCancelTable } from './tables/waiting-cancel-table/WaitingCancelTable';
 
 // Guards
 export { default as ProjectAccessGuard } from './guards/ProjectAccessGuard';

@@ -6,6 +6,7 @@ import type {
   SummaryResponse,
   UnassignedProjectItem,
   UpdateProjectPayload,
+  WaitingCancelProjectItem,
   WorkloadStatsResponse,
 } from '../types/index';
 import {
@@ -13,6 +14,7 @@ import {
   mapProjectDetail,
   mapProjectListItem,
   mapUnassignedProjectItem,
+  mapWaitingCancelProjectItem,
 } from './project.mappers';
 import {
   acceptProjectsRequest,
@@ -32,6 +34,7 @@ import {
   fetchProjectSummary,
   fetchProjectsPage,
   fetchUnassignedProjects,
+  fetchWaitingCancelProjects,
   fetchWorkloadStats,
   rejectCancellationRequest,
   requestEditProjectRequest,
@@ -60,6 +63,15 @@ export const getAssignedProjects = async (date: Date): Promise<AssignedProjectIt
 export const getUnassignedProjects = async (unitId?: string): Promise<UnassignedProjectItem[]> => {
   const parsed = await fetchUnassignedProjects(unitId);
   return parsed.data.map(mapUnassignedProjectItem);
+};
+
+export const getWaitingCancelProjects = async (
+  unitId?: string
+): Promise<WaitingCancelProjectItem[]> => {
+  return [];
+
+  const parsed = await fetchWaitingCancelProjects(unitId);
+  return parsed.data.map(mapWaitingCancelProjectItem);
 };
 
 export const assignProject = async (assignments: ProjectAssignmentsPayload) => {

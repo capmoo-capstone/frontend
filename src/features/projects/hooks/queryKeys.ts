@@ -7,5 +7,6 @@ export const projectKeys = {
   own: (page?: number, limit?: number) => [...projectKeys.all, 'own', page, limit] as const,
   assigned: (date?: Date) => [...projectKeys.all, 'assigned', date] as const,
   unassigned: (unitId?: string) => [...projectKeys.all, 'unassigned', unitId] as const,
+  waitingCancel: (unitId?: string) => [...projectKeys.all, 'waiting-cancel', unitId] as const,
   detail: (id?: string) => ['project', id] as const,
 };

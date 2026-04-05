@@ -9,6 +9,7 @@ import {
   getProjectSummary,
   getProjects,
   getUnassignedProjects,
+  getWaitingCancelProjects,
   getWorkloadStats,
 } from '../api';
 import type { ProjectDetail, SummaryResponse, WorkloadStatsResponse } from '../types/index';
@@ -71,5 +72,12 @@ export const useUnassignedProjects = (unitId?: string) => {
   return useQuery({
     queryKey: projectKeys.unassigned(unitId),
     queryFn: () => getUnassignedProjects(unitId),
+  });
+};
+
+export const useWaitingCancelProjects = (unitId?: string) => {
+  return useQuery({
+    queryKey: projectKeys.waitingCancel(unitId),
+    queryFn: () => getWaitingCancelProjects(unitId),
   });
 };

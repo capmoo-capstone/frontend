@@ -74,14 +74,26 @@ export type AuthUser = z.infer<typeof AuthUserSchema> & {
   };
 };
 
+const ROLE_PRIORITY: Record<Role, number> = {
+  SUPER_ADMIN: 8,
+  ADMIN: 7,
+  HEAD_OF_DEPARTMENT: 6,
+  HEAD_OF_UNIT: 5,
+  REPRESENTATIVE: 4,
+  DOCUMENT_STAFF: 3,
+  FINANCE_STAFF: 2,
+  GENERAL_STAFF: 1,
+  GUEST: 0,
+};
+
 export const getPrimaryRole = (user: AuthUser): RoleDetail | null => {
-  if (user.roles.own.length > 0) {
-    return user.roles.own[0];
-  }
-  if (user.roles.delegated.length > 0) {
-    return user.roles.delegated[0];
-  }
-  return null;
+  const allRoles = [...user.roles.own, ...user.roles.delegated];
+
+  if (allRoles.length === 0) return null;
+
+  return allRoles.reduce((highestRole, currentRole) =>
+    ROLE_PRIORITY[currentRole.role] > ROLE_PRIORITY[highestRole.role] ? currentRole : highestRole
+  );
 };
 
 export const enrichUser = (userData: z.infer<typeof AuthUserSchema>): AuthUser => {

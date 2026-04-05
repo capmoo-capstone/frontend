@@ -73,6 +73,16 @@ export const fetchUnassignedProjects = async (unitId?: string) => {
   return ProjectsListApiResponseSchema.parse(data);
 };
 
+export const fetchWaitingCancelProjects = async (unitId?: string) => {
+  return [];
+
+  const { data } = await api.get('/projects/waiting-cancel', {
+    params: unitId ? { unitId } : {},
+  });
+
+  return ProjectsListApiResponseSchema.parse(data);
+};
+
 export const assignProjectRequest = async (assignments: ProjectAssignmentsPayload) => {
   ProjectAssignmentsPayloadSchema.parse(assignments);
 

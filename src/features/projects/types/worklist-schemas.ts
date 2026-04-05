@@ -46,6 +46,22 @@ export const UnassignedProjectItemSchema = z.object({
   created_at: z.string().datetime(),
 });
 
+export const WaitingCancelProjectItemSchema = z.object({
+  id: z.string(),
+  receive_no: z.string(),
+  title: z.string(),
+  status: z.literal('WAITING_CANCEL'),
+  request_unit: RequestUnitSchema,
+  procurement_type: ProcurementTypeEnum,
+  template_type: UnitResponsibleTypeEnum,
+  assignee_id: z.string().nullable(),
+  assignee_full_name: z.string().nullable(),
+  urgent_status: ProjectUrgentStatusEnum,
+  cancel_reason: z.string().nullable(),
+  expected_approval_date: z.string().datetime().nullable(),
+  created_at: z.string().datetime(),
+});
+
 const ProjectWorklistRequestUnitApiSchema = z.object({
   name: z.string().nullable(),
   department: z.object({
@@ -97,6 +113,7 @@ export const UpdateProjectPayloadSchema = z.object({
 
 export type AssignedProjectItem = z.infer<typeof AssignedProjectItemSchema>;
 export type UnassignedProjectItem = z.infer<typeof UnassignedProjectItemSchema>;
+export type WaitingCancelProjectItem = z.infer<typeof WaitingCancelProjectItemSchema>;
 export type ProjectListResponse = z.infer<typeof ProjectListResponseSchema>;
 export type ProjectAssignment = z.infer<typeof ProjectAssignmentSchema>;
 export type ProjectAssignmentsPayload = z.infer<typeof ProjectAssignmentsPayloadSchema>;

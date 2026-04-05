@@ -17,15 +17,34 @@ import {
 } from '../types/index';
 import type { OwnProjectQueryParams, ProjectFilterParams } from './types';
 
-export const fetchProjectsPage = async (params?: ProjectFilterParams) => {
-  const page = params?.myTasks ? 1 : 1;
-  const limit = 50;
+const toProjectsQueryParams = (params?: ProjectFilterParams) => {
+  const query: Record<string, unknown> = {
+    page: 1,
+    limit: 50,
+  };
 
+  if (!params) return query;
+
+  if (params.search) query.search = params.search;
+  if (params.title) query.title = params.title;
+  if (params.fiscalYear) query.fiscalYear = params.fiscalYear;
+  if (params.myTasks !== undefined) query.myTasks = params.myTasks;
+
+  if (params.dateRange?.from) query.dateFrom = params.dateRange.from.toISOString();
+  if (params.dateRange?.to) query.dateTo = params.dateRange.to.toISOString();
+
+  if (params.procurementType?.length) query.procurementType = params.procurementType;
+  if (params.status?.length) query.status = params.status;
+  if (params.urgentStatus?.length) query.urgentStatus = params.urgentStatus;
+  if (params.assignees?.length) query.assignees = params.assignees;
+  if (params.units?.length) query.units = params.units;
+
+  return query;
+};
+
+export const fetchProjectsPage = async (params?: ProjectFilterParams) => {
   const { data } = await api.get('/projects', {
-    params: {
-      page,
-      limit,
-    },
+    params: toProjectsQueryParams(params),
   });
 
   return PaginatedProjectListApiResponseSchema.parse(data);

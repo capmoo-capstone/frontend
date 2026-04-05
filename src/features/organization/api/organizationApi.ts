@@ -1,3 +1,4 @@
+import { SUPPLY_OPERATION_DEPARTMENT_ID } from '@/features/settings/constants';
 import api from '@/lib/axios';
 
 import {
@@ -43,7 +44,12 @@ export const getUnits = async ({ page = 1, limit = 20 }: Partial<UnitListParams>
     params: { page, limit },
   });
 
-  return PaginatedUnitsApiResponseSchema.parse(data);
+  const parsed = PaginatedUnitsApiResponseSchema.parse(data);
+
+  return {
+    ...parsed,
+    data: parsed.data.filter((unit) => unit.dept_id !== SUPPLY_OPERATION_DEPARTMENT_ID),
+  };
 };
 
 export const getUnitById = async (unitId: string): Promise<UnitItem> => {

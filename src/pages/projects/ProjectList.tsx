@@ -1,6 +1,3 @@
-import { useMemo } from 'react';
-
-import { useAuth } from '@/context/AuthContext';
 import {
   AllProjectTable,
   ProjectFilterPanel,
@@ -10,8 +7,6 @@ import {
 } from '@/features/projects';
 
 export default function ProjectListPage() {
-  const { user } = useAuth();
-
   const {
     filters,
     tempFilters,
@@ -24,16 +19,6 @@ export default function ProjectListPage() {
     handleApplyFilter,
     handleResetFilter,
   } = useProjectFilters();
-
-  const finalFilters = useMemo(() => {
-    const appliedFilters = { ...filters };
-
-    if (user?.department?.name !== 'procurement' && user?.department?.id) {
-      appliedFilters.departments = [user.department.id];
-    }
-
-    return appliedFilters;
-  }, [filters, user]);
 
   return (
     <div className="relative space-y-6">
@@ -64,7 +49,7 @@ export default function ProjectListPage() {
       )}
 
       {/* Data Table */}
-      <AllProjectTable filters={finalFilters} />
+      <AllProjectTable filters={filters} />
     </div>
   );
 }

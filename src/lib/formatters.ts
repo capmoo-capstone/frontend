@@ -74,6 +74,7 @@ const getPhaseFormat = (
 
   if (!isProcurementStaff) {
     if (overallStatus === 'CANCELLED') return { label: 'ยกเลิก', variant: 'destructive' };
+    if (overallStatus === 'CLOSED') return { label: 'ปิดโครงการ', variant: 'success' };
     if (status === 'NOT_STARTED') return { label: 'ยังไม่เริ่ม', variant: 'secondary' };
     if (status === 'COMPLETED') return { label: 'เสร็จสิ้น', variant: 'success' };
     return { label: 'กำลังดำเนินการ', variant: 'warning' };

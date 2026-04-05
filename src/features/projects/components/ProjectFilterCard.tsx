@@ -1,27 +1,50 @@
 import React, { useMemo } from 'react';
 
+
+
 import { Search } from 'lucide-react';
+
+
 
 import { Card } from '@/components/ui/card';
 import { DatePickerWithRange } from '@/components/ui/date-picker-with-range';
 import { Input } from '@/components/ui/input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { usePermissions } from '@/features/auth';
 import { useUnitsList } from '@/features/organization';
 import { SUPPLY_OPERATION_DEPARTMENT_ID } from '@/features/settings/constants';
 import { useUsersForSelection } from '@/features/users';
 import { getResponsibleTypeFormat } from '@/lib/formatters';
 
+
+
 import { type ProjectFilterParams } from '../api';
 import { ProcurementTypeEnum, ProjectStatusEnum, ProjectUrgentStatusEnum } from '../types/index';
 import { FilterCheckbox } from './FilterCheckbox';
 import { SearchCheckbox } from './SearchCheckbox';
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 interface ProjectFilterCardProps {
   filters: ProjectFilterParams;
@@ -169,7 +192,8 @@ export function ProjectFilterCard({ filters, setFilters }: ProjectFilterCardProp
                 {
                   NORMAL: 'ปกติ',
                   URGENT: 'ด่วน',
-                  VERY_URGENT: 'ด่วนพิเศษ',
+                  VERY_URGENT: 'ด่วนที่สุด',
+                  SUPER_URGENT: 'ด่วนพิเศษ',
                 }[status]
               }
               checked={filters.urgentStatus?.includes(status)}

@@ -22,9 +22,10 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 
 import type { ProjectDetail, ProjectUrgentStatus } from '../../types/index';
+import { ProjectUrgentStatusEnum } from '../../types/index';
 
 const isUrgentProject = (value: ProjectUrgentStatus) =>
-  value === 'URGENT' || value === 'VERY_URGENT';
+  value === 'URGENT' || value === 'VERY_URGENT' || value === 'SUPER_URGENT';
 
 interface EditProjectDialogProps {
   isOpen: boolean;
@@ -44,7 +45,7 @@ const EditProjectSchema = z.object({
   title: z.string().trim().min(1, 'กรุณากรอกชื่อโครงการ'),
   description: z.string().nullable(),
   budget: z.number().nullable(),
-  is_urgent: z.enum(['NORMAL', 'URGENT', 'VERY_URGENT']),
+  is_urgent: ProjectUrgentStatusEnum,
 });
 
 type EditProjectFormValues = z.infer<typeof EditProjectSchema>;
@@ -89,7 +90,10 @@ export function EditProjectDialog({ isOpen, onClose, onConfirm, project }: EditP
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={form.handleSubmit(onConfirm)} className="space-y-4 py-4">
+        <form
+          onSubmit={form.handleSubmit(async (values) => onConfirm(values))}
+          className="space-y-4 py-4"
+        >
           {/* Project Title */}
           <div className="space-y-2">
             <Label htmlFor="title" className="required">

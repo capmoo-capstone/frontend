@@ -20,7 +20,7 @@ export const ProjectStatusByTypeEnum = z.enum([
   'REJECTED',
 ]);
 
-export const ProjectUrgentStatusEnum = z.enum(['NORMAL', 'URGENT', 'VERY_URGENT']);
+export const ProjectUrgentStatusEnum = z.enum(['NORMAL', 'URGENT', 'VERY_URGENT', 'SUPER_URGENT']);
 
 export const ProcurementTypeEnum = z.enum([
   'LT100K',

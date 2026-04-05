@@ -21,10 +21,15 @@ import { useUnassignedProjects } from '../../../hooks/useProjectQueries';
 import { type UnassignedProjectItem } from '../../../types/index';
 import { CancelProjectDialog } from '../../dialogs/CancelProjectDialog';
 import { ProjectDataTable } from '../DataTable';
-import { WorkloadChart } from './WorkloadChart';
 import { getColumns } from './columns';
 
-export function UnassignTable({ unitId }: { unitId?: string }) {
+interface UnassignTableProps {
+  unitId?: string;
+  pendingChanges: Record<string, string>;
+  setPendingChanges: React.Dispatch<React.SetStateAction<Record<string, string>>>;
+}
+
+export function UnassignTable({ unitId, pendingChanges, setPendingChanges }: UnassignTableProps) {
   const { user } = useAuth();
   const viewAsRole = user?.role ?? 'GUEST';
 
@@ -33,8 +38,6 @@ export function UnassignTable({ unitId }: { unitId?: string }) {
   const { mutateAsync: claimProjectMutation } = useClaimProject();
 
   const [projectToCancel, setProjectToCancel] = useState<UnassignedProjectItem | null>(null);
-
-  const [pendingChanges, setPendingChanges] = useState<Record<string, string>>({});
   const [sorting, setSorting] = useState<SortingState>([]);
 
   const handleClaimProject = useCallback(
@@ -110,12 +113,10 @@ export function UnassignTable({ unitId }: { unitId?: string }) {
 
   return (
     <>
-      {ManageUnitRoles.includes(viewAsRole) && (
-        <WorkloadChart pendingChanges={pendingChanges} unitId={unitId} />
-      )}
       <ProjectDataTable
         table={table}
         columnsLength={columns.length}
+        emptyStateText="ไม่มีงานที่ยังไม่ได้มอบหมายในกลุ่มงานนี้"
         toolbar={
           <div className="flex w-full items-center justify-between space-x-4">
             <TitleBar title="งานที่ยังไม่ได้มอบหมาย" />

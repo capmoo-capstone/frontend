@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
 import {
@@ -14,13 +14,20 @@ import { useAuth } from '@/context/AuthContext';
 import { useUnits } from '@/features/organization/hooks/useOrganization';
 import type { UnitItem } from '@/features/organization/types';
 import { AssignedTable, UnassignTable, WaitingCancelTable } from '@/features/projects/components';
+import { WorkloadChart } from '@/features/projects/components/tables/unassign-table/WorkloadChart';
 import { SUPPLY_OPERATION_DEPARTMENT_ID } from '@/features/settings/constants';
-import { hasDepartmentPermission, hasUnitPermission } from '@/lib/permissions';
+import {
+  ManageUnitRoles,
+  SupervisorRoles,
+  hasDepartmentPermission,
+  hasUnitPermission,
+} from '@/lib/permissions';
 
 export default function AssignJobs() {
   const navigate = useNavigate();
   const { id } = useParams();
   const { user } = useAuth();
+  const [pendingChanges, setPendingChanges] = useState<Record<string, string>>({});
 
   const { data: units, isLoading } = useUnits(SUPPLY_OPERATION_DEPARTMENT_ID);
 
@@ -75,8 +82,16 @@ export default function AssignJobs() {
         </div>
       </div>
 
-      <UnassignTable unitId={id} />
+      {(ManageUnitRoles.includes(user?.role ?? 'GUEST') ||
+        SupervisorRoles.includes(user?.role ?? 'GUEST')) && (
+        <WorkloadChart pendingChanges={pendingChanges} unitId={id} />
+      )}
       <WaitingCancelTable unitId={id} />
+      <UnassignTable
+        unitId={id}
+        pendingChanges={pendingChanges}
+        setPendingChanges={setPendingChanges}
+      />
       <AssignedTable unitId={id} />
     </div>
   );

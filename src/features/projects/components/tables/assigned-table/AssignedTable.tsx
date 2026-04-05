@@ -109,6 +109,7 @@ export function AssignedTable({ unitId }: { unitId?: string }) {
       <ProjectDataTable
         table={table}
         columnsLength={columns.length}
+        emptyStateText="ไม่มีงานที่ถูกมอบหมายแล้วในช่วงวันที่ที่เลือก"
         toolbar={
           <div className="flex w-full items-center justify-between space-x-4">
             <TitleBar title="งานที่ถูกมอบหมายแล้ว" variant="grey" />

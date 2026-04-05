@@ -89,14 +89,11 @@ export function WaitingCancelTable({ unitId }: { unitId?: string }) {
     );
   }
 
-  if (!projects || projects.length === 0) {
-    return null;
-  }
-
   return (
     <ProjectDataTable
       table={table}
       columnsLength={columns.length}
+      emptyStateText="ไม่มีงานที่ขออนุมัติยกเลิกในกลุ่มงานนี้"
       toolbar={
         <div className="flex w-full items-center justify-between space-x-4">
           <TitleBar title="งานที่ขออนุมัติยกเลิก" variant="accent" />

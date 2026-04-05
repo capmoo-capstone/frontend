@@ -97,12 +97,13 @@ export const BackendUserDetailResponseSchema = z.object({
 
 export type BackendUserDetailResponse = z.infer<typeof BackendUserDetailResponseSchema>;
 
-export const AddUsersToUnitSchema = z.object({
+export const UpdateUsersToUnitSchema = z.object({
   unitId: z.string(),
-  userIds: z.array(z.string()),
+  newUserIds: z.array(z.string()),
+  removeUserIds: z.array(z.string()),
 });
 
-export type AddUsersToUnitRequest = z.infer<typeof AddUsersToUnitSchema>;
+export type UpdateUsersToUnitRequest = z.infer<typeof UpdateUsersToUnitSchema>;
 
 export const UpdateUserRoleSchema = z.object({
   userId: z.string(),

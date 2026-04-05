@@ -3,8 +3,6 @@ import api from '@/lib/axios';
 import {
   type AddDelegationRequest,
   AddDelegationSchema,
-  type AddUsersToUnitRequest,
-  AddUsersToUnitSchema,
   type BackendUpdateUserRoleResponse,
   BackendUpdateUserRoleResponseSchema,
   type BackendUserDelegationDetailResponse,
@@ -18,6 +16,8 @@ import {
   type GetUsersSelectionParams,
   type UpdateUserRoleRequest,
   UpdateUserRoleSchema,
+  type UpdateUsersToUnitRequest,
+  UpdateUsersToUnitSchema,
   type UserListResponse,
   UserListResponseSchema,
   type UserSelectionResponse,
@@ -67,10 +67,11 @@ export const getUserById = async (userId: string): Promise<BackendUserDetailResp
   return parsed;
 };
 
-export const addUsersToUnit = async (request: AddUsersToUnitRequest): Promise<any> => {
-  const requestData = AddUsersToUnitSchema.parse(request);
-  const { data } = await api.patch(`/users/add-unit/${requestData.unitId}`, {
-    users: requestData.userIds,
+export const updateUsersInUnit = async (request: UpdateUsersToUnitRequest): Promise<any> => {
+  const requestData = UpdateUsersToUnitSchema.parse(request);
+  const { data } = await api.patch(`/units/${requestData.unitId}/users`, {
+    new_users: requestData.newUserIds,
+    remove_users: requestData.removeUserIds,
   });
   return data;
 };

@@ -9,7 +9,6 @@ import {
 import {
   addDelegation,
   addRepresentativeToUnit,
-  addUsersToUnit,
   cancelDelegation,
   getDelegationById,
   getUserById,
@@ -17,6 +16,7 @@ import {
   getUsersForSelection,
   removeUser,
   updateUserRole,
+  updateUsersInUnit,
 } from '../api';
 import type { GetUsersParams, GetUsersSelectionParams, UserRole } from '../types';
 
@@ -65,11 +65,12 @@ export const useUserById = (userId: string) => {
   });
 };
 
-export const useAddUserToUnit = () => {
+export const useUpdateUsersInUnit = () => {
   return useMutation({
-    mutationFn: (data: { unitId: string; userIds: string[] }) => addUsersToUnit(data),
+    mutationFn: (data: { unitId: string; newUserIds: string[]; removeUserIds: string[] }) =>
+      updateUsersInUnit(data),
     onError: (error) => {
-      throw new Error('Failed to add users to unit:' + error.message);
+      throw new Error('Failed to update users in unit:' + error.message);
     },
   });
 };

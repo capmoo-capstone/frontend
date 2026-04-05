@@ -10,7 +10,7 @@ const ProcurementAllowedRoles: Role[] = [
   'GENERAL_STAFF',
 ];
 
-const UnitAllowedRoles: Role[] = ['SUPER_ADMIN', 'ADMIN', 'HEAD_OF_DEPARTMENT', 'HEAD_OF_UNIT'];
+const UnitAllowedRoles: Role[] = ['SUPER_ADMIN', 'ADMIN', 'HEAD_OF_UNIT'];
 
 const DepartmentAllowedRoles: Role[] = ['SUPER_ADMIN', 'ADMIN', 'HEAD_OF_DEPARTMENT'];
 

@@ -1,5 +1,5 @@
 import { type ColumnDef } from '@tanstack/react-table';
-import { MoreVertical, UserRoundPlus } from 'lucide-react';
+import { MoreVertical, Reply, Trash2, UserRoundPlus } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -11,17 +11,22 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { type Role, type User, isProcurementStaffRole } from '@/features/auth';
 import { getProjectStatusesFormat, getResponsibleTypeFormat } from '@/lib/formatters';
+import { hasDepartmentPermission, hasUnitPermission } from '@/lib/permissions';
 
 import type { Project } from '../../types/index';
 import {
+  canCancelProject,
   canEditProjectAssignee,
   canManageAssigneeByRole,
   getActiveResponsibleUsers,
+  getCancelProjectActionLabel,
 } from '../../utils/project-selectors';
 import { renderSortableHeader, renderUrgentText } from './column-helpers';
 
 interface SharedColumnsProps {
   onAddAssignee: (project: Project) => void;
+  onReturnProject: (project: Project) => void;
+  onCancelProject: (project: Project) => void;
   viewAsRole: Role;
   user?: User;
 }
@@ -40,6 +45,8 @@ const getProjectStatuses = (project: Project, user?: User) =>
 
 export const baseColumns = ({
   onAddAssignee,
+  onReturnProject,
+  onCancelProject,
   viewAsRole,
   user,
 }: SharedColumnsProps): ColumnDef<Project>[] => [
@@ -132,14 +139,20 @@ export const baseColumns = ({
     enableHiding: false,
     cell: ({ row }) => {
       const project = row.original;
-      const canEdit = canEditProjectAssignee(project.status);
+      const assigneeIds =
+        project.current_workflow_type === 'CONTRACT'
+          ? (project.assignee_contract?.map((u) => u.id) ?? [])
+          : (project.assignee_procurement?.map((u) => u.id) ?? []);
 
-      if (row.original.status === 'CANCELLED') {
-        return null;
-      }
+      const canAddAssignee =
+        canEditProjectAssignee(project.status) &&
+        ((user && hasUnitPermission(user, project.responsible_unit_id)) ||
+          assigneeIds.includes(user?.id ?? ''));
+      const canReturnProject = canAddAssignee;
+      const canDeleteProject = canCancelProject(project.status);
 
       return (
-        canEdit && (
+        (canAddAssignee || canReturnProject || canDeleteProject) && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="h-8 w-8 p-0">
@@ -147,13 +160,25 @@ export const baseColumns = ({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              {canManageAssigneeByRole(viewAsRole) && (
+              {canAddAssignee && (
                 <DropdownMenuItem
                   onClick={() => onAddAssignee(project)}
                   className="normal text-foreground"
                 >
                   <UserRoundPlus className="normal h-4 w-4" />
                   เพิ่มผู้รับผิดชอบ
+                </DropdownMenuItem>
+              )}
+              {canReturnProject && (
+                <DropdownMenuItem onClick={() => onReturnProject(project)} variant="destructive">
+                  <Reply className="normal text-destructive h-4 w-4" />
+                  คืนโครงการ
+                </DropdownMenuItem>
+              )}
+              {canCancelProject(project.status) && (
+                <DropdownMenuItem onClick={() => onCancelProject(project)} variant="destructive">
+                  <Trash2 className="normal h-4 w-4" />
+                  {getCancelProjectActionLabel(viewAsRole)}
                 </DropdownMenuItem>
               )}
             </DropdownMenuContent>

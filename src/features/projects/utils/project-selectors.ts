@@ -14,6 +14,10 @@ export const canEditProjectAssignee = (status: Project['status']) => {
   return status === 'IN_PROGRESS' || status === 'UNASSIGNED';
 };
 
+export const canCancelProject = (status: Project['status']) => {
+  return status === 'IN_PROGRESS' || status === 'UNASSIGNED' || status === 'WAITING_ACCEPT';
+};
+
 export const canManageAssigneeByRole = (viewAsRole: Role) => {
   return ManageUnitRoles.includes(viewAsRole) || ManageSelfRoles.includes(viewAsRole);
 };

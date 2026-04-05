@@ -73,7 +73,8 @@ How it works in this repo:
   - `staleTime = 5 minutes`
   - `retry = 1`
 - Query hooks live inside each feature, for example:
-  - `src/features/projects/hooks/useProjects.ts`
+  - `src/features/projects/hooks/useProjectQueries.ts`
+  - `src/features/projects/hooks/useProjectMutations.ts`
   - `src/features/organization/hooks/useOrganization.ts`
 - Mutations invalidate related query keys after success
 

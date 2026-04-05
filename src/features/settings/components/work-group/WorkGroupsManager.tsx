@@ -1,12 +1,17 @@
 import { useCallback, useMemo, useState } from 'react';
 
+import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { useUnitDetailsByIds, useUnits, useUpdateUnit } from '@/features/organization';
 import { type WorkGroupSetting } from '@/features/settings/types';
-import { useUsersForSelection, useUsersForUnitsSelection } from '@/features/users';
+import {
+  useUpdateUsersInUnit,
+  useUsersForSelection,
+  useUsersForUnitsSelection,
+} from '@/features/users';
 
 import {
   DIRECTOR_ROLE_ID,
@@ -18,9 +23,11 @@ import { WorkGroupCard } from './WorkGroupCard';
 
 export function WorkGroupsManager() {
   const [isCreateVisible, setIsCreateVisible] = useState(false);
+  const queryClient = useQueryClient();
 
   const { data: units } = useUnits(SUPPLY_OPERATION_DEPARTMENT_ID);
   const updateUnitMutation = useUpdateUnit();
+  const updateUsersInUnitMutation = useUpdateUsersInUnit();
 
   const unitIds = useMemo(() => (units ?? []).map((unit) => unit.id), [units]);
   const unitDetailQueries = useUnitDetailsByIds(unitIds);
@@ -89,9 +96,34 @@ export function WorkGroupsManager() {
           await updateUnitMutation.mutateAsync(changedPayload);
         }
 
+        const currentAssignedUsers = new Set(
+          [currentGroup.head_id, ...currentGroup.member_ids].filter(Boolean)
+        );
+        const nextAssignedUsers = Array.from(
+          new Set([updated.head_id, ...updated.member_ids].filter(Boolean))
+        );
+
+        const newUserIds = nextAssignedUsers.filter((userId) => !currentAssignedUsers.has(userId));
+        const removeUserIds = Array.from(currentAssignedUsers).filter(
+          (userId) => !nextAssignedUsers.includes(userId)
+        );
+
+        if (newUserIds.length > 0 || removeUserIds.length > 0) {
+          await updateUsersInUnitMutation.mutateAsync({
+            unitId: updated.id,
+            newUserIds,
+            removeUserIds,
+          });
+        }
+
+        await Promise.all([
+          queryClient.invalidateQueries({ queryKey: ['users'] }),
+          queryClient.invalidateQueries({ queryKey: ['units'] }),
+        ]);
+
         // TODO: Backend Migration required here.
-        // We need endpoints to handle the member assignments, head updates, and delegations.
-        // e.g., await updateUnitMembersMutation.mutateAsync(...)
+        // Head role updates and delegation management still need dedicated endpoints.
+        // e.g., await updateUnitHeadMutation.mutateAsync(...)
         // e.g., await updateDelegationMutation.mutateAsync(...)
 
         toast.success('บันทึกกลุ่มงานเรียบร้อยแล้ว');
@@ -100,7 +132,7 @@ export function WorkGroupsManager() {
         throw error;
       }
     },
-    [groups, updateUnitMutation]
+    [groups, queryClient, updateUnitMutation, updateUsersInUnitMutation]
   );
 
   const handleCreateGroup = useCallback((_newGroup: WorkGroupSetting) => {

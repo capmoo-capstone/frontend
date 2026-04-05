@@ -87,7 +87,7 @@ export const RESPONSIBLE_SELECT_OPTIONS: { value: UnitResponsibleType; label: st
   { value: 'SELECTION', label: 'ซื้อ/จ้าง แบบคัดเลือก' },
   { value: 'EBIDDING', label: 'ซื้อ/จ้าง แบบประกาศเชิญชวนทั่วไป' },
   { value: 'CONTRACT', label: 'บริหารสัญญา' },
-  { value: 'NO18', label: 'ข้อ 18' },
+  { value: 'INTERNAL', label: 'ข้อ 18' },
 ];
 
 export const getResponsibleTypeFormat = (type: UnitResponsibleType) => {
@@ -132,7 +132,7 @@ export const getResponsibleTypeFormat = (type: UnitResponsibleType) => {
         indicator: 'var(--chart-6-dark)',
         bg: 'var(--chart-6-light)',
       };
-    case 'NO18':
+    case 'INTERNAL':
       return {
         label: 'ข้อ 18',
         indicator: 'var(--chart-7-dark)',

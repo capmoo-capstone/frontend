@@ -19,7 +19,14 @@ export const ProjectStatusEnum = z.enum([
 
 export const ProjectUrgentStatusEnum = z.enum(['NORMAL', 'URGENT', 'VERY_URGENT']);
 
-export const ProcurementTypeEnum = z.enum(['LT100K', 'LT500K', 'MT500K', 'SELECTION', 'EBIDDING', 'NO18']);
+export const ProcurementTypeEnum = z.enum([
+  'LT100K',
+  'LT500K',
+  'MT500K',
+  'SELECTION',
+  'EBIDDING',
+  'INTERNAL',
+]);
 
 export const UnitResponsibleTypeEnum = z.enum([
   'LT100K',
@@ -28,7 +35,7 @@ export const UnitResponsibleTypeEnum = z.enum([
   'SELECTION',
   'EBIDDING',
   'CONTRACT',
-  'NO18'
+  'INTERNAL',
 ]);
 
 export const AssignedProjectStatusEnum = z.enum(['WAITING_ACCEPT', 'IN_PROGRESS', 'CANCELLED']);

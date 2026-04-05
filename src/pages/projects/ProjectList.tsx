@@ -1,3 +1,5 @@
+import { useNavigate } from 'react-router-dom';
+
 import {
   AllProjectTable,
   ProjectFilterPanel,
@@ -20,6 +22,8 @@ export default function ProjectListPage() {
     handleResetFilter,
   } = useProjectFilters();
 
+  const navigate = useNavigate();
+
   return (
     <div className="relative space-y-6">
       {/* Header */}
@@ -36,6 +40,9 @@ export default function ProjectListPage() {
         onSearchChange={setSearchQuery}
         onSearch={handleGlobalSearch}
         onFilterToggle={() => setIsFilterOpen(!isFilterOpen)}
+        onImport={() => {
+          navigate('/app/project-import');
+        }}
       />
 
       {/* Filter Panel */}

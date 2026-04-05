@@ -42,7 +42,7 @@ export function ProjectImportContainer() {
   }, [mode, setData]);
 
   const handleSuccess = () => {
-    navigate('/app/projects/import/success?mode=' + mode);
+    navigate('/app/project-import/success?mode=' + mode);
   };
 
   const handleSelectMode = (selectedMode: ImportMode) => {
@@ -50,7 +50,7 @@ export function ProjectImportContainer() {
   };
 
   const handleBack = () => {
-    navigate('/app/projects/import');
+    navigate('/app/project-import');
   };
 
   return (

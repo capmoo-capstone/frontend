@@ -17,9 +17,9 @@ export default function ProjectImportSuccess() {
 
   const handleCreateMore = () => {
     if (user && hasImportOptionsPermission(user)) {
-      navigate('/app/projects/import');
+      navigate('/app/project-import');
     } else {
-      navigate('/app/projects/import?mode=manual');
+      navigate('/app/project-import?mode=manual');
     }
   };
 

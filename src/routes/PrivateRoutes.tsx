@@ -64,8 +64,8 @@ export const PrivateRoutes = () => {
                   <PermissionGuard isAllowed={canImportProjects} redirectPath="/app/projects" />
                 }
               >
-                <Route path="/app/projects/import" element={<ProjectImport />} />
-                <Route path="/app/projects/import/success" element={<ProjectImportSuccess />} />
+                <Route path="/app/project-import" element={<ProjectImport />} />
+                <Route path="/app/project-import/success" element={<ProjectImportSuccess />} />
               </Route>
 
               {/* --- Exports --- */}

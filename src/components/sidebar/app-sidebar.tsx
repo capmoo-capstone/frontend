@@ -99,7 +99,7 @@ const menuGroups: MenuGroup[] = [
       },
       {
         title: 'นำเข้าโครงการ',
-        url: '/app/projects/import',
+        url: '/app/project-import',
         icon: Import,
       },
       {

@@ -11,7 +11,7 @@ export const getActiveResponsibleUsers = (project: Project) => {
 };
 
 export const canEditProjectAssignee = (status: Project['status']) => {
-  return status === 'IN_PROGRESS' || status === 'UNASSIGNED' || status === 'WAITING_ACCEPT';
+  return status === 'IN_PROGRESS' || status === 'UNASSIGNED';
 };
 
 export const canManageAssigneeByRole = (viewAsRole: Role) => {

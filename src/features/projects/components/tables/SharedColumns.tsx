@@ -11,13 +11,13 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { type Role, type User, isProcurementStaffRole } from '@/features/auth';
 import { getProjectStatusesFormat, getResponsibleTypeFormat } from '@/lib/formatters';
-import { hasDepartmentPermission, hasUnitPermission } from '@/lib/permissions';
+import { hasUnitPermission } from '@/lib/permissions';
 
 import type { Project } from '../../types/index';
 import {
   canCancelProject,
   canEditProjectAssignee,
-  canManageAssigneeByRole,
+  canReturnProject,
   getActiveResponsibleUsers,
   getCancelProjectActionLabel,
 } from '../../utils/project-selectors';
@@ -143,16 +143,24 @@ export const baseColumns = ({
         project.current_workflow_type === 'CONTRACT'
           ? (project.assignee_contract?.map((u) => u.id) ?? [])
           : (project.assignee_procurement?.map((u) => u.id) ?? []);
+      const canManage =
+        (user && hasUnitPermission(user, project.responsible_unit_id)) ||
+        assigneeIds.includes(user?.id ?? '');
 
-      const canAddAssignee =
-        canEditProjectAssignee(project.status) &&
-        ((user && hasUnitPermission(user, project.responsible_unit_id)) ||
-          assigneeIds.includes(user?.id ?? ''));
-      const canReturnProject = canAddAssignee;
-      const canDeleteProject = canCancelProject(project.status);
+      const canAddAssignee = canEditProjectAssignee(project.status) && canManage;
+      const canReturnProjectAction =
+        canReturnProject(
+          project.status,
+          project.current_workflow_type,
+          project.procurement_status,
+          project.procurement_step,
+          project.contract_status,
+          project.contract_step
+        ) && canManage;
+      const canDeleteProject = canCancelProject(project.status) && canManage;
 
       return (
-        (canAddAssignee || canReturnProject || canDeleteProject) && (
+        (canAddAssignee || canReturnProjectAction || canDeleteProject) && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="h-8 w-8 p-0">
@@ -169,13 +177,13 @@ export const baseColumns = ({
                   เพิ่มผู้รับผิดชอบ
                 </DropdownMenuItem>
               )}
-              {canReturnProject && (
+              {canReturnProjectAction && (
                 <DropdownMenuItem onClick={() => onReturnProject(project)} variant="destructive">
                   <Reply className="normal text-destructive h-4 w-4" />
                   คืนโครงการ
                 </DropdownMenuItem>
               )}
-              {canCancelProject(project.status) && (
+              {canDeleteProject && (
                 <DropdownMenuItem onClick={() => onCancelProject(project)} variant="destructive">
                   <Trash2 className="normal h-4 w-4" />
                   {getCancelProjectActionLabel(viewAsRole)}

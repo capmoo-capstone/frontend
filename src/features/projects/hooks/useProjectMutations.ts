@@ -2,10 +2,18 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import {
   acceptProjects,
+  addProjectAssignee,
+  approveProjectCancellation,
   assignProject,
   cancelProject,
   changeProjectAssignee,
   claimProject,
+  closeProject,
+  completeProjectProcurement,
+  deleteProject,
+  rejectProjectCancellation,
+  requestProjectEdit,
+  returnProject,
   updateProject,
 } from '../api';
 import type { UpdateProjectPayload } from '../types/index';
@@ -107,6 +115,118 @@ export const useClaimProject = () => {
       queryClient.invalidateQueries({
         queryKey: projectKeys.unassigned(),
       });
+    },
+  });
+};
+
+export const useAddProjectAssignee = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ projectId, userId }: { projectId: string; userId: string }) =>
+      addProjectAssignee(projectId, userId),
+
+    onSuccess: (_, { projectId }) => {
+      queryClient.invalidateQueries({
+        queryKey: projectKeys.all,
+      });
+      queryClient.invalidateQueries({
+        queryKey: projectKeys.detail(projectId),
+      });
+    },
+  });
+};
+
+export const useReturnProject = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (projectId: string) => returnProject(projectId),
+
+    onSuccess: (_, projectId) => {
+      queryClient.invalidateQueries({
+        queryKey: projectKeys.all,
+      });
+      queryClient.invalidateQueries({
+        queryKey: projectKeys.detail(projectId),
+      });
+    },
+  });
+};
+
+export const useApproveProjectCancellation = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (projectId: string) => approveProjectCancellation(projectId),
+
+    onSuccess: (_, projectId) => {
+      queryClient.invalidateQueries({ queryKey: projectKeys.all });
+      queryClient.invalidateQueries({ queryKey: projectKeys.detail(projectId) });
+    },
+  });
+};
+
+export const useRejectProjectCancellation = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (projectId: string) => rejectProjectCancellation(projectId),
+
+    onSuccess: (_, projectId) => {
+      queryClient.invalidateQueries({ queryKey: projectKeys.all });
+      queryClient.invalidateQueries({ queryKey: projectKeys.detail(projectId) });
+    },
+  });
+};
+
+export const useCompleteProjectProcurement = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (projectId: string) => completeProjectProcurement(projectId),
+
+    onSuccess: (_, projectId) => {
+      queryClient.invalidateQueries({ queryKey: projectKeys.all });
+      queryClient.invalidateQueries({ queryKey: projectKeys.detail(projectId) });
+    },
+  });
+};
+
+export const useCloseProject = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (projectId: string) => closeProject(projectId),
+
+    onSuccess: (_, projectId) => {
+      queryClient.invalidateQueries({ queryKey: projectKeys.all });
+      queryClient.invalidateQueries({ queryKey: projectKeys.detail(projectId) });
+    },
+  });
+};
+
+export const useRequestProjectEdit = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (projectId: string) => requestProjectEdit(projectId),
+
+    onSuccess: (_, projectId) => {
+      queryClient.invalidateQueries({ queryKey: projectKeys.all });
+      queryClient.invalidateQueries({ queryKey: projectKeys.detail(projectId) });
+    },
+  });
+};
+
+export const useDeleteProject = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (projectId: string) => deleteProject(projectId),
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: projectKeys.all });
     },
   });
 };

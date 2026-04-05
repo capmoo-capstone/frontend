@@ -34,19 +34,29 @@ export { useProjectFilters } from './hooks/useProjectFilters';
 export { projectKeys } from './hooks/queryKeys';
 export {
   useAssignedProjects,
+  useOwnProjects,
   useProjectDetail,
   useProjectSummary,
   useProjects,
   useUnassignedProjects,
   useWorkloadStats,
+  type OwnProjectQueryParams,
   type ProjectFilterParams,
 } from './hooks/useProjectQueries';
 export {
   useAcceptProjects,
+  useAddProjectAssignee,
+  useApproveProjectCancellation,
   useAssignProjects,
   useCancelProject,
   useChangeProjectAssignee,
   useClaimProject,
+  useCloseProject,
+  useCompleteProjectProcurement,
+  useDeleteProject,
+  useRejectProjectCancellation,
+  useRequestProjectEdit,
+  useReturnProject,
   useUpdateProject,
 } from './hooks/useProjectMutations';
 

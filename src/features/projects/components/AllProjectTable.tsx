@@ -17,6 +17,8 @@ import { useAuth } from '@/context/AuthContext';
 import { type ProjectFilterParams, useProjects } from '../hooks/useProjectQueries';
 import type { Project } from '../types/index';
 import { AddAssigneeDialog } from './dialogs/AddAssigneeDialog';
+import { CancelProjectDialog } from './dialogs/CancelProjectDialog';
+import { ReturnProjectDialog } from './dialogs/ReturnProjectDialog';
 import { ProjectDataTable } from './tables/DataTable';
 import { baseColumns } from './tables/SharedColumns';
 
@@ -32,16 +34,27 @@ export function AllProjectTable({ filters, columns: customColumns }: AllProjectT
   const { data: projects, isLoading, isError } = useProjects(filters);
   const [sorting, setSorting] = useState<SortingState>([]);
   const [projectToAddAssignee, setProjectToAddAssignee] = useState<Project | null>(null);
+  const [projectToReturn, setProjectToReturn] = useState<Project | null>(null);
+  const [projectToCancel, setProjectToCancel] = useState<Project | null>(null);
 
   const columns = useMemo(
     () =>
       customColumns ||
       baseColumns({
         onAddAssignee: (project) => setProjectToAddAssignee(project),
+        onReturnProject: (project) => setProjectToReturn(project),
+        onCancelProject: (project) => setProjectToCancel(project),
         viewAsRole,
         user: user ?? undefined,
       }),
-    [customColumns, viewAsRole, user, setProjectToAddAssignee]
+    [
+      customColumns,
+      viewAsRole,
+      user,
+      setProjectToAddAssignee,
+      setProjectToReturn,
+      setProjectToCancel,
+    ]
   );
 
   const table = useReactTable({
@@ -84,7 +97,23 @@ export function AllProjectTable({ filters, columns: customColumns }: AllProjectT
         <AddAssigneeDialog
           isOpen={!!projectToAddAssignee}
           onClose={() => setProjectToAddAssignee(null)}
-          projectId={projectToAddAssignee.id}
+          project={projectToAddAssignee}
+        />
+      )}
+
+      {projectToReturn && (
+        <ReturnProjectDialog
+          isOpen={!!projectToReturn}
+          onClose={() => setProjectToReturn(null)}
+          project={projectToReturn}
+        />
+      )}
+
+      {projectToCancel && (
+        <CancelProjectDialog
+          isOpen={!!projectToCancel}
+          onClose={() => setProjectToCancel(null)}
+          project={projectToCancel}
         />
       )}
     </>

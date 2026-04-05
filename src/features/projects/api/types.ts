@@ -12,3 +12,8 @@ export interface ProjectFilterParams {
   departments?: string[];
   myTasks?: boolean;
 }
+
+export interface OwnProjectQueryParams {
+  page?: number;
+  limit?: number;
+}

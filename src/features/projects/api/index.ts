@@ -16,21 +16,31 @@ import {
 } from './project.mappers';
 import {
   acceptProjectsRequest,
+  addProjectAssigneeRequest,
+  approveCancellationRequest,
   assignProjectRequest,
   cancelProjectRequest,
   changeProjectAssigneeRequest,
   claimProjectRequest,
+  closeProjectRequest,
+  completeProcurementRequest,
+  createProjectRequest,
+  deleteProjectRequest,
   fetchAssignedProjects,
+  fetchOwnProjects,
   fetchProjectDetail,
   fetchProjectSummary,
   fetchProjectsPage,
   fetchUnassignedProjects,
   fetchWorkloadStats,
+  rejectCancellationRequest,
+  requestEditProjectRequest,
+  returnProjectRequest,
   updateProjectRequest,
 } from './project.requests';
-import type { ProjectFilterParams } from './types';
+import type { OwnProjectQueryParams, ProjectFilterParams } from './types';
 
-export type { ProjectFilterParams } from './types';
+export type { OwnProjectQueryParams, ProjectFilterParams } from './types';
 
 export const getProjects = async (params?: ProjectFilterParams): Promise<Project[]> => {
   const parsed = await fetchProjectsPage(params);
@@ -47,8 +57,8 @@ export const getAssignedProjects = async (date: Date): Promise<AssignedProjectIt
   return parsed.data.map(mapAssignedProjectItem);
 };
 
-export const getUnassignedProjects = async (): Promise<UnassignedProjectItem[]> => {
-  const parsed = await fetchUnassignedProjects();
+export const getUnassignedProjects = async (unitId?: string): Promise<UnassignedProjectItem[]> => {
+  const parsed = await fetchUnassignedProjects(unitId);
   return parsed.data.map(mapUnassignedProjectItem);
 };
 
@@ -82,4 +92,44 @@ export const getWorkloadStats = async (unitId?: string): Promise<WorkloadStatsRe
 
 export const getProjectSummary = async (): Promise<SummaryResponse> => {
   return fetchProjectSummary();
+};
+
+export const getOwnProjects = async (params?: OwnProjectQueryParams) => {
+  return fetchOwnProjects(params);
+};
+
+export const createProject = async (payload: unknown) => {
+  return createProjectRequest(payload);
+};
+
+export const addProjectAssignee = async (projectId: string, userId: string) => {
+  return addProjectAssigneeRequest(projectId, userId);
+};
+
+export const returnProject = async (projectId: string) => {
+  return returnProjectRequest(projectId);
+};
+
+export const approveProjectCancellation = async (projectId: string) => {
+  return approveCancellationRequest(projectId);
+};
+
+export const rejectProjectCancellation = async (projectId: string) => {
+  return rejectCancellationRequest(projectId);
+};
+
+export const completeProjectProcurement = async (projectId: string) => {
+  return completeProcurementRequest(projectId);
+};
+
+export const closeProject = async (projectId: string) => {
+  return closeProjectRequest(projectId);
+};
+
+export const requestProjectEdit = async (projectId: string) => {
+  return requestEditProjectRequest(projectId);
+};
+
+export const deleteProject = async (projectId: string) => {
+  return deleteProjectRequest(projectId);
 };

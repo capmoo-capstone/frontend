@@ -15,9 +15,9 @@ import { Button } from '@/components/ui/button';
 import { DatePicker } from '@/components/ui/date-picker';
 import { TitleBar } from '@/components/ui/title-bar';
 import { useAuth } from '@/context/AuthContext';
-import { ManageSelfRoles, ManageUnitRoles, SupervisorRoles } from '@/lib/permissions';
+import { ManageSelfRoles } from '@/lib/permissions';
 
-import { useAcceptProjects, useCancelProject } from '../../../hooks/useProjectMutations';
+import { useAcceptProjects } from '../../../hooks/useProjectMutations';
 import { useAssignedProjects } from '../../../hooks/useProjectQueries';
 import type { AssignedProjectItem } from '../../../types/index';
 import { CancelProjectDialog } from '../../dialogs/CancelProjectDialog';
@@ -32,7 +32,6 @@ export function AssignedTable({ unitId }: { unitId?: string }) {
   const [date, setDate] = useState<Date | undefined>(new Date());
 
   const { data: projects, isLoading, isError } = useAssignedProjects(date);
-  const { mutateAsync: cancelProjectMutation } = useCancelProject();
   const { mutateAsync: acceptProjectsMutation } = useAcceptProjects();
 
   const [sorting, setSorting] = useState<SortingState>([{ id: 'status', desc: true }]);
@@ -72,29 +71,6 @@ export function AssignedTable({ unitId }: { unitId?: string }) {
     getSortedRowModel: getSortedRowModel(),
     state: { sorting },
   });
-
-  const handleConfirmCancel = async (reason: string) => {
-    if (!projectToCancel) return;
-
-    const cancelPromise = cancelProjectMutation({
-      projectId: projectToCancel.id,
-      reason,
-    });
-
-    const actionLabel =
-      ManageUnitRoles.includes(viewAsRole) || SupervisorRoles.includes(viewAsRole)
-        ? 'ยกเลิก'
-        : 'ขอยกเลิก';
-
-    toast.promise(cancelPromise, {
-      loading: `กำลัง${actionLabel}โครงการ...`,
-      success: () => {
-        setProjectToCancel(null);
-        return `${actionLabel}โครงการเรียบร้อยแล้ว`;
-      },
-      error: 'ไม่สามารถยกเลิกโครงการได้',
-    });
-  };
 
   const handlePrint = async () => {
     toast.info('สมมตว่ากำลังส่งออกรายงาน...');
@@ -153,13 +129,13 @@ export function AssignedTable({ unitId }: { unitId?: string }) {
         }
       />
 
-      <CancelProjectDialog
-        isOpen={!!projectToCancel}
-        onClose={() => setProjectToCancel(null)}
-        onConfirm={handleConfirmCancel}
-        projectTitle={projectToCancel?.title}
-        isAuthorized={ManageUnitRoles.includes(viewAsRole) || SupervisorRoles.includes(viewAsRole)}
-      />
+      {projectToCancel && (
+        <CancelProjectDialog
+          isOpen={!!projectToCancel}
+          onClose={() => setProjectToCancel(null)}
+          project={projectToCancel as any}
+        />
+      )}
 
       {projectToChangeAssignee && (
         <ChangeAssigneeDialog

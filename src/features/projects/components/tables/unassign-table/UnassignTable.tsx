@@ -14,13 +14,9 @@ import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { TitleBar } from '@/components/ui/title-bar';
 import { useAuth } from '@/context/AuthContext';
-import { ManageUnitRoles, SupervisorRoles } from '@/lib/permissions';
+import { ManageUnitRoles } from '@/lib/permissions';
 
-import {
-  useAssignProjects,
-  useCancelProject,
-  useClaimProject,
-} from '../../../hooks/useProjectMutations';
+import { useAssignProjects, useClaimProject } from '../../../hooks/useProjectMutations';
 import { useUnassignedProjects } from '../../../hooks/useProjectQueries';
 import { type UnassignedProjectItem } from '../../../types/index';
 import { CancelProjectDialog } from '../../dialogs/CancelProjectDialog';
@@ -32,9 +28,8 @@ export function UnassignTable({ unitId }: { unitId?: string }) {
   const { user } = useAuth();
   const viewAsRole = user?.role ?? 'GUEST';
 
-  const { data: projects, isLoading, isError } = useUnassignedProjects();
+  const { data: projects, isLoading, isError } = useUnassignedProjects(unitId);
   const { mutateAsync: assignProjectsMutation } = useAssignProjects();
-  const { mutateAsync: cancelProjectMutation } = useCancelProject();
   const { mutateAsync: claimProjectMutation } = useClaimProject();
 
   const [projectToCancel, setProjectToCancel] = useState<UnassignedProjectItem | null>(null);
@@ -76,29 +71,6 @@ export function UnassignTable({ unitId }: { unitId?: string }) {
     getSortedRowModel: getSortedRowModel(),
     state: { sorting },
   });
-
-  const handleConfirmCancel = async (reason: string) => {
-    if (!projectToCancel) return;
-
-    const cancelPromise = cancelProjectMutation({
-      projectId: projectToCancel.id,
-      reason,
-    });
-
-    const actionLabel =
-      ManageUnitRoles.includes(viewAsRole) || SupervisorRoles.includes(viewAsRole)
-        ? 'ยกเลิก'
-        : 'ขอยกเลิก';
-
-    toast.promise(cancelPromise, {
-      loading: `กำลัง${actionLabel}โครงการ...`,
-      success: () => {
-        setProjectToCancel(null);
-        return `${actionLabel}โครงการเรียบร้อยแล้ว`;
-      },
-      error: 'ไม่สามารถยกเลิกโครงการได้',
-    });
-  };
 
   const handleSave = async () => {
     if (Object.keys(pendingChanges).length === 0) return;
@@ -161,13 +133,13 @@ export function UnassignTable({ unitId }: { unitId?: string }) {
           </div>
         }
       />
-      <CancelProjectDialog
-        isOpen={!!projectToCancel}
-        onClose={() => setProjectToCancel(null)}
-        onConfirm={handleConfirmCancel}
-        projectTitle={projectToCancel?.title}
-        isAuthorized={ManageUnitRoles.includes(viewAsRole) || SupervisorRoles.includes(viewAsRole)}
-      />
+      {projectToCancel && (
+        <CancelProjectDialog
+          isOpen={!!projectToCancel}
+          onClose={() => setProjectToCancel(null)}
+          project={projectToCancel as any}
+        />
+      )}
     </>
   );
 }

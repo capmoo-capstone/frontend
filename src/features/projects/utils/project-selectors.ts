@@ -18,6 +18,24 @@ export const canCancelProject = (status: Project['status']) => {
   return status === 'IN_PROGRESS' || status === 'UNASSIGNED' || status === 'WAITING_ACCEPT';
 };
 
+export const canReturnProject = (
+  status: Project['status'],
+  currentWorkflowType: Project['current_workflow_type'],
+  procurementStatus: Project['procurement_status'],
+  procurementStep: Project['procurement_step'],
+  contractStatus: Project['contract_status'],
+  contractStep: Project['contract_step']
+) => {
+  if (status !== 'IN_PROGRESS') return false;
+
+  return (
+    (currentWorkflowType !== 'CONTRACT' &&
+      procurementStatus === 'IN_PROGRESS' &&
+      procurementStep === 1) ||
+    (currentWorkflowType === 'CONTRACT' && contractStatus !== 'IN_PROGRESS' && contractStep === 1)
+  );
+};
+
 export const canManageAssigneeByRole = (viewAsRole: Role) => {
   return ManageUnitRoles.includes(viewAsRole) || ManageSelfRoles.includes(viewAsRole);
 };

@@ -1,8 +1,10 @@
 import { useQuery } from '@tanstack/react-query';
 
 import {
+  type OwnProjectQueryParams,
   type ProjectFilterParams,
   getAssignedProjects,
+  getOwnProjects,
   getProjectDetail,
   getProjectSummary,
   getProjects,
@@ -13,6 +15,7 @@ import type { ProjectDetail, SummaryResponse, WorkloadStatsResponse } from '../t
 import { projectKeys } from './queryKeys';
 
 export type { ProjectFilterParams } from '../api';
+export type { OwnProjectQueryParams } from '../api';
 
 export const useProjects = (filters?: ProjectFilterParams) => {
   return useQuery({
@@ -25,6 +28,16 @@ export const useProjectSummary = () => {
   return useQuery<SummaryResponse, Error>({
     queryKey: projectKeys.summary(),
     queryFn: getProjectSummary,
+  });
+};
+
+export const useOwnProjects = (params?: OwnProjectQueryParams) => {
+  const page = params?.page ?? 1;
+  const limit = params?.limit ?? 10;
+
+  return useQuery({
+    queryKey: projectKeys.own(page, limit),
+    queryFn: () => getOwnProjects({ page, limit }),
   });
 };
 
@@ -54,9 +67,9 @@ export const useAssignedProjects = (date: Date | undefined) => {
   });
 };
 
-export const useUnassignedProjects = () => {
+export const useUnassignedProjects = (unitId?: string) => {
   return useQuery({
-    queryKey: projectKeys.unassigned(),
-    queryFn: () => getUnassignedProjects(),
+    queryKey: projectKeys.unassigned(unitId),
+    queryFn: () => getUnassignedProjects(unitId),
   });
 };

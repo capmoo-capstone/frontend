@@ -14,8 +14,8 @@ import { AlertTriangle, Loader2 } from 'lucide-react';
 
 import { useAuth } from '@/context/AuthContext';
 
-import { type ProjectFilterParams, useProjects } from '../hooks/useProjects';
-import type { Project } from '../types';
+import { type ProjectFilterParams, useProjects } from '../hooks/useProjectQueries';
+import type { Project } from '../types/index';
 import { AddAssigneeDialog } from './dialogs/AddAssigneeDialog';
 import { ProjectDataTable } from './tables/DataTable';
 import { baseColumns } from './tables/SharedColumns';

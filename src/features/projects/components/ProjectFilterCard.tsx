@@ -18,7 +18,7 @@ import { useUsersForSelection } from '@/features/users';
 import { getResponsibleTypeFormat } from '@/lib/formatters';
 
 import { type ProjectFilterParams } from '../api';
-import type { ProcurementType, ProjectStatus, ProjectUrgentStatus } from '../types';
+import type { ProcurementType, ProjectStatus, ProjectUrgentStatus } from '../types/index';
 import { FilterCheckbox } from './FilterCheckbox';
 import { SearchCheckbox } from './SearchCheckbox';
 

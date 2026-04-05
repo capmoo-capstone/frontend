@@ -20,9 +20,9 @@ import {
   useAssignProjects,
   useCancelProject,
   useClaimProject,
-  useUnassignedProjects,
-} from '../../../hooks/useProjects';
-import { type UnassignedProjectItem } from '../../../types';
+} from '../../../hooks/useProjectMutations';
+import { useUnassignedProjects } from '../../../hooks/useProjectQueries';
+import { type UnassignedProjectItem } from '../../../types/index';
 import { CancelProjectDialog } from '../../dialogs/CancelProjectDialog';
 import { ProjectDataTable } from '../DataTable';
 import { WorkloadChart } from './WorkloadChart';
@@ -32,7 +32,7 @@ export function UnassignTable({ unitId }: { unitId?: string }) {
   const { user } = useAuth();
   const viewAsRole = user?.role ?? 'GUEST';
 
-  const { data: projects, isLoading, isError } = useUnassignedProjects(unitId);
+  const { data: projects, isLoading, isError } = useUnassignedProjects();
   const { mutateAsync: assignProjectsMutation } = useAssignProjects();
   const { mutateAsync: cancelProjectMutation } = useCancelProject();
   const { mutateAsync: claimProjectMutation } = useClaimProject();
@@ -138,7 +138,9 @@ export function UnassignTable({ unitId }: { unitId?: string }) {
 
   return (
     <>
-      {ManageUnitRoles.includes(viewAsRole) && <WorkloadChart pendingChanges={pendingChanges} />}
+      {ManageUnitRoles.includes(viewAsRole) && (
+        <WorkloadChart pendingChanges={pendingChanges} unitId={unitId} />
+      )}
       <ProjectDataTable
         table={table}
         columnsLength={columns.length}

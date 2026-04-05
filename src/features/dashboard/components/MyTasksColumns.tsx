@@ -2,13 +2,25 @@ import { type ColumnDef } from '@tanstack/react-table';
 import { ArrowUpDown } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
-import type { User } from '@/features/auth';
+import { type User, isProcurementStaffRole } from '@/features/auth';
 import { type Project } from '@/features/projects';
-import { getProjectStatusFormat, getResponsibleTypeFormat } from '@/lib/formatters';
+import { getProjectStatusesFormat, getResponsibleTypeFormat } from '@/lib/formatters';
 
 interface MyTasksColumnsProps {
   user?: User;
 }
+
+const getProjectStatuses = (project: Project, user?: User) =>
+  getProjectStatusesFormat({
+    overallStatus: project.status,
+    currentWorkflowType: project.current_workflow_type,
+    procurementStatus: project.procurement_status ?? 'NOT_STARTED',
+    procurementStep: project.procurement_step ?? null,
+    contractStatus: project.contract_status ?? 'NOT_STARTED',
+    contractStep: project.contract_step ?? null,
+    isProcurementStaff: isProcurementStaffRole(user),
+    role: user?.role,
+  });
 
 export const myTasksColumns = ({ user }: MyTasksColumnsProps): ColumnDef<Project>[] => [
   {
@@ -41,10 +53,10 @@ export const myTasksColumns = ({ user }: MyTasksColumnsProps): ColumnDef<Project
     ),
     cell: ({ row }) => (
       <div>
-        {row.original.urgent_status === 'URGENT' && (
+        {row.original.is_urgent === 'URGENT' && (
           <span className="text-destructive normal-b mr-2">ด่วน</span>
         )}
-        {row.original.urgent_status === 'VERY_URGENT' && (
+        {row.original.is_urgent === 'VERY_URGENT' && (
           <span className="text-destructive normal-b mr-2">ด่วนพิเศษ</span>
         )}
         {row.getValue('title')}
@@ -77,16 +89,8 @@ export const myTasksColumns = ({ user }: MyTasksColumnsProps): ColumnDef<Project
   {
     accessorKey: 'procure_status',
     sortingFn: (rowA, rowB) => {
-      const labelA = getProjectStatusFormat(
-        rowA.original.status,
-        rowA.original.workflow_status.p,
-        user?.department?.name
-      ).label;
-      const labelB = getProjectStatusFormat(
-        rowB.original.status,
-        rowB.original.workflow_status.p,
-        user?.department?.name
-      ).label;
+      const labelA = getProjectStatuses(rowA.original, user).procurement.label;
+      const labelB = getProjectStatuses(rowB.original, user).procurement.label;
       return labelA.localeCompare(labelB, 'th');
     },
     header: ({ column }) => (
@@ -101,29 +105,15 @@ export const myTasksColumns = ({ user }: MyTasksColumnsProps): ColumnDef<Project
       </div>
     ),
     cell: ({ row }) => {
-      const { variant, label } = getProjectStatusFormat(
-        row.original.status,
-        row.original.workflow_status.p,
-        user?.department?.name
-      );
+      const { variant, label } = getProjectStatuses(row.original, user).procurement;
       return <Badge variant={variant}>{label} </Badge>;
     },
   },
   {
     accessorKey: 'contract_status',
     sortingFn: (rowA, rowB) => {
-      const labelA = getProjectStatusFormat(
-        rowA.original.status,
-        rowA.original.workflow_status.c,
-        user?.department?.name,
-        rowA.original.workflow_status.p
-      ).label;
-      const labelB = getProjectStatusFormat(
-        rowB.original.status,
-        rowB.original.workflow_status.c,
-        user?.department?.name,
-        rowB.original.workflow_status.p
-      ).label;
+      const labelA = getProjectStatuses(rowA.original, user).contract.label;
+      const labelB = getProjectStatuses(rowB.original, user).contract.label;
       return labelA.localeCompare(labelB, 'th');
     },
     header: ({ column }) => (
@@ -138,12 +128,7 @@ export const myTasksColumns = ({ user }: MyTasksColumnsProps): ColumnDef<Project
       </div>
     ),
     cell: ({ row }) => {
-      const { variant, label } = getProjectStatusFormat(
-        row.original.status,
-        row.original.workflow_status.c,
-        user?.department?.name,
-        row.original.workflow_status.p
-      );
+      const { variant, label } = getProjectStatuses(row.original, user).contract;
       return <Badge variant={variant}>{label} </Badge>;
     },
   },

@@ -1,7 +1,6 @@
 import { type ColumnDef } from '@tanstack/react-table';
-import { ArrowUpDown, MoreVertical, Trash2, UserCog } from 'lucide-react';
+import { MoreVertical, Trash2, UserCog } from 'lucide-react';
 
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -18,7 +17,13 @@ import {
   ViewUnitRoles,
 } from '@/lib/permissions';
 
-import type { AssignedProjectItem } from '../../../types';
+import type { AssignedProjectItem } from '../../../types/index';
+import { getCancelProjectActionLabel } from '../../../utils/project-selectors';
+import {
+  renderAssignedStatusBadge,
+  renderSortableHeader,
+  renderUrgentText,
+} from '../column-helpers';
 
 interface GetColumnsProps {
   onCancelProject: (project: AssignedProjectItem) => void;
@@ -35,73 +40,28 @@ export const getColumns = ({
 }: GetColumnsProps): ColumnDef<AssignedProjectItem>[] => [
   {
     accessorKey: 'receive_no',
-    header: ({ column }) => (
-      <div
-        className="flex cursor-pointer items-center"
-        onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-      >
-        เลขที่ลงรับ
-        <ArrowUpDown
-          className={`ml-2 h-4 w-4 ${column.getIsSorted() ? 'text-primary' : 'text-ring'}`}
-        />
-      </div>
-    ),
+    header: ({ column }) => renderSortableHeader(column, 'เลขที่ลงรับ'),
     cell: ({ row }) => <div className="font-medium">{row.getValue('receive_no')}</div>,
   },
   {
     accessorKey: 'title',
-    header: ({ column }) => (
-      <div
-        className="flex cursor-pointer items-center"
-        onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-      >
-        โครงการ
-        <ArrowUpDown
-          className={`ml-2 h-4 w-4 ${column.getIsSorted() ? 'text-primary' : 'text-ring'}`}
-        />
-      </div>
-    ),
+    header: ({ column }) => renderSortableHeader(column, 'โครงการ'),
     cell: ({ row }) => (
       <div>
-        {row.original.urgent_status === 'URGENT' && (
-          <span className="text-destructive mr-2 font-semibold">ด่วน</span>
-        )}
-        {row.original.urgent_status === 'VERY_URGENT' && (
-          <span className="text-destructive mr-2 font-semibold">ด่วนพิเศษ</span>
-        )}
+        {renderUrgentText(row.original.urgent_status)}
         {row.getValue('title')}
       </div>
     ),
   },
   {
     id: 'procurement_type',
-    header: ({ column }) => (
-      <div
-        className="flex cursor-pointer items-center"
-        onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-      >
-        ประเภทงาน
-        <ArrowUpDown
-          className={`ml-2 h-4 w-4 ${column.getIsSorted() ? 'text-primary' : 'text-ring'}`}
-        />
-      </div>
-    ),
+    header: ({ column }) => renderSortableHeader(column, 'ประเภทงาน'),
     cell: ({ row }) => <div>{getResponsibleTypeFormat(row.original.procurement_type).label}</div>,
     accessorFn: (row) => row.procurement_type,
   },
   {
     id: 'expected_approval_date',
-    header: ({ column }) => (
-      <div
-        className="flex cursor-pointer items-center"
-        onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-      >
-        กำหนดส่งงาน
-        <ArrowUpDown
-          className={`ml-2 h-4 w-4 ${column.getIsSorted() ? 'text-primary' : 'text-ring'}`}
-        />
-      </div>
-    ),
+    header: ({ column }) => renderSortableHeader(column, 'กำหนดส่งงาน'),
     cell: ({ row }) => (
       <div>
         {row.original.expected_approval_date
@@ -113,54 +73,15 @@ export const getColumns = ({
   },
   {
     id: 'request_unit',
-    header: ({ column }) => (
-      <div
-        className="flex cursor-pointer items-center"
-        onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-      >
-        หน่วยงาน
-        <ArrowUpDown
-          className={`ml-2 h-4 w-4 ${column.getIsSorted() ? 'text-primary' : 'text-ring'}`}
-        />
-      </div>
-    ),
+    header: ({ column }) => renderSortableHeader(column, 'หน่วยงาน'),
     cell: ({ row }) => <div>{row.original.request_unit.department.name}</div>,
     accessorFn: (row) => row.request_unit.department.name,
   },
   {
     accessorKey: 'status',
-    header: ({ column }) => (
-      <div
-        className="flex cursor-pointer items-center"
-        onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-      >
-        สถานะ
-        <ArrowUpDown
-          className={`ml-2 h-4 w-4 ${column.getIsSorted() ? 'text-primary' : 'text-ring'}`}
-        />
-      </div>
-    ),
-    cell: ({ row }) => {
-      const status = row.getValue('status') as string;
-      let variant: 'secondary' | 'destructive' | 'warning' | 'info' = 'secondary';
-      let label = status;
-
-      if (status === 'UNASSIGNED') {
-        variant = 'secondary';
-        label = 'ยังไม่ได้มอบหมาย';
-      } else if (status === 'WAITING_ACCEPT') {
-        variant = 'warning';
-        label = 'รอการตอบรับ';
-      } else if (status === 'IN_PROGRESS') {
-        variant = 'info';
-        label = 'มอบหมายแล้ว';
-      } else if (status === 'CANCELLED') {
-        variant = 'destructive';
-        label = 'ยกเลิก';
-      }
-
-      return <Badge variant={variant}>{label}</Badge>;
-    },
+    header: ({ column }) => renderSortableHeader(column, 'สถานะ'),
+    cell: ({ row }) =>
+      renderAssignedStatusBadge(row.getValue('status') as AssignedProjectItem['status']),
   },
   {
     id: 'assignee',
@@ -207,9 +128,7 @@ export const getColumns = ({
 
             <DropdownMenuItem onClick={() => onCancelProject(project)} variant="destructive">
               <Trash2 className="text-destructive h-4 w-4" />
-              {ManageUnitRoles.includes(viewAsRole) || SupervisorRoles.includes(viewAsRole)
-                ? 'ยกเลิกโครงการ'
-                : 'ขอยกเลิกโครงการ'}
+              {getCancelProjectActionLabel(viewAsRole)}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

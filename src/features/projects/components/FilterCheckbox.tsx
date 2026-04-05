@@ -1,6 +1,6 @@
 import { Checkbox } from '@/components/ui/checkbox';
 
-import type { ProcurementType, ProjectStatus, ProjectUrgentStatus } from '../types';
+import type { ProcurementType, ProjectStatus, ProjectUrgentStatus } from '../types/index';
 
 interface FilterCheckboxProps {
   id: ProcurementType | ProjectStatus | ProjectUrgentStatus | 'MY_TASKS';

@@ -1,5 +1,5 @@
 import { type ColumnDef } from '@tanstack/react-table';
-import { ArrowUpDown, MoreVertical, UserRoundPlus } from 'lucide-react';
+import { MoreVertical, UserRoundPlus } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -9,17 +9,34 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import type { Role, User } from '@/features/auth';
-import { getProjectStatusFormat, getResponsibleTypeFormat } from '@/lib/formatters';
-import { ManageSelfRoles, ManageUnitRoles } from '@/lib/permissions';
+import { type Role, type User, isProcurementStaffRole } from '@/features/auth';
+import { getProjectStatusesFormat, getResponsibleTypeFormat } from '@/lib/formatters';
 
-import type { Project } from '../../types';
+import type { Project } from '../../types/index';
+import {
+  canEditProjectAssignee,
+  canManageAssigneeByRole,
+  getActiveResponsibleUsers,
+} from '../../utils/project-selectors';
+import { renderSortableHeader, renderUrgentText } from './column-helpers';
 
 interface SharedColumnsProps {
   onAddAssignee: (project: Project) => void;
   viewAsRole: Role;
   user?: User;
 }
+
+const getProjectStatuses = (project: Project, user?: User) =>
+  getProjectStatusesFormat({
+    overallStatus: project.status,
+    currentWorkflowType: project.current_workflow_type,
+    procurementStatus: project.procurement_status,
+    procurementStep: project.procurement_step ?? null,
+    contractStatus: project.contract_status,
+    contractStep: project.contract_step ?? null,
+    isProcurementStaff: isProcurementStaffRole(user),
+    role: user?.role,
+  });
 
 export const baseColumns = ({
   onAddAssignee,
@@ -28,40 +45,15 @@ export const baseColumns = ({
 }: SharedColumnsProps): ColumnDef<Project>[] => [
   {
     accessorKey: 'receive_no',
-    header: ({ column }) => (
-      <div
-        className="flex cursor-pointer items-center"
-        onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-      >
-        เลขที่ลงรับ
-        <ArrowUpDown
-          className={`ml-2 h-4 w-4 ${column.getIsSorted() ? 'text-primary' : 'text-ring'}`}
-        />
-      </div>
-    ),
+    header: ({ column }) => renderSortableHeader(column, 'เลขที่ลงรับ'),
     cell: ({ row }) => <div className="normal">{row.getValue('receive_no')}</div>,
   },
   {
     accessorKey: 'title',
-    header: ({ column }) => (
-      <div
-        className="flex cursor-pointer items-center"
-        onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-      >
-        โครงการ
-        <ArrowUpDown
-          className={`ml-2 h-4 w-4 ${column.getIsSorted() ? 'text-primary' : 'text-ring'}`}
-        />
-      </div>
-    ),
+    header: ({ column }) => renderSortableHeader(column, 'โครงการ'),
     cell: ({ row }) => (
       <div>
-        {row.original.urgent_status === 'URGENT' && (
-          <span className="text-destructive normal-b mr-2">ด่วน</span>
-        )}
-        {row.original.urgent_status === 'VERY_URGENT' && (
-          <span className="text-destructive normal-b mr-2">ด่วนพิเศษ</span>
-        )}
+        {renderUrgentText(row.original.is_urgent, 'text-destructive normal-b mr-2')}
         {row.getValue('title')}
       </div>
     ),
@@ -73,22 +65,9 @@ export const baseColumns = ({
       const nameB = rowB.original.assignee_procurement?.[0]?.full_name ?? '';
       return nameA.localeCompare(nameB, 'th');
     },
-    header: ({ column }) => (
-      <div
-        className="flex cursor-pointer items-center"
-        onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-      >
-        ผู้รับผิดชอบ
-        <ArrowUpDown
-          className={`ml-2 h-4 w-4 ${column.getIsSorted() ? 'text-primary' : 'text-ring'}`}
-        />
-      </div>
-    ),
+    header: ({ column }) => renderSortableHeader(column, 'ผู้รับผิดชอบ'),
     cell: ({ row }) => {
-      const procurementUsers = (row.original.assignee_procurement ?? []) as User[];
-      const contractUsers = (row.original.assignee_contract ?? []) as User[];
-
-      const allUsers = [...procurementUsers, ...contractUsers];
+      const allUsers = getActiveResponsibleUsers(row.original);
 
       return (
         <div className="flex flex-col gap-1 text-sm">
@@ -114,17 +93,7 @@ export const baseColumns = ({
       const labelB = getResponsibleTypeFormat(rowB.original.procurement_type).label;
       return labelA.localeCompare(labelB, 'th');
     },
-    header: ({ column }) => (
-      <div
-        className="flex cursor-pointer items-center"
-        onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-      >
-        ประเภทงาน
-        <ArrowUpDown
-          className={`ml-2 h-4 w-4 ${column.getIsSorted() ? 'text-primary' : 'text-ring'}`}
-        />
-      </div>
-    ),
+    header: ({ column }) => renderSortableHeader(column, 'วิธีการจัดหา'),
     cell: ({ row }) => {
       const config = getResponsibleTypeFormat(row.original.procurement_type);
       return <div className="normal">{config.label}</div>;
@@ -133,73 +102,28 @@ export const baseColumns = ({
   {
     accessorKey: 'procure_status',
     sortingFn: (rowA, rowB) => {
-      const labelA = getProjectStatusFormat(
-        rowA.original.status,
-        rowA.original.workflow_status.p,
-        user?.department?.name
-      ).label;
-      const labelB = getProjectStatusFormat(
-        rowB.original.status,
-        rowB.original.workflow_status.p,
-        user?.department?.name
-      ).label;
+      const labelA = getProjectStatuses(rowA.original, user).procurement.label;
+      const labelB = getProjectStatuses(rowB.original, user).procurement.label;
       return labelA.localeCompare(labelB, 'th');
     },
-    header: ({ column }) => (
-      <div
-        className="flex cursor-pointer items-center"
-        onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-      >
-        ซื้อ/จ้าง
-        <ArrowUpDown
-          className={`ml-2 h-4 w-4 ${column.getIsSorted() ? 'text-primary' : 'text-ring'}`}
-        />
-      </div>
-    ),
+    header: ({ column }) => renderSortableHeader(column, 'ซื้อ/จ้าง'),
     cell: ({ row }) => {
-      const { variant, label } = getProjectStatusFormat(
-        row.original.status,
-        row.original.workflow_status.p,
-        user?.department?.name
-      );
+      const { procurement } = getProjectStatuses(row.original, user);
+      const { variant, label } = procurement;
       return <Badge variant={variant}>{label} </Badge>;
     },
   },
   {
     accessorKey: 'contract_status',
     sortingFn: (rowA, rowB) => {
-      const labelA = getProjectStatusFormat(
-        rowA.original.status,
-        rowA.original.workflow_status.c,
-        user?.department?.name,
-        rowA.original.workflow_status.p
-      ).label;
-      const labelB = getProjectStatusFormat(
-        rowB.original.status,
-        rowB.original.workflow_status.c,
-        user?.department?.name,
-        rowB.original.workflow_status.p
-      ).label;
+      const labelA = getProjectStatuses(rowA.original, user).contract.label;
+      const labelB = getProjectStatuses(rowB.original, user).contract.label;
       return labelA.localeCompare(labelB, 'th');
     },
-    header: ({ column }) => (
-      <div
-        className="flex cursor-pointer items-center"
-        onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-      >
-        บริหารสัญญา
-        <ArrowUpDown
-          className={`ml-2 h-4 w-4 ${column.getIsSorted() ? 'text-primary' : 'text-ring'}`}
-        />
-      </div>
-    ),
+    header: ({ column }) => renderSortableHeader(column, 'บริหารสัญญา'),
     cell: ({ row }) => {
-      const { variant, label } = getProjectStatusFormat(
-        row.original.status,
-        row.original.workflow_status.c,
-        user?.department?.name,
-        row.original.workflow_status.p
-      );
+      const { contract } = getProjectStatuses(row.original, user);
+      const { variant, label } = contract;
       return <Badge variant={variant}>{label} </Badge>;
     },
   },
@@ -208,10 +132,7 @@ export const baseColumns = ({
     enableHiding: false,
     cell: ({ row }) => {
       const project = row.original;
-      const canEdit =
-        project.status === 'IN_PROGRESS' ||
-        project.status === 'UNASSIGNED' ||
-        project.status === 'WAITING_ACCEPT';
+      const canEdit = canEditProjectAssignee(project.status);
 
       if (row.original.status === 'CANCELLED') {
         return null;
@@ -226,7 +147,7 @@ export const baseColumns = ({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              {(ManageUnitRoles.includes(viewAsRole) || ManageSelfRoles.includes(viewAsRole)) && (
+              {canManageAssigneeByRole(viewAsRole) && (
                 <DropdownMenuItem
                   onClick={() => onAddAssignee(project)}
                   className="normal text-foreground"

@@ -21,7 +21,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 
-import type { ProjectDetail } from '../../types';
+import type { ProjectDetail, ProjectUrgentStatus } from '../../types/index';
+
+const isUrgentProject = (value: ProjectUrgentStatus) =>
+  value === 'URGENT' || value === 'VERY_URGENT';
 
 interface EditProjectDialogProps {
   isOpen: boolean;
@@ -34,18 +37,20 @@ export interface EditProjectData {
   title: string;
   description: string | null;
   budget: number | null;
-  is_urgent: boolean;
+  is_urgent: ProjectUrgentStatus;
 }
 
 const EditProjectSchema = z.object({
   title: z.string().trim().min(1, 'กรุณากรอกชื่อโครงการ'),
   description: z.string().nullable(),
   budget: z.number().nullable(),
-  is_urgent: z.boolean(),
+  is_urgent: z.enum(['NORMAL', 'URGENT', 'VERY_URGENT']),
 });
 
+type EditProjectFormValues = z.infer<typeof EditProjectSchema>;
+
 export function EditProjectDialog({ isOpen, onClose, onConfirm, project }: EditProjectDialogProps) {
-  const form = useForm<EditProjectData>({
+  const form = useForm<EditProjectFormValues>({
     resolver: zodResolver(EditProjectSchema),
     defaultValues: {
       title: project.title,
@@ -155,8 +160,10 @@ export function EditProjectDialog({ isOpen, onClose, onConfirm, project }: EditP
                 render={({ field }) => (
                   <Checkbox
                     id="is_urgent"
-                    checked={field.value}
-                    onCheckedChange={(checked) => field.onChange(Boolean(checked))}
+                    checked={isUrgentProject(field.value)}
+                    onCheckedChange={(checked) =>
+                      field.onChange(Boolean(checked) ? 'URGENT' : 'NORMAL')
+                    }
                     disabled={isSubmitting}
                   />
                 )}

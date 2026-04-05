@@ -16,20 +16,76 @@ const DepartmentAllowedRoles: Role[] = ['SUPER_ADMIN', 'ADMIN', 'HEAD_OF_DEPARTM
 
 const SettingsAllowedRoles: Role[] = ['SUPER_ADMIN', 'ADMIN'];
 
-export const hasProcurementPermission = (user: User) => {
-  return !!user.role && ProcurementAllowedRoles.includes(user.role);
+const UnitBypassRoles: Role[] = ['SUPER_ADMIN', 'ADMIN'];
+const DepartmentBypassRoles: Role[] = ['SUPER_ADMIN', 'ADMIN'];
+
+const getAllScopes = (user: User) => [...user.roles.own, ...user.roles.delegated];
+
+const hasRoleInScopes = (
+  user: User,
+  allowedRoles: Role[],
+  options?: { unitId?: string; departmentId?: string }
+) => {
+  const scopes = getAllScopes(user);
+
+  return scopes.some((scope) => {
+    if (!allowedRoles.includes(scope.role)) return false;
+    if (options?.unitId && scope.unit_id !== options.unitId) return false;
+    if (options?.departmentId && scope.dept_id !== options.departmentId) return false;
+    return true;
+  });
 };
 
-export const hasUnitPermission = (user: User) => {
-  return !!user.role && UnitAllowedRoles.includes(user.role);
+const hasBypassRole = (user: User, bypassRoles: Role[]) => {
+  return hasRoleInScopes(user, bypassRoles) || (!!user.role && bypassRoles.includes(user.role));
 };
 
-export const hasDepartmentPermission = (user: User) => {
-  return !!user.role && DepartmentAllowedRoles.includes(user.role);
+export const hasProcurementPermission = (user: User, targetDepartmentId?: string) => {
+  if (targetDepartmentId) {
+    return hasRoleInScopes(user, ProcurementAllowedRoles, { departmentId: targetDepartmentId });
+  }
+
+  return (
+    hasRoleInScopes(user, ProcurementAllowedRoles) ||
+    (!!user.role && ProcurementAllowedRoles.includes(user.role))
+  );
+};
+
+export const hasUnitPermission = (user: User, targetUnitId?: string) => {
+  if (!targetUnitId) {
+    return (
+      hasRoleInScopes(user, UnitAllowedRoles) ||
+      (!!user.role && UnitAllowedRoles.includes(user.role))
+    );
+  }
+
+  if (hasBypassRole(user, UnitBypassRoles)) {
+    return true;
+  }
+
+  return hasRoleInScopes(user, UnitAllowedRoles, { unitId: targetUnitId });
+};
+
+export const hasDepartmentPermission = (user: User, targetDepartmentId?: string) => {
+  if (!targetDepartmentId) {
+    return (
+      hasRoleInScopes(user, DepartmentAllowedRoles) ||
+      (!!user.role && DepartmentAllowedRoles.includes(user.role))
+    );
+  }
+
+  if (hasBypassRole(user, DepartmentBypassRoles)) {
+    return true;
+  }
+
+  return hasRoleInScopes(user, DepartmentAllowedRoles, { departmentId: targetDepartmentId });
 };
 
 export const hasSettingsPermission = (user: User) => {
-  return !!user.role && SettingsAllowedRoles.includes(user.role);
+  return (
+    hasRoleInScopes(user, SettingsAllowedRoles) ||
+    (!!user.role && SettingsAllowedRoles.includes(user.role))
+  );
 };
 
 /** Supervisory roles that have department-level oversight */

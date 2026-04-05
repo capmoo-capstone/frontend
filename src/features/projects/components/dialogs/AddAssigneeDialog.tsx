@@ -10,7 +10,8 @@ import { z } from 'zod';
 import { CustomContentDialog } from '@/components/shared-dialog';
 import { UserSelect } from '@/features/users';
 
-import { useAssignProjects, useProjectDetail } from '../../hooks/useProjects';
+import { useAssignProjects } from '../../hooks/useProjectMutations';
+import { useProjectDetail } from '../../hooks/useProjectQueries';
 
 const AddAssigneeFormSchema = z.object({
   userId: z.string().min(1, 'กรุณาเลือกเจ้าหน้าที่'),

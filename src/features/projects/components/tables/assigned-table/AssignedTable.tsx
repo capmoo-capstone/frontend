@@ -17,12 +17,9 @@ import { TitleBar } from '@/components/ui/title-bar';
 import { useAuth } from '@/context/AuthContext';
 import { ManageSelfRoles, ManageUnitRoles, SupervisorRoles } from '@/lib/permissions';
 
-import {
-  useAcceptProjects,
-  useAssignedProjects,
-  useCancelProject,
-} from '../../../hooks/useProjects';
-import type { AssignedProjectItem } from '../../../types';
+import { useAcceptProjects, useCancelProject } from '../../../hooks/useProjectMutations';
+import { useAssignedProjects } from '../../../hooks/useProjectQueries';
+import type { AssignedProjectItem } from '../../../types/index';
 import { CancelProjectDialog } from '../../dialogs/CancelProjectDialog';
 import { ChangeAssigneeDialog } from '../../dialogs/ChangeAssigneeDialog';
 import { ProjectDataTable } from '../DataTable';
@@ -34,7 +31,7 @@ export function AssignedTable({ unitId }: { unitId?: string }) {
 
   const [date, setDate] = useState<Date | undefined>(new Date());
 
-  const { data: projects, isLoading, isError } = useAssignedProjects(unitId, date);
+  const { data: projects, isLoading, isError } = useAssignedProjects(date);
   const { mutateAsync: cancelProjectMutation } = useCancelProject();
   const { mutateAsync: acceptProjectsMutation } = useAcceptProjects();
 

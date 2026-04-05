@@ -8,8 +8,12 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import type { Role } from '@/features/auth';
-import type { ProjectDetail } from '@/features/projects';
 import { ManageUnitRoles, SupervisorRoles } from '@/lib/permissions';
+
+import type { ProjectDetail, ProjectUrgentStatus } from '../types/index';
+
+const isUrgentProject = (value: ProjectUrgentStatus) =>
+  value === 'URGENT' || value === 'VERY_URGENT';
 
 interface ProjectHeaderProps {
   project: ProjectDetail;
@@ -31,7 +35,7 @@ export const ProjectHeader = ({
       <div className="space-y-4">
         <div className="space-y-1">
           <h1 className="text-primary h1-topic">
-            {project.is_urgent && <span className="text-destructive">ด่วน </span>}
+            {isUrgentProject(project.is_urgent) && <span className="text-destructive">ด่วน </span>}
             {project.title}
           </h1>
           {project.description && (

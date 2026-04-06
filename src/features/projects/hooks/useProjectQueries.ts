@@ -72,6 +72,7 @@ export const useUnassignedProjects = (unitId?: string) => {
   return useQuery({
     queryKey: projectKeys.unassigned(unitId),
     queryFn: () => getUnassignedProjects(unitId),
+    enabled: !!unitId,
   });
 };
 

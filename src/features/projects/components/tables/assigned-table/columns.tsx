@@ -29,6 +29,7 @@ interface GetColumnsProps {
   onCancelProject: (project: AssignedProjectItem) => void;
   onChangeAssignee: (project: AssignedProjectItem) => void;
   onAcceptProject: (project: AssignedProjectItem) => void;
+  isAcceptPending: boolean;
   viewAsRole: Role;
 }
 
@@ -36,6 +37,7 @@ export const getColumns = ({
   onCancelProject,
   onChangeAssignee,
   onAcceptProject,
+  isAcceptPending,
   viewAsRole,
 }: GetColumnsProps): ColumnDef<AssignedProjectItem>[] => [
   {
@@ -55,7 +57,7 @@ export const getColumns = ({
   },
   {
     id: 'procurement_type',
-    header: ({ column }) => renderSortableHeader(column, 'ประเภทงาน'),
+    header: ({ column }) => renderSortableHeader(column, 'วิธีการจัดหา'),
     cell: ({ row }) => <div>{getResponsibleTypeFormat(row.original.procurement_type).label}</div>,
     accessorFn: (row) => row.procurement_type,
   },
@@ -85,14 +87,19 @@ export const getColumns = ({
   },
   {
     id: 'assignee',
-    header: 'มอบหมายให้',
+    header: viewAsRole !== 'GENERAL_STAFF' ? 'มอบหมายให้' : undefined,
     cell: ({ row }) => {
       return SupervisorRoles.includes(viewAsRole) ||
         ManageUnitRoles.includes(viewAsRole) ||
         ViewUnitRoles.includes(viewAsRole) ? (
         <div>{row.original.assignee_full_name ?? '-'}</div>
       ) : ManageSelfRoles.includes(viewAsRole) && row.original.status === 'WAITING_ACCEPT' ? (
-        <Button variant="outline" size="sm" onClick={() => onAcceptProject(row.original)}>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => onAcceptProject(row.original)}
+          disabled={isAcceptPending}
+        >
           รับทราบ
         </Button>
       ) : null;
@@ -106,7 +113,7 @@ export const getColumns = ({
 
       const canEdit = project.status === 'WAITING_ACCEPT';
 
-      if (row.original.status === 'CANCELLED') {
+      if (row.original.status === 'CANCELLED' || row.original.status === 'WAITING_CANCEL') {
         return null;
       }
 

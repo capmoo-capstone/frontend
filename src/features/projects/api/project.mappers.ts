@@ -21,6 +21,12 @@ type ProjectListApiItem = z.infer<typeof ProjectListApiItemSchema>;
 type ProjectWorklistApiItem = z.infer<typeof ProjectWorklistApiItemSchema>;
 type ProjectDetailApi = z.infer<typeof ProjectDetailApiSchema>;
 
+const getWorklistAssignee = (item: ProjectWorklistApiItem) => {
+  const assignees = item.assignee ?? [];
+
+  return assignees[0] ?? null;
+};
+
 export const mapProjectListItem = (project: ProjectListApiItem): Project =>
   ProjectSchema.parse({
     id: project.id,
@@ -73,14 +79,8 @@ export const mapAssignedProjectItem = (item: ProjectWorklistApiItem): AssignedPr
     },
     procurement_type: item.procurement_type,
     template_type: item.current_workflow_type,
-    assignee_id:
-      item.current_workflow_type === 'CONTRACT'
-        ? (item.assignee_contract?.[0]?.id ?? null)
-        : (item.assignee_procurement?.[0]?.id ?? null),
-    assignee_full_name:
-      item.current_workflow_type === 'CONTRACT'
-        ? (item.assignee_contract?.[0]?.full_name ?? null)
-        : (item.assignee_procurement?.[0]?.full_name ?? null),
+    assignee_id: getWorklistAssignee(item)?.id ?? null,
+    assignee_full_name: getWorklistAssignee(item)?.full_name ?? null,
     urgent_status: item.is_urgent,
     expected_approval_date: item.expected_approval_date,
     created_at: item.created_at,
@@ -123,14 +123,8 @@ export const mapWaitingCancelProjectItem = (
     },
     procurement_type: item.procurement_type,
     template_type: item.current_workflow_type,
-    assignee_id:
-      item.current_workflow_type === 'CONTRACT'
-        ? (item.assignee_contract?.[0]?.id ?? null)
-        : (item.assignee_procurement?.[0]?.id ?? null),
-    assignee_full_name:
-      item.current_workflow_type === 'CONTRACT'
-        ? (item.assignee_contract?.[0]?.full_name ?? null)
-        : (item.assignee_procurement?.[0]?.full_name ?? null),
+    assignee_id: getWorklistAssignee(item)?.id ?? null,
+    assignee_full_name: getWorklistAssignee(item)?.full_name ?? null,
     urgent_status: item.is_urgent,
     cancel_reason: null,
     expected_approval_date: item.expected_approval_date,

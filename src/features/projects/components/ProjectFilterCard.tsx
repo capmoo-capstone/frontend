@@ -120,7 +120,7 @@ export function ProjectFilterCard({ filters, setFilters }: ProjectFilterCardProp
 
       <div className="grid grid-cols-4 gap-4">
         <div className="flex flex-col gap-0.5">
-          <span className="normal-b">ประเภทงาน</span>
+          <span className="normal-b">วิธีการจัดหา</span>
           {procurementTypes.map((type) => {
             const format = getResponsibleTypeFormat(type);
 

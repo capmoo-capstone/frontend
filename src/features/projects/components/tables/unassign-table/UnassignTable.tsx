@@ -2,19 +2,20 @@
 
 import { useCallback, useMemo, useState } from 'react';
 
-import {
-  type SortingState,
-  getCoreRowModel,
-  getSortedRowModel,
-  useReactTable,
-} from '@tanstack/react-table';
+
+
+import { type SortingState, getCoreRowModel, getSortedRowModel, useReactTable } from '@tanstack/react-table';
 import { AlertTriangle, Loader2, Save } from 'lucide-react';
 import { toast } from 'sonner';
 
+
+
 import { Button } from '@/components/ui/button';
 import { TitleBar } from '@/components/ui/title-bar';
-import { useAuth } from '@/context/AuthContext';
+import { usePermissions } from '@/features/auth';
 import { ManageUnitRoles } from '@/lib/permissions';
+
+
 
 import { useAssignProjects, useClaimProject } from '../../../hooks/useProjectMutations';
 import { useUnassignedProjects } from '../../../hooks/useProjectQueries';
@@ -23,6 +24,28 @@ import { CancelProjectDialog } from '../../dialogs/CancelProjectDialog';
 import { ProjectDataTable } from '../DataTable';
 import { getColumns } from './columns';
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 interface UnassignTableProps {
   unitId?: string;
   pendingChanges: Record<string, string>;
@@ -30,8 +53,8 @@ interface UnassignTableProps {
 }
 
 export function UnassignTable({ unitId, pendingChanges, setPendingChanges }: UnassignTableProps) {
-  const { user } = useAuth();
-  const viewAsRole = user?.role ?? 'GUEST';
+  const { roleInUnit } = usePermissions(unitId);
+  const viewAsRole = roleInUnit ?? 'GUEST';
 
   const { data: projects, isLoading, isError } = useUnassignedProjects(unitId);
   const { mutateAsync: assignProjectsMutation } = useAssignProjects();
@@ -116,7 +139,8 @@ export function UnassignTable({ unitId, pendingChanges, setPendingChanges }: Una
       <ProjectDataTable
         table={table}
         columnsLength={columns.length}
-        emptyStateText="ไม่มีงานที่ยังไม่ได้มอบหมายในกลุ่มงานนี้"
+        hasPagination={false}
+        emptyStateText="ตอนนี้ได้มอบหมายงานทุกงานแล้ว"
         toolbar={
           <div className="flex w-full items-center justify-between space-x-4">
             <TitleBar title="งานที่ยังไม่ได้มอบหมาย" />

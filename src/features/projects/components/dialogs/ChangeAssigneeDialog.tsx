@@ -108,6 +108,7 @@ export function ChangeAssigneeDialog({
             className="w-full"
             placeholder="เลือกเจ้าหน้าที่..."
             hasClearButton={false}
+            excludeHeadOfUnit
           />
         )}
       />

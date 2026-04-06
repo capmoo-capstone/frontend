@@ -20,6 +20,7 @@ import {
   ManageUnitRoles,
   SupervisorRoles,
   hasDepartmentPermission,
+  hasSelfManagePermission,
   hasUnitPermission,
 } from '@/lib/permissions';
 
@@ -38,7 +39,9 @@ export default function AssignJobs() {
 
     return allUnits.filter(
       (unit: UnitItem) =>
-        hasUnitPermission(user, unit.id) || hasDepartmentPermission(user, unit.dept_id)
+        hasUnitPermission(user, unit.id) ||
+        hasDepartmentPermission(user, unit.dept_id) ||
+        hasSelfManagePermission(user, unit.id)
     );
   }, [units, user]);
 

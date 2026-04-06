@@ -12,7 +12,7 @@ import { AlertTriangle, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { TitleBar } from '@/components/ui/title-bar';
-import { useAuth } from '@/context/AuthContext';
+import { usePermissions } from '@/features/auth/hooks/usePermissions';
 import { ManageUnitRoles, SupervisorRoles } from '@/lib/permissions';
 
 import {
@@ -24,8 +24,8 @@ import { ProjectDataTable } from '../DataTable';
 import { getColumns } from './columns';
 
 export function WaitingCancelTable({ unitId }: { unitId?: string }) {
-  const { user } = useAuth();
-  const viewAsRole = user?.role ?? 'GUEST';
+  const { roleInUnit } = usePermissions(unitId);
+  const viewAsRole = roleInUnit ?? 'GUEST';
 
   const { data: projects, isLoading, isError } = useWaitingCancelProjects(unitId);
   const { mutateAsync: approveMutation } = useApproveProjectCancellation();
@@ -93,10 +93,11 @@ export function WaitingCancelTable({ unitId }: { unitId?: string }) {
     <ProjectDataTable
       table={table}
       columnsLength={columns.length}
-      emptyStateText="ไม่มีงานที่ขออนุมัติยกเลิกในกลุ่มงานนี้"
+      hasPagination={false}
+      emptyStateText="ตอนนี้ยังไม่มีงานที่ต้องอนุมัติคำขอยกเลิกโครงการ"
       toolbar={
         <div className="flex w-full items-center justify-between space-x-4">
-          <TitleBar title="งานที่ขออนุมัติยกเลิก" variant="accent" />
+          <TitleBar title="งานที่ขออนุมัติยกเลิก" variant="error" />
         </div>
       }
     />

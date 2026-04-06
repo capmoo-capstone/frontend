@@ -1,4 +1,4 @@
-type TitleBarVariant = 'default' | 'grey' | 'accent';
+type TitleBarVariant = 'default' | 'grey' | 'error';
 
 function TitleBar({ title, variant = 'default' }: { title: string; variant?: TitleBarVariant }) {
   const variantStyles: Record<TitleBarVariant, { foreground: string; background: string }> = {
@@ -10,9 +10,9 @@ function TitleBar({ title, variant = 'default' }: { title: string; variant?: Tit
       foreground: 'bg-muted-foreground',
       background: 'bg-muted',
     },
-    accent: {
-      foreground: 'bg-amber-600',
-      background: 'bg-amber-50',
+    error: {
+      foreground: 'bg-error',
+      background: 'bg-error-light',
     },
   };
 

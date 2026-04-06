@@ -52,7 +52,7 @@ export const getColumns = ({
   },
   {
     id: 'procurement_type',
-    header: ({ column }) => renderSortableHeader(column, 'ประเภทงาน'),
+    header: ({ column }) => renderSortableHeader(column, 'วิธีการจัดหา'),
     cell: ({ row }) => <div>{getResponsibleTypeFormat(row.original.procurement_type).label}</div>,
     accessorFn: (row) => row.procurement_type,
   },

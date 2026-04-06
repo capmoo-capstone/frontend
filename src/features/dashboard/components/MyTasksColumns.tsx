@@ -75,7 +75,7 @@ export const myTasksColumns = ({ user }: MyTasksColumnsProps): ColumnDef<Project
         className="flex cursor-pointer items-center"
         onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
       >
-        ประเภทงาน
+        วิธีการจัดหา
         <ArrowUpDown
           className={`ml-2 h-4 w-4 ${column.getIsSorted() ? 'text-primary' : 'text-ring'}`}
         />

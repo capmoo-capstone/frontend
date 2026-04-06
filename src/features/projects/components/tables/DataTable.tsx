@@ -1,7 +1,9 @@
 import { useNavigate } from 'react-router-dom';
 
 import { type Cell, type Table as ReactTable, type Row, flexRender } from '@tanstack/react-table';
+import { Inbox } from 'lucide-react';
 
+import { Card } from '@/components/ui/card';
 import {
   Table,
   TableBody,
@@ -70,9 +72,10 @@ export function ProjectDataTable<TData extends { id?: string }>({
       </div>
 
       {table.getRowModel().rows.length === 0 ? (
-        <div className="bg-secondary flex h-48 w-full items-center justify-center rounded-md">
+        <Card className="flex items-center justify-center gap-2">
+          <Inbox className="text-primary h-12 w-12" />
           <p className="text-primary normal">{emptyStateText}</p>
-        </div>
+        </Card>
       ) : (
         <div className="bg-background overflow-hidden">
           <Table>

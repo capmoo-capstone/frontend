@@ -14,6 +14,7 @@ import {
   CommandList,
 } from '@/components/ui/command';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import type { Role } from '@/features/auth';
 import { cn } from '@/lib/utils';
 
 import { useUsersForSelection } from '../hooks/useUsers';
@@ -31,6 +32,10 @@ interface UserSelectProps {
   className?: string;
   disabled?: boolean;
   hasClearButton?: boolean;
+  excludeHeadOfUnit?: boolean;
+  excludeHeadOfDept?: boolean;
+  excludeUserIds?: string[];
+  onlyIncludeRoles?: Role[];
 }
 
 export function UserSelect({
@@ -46,6 +51,10 @@ export function UserSelect({
   className,
   hasClearButton = true,
   disabled = false,
+  excludeHeadOfUnit = true,
+  excludeHeadOfDept = true,
+  excludeUserIds = [],
+  onlyIncludeRoles = [],
 }: UserSelectProps) {
   const [open, setOpen] = React.useState(false);
   const shouldFetchUsers = !options;
@@ -55,7 +64,22 @@ export function UserSelect({
     { enabled: shouldFetchUsers }
   );
 
-  const users = options ?? data?.data ?? [];
+  const users = React.useMemo(() => {
+    const allUsers = options ?? data?.data ?? [];
+
+    return allUsers.filter((user) => {
+      const role = user.role as Role;
+      if (!role) return false;
+
+      if (excludeUserIds.includes(user.id)) return false;
+      if (excludeHeadOfUnit && role === 'HEAD_OF_UNIT') return false;
+      if (excludeHeadOfDept && role === 'HEAD_OF_DEPARTMENT') return false;
+      if (onlyIncludeRoles.length > 0 && !onlyIncludeRoles.includes(role)) return false;
+
+      return true;
+    });
+  }, [options, data?.data, excludeUserIds, excludeHeadOfUnit, excludeHeadOfDept, onlyIncludeRoles]);
+
   const selectedUser = users.find((user) => user.id === value);
 
   const handleClear = (e: React.MouseEvent) => {

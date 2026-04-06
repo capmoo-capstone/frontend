@@ -169,7 +169,7 @@ export const BackendUserDelegationDetailResponseSchema = BackendUserDelegationRe
       ),
     }),
   }
-);
+).nullable();
 
 export type BackendUserDelegationDetailResponse = z.infer<
   typeof BackendUserDelegationDetailResponseSchema

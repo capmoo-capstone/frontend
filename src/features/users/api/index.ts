@@ -114,7 +114,7 @@ export const addDelegation = async (
 export const cancelDelegation = async (
   delegationId: string
 ): Promise<BackendUserDelegationResponse> => {
-  const { data } = await api.patch(`/delegations/${delegationId}`);
+  const { data } = await api.patch(`/delegations/${delegationId}/cancel`);
   const parsed = BackendUserDelegationResponseSchema.parse(data);
   return parsed;
 };
@@ -124,5 +124,15 @@ export const getDelegationById = async (
 ): Promise<BackendUserDelegationDetailResponse> => {
   const { data } = await api.get(`/delegations/${delegationId}`);
   const parsed = BackendUserDelegationDetailResponseSchema.parse(data);
+  return parsed;
+};
+
+export const getActiveDelegationByUnit = async (
+  unitId: string
+): Promise<BackendUserDelegationDetailResponse> => {
+  const { data } = await api.get(`/delegations/active?unitId=${unitId}`);
+  console.log('getActiveDelegationByUnit response', data);
+  const parsed = BackendUserDelegationDetailResponseSchema.parse(data);
+  console.log('getActiveDelegationByUnit parsed', parsed);
   return parsed;
 };

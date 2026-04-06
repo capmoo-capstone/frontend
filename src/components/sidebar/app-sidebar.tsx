@@ -109,12 +109,7 @@ const menuGroups: MenuGroup[] = [
   },
   {
     label: 'มอบหมายการทำงาน',
-    allowedRoles: [
-      'HEAD_OF_UNIT',
-      'HEAD_OF_DEPARTMENT',
-      'SUPER_ADMIN',
-      'GENERAL_STAFF',
-    ],
+    allowedRoles: ['HEAD_OF_UNIT', 'HEAD_OF_DEPARTMENT', 'SUPER_ADMIN', 'GENERAL_STAFF'],
     items: [
       {
         title: 'มอบหมายงาน',

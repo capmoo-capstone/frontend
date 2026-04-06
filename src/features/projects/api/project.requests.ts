@@ -152,7 +152,7 @@ export const fetchOwnProjects = async (params?: OwnProjectQueryParams) => {
     },
   });
 
-  return data;
+  return PaginatedProjectListApiResponseSchema.parse(data);
 };
 
 export const createProjectRequest = async (payload: unknown) => {

@@ -29,7 +29,7 @@ const OrganizationManagement = lazy(() => import('@/pages/admin/OrganizationMana
 const DepartmentRepsPage = lazy(() => import('@/pages/settings/DepartmentRepsPage'));
 const WorkGroupsPage = lazy(() => import('@/pages/settings/WorkGroupsPage'));
 const ProcurementStaffPage = lazy(() => import('@/pages/settings/ProcurementStaffPage'));
-const ProcumentJobs = lazy(() => import('@/pages/assign/AssignJobs'));
+const ProcurementJobs = lazy(() => import('@/pages/assign/AssignJobs'));
 const VendorSubmission = lazy(() => import('@/pages/vendor/VendorSubmission'));
 const ApiProbe = lazy(() => import('@/pages/dev/ApiProbe'));
 const VendorForm = lazy(() => import('@/pages/vendor/VendorForm'));
@@ -72,8 +72,8 @@ export const PrivateRoutes = () => {
               <Route path="/app/exports/finance" element={<FinanceExportPage />} />
 
               {/* --- Specific Workflows --- */}
-              <Route path="/app/assign" element={<ProcumentJobs />} />
-              <Route path="/app/assign/:id" element={<ProcumentJobs />} />
+              <Route path="/app/assign" element={<ProcurementJobs />} />
+              <Route path="/app/assign/:id" element={<ProcurementJobs />} />
 
               {/* --- Vendor Management --- */}
               <Route path="/app/vendor-response" element={<VendorSubmission />} />

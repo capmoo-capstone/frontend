@@ -13,7 +13,7 @@ import { ManageUnitRoles, SupervisorRoles } from '@/lib/permissions';
 import type { ProjectDetail, ProjectUrgentStatus } from '../types/index';
 
 const isUrgentProject = (value: ProjectUrgentStatus) =>
-  value === 'URGENT' || value === 'VERY_URGENT';
+  value === 'URGENT' || value === 'VERY_URGENT' || value === 'SUPER_URGENT';
 
 interface ProjectHeaderProps {
   project: ProjectDetail;

@@ -158,7 +158,7 @@ export function AssignedTable({ unitId }: { unitId?: string }) {
         <CancelProjectDialog
           isOpen={!!projectToCancel}
           onClose={() => setProjectToCancel(null)}
-          project={projectToCancel as any}
+          project={projectToCancel}
         />
       )}
 

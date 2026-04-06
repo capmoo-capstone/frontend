@@ -1,20 +1,20 @@
 'use client';
 
-import { useEffect } from 'react';
-
 import { toast } from 'sonner';
 
 import { TextInputDialog } from '@/components/shared-dialog';
 import { useAuth } from '@/context/AuthContext';
 
 import { useCancelProject } from '../../hooks/useProjectMutations';
-import type { Project } from '../../types/index';
 import { getCancelProjectActionLabel } from '../../utils/project-selectors';
 
 interface CancelProjectDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  project: Project;
+  project: {
+    id: string;
+    title: string;
+  };
 }
 
 export function CancelProjectDialog({ isOpen, onClose, project }: CancelProjectDialogProps) {
@@ -22,12 +22,6 @@ export function CancelProjectDialog({ isOpen, onClose, project }: CancelProjectD
   const { mutateAsync: cancelProjectMutation } = useCancelProject();
   const isAuthorized = user?.role === 'SUPER_ADMIN' || user?.role === 'HEAD_OF_DEPARTMENT';
   const actionLabel = getCancelProjectActionLabel(user?.role ?? 'GUEST');
-
-  useEffect(() => {
-    if (!isOpen) {
-      return;
-    }
-  }, [isOpen]);
 
   const handleConfirm = async (reason: string) => {
     const savePromise = cancelProjectMutation({

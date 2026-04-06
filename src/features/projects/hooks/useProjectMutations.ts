@@ -45,9 +45,6 @@ export const useChangeProjectAssignee = () => {
       queryClient.invalidateQueries({
         queryKey: projectKeys.all,
       });
-      queryClient.invalidateQueries({
-        queryKey: projectKeys.assigned(),
-      });
     },
   });
 };
@@ -95,9 +92,6 @@ export const useAcceptProjects = () => {
       queryClient.invalidateQueries({
         queryKey: projectKeys.all,
       });
-      queryClient.invalidateQueries({
-        queryKey: projectKeys.assigned(),
-      });
     },
   });
 };
@@ -111,9 +105,6 @@ export const useClaimProject = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: projectKeys.all,
-      });
-      queryClient.invalidateQueries({
-        queryKey: projectKeys.unassigned(),
       });
     },
   });

@@ -68,13 +68,13 @@ export function UserSelect({
     const allUsers = options ?? data?.data ?? [];
 
     return allUsers.filter((user) => {
-      const role = user.role as Role;
-      if (!role) return false;
+      const role = user.role;
 
       if (excludeUserIds.includes(user.id)) return false;
+      if (!role) return false;
       if (excludeHeadOfUnit && role === 'HEAD_OF_UNIT') return false;
       if (excludeHeadOfDept && role === 'HEAD_OF_DEPARTMENT') return false;
-      if (onlyIncludeRoles.length > 0 && !onlyIncludeRoles.includes(role)) return false;
+      if (onlyIncludeRoles.length > 0 && !onlyIncludeRoles.includes(role as Role)) return false;
 
       return true;
     });

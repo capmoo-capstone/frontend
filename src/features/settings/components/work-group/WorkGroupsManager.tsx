@@ -8,6 +8,9 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { useUnitDetailsByIds, useUnits, useUpdateUnit } from '@/features/organization';
 import { type WorkGroupSetting } from '@/features/settings/types';
 import {
+  useActiveDelegationByUnit,
+  useAddDelegation,
+  useCancelDelegation,
   useUpdateUsersInUnit,
   useUsersForSelection,
   useUsersForUnitsSelection,
@@ -28,10 +31,13 @@ export function WorkGroupsManager() {
   const { data: units } = useUnits(SUPPLY_OPERATION_DEPARTMENT_ID);
   const updateUnitMutation = useUpdateUnit();
   const updateUsersInUnitMutation = useUpdateUsersInUnit();
+  const addDelegationMutation = useAddDelegation();
+  const cancelDelegationMutation = useCancelDelegation();
 
   const unitIds = useMemo(() => (units ?? []).map((unit) => unit.id), [units]);
   const unitDetailQueries = useUnitDetailsByIds(unitIds);
   const unitUsersQueries = useUsersForUnitsSelection(unitIds);
+  const delegationQueries = useActiveDelegationByUnit(unitIds);
 
   const { data: procurementUsersResponse } = useUsersForSelection({
     deptId: SUPPLY_OPERATION_DEPARTMENT_ID,
@@ -50,6 +56,7 @@ export function WorkGroupsManager() {
       const detail = unitDetailQueries[index]?.data;
       const users = unitUsersQueries[index]?.data?.data ?? [];
       const headId = users.find((user) => user.role === HEAD_OF_UNIT_ROLE_ID)?.id ?? '';
+      const delegation = delegationQueries[index]?.data ?? null;
 
       return {
         id: unit.id,
@@ -57,10 +64,17 @@ export function WorkGroupsManager() {
         workflow_types: detail?.type ?? [],
         head_id: headId,
         member_ids: users.filter((user) => user.id !== headId).map((user) => user.id),
-        delegation: null, // TODO: Replace with real delegation fetching hook when available
+        delegation: delegation
+          ? {
+              id: delegation.id,
+              user_id: delegation.delegatee_id,
+              start_date: new Date(delegation.start_date),
+              end_date: delegation.end_date ? new Date(delegation.end_date) : new Date(),
+            }
+          : null,
       };
     });
-  }, [units, unitDetailQueries, unitUsersQueries]);
+  }, [units, unitDetailQueries, unitUsersQueries, delegationQueries]);
 
   const handleSaveGroup = useCallback(
     async (updated: WorkGroupSetting) => {
@@ -116,15 +130,26 @@ export function WorkGroupsManager() {
           });
         }
 
-        await Promise.all([
-          queryClient.invalidateQueries({ queryKey: ['users'] }),
-          queryClient.invalidateQueries({ queryKey: ['units'] }),
-        ]);
+        if (updated.delegation && !currentGroup.delegation) {
+          await addDelegationMutation.mutateAsync({
+            delegatorId: updated.head_id,
+            delegateeId: updated.delegation.user_id,
+            startDate: new Date(updated.delegation.start_date),
+            endDate: updated.delegation.end_date
+              ? new Date(updated.delegation.end_date)
+              : undefined,
+          });
+        }
+
+        if (!updated.delegation && currentGroup.delegation) {
+          await cancelDelegationMutation.mutateAsync({
+            delegationId: currentGroup.delegation.id!,
+          });
+        }
 
         // TODO: Backend Migration required here.
-        // Head role updates and delegation management still need dedicated endpoints.
+        // Head role updates still need dedicated endpoints.
         // e.g., await updateUnitHeadMutation.mutateAsync(...)
-        // e.g., await updateDelegationMutation.mutateAsync(...)
 
         toast.success('บันทึกกลุ่มงานเรียบร้อยแล้ว');
       } catch (error) {
@@ -132,7 +157,14 @@ export function WorkGroupsManager() {
         throw error;
       }
     },
-    [groups, queryClient, updateUnitMutation, updateUsersInUnitMutation]
+    [
+      groups,
+      queryClient,
+      updateUnitMutation,
+      updateUsersInUnitMutation,
+      addDelegationMutation,
+      cancelDelegationMutation,
+    ]
   );
 
   const handleCreateGroup = useCallback((_newGroup: WorkGroupSetting) => {

@@ -7,6 +7,7 @@ const startOfToday = () => {
 
 export const DelegationSchema = z
   .object({
+    id: z.string().optional(),
     user_id: z.string().min(1, 'กรุณาเลือกเจ้าหน้าที่'),
     start_date: z.date({ message: 'กรุณาเลือกวันเริ่มต้น' }),
     end_date: z.date({ message: 'กรุณาเลือกวันสิ้นสุด' }),

@@ -174,3 +174,11 @@ export const BackendUserDelegationDetailResponseSchema = BackendUserDelegationRe
 export type BackendUserDelegationDetailResponse = z.infer<
   typeof BackendUserDelegationDetailResponseSchema
 >;
+
+export const BackendRepresentativeResponseSchema = z.object({
+  id: z.string(),
+  full_name: z.string(),
+  unit_id: z.string(),
+});
+
+export type BackendRepresentativeResponse = z.infer<typeof BackendRepresentativeResponseSchema>;

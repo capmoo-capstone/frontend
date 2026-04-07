@@ -11,6 +11,7 @@ import {
   cancelDelegation,
   getActiveDelegationByUnit,
   getDelegationById,
+  getRepresentative,
   getUserById,
   getUsers,
   getUsersForSelection,
@@ -83,20 +84,6 @@ export const useUpdateUserRole = () => {
       updateUserRole(data),
     onError: (error) => {
       throw new Error('Failed to update user role:' + error.message);
-    },
-  });
-};
-
-export const useUpdateRepresentative = () => {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: (data: { userId: string; unitId: string }) =>
-      updateRepresentative(data.userId, data.unitId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['users', 'selection'] });
-    },
-    onError: (error) => {
-      throw new Error('Failed to update representative for unit:' + error.message);
     },
   });
 };

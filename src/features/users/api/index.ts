@@ -3,6 +3,8 @@ import api from '@/lib/axios';
 import {
   type AddDelegationRequest,
   AddDelegationSchema,
+  type BackendRepresentativeResponse,
+  BackendRepresentativeResponseSchema,
   type BackendUpdateUserRoleResponse,
   BackendUpdateUserRoleResponseSchema,
   type BackendUserDelegationDetailResponse,
@@ -74,6 +76,12 @@ export const updateUsersInUnit = async (request: UpdateUsersToUnitRequest): Prom
     remove_users: requestData.removeUserIds,
   });
   return data;
+};
+
+export const getRepresentative = async (unitId: string): Promise<BackendRepresentativeResponse> => {
+  const { data } = await api.get(`/units/${unitId}/rep`);
+  const parsed = BackendRepresentativeResponseSchema.parse(data);
+  return parsed;
 };
 
 export const updateRepresentative = async (

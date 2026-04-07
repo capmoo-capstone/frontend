@@ -76,11 +76,11 @@ export const updateUsersInUnit = async (request: UpdateUsersToUnitRequest): Prom
   return data;
 };
 
-export const addRepresentativeToUnit = async (
+export const updateRepresentative = async (
   userId: string,
   unitId: string
 ): Promise<BackendUpdateUserRoleResponse> => {
-  const { data } = await api.patch(`/users/${userId}/rep/${unitId}`);
+  const { data } = await api.patch(`/units/${unitId}/rep/${userId}`);
   const parsed = BackendUpdateUserRoleResponseSchema.parse(data);
   return parsed;
 };

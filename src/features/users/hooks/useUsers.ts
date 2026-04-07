@@ -8,7 +8,6 @@ import {
 
 import {
   addDelegation,
-  addRepresentativeToUnit,
   cancelDelegation,
   getActiveDelegationByUnit,
   getDelegationById,
@@ -16,6 +15,7 @@ import {
   getUsers,
   getUsersForSelection,
   removeUser,
+  updateRepresentative,
   updateUserRole,
   updateUsersInUnit,
 } from '../api';
@@ -87,12 +87,16 @@ export const useUpdateUserRole = () => {
   });
 };
 
-export const useAddRepresentativeToUnit = () => {
+export const useUpdateRepresentative = () => {
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (data: { userId: string; unitId: string }) =>
-      addRepresentativeToUnit(data.userId, data.unitId),
+      updateRepresentative(data.userId, data.unitId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['users', 'selection'] });
+    },
     onError: (error) => {
-      throw new Error('Failed to add representative to unit:' + error.message);
+      throw new Error('Failed to update representative for unit:' + error.message);
     },
   });
 };

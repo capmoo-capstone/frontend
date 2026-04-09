@@ -1,10 +1,18 @@
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 
+import { useQueryClient } from '@tanstack/react-query';
 import { Trash2, UserPlus, Users, X } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { type ProcurementRoleSetting, type SettingsUserOption } from '@/features/settings/types';
-import { UserSelect, useUsersForSelection } from '@/features/users';
+import {
+  type UserRole,
+  UserSelect,
+  useAddDelegation,
+  useCancelDelegation,
+  useUpdateUserRole,
+  useUsersForSelection,
+} from '@/features/users';
 import { formatDateThaiShort } from '@/lib/formatters';
 
 import { SUPPLY_OPERATION_DEPARTMENT_ID } from '../../constants';
@@ -17,6 +25,11 @@ export function ProcurementStaffManager() {
   const { data: procurementUsersResponse, isPending } = useUsersForSelection({
     deptId: SUPPLY_OPERATION_DEPARTMENT_ID,
   });
+  const addDelegationMutation = useAddDelegation();
+  const cancelDelegationMutation = useCancelDelegation();
+  const updateUserRoleMutation = useUpdateUserRole();
+
+  const queryClient = useQueryClient();
 
   const procurementUsers = procurementUsersResponse?.data ?? [];
 
@@ -36,10 +49,87 @@ export function ProcurementStaffManager() {
     });
   }, [procurementUsers]);
 
-  const submitRoleChanges = (_updatedRole: ProcurementRoleSetting) => {
-    // TODO (BACKEND): Connect this UI action to the corresponding API endpoint.
-    // Example: await updateUserRolesMutation.mutateAsync({ roleId: _updatedRole.id, userIds: _updatedRole.member_ids });
-  };
+  const submitRoleChanges = useCallback(
+    async (_updatedRole: ProcurementRoleSetting) => {
+      // TODO (BACKEND): Connect this UI action to the corresponding API endpoint.
+      // Example: await updateUserRolesMutation.mutateAsync({ roleId: _updatedRole.id, userIds: _updatedRole.member_ids });
+      const current = procurementRoles.find((role) => role.id === _updatedRole.id);
+
+      if (!current) {
+        console.error('Current role data not found for id:', _updatedRole.id);
+        return;
+      }
+
+      if (_updatedRole.id === 'HEAD_OF_DEPARTMENT') {
+        if (_updatedRole.delegation.length > 0 && current.delegation) {
+          await addDelegationMutation.mutateAsync({
+            delegatorId: _updatedRole.member_ids[0],
+            delegateeId: _updatedRole.delegation[0].user_id,
+            startDate: _updatedRole.delegation[0].start_date,
+            endDate: _updatedRole.delegation[0].end_date,
+          });
+        } else if (_updatedRole.delegation.length === 0 && current.delegation[0]) {
+          await cancelDelegationMutation.mutateAsync({
+            delegationId: current.delegation[0].id!,
+          });
+        }
+
+        if (current.member_ids[0] !== _updatedRole.member_ids[0]) {
+          await updateUserRoleMutation.mutateAsync({
+            userId: _updatedRole.member_ids[0],
+            role: _updatedRole.id as UserRole,
+            deptId: SUPPLY_OPERATION_DEPARTMENT_ID,
+          });
+
+          await updateUserRoleMutation.mutateAsync({
+            userId: current.member_ids[0],
+            role: 'GUEST' as UserRole,
+            deptId: SUPPLY_OPERATION_DEPARTMENT_ID,
+          });
+        }
+      } else {
+        const addedUserIds = _updatedRole.member_ids.filter(
+          (id) => !current.member_ids.includes(id)
+        );
+        const removedUserIds = current.member_ids.filter(
+          (id) => !_updatedRole.member_ids.includes(id)
+        );
+
+        if (addedUserIds.length > 0) {
+          await Promise.all([
+            ...addedUserIds.map((userId) =>
+              updateUserRoleMutation.mutateAsync({
+                userId,
+                role: _updatedRole.id as UserRole,
+                deptId: SUPPLY_OPERATION_DEPARTMENT_ID,
+              })
+            ),
+          ]);
+        }
+
+        if (removedUserIds.length > 0) {
+          await Promise.all([
+            ...removedUserIds.map((userId) =>
+              updateUserRoleMutation.mutateAsync({
+                userId,
+                role: 'GUEST' as UserRole,
+                deptId: SUPPLY_OPERATION_DEPARTMENT_ID,
+              })
+            ),
+          ]);
+        }
+
+        await queryClient.invalidateQueries({ queryKey: ['users', 'selection'] });
+      }
+    },
+    [
+      procurementRoles,
+      addDelegationMutation,
+      cancelDelegationMutation,
+      updateUserRoleMutation,
+      queryClient,
+    ]
+  );
 
   if (isPending) {
     return (

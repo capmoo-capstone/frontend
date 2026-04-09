@@ -79,9 +79,13 @@ export const useUpdateUsersInUnit = () => {
 };
 
 export const useUpdateUserRole = () => {
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (data: { userId: string; role: UserRole; deptId: string; unitId?: string }) =>
       updateUserRole(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['users', 'selection'] });
+    },
     onError: (error) => {
       throw new Error('Failed to update user role:' + error.message);
     },

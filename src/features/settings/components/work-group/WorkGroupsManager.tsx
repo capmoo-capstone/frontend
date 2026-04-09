@@ -1,6 +1,5 @@
 import { useCallback, useMemo, useState } from 'react';
 
-import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
@@ -8,9 +7,11 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { useUnitDetailsByIds, useUnits, useUpdateUnit } from '@/features/organization';
 import { type WorkGroupSetting } from '@/features/settings/types';
 import {
+  type UserRole,
   useActiveDelegationByUnit,
   useAddDelegation,
   useCancelDelegation,
+  useUpdateUserRole,
   useUpdateUsersInUnit,
   useUsersForSelection,
   useUsersForUnitsSelection,
@@ -26,13 +27,13 @@ import { WorkGroupCard } from './WorkGroupCard';
 
 export function WorkGroupsManager() {
   const [isCreateVisible, setIsCreateVisible] = useState(false);
-  const queryClient = useQueryClient();
 
   const { data: units } = useUnits(SUPPLY_OPERATION_DEPARTMENT_ID);
   const updateUnitMutation = useUpdateUnit();
   const updateUsersInUnitMutation = useUpdateUsersInUnit();
   const addDelegationMutation = useAddDelegation();
   const cancelDelegationMutation = useCancelDelegation();
+  const updateUserRoleMutation = useUpdateUserRole();
 
   const unitIds = useMemo(() => (units ?? []).map((unit) => unit.id), [units]);
   const unitDetailQueries = useUnitDetailsByIds(unitIds);
@@ -135,9 +136,7 @@ export function WorkGroupsManager() {
             delegatorId: updated.head_id,
             delegateeId: updated.delegation.user_id,
             startDate: new Date(updated.delegation.start_date),
-            endDate: updated.delegation.end_date
-              ? new Date(updated.delegation.end_date)
-              : undefined,
+            endDate: new Date(updated.delegation.end_date),
           });
         }
 
@@ -147,9 +146,20 @@ export function WorkGroupsManager() {
           });
         }
 
-        // TODO: Backend Migration required here.
-        // Head role updates still need dedicated endpoints.
-        // e.g., await updateUnitHeadMutation.mutateAsync(...)
+        if (updated.head_id !== currentGroup.head_id) {
+          await updateUserRoleMutation.mutateAsync({
+            userId: updated.head_id,
+            role: 'HEAD_OF_UNIT' as UserRole,
+            deptId: SUPPLY_OPERATION_DEPARTMENT_ID,
+            unitId: updated.id,
+          });
+
+          await updateUserRoleMutation.mutateAsync({
+            userId: currentGroup.head_id,
+            role: 'GUEST' as UserRole,
+            deptId: SUPPLY_OPERATION_DEPARTMENT_ID,
+          });
+        }
 
         toast.success('บันทึกกลุ่มงานเรียบร้อยแล้ว');
       } catch (error) {
@@ -159,11 +169,11 @@ export function WorkGroupsManager() {
     },
     [
       groups,
-      queryClient,
       updateUnitMutation,
       updateUsersInUnitMutation,
       addDelegationMutation,
       cancelDelegationMutation,
+      updateUserRoleMutation,
     ]
   );
 

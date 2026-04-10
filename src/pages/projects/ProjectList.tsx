@@ -7,6 +7,7 @@ import {
   ProjectToolbar,
   useProjectFilters,
 } from '@/features/projects';
+import { useProjectPermissions } from '@/features/projects/hooks/useProjectPermissions';
 
 export default function ProjectListPage() {
   const {
@@ -21,6 +22,7 @@ export default function ProjectListPage() {
     handleApplyFilter,
     handleResetFilter,
   } = useProjectFilters();
+  const { canImportProject } = useProjectPermissions();
 
   const navigate = useNavigate();
 
@@ -43,6 +45,7 @@ export default function ProjectListPage() {
         onImport={() => {
           navigate('/app/project-import');
         }}
+        canImportProject={canImportProject}
       />
 
       {/* Filter Panel */}

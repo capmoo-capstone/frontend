@@ -25,7 +25,8 @@ import { ProjectDataTable } from '../DataTable';
 import { getColumns } from './columns';
 
 export function AssignedTable({ unitId }: { unitId?: string }) {
-  const { canClaimProjects, canChangeProjectAssignee } = useProjectPermissions(unitId);
+  const { canClaimProjects, canChangeProjectAssignee, canCancelProjects } =
+    useProjectPermissions(unitId);
 
   const [date, setDate] = useState<Date | undefined>(new Date());
 
@@ -59,9 +60,15 @@ export function AssignedTable({ unitId }: { unitId?: string }) {
         isAcceptPending: isAccepting,
         canClaimProjects,
         canChangeProjectAssignee,
-        unitId,
+        canCancelProjects,
       }),
-    [handleAcceptProject, isAccepting, canClaimProjects, canChangeProjectAssignee, unitId]
+    [
+      handleAcceptProject,
+      isAccepting,
+      canClaimProjects,
+      canChangeProjectAssignee,
+      canCancelProjects,
+    ]
   );
 
   const waitingProjectIds = useMemo(

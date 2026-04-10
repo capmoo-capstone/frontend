@@ -19,23 +19,23 @@ import {
 } from '../column-helpers';
 
 interface GetColumnsProps {
-  unitId?: string;
   onCancelProject: (project: AssignedProjectItem) => void;
   onChangeAssignee: (project: AssignedProjectItem) => void;
   onAcceptProject: (project: AssignedProjectItem) => void;
   isAcceptPending: boolean;
   canClaimProjects: boolean;
   canChangeProjectAssignee: boolean;
+  canCancelProjects: boolean;
 }
 
 export const getColumns = ({
-  unitId,
   onCancelProject,
   onChangeAssignee,
   onAcceptProject,
   isAcceptPending,
   canClaimProjects,
   canChangeProjectAssignee,
+  canCancelProjects,
 }: GetColumnsProps): ColumnDef<AssignedProjectItem>[] => [
   {
     accessorKey: 'receive_no',
@@ -130,7 +130,7 @@ export const getColumns = ({
 
             <DropdownMenuItem onClick={() => onCancelProject(project)} variant="destructive">
               <Trash2 className="text-destructive h-4 w-4" />
-              {getCancelProjectActionLabel(unitId)}
+              {getCancelProjectActionLabel(canCancelProjects)}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

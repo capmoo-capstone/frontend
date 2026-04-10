@@ -1,5 +1,5 @@
 import type { Role } from '@/features/auth';
-import { ManageSelfRoles, ManageUnitRoles, SupervisorRoles } from '@/lib/permissions';
+import { ManageSelfRoles, ManageUnitRoles } from '@/lib/permissions';
 
 import type { Project } from '../types/index';
 
@@ -40,6 +40,6 @@ export const canManageAssigneeByRole = (viewAsRole: Role) => {
   return ManageUnitRoles.includes(viewAsRole) || ManageSelfRoles.includes(viewAsRole);
 };
 
-export const getCancelProjectActionLabel = (unitId?: string) => {
-  return unitId ? 'ยกเลิกโครงการ' : 'ขอยกเลิกโครงการ';
+export const getCancelProjectActionLabel = (canCancelProjects?: boolean) => {
+  return canCancelProjects ? 'ยกเลิกโครงการ' : 'ขอยกเลิกโครงการ';
 };

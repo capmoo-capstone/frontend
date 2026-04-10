@@ -28,6 +28,7 @@ interface GetColumnsProps {
   onClaimProject: (project: UnassignedProjectItem) => void;
   canAssignProjects: boolean;
   canClaimProjects: boolean;
+  canCancelProjects: boolean;
 }
 
 export const getColumns = ({
@@ -38,6 +39,7 @@ export const getColumns = ({
   onClaimProject,
   canAssignProjects,
   canClaimProjects,
+  canCancelProjects,
 }: GetColumnsProps): ColumnDef<UnassignedProjectItem>[] => [
   {
     accessorKey: 'receive_no',
@@ -123,7 +125,7 @@ export const getColumns = ({
           <DropdownMenuContent align="end">
             <DropdownMenuItem onClick={() => onOpenCancelDialog(project)} variant="destructive">
               <Trash2 className="text-destructive h-4 w-4" />
-              {getCancelProjectActionLabel(unitId)}
+              {getCancelProjectActionLabel(canCancelProjects)}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

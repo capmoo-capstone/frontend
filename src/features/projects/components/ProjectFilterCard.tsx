@@ -12,7 +12,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { usePermissions } from '@/features/auth';
 import { useUnitsList } from '@/features/organization';
 import { SUPPLY_OPERATION_DEPARTMENT_ID } from '@/features/settings/constants';
 import { useUsersForSelection } from '@/features/users';
@@ -20,6 +19,7 @@ import { getResponsibleTypeFormat } from '@/lib/formatters';
 
 import { type ProjectFilterParams } from '../api';
 import { ProcurementTypeEnum, ProjectStatusEnum, ProjectUrgentStatusEnum } from '../types/index';
+import { useProjectPermissions } from '../hooks/useProjectPermissions';
 import { FilterCheckbox } from './FilterCheckbox';
 import { SearchCheckbox } from './SearchCheckbox';
 
@@ -29,7 +29,7 @@ interface ProjectFilterCardProps {
 }
 
 export function ProjectFilterCard({ filters, setFilters }: ProjectFilterCardProps) {
-  const { isProcurementStaff } = usePermissions();
+  const { isProcurementStaff } = useProjectPermissions();
 
   const handleToggleFilter = (key: keyof ProjectFilterParams, value: string) => {
     setFilters((prev) => {

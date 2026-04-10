@@ -14,12 +14,11 @@ import {
   ProjectDetailTabs,
   ProjectHeader,
   ProjectInfoGrid,
-  useCancelProject,
   useProjectDetail,
   useUpdateProject,
 } from '@/features/projects';
+import { useProjectPermissions } from '@/features/projects/hooks/useProjectPermissions';
 import { ProcurementWorkflows } from '@/features/workflow';
-import { ManageUnitRoles, SupervisorRoles } from '@/lib/permissions';
 
 export default function ProjectDetail() {
   const { id } = useParams();
@@ -31,11 +30,10 @@ export default function ProjectDetail() {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
   const { data: project, isLoading, isError, error } = useProjectDetail(id);
-  const { mutateAsync: cancelProjectMutation } = useCancelProject();
   const { mutateAsync: updateProjectMutation } = useUpdateProject();
+  const { canCancelProjects } = useProjectPermissions(project?.requester.unit_id ?? undefined);
 
   if (!id || !user) return null;
-  const viewAsRole = user.role ?? 'GUEST';
   if (isLoading)
     return (
       <div className="flex h-screen w-full items-center justify-center">
@@ -64,7 +62,7 @@ export default function ProjectDetail() {
         project={project}
         onEditProject={() => setIsEditDialogOpen(true)}
         onCancelProject={() => setIsCancelDialogOpen(true)}
-        viewAsRole={viewAsRole}
+        canCancelProjects={canCancelProjects}
       />
 
       {/* --- Project Alerts --- */}
@@ -103,17 +101,7 @@ export default function ProjectDetail() {
       <CancelProjectDialog
         isOpen={isCancelDialogOpen}
         onClose={() => setIsCancelDialogOpen(false)}
-        onConfirm={async (reason) => {
-          try {
-            await cancelProjectMutation({ projectId: id, reason });
-            toast.success('ยกเลิกโครงการสำเร็จ');
-            setIsCancelDialogOpen(false);
-          } catch {
-            toast.error('ไม่สามารถยกเลิกโครงการได้ กรุณาลองใหม่อีกครั้ง');
-          }
-        }}
-        projectTitle={project.title}
-        isAuthorized={ManageUnitRoles.includes(viewAsRole) || SupervisorRoles.includes(viewAsRole)}
+        project={{ id, title: project.title }}
       />
     </>
   );

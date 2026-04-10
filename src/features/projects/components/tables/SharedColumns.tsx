@@ -9,7 +9,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { type Role, type User, isProcurementStaffRole } from '@/features/auth';
+import { type User, isProcurementStaffRole } from '@/features/auth';
 import { getProjectStatusesFormat, getResponsibleTypeFormat } from '@/lib/formatters';
 import { hasUnitPermission } from '@/lib/permissions';
 
@@ -27,7 +27,7 @@ interface SharedColumnsProps {
   onAddAssignee: (project: Project) => void;
   onReturnProject: (project: Project) => void;
   onCancelProject: (project: Project) => void;
-  viewAsRole: Role;
+  canCancelProjects?: boolean;
   user?: User;
 }
 
@@ -47,7 +47,7 @@ export const baseColumns = ({
   onAddAssignee,
   onReturnProject,
   onCancelProject,
-  viewAsRole,
+  canCancelProjects = false,
   user,
 }: SharedColumnsProps): ColumnDef<Project>[] => [
   {
@@ -186,7 +186,7 @@ export const baseColumns = ({
               {canDeleteProject && (
                 <DropdownMenuItem onClick={() => onCancelProject(project)} variant="destructive">
                   <Trash2 className="normal h-4 w-4" />
-                  {getCancelProjectActionLabel(viewAsRole)}
+                  {getCancelProjectActionLabel(canCancelProjects)}
                 </DropdownMenuItem>
               )}
             </DropdownMenuContent>

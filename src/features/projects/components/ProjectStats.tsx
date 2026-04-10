@@ -2,13 +2,13 @@ import { AlertTriangle, Inbox, Loader2 } from 'lucide-react';
 
 import { Card } from '@/components/ui/card';
 import { StatusCard } from '@/components/ui/status-card';
-import { usePermissions } from '@/features/auth';
 
+import { useProjectPermissions } from '../hooks/useProjectPermissions';
 import { useProjectSummary } from '../hooks/useProjectQueries';
 
 export function ProjectStats() {
   const { data, isLoading, isError } = useProjectSummary();
-  const { isProcurementStaff } = usePermissions();
+  const { isProcurementStaff } = useProjectPermissions();
 
   if (isLoading) {
     return (

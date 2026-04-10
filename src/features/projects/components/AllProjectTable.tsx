@@ -15,6 +15,7 @@ import { AlertTriangle, Loader2 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 
 import { type ProjectFilterParams, useProjects } from '../hooks/useProjectQueries';
+import { useProjectPermissions } from '../hooks/useProjectPermissions';
 import type { Project } from '../types/index';
 import { AddAssigneeDialog } from './dialogs/AddAssigneeDialog';
 import { CancelProjectDialog } from './dialogs/CancelProjectDialog';
@@ -29,7 +30,7 @@ interface AllProjectTableProps {
 
 export function AllProjectTable({ filters, columns: customColumns }: AllProjectTableProps) {
   const { user } = useAuth();
-  const viewAsRole = user?.role ?? 'GUEST';
+  const { canCancelProjects } = useProjectPermissions();
 
   const { data: projects, isLoading, isError } = useProjects(filters);
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -44,17 +45,10 @@ export function AllProjectTable({ filters, columns: customColumns }: AllProjectT
         onAddAssignee: (project) => setProjectToAddAssignee(project),
         onReturnProject: (project) => setProjectToReturn(project),
         onCancelProject: (project) => setProjectToCancel(project),
-        viewAsRole,
+        canCancelProjects,
         user: user ?? undefined,
       }),
-    [
-      customColumns,
-      viewAsRole,
-      user,
-      setProjectToAddAssignee,
-      setProjectToReturn,
-      setProjectToCancel,
-    ]
+    [customColumns, canCancelProjects, user]
   );
 
   const table = useReactTable({

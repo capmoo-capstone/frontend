@@ -6,6 +6,7 @@ import { TextInputDialog } from '@/components/shared-dialog';
 import { useAuth } from '@/context/AuthContext';
 
 import { useCancelProject } from '../../hooks/useProjectMutations';
+import { useProjectPermissions } from '../../hooks/useProjectPermissions';
 import { getCancelProjectActionLabel } from '../../utils/project-selectors';
 
 interface CancelProjectDialogProps {
@@ -20,8 +21,9 @@ interface CancelProjectDialogProps {
 export function CancelProjectDialog({ isOpen, onClose, project }: CancelProjectDialogProps) {
   const { user } = useAuth();
   const { mutateAsync: cancelProjectMutation } = useCancelProject();
+  const { canCancelProjects } = useProjectPermissions();
   const isAuthorized = user?.role === 'SUPER_ADMIN' || user?.role === 'HEAD_OF_DEPARTMENT';
-  const actionLabel = getCancelProjectActionLabel(user?.role ?? 'GUEST');
+  const actionLabel = getCancelProjectActionLabel(canCancelProjects);
 
   const handleConfirm = async (reason: string) => {
     const savePromise = cancelProjectMutation({

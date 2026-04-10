@@ -29,7 +29,7 @@ interface UnassignTableProps {
 }
 
 export function UnassignTable({ unitId, pendingChanges, setPendingChanges }: UnassignTableProps) {
-  const { canAssignProjects, canClaimProjects } = useProjectPermissions(unitId);
+  const { canAssignProjects, canClaimProjects, canCancelProjects } = useProjectPermissions(unitId);
 
   const { data: projects, isLoading, isError } = useUnassignedProjects(unitId);
   const { mutateAsync: assignProjectsMutation } = useAssignProjects();
@@ -61,8 +61,16 @@ export function UnassignTable({ unitId, pendingChanges, setPendingChanges }: Una
         onClaimProject: (project) => handleClaimProject(project),
         canAssignProjects,
         canClaimProjects,
+        canCancelProjects,
       }),
-    [pendingChanges, unitId, canClaimProjects, canAssignProjects, handleClaimProject]
+    [
+      pendingChanges,
+      unitId,
+      canClaimProjects,
+      canAssignProjects,
+      canCancelProjects,
+      handleClaimProject,
+    ]
   );
 
   const table = useReactTable({

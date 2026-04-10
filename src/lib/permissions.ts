@@ -68,6 +68,9 @@ export const hasRoleInScopes = (
   options?: { unitId?: string; departmentId?: string }
 ) => {
   const scopes = getAllScopes(user);
+  if (scopes.length === 0) return false;
+
+  allowedRoles.push('SUPER_ADMIN');
 
   return scopes.some((scope) => {
     if (!allowedRoles.includes(scope.role)) return false;

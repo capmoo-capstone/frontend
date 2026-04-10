@@ -1,9 +1,8 @@
 import { useAuth } from '@/context/AuthContext';
 import {
-  getRoleInDept,
-  getRoleInUnit,
+  getRolesInDept,
+  getRolesInUnit,
   hasDepartmentPermission,
-  hasImportProjectPermission,
   hasProcurementPermission,
   hasSettingsPermission,
   hasUnitPermission,
@@ -29,13 +28,11 @@ export const usePermissions = (targetUnitId?: string, targetDepartmentId?: strin
       canManageUnit: false,
       canManageDepartment: false,
       canAccessSettings: false,
-      canImportProject: false,
-      canImportOptions: false,
       canDoProcurement: false,
       roleInDeptSupOps: undefined as RoleDetail | undefined,
       isProcurementStaff: false,
-      roleInDept: null,
-      roleInUnit: null,
+      rolesInDept: [],
+      rolesInUnit: [],
     };
   }
 
@@ -45,12 +42,10 @@ export const usePermissions = (targetUnitId?: string, targetDepartmentId?: strin
     canManageUnit: hasUnitPermission(user, targetUnitId),
     canManageDepartment: hasDepartmentPermission(user, targetDepartmentId),
     canAccessSettings: hasSettingsPermission(user),
-    canImportProject: hasImportProjectPermission(user),
-    canImportOptions: hasProcurementPermission(user, targetDepartmentId),
     canDoProcurement: hasProcurementPermission(user, targetDepartmentId),
     roleInDeptSupOps,
     isProcurementStaff: Boolean(roleInDeptSupOps),
-    roleInDept: getRoleInDept(user, targetDepartmentId),
-    roleInUnit: getRoleInUnit(user, targetUnitId),
+    rolesInDept: getRolesInDept(user, targetDepartmentId),
+    rolesInUnit: getRolesInUnit(user, targetUnitId),
   };
 };

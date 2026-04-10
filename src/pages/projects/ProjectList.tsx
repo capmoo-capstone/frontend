@@ -1,6 +1,5 @@
-import { useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-import { useAuth } from '@/context/AuthContext';
 import {
   AllProjectTable,
   ProjectFilterPanel,
@@ -8,10 +7,9 @@ import {
   ProjectToolbar,
   useProjectFilters,
 } from '@/features/projects';
+import { useProjectPermissions } from '@/features/projects/hooks/useProjectPermissions';
 
 export default function ProjectListPage() {
-  const { user } = useAuth();
-
   const {
     filters,
     tempFilters,
@@ -24,16 +22,9 @@ export default function ProjectListPage() {
     handleApplyFilter,
     handleResetFilter,
   } = useProjectFilters();
+  const { canImportProject } = useProjectPermissions();
 
-  const finalFilters = useMemo(() => {
-    const appliedFilters = { ...filters };
-
-    if (user?.department?.name !== 'procurement' && user?.department?.id) {
-      appliedFilters.departments = [user.department.id];
-    }
-
-    return appliedFilters;
-  }, [filters, user]);
+  const navigate = useNavigate();
 
   return (
     <div className="relative space-y-6">
@@ -51,6 +42,10 @@ export default function ProjectListPage() {
         onSearchChange={setSearchQuery}
         onSearch={handleGlobalSearch}
         onFilterToggle={() => setIsFilterOpen(!isFilterOpen)}
+        onImport={() => {
+          navigate('/app/project-import');
+        }}
+        canImportProject={canImportProject}
       />
 
       {/* Filter Panel */}
@@ -64,7 +59,7 @@ export default function ProjectListPage() {
       )}
 
       {/* Data Table */}
-      <AllProjectTable filters={finalFilters} />
+      <AllProjectTable filters={filters} />
     </div>
   );
 }

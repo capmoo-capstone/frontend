@@ -9,6 +9,7 @@ interface ProjectToolbarProps {
   onSearch: () => void;
   onFilterToggle: () => void;
   onImport?: () => void;
+  canImportProject?: boolean;
 }
 
 export function ProjectToolbar({
@@ -17,6 +18,7 @@ export function ProjectToolbar({
   onSearch,
   onFilterToggle,
   onImport,
+  canImportProject = false,
 }: ProjectToolbarProps) {
   return (
     <div className="flex items-end justify-end gap-2">
@@ -39,10 +41,12 @@ export function ProjectToolbar({
       <Button variant="outline" onClick={onFilterToggle}>
         <Funnel /> ค้นหาขั้นสูง
       </Button>
-      <Button variant="brand" onClick={onImport}>
-        <Import />
-        นำเข้าโครงการ
-      </Button>
+      {canImportProject && onImport && (
+        <Button variant="brand" onClick={onImport}>
+          <Import />
+          นำเข้าโครงการ
+        </Button>
+      )}
     </div>
   );
 }

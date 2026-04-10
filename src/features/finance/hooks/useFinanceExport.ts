@@ -1,7 +1,6 @@
 import { useMemo } from 'react';
 
-import { useProjects } from '@/features/projects/hooks/useProjects';
-import type { Project } from '@/features/projects/types';
+import { type Project, useProjects } from '@/features/projects';
 import { getResponsiblePerson } from '@/lib/formatters';
 
 import type { FinanceExportItem, FinanceExportStatus } from '../types';
@@ -54,7 +53,7 @@ export function useFinanceExport() {
         id: project.id,
         receive_no: project.receive_no,
         project_title: project.title,
-        is_urgent: project.urgent_status !== 'NORMAL',
+        is_urgent: project.is_urgent !== 'NORMAL',
         responsible_person: getResponsiblePerson(project),
         procurement_type: project.procurement_type,
         budget:
@@ -62,7 +61,7 @@ export function useFinanceExport() {
         department_name: getDepartmentName(project),
         export_status: mapToFinanceStatus(project.status),
         project_status: project.status,
-        urgent_status: project.urgent_status,
+        urgent_status: project.is_urgent,
       }))
       .sort((a, b) => {
         // Sort by receive number descending

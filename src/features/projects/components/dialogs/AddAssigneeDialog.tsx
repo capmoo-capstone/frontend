@@ -10,7 +10,8 @@ import { z } from 'zod';
 import { CustomContentDialog } from '@/components/shared-dialog';
 import { UserSelect } from '@/features/users';
 
-import { useAssignProjects, useProjectDetail } from '../../hooks/useProjects';
+import { useAddProjectAssignee } from '../../hooks/useProjectMutations';
+import type { Project } from '../../types/index';
 
 const AddAssigneeFormSchema = z.object({
   userId: z.string().min(1, 'กรุณาเลือกเจ้าหน้าที่'),
@@ -21,17 +22,12 @@ type AddAssigneeFormValues = z.infer<typeof AddAssigneeFormSchema>;
 interface AddAssigneeDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  projectId: string;
+  project: Project;
 }
 
-export function AddAssigneeDialog({ isOpen, onClose, projectId }: AddAssigneeDialogProps) {
-  const { mutateAsync: assignProjectsMutation, isPending } = useAssignProjects();
-  const projectDetail = useProjectDetail(projectId);
-  const data = projectDetail.data;
-  const unitId =
-    (data?.current_template_type !== 'CONTRACT'
-      ? data?.assignee_contract?.unit_id
-      : data?.assignee_procurement?.unit_id) ?? undefined;
+export function AddAssigneeDialog({ isOpen, onClose, project }: AddAssigneeDialogProps) {
+  const { mutateAsync: addProjectAssigneeMutation, isPending } = useAddProjectAssignee();
+  const unitId = project.responsible_unit_id;
 
   const form = useForm<AddAssigneeFormValues>({
     resolver: zodResolver(AddAssigneeFormSchema),
@@ -50,12 +46,10 @@ export function AddAssigneeDialog({ isOpen, onClose, projectId }: AddAssigneeDia
   }, [isOpen, form]);
 
   const handleConfirm = form.handleSubmit(async (values) => {
-    const savePromise = assignProjectsMutation([
-      {
-        projectId,
-        userId: values.userId,
-      },
-    ]);
+    const savePromise = addProjectAssigneeMutation({
+      projectId: project.id,
+      userId: values.userId,
+    });
 
     toast.promise(savePromise, {
       loading: 'กำลังเพิ่มเจ้าหน้าที่...',

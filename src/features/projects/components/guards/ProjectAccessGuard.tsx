@@ -3,6 +3,8 @@ import { Navigate, Outlet, useParams } from 'react-router-dom';
 
 import { useAuth } from '@/context/AuthContext';
 
+import { getProjectDetail } from '../../api';
+
 const ProjectAccessGuard = () => {
   const { id } = useParams();
   const { user } = useAuth();
@@ -19,23 +21,7 @@ const ProjectAccessGuard = () => {
       }
 
       try {
-        // todo check logic from API
-        const mockProject = {
-          id: '123',
-          assigneeId: 'staff_01',
-          unitId: 'unit_eng',
-        };
-
-        const isAssignee = mockProject.assigneeId === user.id;
-        const isHeadOfUnit = user.role === 'HEAD_OF_UNIT' && user.unit?.id === mockProject.unitId;
-
-        if (isAssignee || isHeadOfUnit) {
-          setIsAllowed(true);
-        } else {
-          setIsAllowed(false);
-        }
-
-        // If all checks pass
+        await getProjectDetail(id);
         setIsAllowed(true);
       } catch (error) {
         console.error('Access check failed', error);

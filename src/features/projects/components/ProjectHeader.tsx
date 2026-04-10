@@ -7,13 +7,16 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import type { Role } from '@/features/auth';
-import type { ProjectDetail } from '@/features/projects';
-import { ManageUnitRoles, SupervisorRoles } from '@/lib/permissions';
+
+import type { ProjectDetail, ProjectUrgentStatus } from '../types/index';
+import { getCancelProjectActionLabel } from '../utils/project-selectors';
+
+const isUrgentProject = (value: ProjectUrgentStatus) =>
+  value === 'URGENT' || value === 'VERY_URGENT' || value === 'SUPER_URGENT';
 
 interface ProjectHeaderProps {
   project: ProjectDetail;
-  viewAsRole: Role;
+  canCancelProjects: boolean;
   onEditProject?: () => void;
   onCancelProject?: () => void;
   onExportReport?: () => void;
@@ -21,7 +24,7 @@ interface ProjectHeaderProps {
 
 export const ProjectHeader = ({
   project,
-  viewAsRole,
+  canCancelProjects,
   onEditProject,
   onCancelProject,
   onExportReport,
@@ -31,7 +34,7 @@ export const ProjectHeader = ({
       <div className="space-y-4">
         <div className="space-y-1">
           <h1 className="text-primary h1-topic">
-            {project.is_urgent && <span className="text-destructive">ด่วน </span>}
+            {isUrgentProject(project.is_urgent) && <span className="text-destructive">ด่วน </span>}
             {project.title}
           </h1>
           {project.description && (
@@ -61,9 +64,7 @@ export const ProjectHeader = ({
               className="text-destructive focus:text-destructive"
             >
               <Trash2 className="text-destructive h-4 w-4" />
-              {ManageUnitRoles.includes(viewAsRole) || SupervisorRoles.includes(viewAsRole)
-                ? 'ยกเลิกโครงการ'
-                : 'ขอยกเลิกโครงการ'}
+              {getCancelProjectActionLabel(canCancelProjects)}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

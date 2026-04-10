@@ -10,7 +10,7 @@ const INITIAL_FILTERS: ProjectFilterParams = {
   procurementType: [],
   status: [],
   urgentStatus: [],
-  departments: [],
+  units: [],
   myTasks: false,
 };
 

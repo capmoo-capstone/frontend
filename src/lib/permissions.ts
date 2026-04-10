@@ -62,12 +62,15 @@ const getAllScopes = (user: User) => [...user.roles.own, ...user.roles.delegated
  * @param allowedRoles Array of roles that pass the check
  * @param options Optional context restrictions (unitId, departmentId)
  */
-const hasRoleInScopes = (
+export const hasRoleInScopes = (
   user: User,
   allowedRoles: Role[],
   options?: { unitId?: string; departmentId?: string }
 ) => {
   const scopes = getAllScopes(user);
+  if (scopes.length === 0) return false;
+
+  allowedRoles.push('SUPER_ADMIN');
 
   return scopes.some((scope) => {
     if (!allowedRoles.includes(scope.role)) return false;
@@ -82,7 +85,7 @@ const hasRoleInScopes = (
  * * @param user The logged-in user
  * @param bypassRoles Array of roles that grant bypass access
  */
-const hasBypassRole = (user: User, bypassRoles: Role[]) => {
+export const hasBypassRole = (user: User, bypassRoles: Role[]) => {
   return hasRoleInScopes(user, bypassRoles) || (!!user.role && bypassRoles.includes(user.role));
 };
 
@@ -147,7 +150,10 @@ export const hasDepartmentPermission = (user: User, targetDepartmentId?: string)
  * Checks if a user has access to global system settings.
  */
 export const hasSettingsPermission = (user: User) => {
-  return !!user.role && SettingsAllowedRoles.includes(user.role);
+  return (
+    hasRoleInScopes(user, SettingsAllowedRoles) ||
+    (!!user.role && SettingsAllowedRoles.includes(user.role))
+  );
 };
 
 /**
@@ -158,19 +164,30 @@ export const hasSelfManagePermission = (user: User, targetUnitId?: string) => {
 };
 
 // ============================================================================
-// 4. FEATURE-SPECIFIC PERMISSIONS
+// 5. ROLE RETRIEVAL UTILITIES
 // ============================================================================
+// Functions for extracting specific data points from the user's scope.
 
-/** * Checks if the user is authorized to use different import options (manual, lesspaper, fiori).
+/**
+ * Retrieves the specific role a user holds within a given department, if any.
  */
-export const hasImportOptionsPermission = (user: User) => {
-  return hasProcurementPermission(user);
+export const getRolesInDept = (user: User, departmentId?: string): Role[] => {
+  if (!departmentId) return [];
+
+  const scopes = getAllScopes(user);
+  const deptScope = scopes.filter((scope) => scope.dept_id === departmentId);
+  return deptScope.map((s) => s.role);
 };
 
-/** * Checks if the user is authorized to actively import projects into the system.
+/**
+ * Retrieves the specific role a user holds within a given unit, if any.
  */
-export const hasImportProjectPermission = (user: User) => {
-  return hasProcurementPermission(user); // or is representative of unit
+export const getRolesInUnit = (user: User, unitId?: string): Role[] => {
+  if (!unitId) return [];
+
+  const scopes = getAllScopes(user);
+  const unitScope = scopes.filter((scope) => scope.unit_id === unitId);
+  return unitScope.map((s) => s.role);
 };
 
 // ============================================================================

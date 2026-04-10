@@ -12,12 +12,14 @@ interface StatusCardProps {
 
 export function StatusCard({ icon, label, count, iconColor, className }: StatusCardProps) {
   return (
-    <div className={cn('flex flex-col gap-3 px-6', className)}>
+    <div className={cn('flex flex-col gap-3 px-2', className)}>
       <div className="flex items-center gap-2">
-        <div className={cn('flex h-5 w-5 items-center justify-center', iconColor)}>{icon}</div>
-        <span className="normal whitespace-nowrap">{label}</span>
+        <div className={cn('flex h-4 w-4 shrink-0 items-center justify-center', iconColor)}>
+          {icon}
+        </div>
+        <span className="normal wrap-break-words leading-tight">{label}</span>
       </div>
-      <span className="h2-topic leading-none">{count.toLocaleString()}</span>
+      <span className="text-lg leading-none font-semibold">{count.toLocaleString()}</span>
     </div>
   );
 }

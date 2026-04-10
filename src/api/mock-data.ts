@@ -8,7 +8,42 @@ import {
 import { type UserSelectionResponse } from '@/features/users';
 import { createMockUser } from '@/lib/mock-utils';
 
-export const MOCK_PROJECTS: Project[] = [
+type MockWorkflowStatus = {
+  p: string;
+  c: string;
+};
+
+type MockProjectSeed = Omit<
+  Project,
+  'procurement_status' | 'procurement_step' | 'contract_status' | 'contract_step'
+> & {
+  workflow_status: MockWorkflowStatus;
+};
+
+const parseWorkflowStatus = (value: string) => {
+  const [status, stepPart] = value.split(' step ');
+  const step = stepPart ? Number(stepPart) : null;
+
+  return {
+    status,
+    step: Number.isFinite(step) ? step : null,
+  };
+};
+
+const normalizeProject = ({ workflow_status, ...project }: MockProjectSeed): Project => {
+  const procurement = parseWorkflowStatus(workflow_status.p);
+  const contract = parseWorkflowStatus(workflow_status.c);
+
+  return {
+    ...project,
+    procurement_status: procurement.status as Project['procurement_status'],
+    procurement_step: procurement.step,
+    contract_status: contract.status as Project['contract_status'],
+    contract_step: contract.step,
+  };
+};
+
+const MOCK_PROJECTS_RAW: MockProjectSeed[] = [
   {
     id: '1',
     receive_no: 'RCV-2024-001',
@@ -796,6 +831,8 @@ export const MOCK_PROJECTS: Project[] = [
     updated_at: new Date('2024-01-30T09:30:00Z').toISOString(),
   },
 ];
+
+export const MOCK_PROJECTS: Project[] = MOCK_PROJECTS_RAW.map(normalizeProject);
 
 export const MOCK_ASSIGNED_PROJECTS: AssignedProjectItem[] = [
   {

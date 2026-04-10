@@ -4,14 +4,12 @@ import {
   ArrowLeftToLine,
   Building2,
   ChartPie,
-  FileSignature,
   HandCoins,
   Home,
   Import,
   ListTodo,
   LogOut,
   MoreVertical,
-  Package,
   Star,
   Table2,
   Truck,
@@ -99,7 +97,7 @@ const menuGroups: MenuGroup[] = [
       },
       {
         title: 'นำเข้าโครงการ',
-        url: '/app/projects/import',
+        url: '/app/project-import',
         icon: Import,
       },
       {
@@ -111,25 +109,12 @@ const menuGroups: MenuGroup[] = [
   },
   {
     label: 'มอบหมายการทำงาน',
-    allowedRoles: [
-      'HEAD_OF_UNIT',
-      'HEAD_OF_DEPARTMENT',
-      'ADMIN',
-      'SUPER_ADMIN',
-      'GENERAL_STAFF',
-      'DOCUMENT_STAFF',
-      'FINANCE_STAFF',
-    ],
+    allowedRoles: ['HEAD_OF_UNIT', 'HEAD_OF_DEPARTMENT', 'SUPER_ADMIN', 'GENERAL_STAFF'],
     items: [
       {
-        title: 'งานจัดซื้อ',
-        url: '/app/assign/procurements',
-        icon: Package,
-      },
-      {
-        title: 'งานบริหารสัญญา',
-        url: '/app/assign/contracts',
-        icon: FileSignature,
+        title: 'มอบหมายงาน',
+        url: '/app/assign',
+        icon: UserCog,
       },
     ],
   },

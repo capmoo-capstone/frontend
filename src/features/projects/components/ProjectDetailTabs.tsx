@@ -10,7 +10,7 @@ import {
 } from '@/features/workflow';
 import { cn } from '@/lib/utils';
 
-import type { ProjectDetail } from '../types';
+import type { ProjectDetail } from '../types/index';
 
 interface WorkflowConfig {
   type: string;

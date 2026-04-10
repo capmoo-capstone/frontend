@@ -1,5 +1,5 @@
 import { type ColumnDef } from '@tanstack/react-table';
-import { ArrowUpDown, MoreVertical, Trash2 } from 'lucide-react';
+import { MoreVertical, Trash2 } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -9,11 +9,15 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { type Role } from '@/features/auth';
 import { formatDateThaiShort, getResponsibleTypeFormat } from '@/lib/formatters';
-import { ManageSelfRoles, ManageUnitRoles, SupervisorRoles } from '@/lib/permissions';
 
-import type { UnassignedProjectItem } from '../../../types';
+import type { UnassignedProjectItem } from '../../../types/index';
+import { getCancelProjectActionLabel } from '../../../utils/project-selectors';
+import {
+  renderAssignedStatusBadge,
+  renderSortableHeader,
+  renderUrgentText,
+} from '../column-helpers';
 import { AssigneeCell } from './AssigneeCell';
 
 interface GetColumnsProps {
@@ -22,7 +26,9 @@ interface GetColumnsProps {
   unitId?: string;
   onOpenCancelDialog: (project: UnassignedProjectItem) => void;
   onClaimProject: (project: UnassignedProjectItem) => void;
-  viewAsRole: Role;
+  canAssignProjects: boolean;
+  canClaimProjects: boolean;
+  canCancelProjects: boolean;
 }
 
 export const getColumns = ({
@@ -31,77 +37,34 @@ export const getColumns = ({
   unitId,
   onOpenCancelDialog,
   onClaimProject,
-  viewAsRole,
+  canAssignProjects,
+  canClaimProjects,
+  canCancelProjects,
 }: GetColumnsProps): ColumnDef<UnassignedProjectItem>[] => [
   {
     accessorKey: 'receive_no',
-    header: ({ column }) => (
-      <div
-        className="flex cursor-pointer items-center"
-        onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-      >
-        เลขที่ลงรับ
-        <ArrowUpDown
-          className={`ml-2 h-4 w-4 ${column.getIsSorted() ? 'text-primary' : 'text-ring'}`}
-        />
-      </div>
-    ),
+    header: ({ column }) => renderSortableHeader(column, 'เลขที่ลงรับ'),
     cell: ({ row }) => <div className="font-medium">{row.getValue('receive_no')}</div>,
   },
   {
     accessorKey: 'title',
-    header: ({ column }) => (
-      <div
-        className="flex cursor-pointer items-center"
-        onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-      >
-        โครงการ
-        <ArrowUpDown
-          className={`ml-2 h-4 w-4 ${column.getIsSorted() ? 'text-primary' : 'text-ring'}`}
-        />
-      </div>
-    ),
+    header: ({ column }) => renderSortableHeader(column, 'โครงการ'),
     cell: ({ row }) => (
       <div>
-        {row.original.urgent_status === 'URGENT' && (
-          <span className="text-destructive mr-2 font-semibold">ด่วน</span>
-        )}
-        {row.original.urgent_status === 'VERY_URGENT' && (
-          <span className="text-destructive mr-2 font-semibold">ด่วนพิเศษ</span>
-        )}
+        {renderUrgentText(row.original.urgent_status)}
         {row.getValue('title')}
       </div>
     ),
   },
   {
     id: 'procurement_type',
-    header: ({ column }) => (
-      <div
-        className="flex cursor-pointer items-center"
-        onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-      >
-        ประเภทงาน
-        <ArrowUpDown
-          className={`ml-2 h-4 w-4 ${column.getIsSorted() ? 'text-primary' : 'text-ring'}`}
-        />
-      </div>
-    ),
+    header: ({ column }) => renderSortableHeader(column, 'วิธีการจัดหา'),
     cell: ({ row }) => <div>{getResponsibleTypeFormat(row.original.procurement_type).label}</div>,
     accessorFn: (row) => row.procurement_type,
   },
   {
     id: 'expected_approval_date',
-    header: ({ column }) => (
-      <div
-        className="flex cursor-pointer items-center"
-        onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-      >
-        กำหนดส่งงาน
-        <ArrowUpDown
-          className={`ml-2 h-4 w-4 ${column.getIsSorted() ? 'text-primary' : 'text-ring'}`}
-        />
-      </div>
-    ),
+    header: ({ column }) => renderSortableHeader(column, 'กำหนดส่งงาน'),
     cell: ({ row }) => (
       <div>
         {row.original.expected_approval_date
@@ -113,17 +76,7 @@ export const getColumns = ({
   },
   {
     id: 'request_unit',
-    header: ({ column }) => (
-      <div
-        className="flex cursor-pointer items-center"
-        onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-      >
-        หน่วยงาน
-        <ArrowUpDown
-          className={`ml-2 h-4 w-4 ${column.getIsSorted() ? 'text-primary' : 'text-ring'}`}
-        />
-      </div>
-    ),
+    header: ({ column }) => renderSortableHeader(column, 'หน่วยงาน'),
     cell: ({ row }) => <div>{row.original.request_unit.department.name}</div>,
     accessorFn: (row) => row.request_unit.department.name,
   },
@@ -136,9 +89,9 @@ export const getColumns = ({
   },
   {
     id: 'assignee',
-    header: ManageUnitRoles.includes(viewAsRole) ? 'มอบหมายให้' : undefined,
+    header: canClaimProjects ? undefined : 'มอบหมายให้',
     cell: ({ row }) => {
-      return ManageUnitRoles.includes(viewAsRole) ? (
+      return canAssignProjects ? (
         <AssigneeCell
           rowId={row.original.id}
           originalValue={null}
@@ -146,11 +99,13 @@ export const getColumns = ({
           setPendingChanges={setPendingChanges}
           unitId={unitId}
         />
-      ) : ManageSelfRoles.includes(viewAsRole) ? (
+      ) : canClaimProjects ? (
         <Button variant="outline" size="sm" onClick={() => onClaimProject(row.original)}>
           เลือกงาน
         </Button>
-      ) : null;
+      ) : (
+        renderAssignedStatusBadge('UNASSIGNED')
+      );
     },
   },
   {
@@ -170,9 +125,7 @@ export const getColumns = ({
           <DropdownMenuContent align="end">
             <DropdownMenuItem onClick={() => onOpenCancelDialog(project)} variant="destructive">
               <Trash2 className="text-destructive h-4 w-4" />
-              {ManageUnitRoles.includes(viewAsRole) || SupervisorRoles.includes(viewAsRole)
-                ? 'ยกเลิกโครงการ'
-                : 'ขอยกเลิกโครงการ'}
+              {getCancelProjectActionLabel(canCancelProjects)}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

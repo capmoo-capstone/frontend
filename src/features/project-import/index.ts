@@ -11,3 +11,4 @@ export { ProjectImportContainer } from './components/ProjectImportContainer';
 export { useExcelImport } from './hooks/useExcelImport';
 export { useCreateProject } from './hooks/useCreateProject';
 export { useProjectImportForm } from './hooks/useProjectImportForm';
+export { useProjectImportPermissions } from './hooks/useProjectImportPermissions';

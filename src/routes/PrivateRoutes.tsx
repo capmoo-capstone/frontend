@@ -3,8 +3,9 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 
 import PermissionGuard from '@/components/guards/PermissionGuard';
 import { useAuth } from '@/context/AuthContext';
+import { useProjectImportPermissions } from '@/features/project-import';
 import AppLayout from '@/layouts/AppLayout';
-import { hasImportProjectPermission, hasSettingsPermission } from '@/lib/permissions';
+import { hasSettingsPermission } from '@/lib/permissions';
 
 // --- Lazy Load Pages ---
 const Home = lazy(() => import('@/pages/home/Home'));
@@ -38,7 +39,7 @@ export const PrivateRoutes = () => {
   const { user } = useAuth();
 
   // permission checks
-  const canImportProjects = user ? hasImportProjectPermission(user) : false;
+  const { canImportProject } = useProjectImportPermissions();
   const canManageSettings = user ? hasSettingsPermission(user) : false;
 
   return (
@@ -61,7 +62,7 @@ export const PrivateRoutes = () => {
               <Route path="/app/projects/:id" element={<ProjectDetail />} />
               <Route
                 element={
-                  <PermissionGuard isAllowed={canImportProjects} redirectPath="/app/projects" />
+                  <PermissionGuard isAllowed={canImportProject} redirectPath="/app/projects" />
                 }
               >
                 <Route path="/app/project-import" element={<ProjectImport />} />

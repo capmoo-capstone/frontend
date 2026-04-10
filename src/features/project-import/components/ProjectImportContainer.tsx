@@ -1,12 +1,11 @@
 import { useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
-import { useAuth } from '@/context/AuthContext';
 import { useDepartments } from '@/features/organization';
 import { getFiscalYear } from '@/lib/formatters';
-import { hasImportOptionsPermission } from '@/lib/permissions';
 
 import { useExcelImport } from '../hooks/useExcelImport';
+import { useProjectImportPermissions } from '../hooks/useProjectImportPermissions';
 import type { ImportMode } from '../types';
 import { EditableImportTable } from './EditableImportTable';
 import { ImportSelector } from './ImportSelector';
@@ -15,7 +14,7 @@ import { ManualForm } from './ManualForm';
 export function ProjectImportContainer() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
-  const { user } = useAuth();
+  const { canImportOptions } = useProjectImportPermissions();
 
   const modeParam = searchParams.get('mode');
   const isImportMode = (value: string | null): value is ImportMode => {
@@ -23,17 +22,16 @@ export function ProjectImportContainer() {
   };
   const mode: ImportMode = isImportMode(modeParam) ? modeParam : 'none';
 
-  const canSeeOptions = user ? hasImportOptionsPermission(user) : false;
   const { data: departments } = useDepartments();
 
   const currentYear = getFiscalYear(new Date());
   const fiscalYears = Array.from({ length: 7 }, (_, i) => (currentYear - 3 + i).toString());
 
   useEffect(() => {
-    if (!canSeeOptions && (mode === 'lesspaper' || mode === 'fiori' || mode === 'none')) {
+    if (!canImportOptions && (mode === 'lesspaper' || mode === 'fiori' || mode === 'none')) {
       setSearchParams({ mode: 'manual' }, { replace: true });
     }
-  }, [mode, canSeeOptions, setSearchParams]);
+  }, [mode, canImportOptions, setSearchParams]);
 
   const { data, setData, handleFileUpload, updateRow, deleteRow, isParsing } = useExcelImport(mode);
 

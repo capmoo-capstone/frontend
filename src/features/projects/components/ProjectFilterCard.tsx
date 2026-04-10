@@ -18,8 +18,8 @@ import { useUsersForSelection } from '@/features/users';
 import { getResponsibleTypeFormat } from '@/lib/formatters';
 
 import { type ProjectFilterParams } from '../api';
-import { ProcurementTypeEnum, ProjectStatusEnum, ProjectUrgentStatusEnum } from '../types/index';
 import { useProjectPermissions } from '../hooks/useProjectPermissions';
+import { ProcurementTypeEnum, ProjectStatusEnum, ProjectUrgentStatusEnum } from '../types/index';
 import { FilterCheckbox } from './FilterCheckbox';
 import { SearchCheckbox } from './SearchCheckbox';
 

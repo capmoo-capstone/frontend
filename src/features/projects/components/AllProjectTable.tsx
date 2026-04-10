@@ -14,8 +14,8 @@ import { AlertTriangle, Loader2 } from 'lucide-react';
 
 import { useAuth } from '@/context/AuthContext';
 
-import { type ProjectFilterParams, useProjects } from '../hooks/useProjectQueries';
 import { useProjectPermissions } from '../hooks/useProjectPermissions';
+import { type ProjectFilterParams, useProjects } from '../hooks/useProjectQueries';
 import type { Project } from '../types/index';
 import { AddAssigneeDialog } from './dialogs/AddAssigneeDialog';
 import { CancelProjectDialog } from './dialogs/CancelProjectDialog';

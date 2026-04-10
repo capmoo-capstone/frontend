@@ -164,22 +164,6 @@ export const hasSelfManagePermission = (user: User, targetUnitId?: string) => {
 };
 
 // ============================================================================
-// 4. FEATURE-SPECIFIC PERMISSIONS
-// ============================================================================
-
-/** * Checks if the user is authorized to use different import options (manual, lesspaper, fiori).
- */
-export const hasImportOptionsPermission = (user: User) => {
-  return hasProcurementPermission(user);
-};
-
-/** * Checks if the user is authorized to actively import projects into the system.
- */
-export const hasImportProjectPermission = (user: User) => {
-  return hasProcurementPermission(user); // or is representative of unit
-};
-
-// ============================================================================
 // 5. ROLE RETRIEVAL UTILITIES
 // ============================================================================
 // Functions for extracting specific data points from the user's scope.

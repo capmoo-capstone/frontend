@@ -22,7 +22,7 @@ type ProjectWorklistApiItem = z.infer<typeof ProjectWorklistApiItemSchema>;
 type ProjectDetailApi = z.infer<typeof ProjectDetailApiSchema>;
 
 const getWorklistAssignee = (item: ProjectWorklistApiItem) => {
-  const assignees = item.assignee ?? [];
+  const assignees = item.assignee ?? item.assignee_procurement ?? item.assignee_contract ?? [];
 
   return assignees[0] ?? null;
 };
@@ -126,7 +126,7 @@ export const mapWaitingCancelProjectItem = (
     assignee_id: getWorklistAssignee(item)?.id ?? null,
     assignee_full_name: getWorklistAssignee(item)?.full_name ?? null,
     urgent_status: item.is_urgent,
-    cancel_reason: null,
+    cancel_reason: item.project_cancellation?.[0]?.reason ?? null,
     expected_approval_date: item.expected_approval_date,
     created_at: item.created_at,
   });

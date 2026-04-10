@@ -1,8 +1,13 @@
 import { type ColumnDef } from '@tanstack/react-table';
-import { Check, X } from 'lucide-react';
+import { Check, MoreVertical, XIcon } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
-import type { Role } from '@/features/auth';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { formatDateThaiShort, getResponsibleTypeFormat } from '@/lib/formatters';
 
 import type { WaitingCancelProjectItem } from '../../../types/index';
@@ -11,11 +16,13 @@ import { renderSortableHeader, renderUrgentText } from '../column-helpers';
 interface GetColumnsProps {
   onApproveCancellation: (projectId: string, projectTitle: string) => void;
   onRejectCancellation: (projectId: string, projectTitle: string) => void;
+  canCancelProjects: boolean;
 }
 
 export const getColumns = ({
   onApproveCancellation,
   onRejectCancellation,
+  canCancelProjects,
 }: GetColumnsProps): ColumnDef<WaitingCancelProjectItem>[] => [
   {
     accessorKey: 'receive_no',
@@ -68,28 +75,35 @@ export const getColumns = ({
   },
   {
     id: 'actions',
-    header: 'การดำเนินการ',
     cell: ({ row }) => {
+      if (!canCancelProjects) {
+        return null;
+      }
+
       return (
         <div className="flex gap-2">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => onApproveCancellation(row.original.id, row.original.title)}
-            className="text-green-600 hover:bg-green-50 hover:text-green-700"
-          >
-            <Check className="mr-2 h-4 w-4" />
-            อนุมัติ
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => onRejectCancellation(row.original.id, row.original.title)}
-            className="text-red-600 hover:bg-red-50 hover:text-red-700"
-          >
-            <X className="mr-2 h-4 w-4" />
-            ปฏิเสธ
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="h-8 w-8 p-0">
+                <MoreVertical className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem
+                variant="destructive"
+                onClick={() => onApproveCancellation(row.original.id, row.original.title)}
+              >
+                <Check className="h-4 w-4" />
+                อนุมัติคำขอยกเลิก
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => onRejectCancellation(row.original.id, row.original.title)}
+              >
+                <XIcon className="h-4 w-4" />
+                ปฏิเสธคำขอยกเลิก
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       );
     },

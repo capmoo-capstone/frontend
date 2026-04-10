@@ -11,6 +11,7 @@ import {
 import { AlertTriangle, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 
+import { ConfirmDialog } from '@/components/shared-dialog';
 import { TitleBar } from '@/components/ui/title-bar';
 
 import {
@@ -22,6 +23,12 @@ import { useWaitingCancelProjects } from '../../../hooks/useProjectQueries';
 import { ProjectDataTable } from '../DataTable';
 import { getColumns } from './columns';
 
+type PendingCancellationAction = {
+  projectId: string;
+  projectTitle: string;
+  type: 'approve' | 'reject';
+} | null;
+
 export function WaitingCancelTable({ unitId }: { unitId?: string }) {
   const { canCancelProjects } = useProjectPermissions(unitId);
 
@@ -30,33 +37,44 @@ export function WaitingCancelTable({ unitId }: { unitId?: string }) {
   const { mutateAsync: rejectMutation } = useRejectProjectCancellation();
 
   const [sorting, setSorting] = useState<SortingState>([]);
-
-  if (!canCancelProjects && (!projects || projects.length === 0)) {
-    return null;
-  }
+  const [pendingAction, setPendingAction] = useState<PendingCancellationAction>(null);
 
   const columns = useMemo(
     () =>
       getColumns({
         onApproveCancellation: async (projectId: string, projectTitle: string) => {
-          const promise = approveMutation(projectId);
-          toast.promise(promise, {
-            loading: `กำลังอนุมัติยกเลิก: ${projectTitle}...`,
-            success: 'อนุมัติยกเลิกโครงการสำเร็จ',
-            error: 'ไม่สามารถอนุมัติยกเลิกได้',
-          });
+          setPendingAction({ projectId, projectTitle, type: 'approve' });
         },
         onRejectCancellation: async (projectId: string, projectTitle: string) => {
-          const promise = rejectMutation(projectId);
-          toast.promise(promise, {
-            loading: `กำลังปฏิเสธการยกเลิก: ${projectTitle}...`,
-            success: 'ปฏิเสธการยกเลิกโครงการสำเร็จ',
-            error: 'ไม่สามารถปฏิเสธการยกเลิกได้',
-          });
+          setPendingAction({ projectId, projectTitle, type: 'reject' });
         },
+        canCancelProjects,
       }),
-    [approveMutation, rejectMutation]
+    [approveMutation, rejectMutation, canCancelProjects]
   );
+
+  const handleConfirmAction = async () => {
+    if (!pendingAction) return;
+
+    const isApprove = pendingAction.type === 'approve';
+    const mutation = isApprove ? approveMutation : rejectMutation;
+    const promise = mutation(pendingAction.projectId);
+
+    toast.promise(promise, {
+      loading: isApprove
+        ? `กำลังอนุมัติคำขอยกเลิก: ${pendingAction.projectTitle}...`
+        : `กำลังปฏิเสธคำขอยกเลิก: ${pendingAction.projectTitle}...`,
+      success: isApprove ? 'อนุมัติคำขอยกเลิกโครงการสำเร็จ' : 'ปฏิเสธคำขอยกเลิกโครงการสำเร็จ',
+      error: isApprove ? 'ไม่สามารถอนุมัติคำขอยกเลิกได้' : 'ไม่สามารถปฏิเสธคำขอยกเลิกได้',
+    });
+
+    try {
+      await promise;
+      setPendingAction(null);
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   const table = useReactTable({
     data: projects || [],
@@ -84,17 +102,45 @@ export function WaitingCancelTable({ unitId }: { unitId?: string }) {
     );
   }
 
+  if (!canCancelProjects && (!projects || projects.length === 0)) {
+    return null;
+  }
+
   return (
-    <ProjectDataTable
-      table={table}
-      columnsLength={columns.length}
-      hasPagination={false}
-      emptyStateText="ตอนนี้ยังไม่มีงานที่ต้องอนุมัติคำขอยกเลิกโครงการ"
-      toolbar={
-        <div className="flex w-full items-center justify-between space-x-4">
-          <TitleBar title="งานที่ขออนุมัติยกเลิก" variant="error" />
-        </div>
-      }
-    />
+    <>
+      <ProjectDataTable
+        table={table}
+        columnsLength={columns.length}
+        hasPagination={false}
+        emptyStateText="ตอนนี้ยังไม่มีงานที่ต้องอนุมัติคำขอยกเลิกโครงการ"
+        toolbar={
+          <div className="flex w-full items-center justify-between space-x-4">
+            <TitleBar title="งานที่ขออนุมัติยกเลิก" variant="error" />
+          </div>
+        }
+      />
+
+      <ConfirmDialog
+        isOpen={!!pendingAction}
+        onClose={() => setPendingAction(null)}
+        onConfirm={handleConfirmAction}
+        title={
+          pendingAction?.type === 'approve' ? 'อนุมัติคำขอยกเลิกโครงการ' : 'ปฏิเสธคำขอยกเลิกโครงการ'
+        }
+        description={
+          pendingAction ? (
+            <>
+              คุณต้องการ
+              {pendingAction.type === 'approve' ? 'อนุมัติ' : 'ปฏิเสธ'}คำขอยกเลิกของโครงการ{' '}
+              <strong className="text-foreground">&quot;{pendingAction.projectTitle}&quot;</strong>
+              ใช่หรือไม่
+            </>
+          ) : undefined
+        }
+        confirmLabel={pendingAction?.type === 'approve' ? 'อนุมัติคำขอยกเลิก' : 'ปฏิเสธคำขอยกเลิก'}
+        cancelLabel="ยกเลิก"
+        destructive={pendingAction?.type === 'approve'}
+      />
+    </>
   );
 }

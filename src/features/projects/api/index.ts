@@ -68,8 +68,6 @@ export const getUnassignedProjects = async (unitId?: string): Promise<Unassigned
 export const getWaitingCancelProjects = async (
   unitId?: string
 ): Promise<WaitingCancelProjectItem[]> => {
-  return [];
-
   const parsed = await fetchWaitingCancelProjects(unitId);
   return parsed.data.map(mapWaitingCancelProjectItem);
 };

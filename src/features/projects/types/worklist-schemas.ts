@@ -80,6 +80,15 @@ export const ProjectWorklistApiItemSchema = z.object({
   procurement_type: ProcurementTypeEnum,
   current_workflow_type: UnitResponsibleTypeEnum,
   assignee: z.array(ProjectPersonSchema).optional(),
+  assignee_procurement: z.array(ProjectPersonSchema).optional(),
+  assignee_contract: z.array(ProjectPersonSchema).optional(),
+  project_cancellation: z
+    .array(
+      z.object({
+        reason: z.string().nullable().optional(),
+      })
+    )
+    .optional(),
   is_urgent: ProjectUrgentStatusEnum,
   expected_approval_date: z.string().datetime().nullable(),
   created_at: z.string().datetime(),

@@ -74,8 +74,6 @@ export const fetchUnassignedProjects = async (unitId?: string) => {
 };
 
 export const fetchWaitingCancelProjects = async (unitId?: string) => {
-  return [];
-
   const { data } = await api.get('/projects/waiting-cancel', {
     params: unitId ? { unitId } : {},
   });

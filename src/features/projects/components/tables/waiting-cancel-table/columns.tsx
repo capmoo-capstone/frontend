@@ -4,25 +4,18 @@ import { Check, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import type { Role } from '@/features/auth';
 import { formatDateThaiShort, getResponsibleTypeFormat } from '@/lib/formatters';
-import { ManageUnitRoles, SupervisorRoles } from '@/lib/permissions';
 
 import type { WaitingCancelProjectItem } from '../../../types/index';
-import {
-  renderAssignedStatusBadge,
-  renderSortableHeader,
-  renderUrgentText,
-} from '../column-helpers';
+import { renderSortableHeader, renderUrgentText } from '../column-helpers';
 
 interface GetColumnsProps {
   onApproveCancellation: (projectId: string, projectTitle: string) => void;
   onRejectCancellation: (projectId: string, projectTitle: string) => void;
-  viewAsRole: Role;
 }
 
 export const getColumns = ({
   onApproveCancellation,
   onRejectCancellation,
-  viewAsRole,
 }: GetColumnsProps): ColumnDef<WaitingCancelProjectItem>[] => [
   {
     accessorKey: 'receive_no',
@@ -77,11 +70,6 @@ export const getColumns = ({
     id: 'actions',
     header: 'การดำเนินการ',
     cell: ({ row }) => {
-      const canManage =
-        ManageUnitRoles.includes(viewAsRole) || SupervisorRoles.includes(viewAsRole);
-
-      if (!canManage) return null;
-
       return (
         <div className="flex gap-2">
           <Button

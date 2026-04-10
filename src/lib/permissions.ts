@@ -62,7 +62,7 @@ const getAllScopes = (user: User) => [...user.roles.own, ...user.roles.delegated
  * @param allowedRoles Array of roles that pass the check
  * @param options Optional context restrictions (unitId, departmentId)
  */
-const hasRoleInScopes = (
+export const hasRoleInScopes = (
   user: User,
   allowedRoles: Role[],
   options?: { unitId?: string; departmentId?: string }
@@ -82,7 +82,7 @@ const hasRoleInScopes = (
  * * @param user The logged-in user
  * @param bypassRoles Array of roles that grant bypass access
  */
-const hasBypassRole = (user: User, bypassRoles: Role[]) => {
+export const hasBypassRole = (user: User, bypassRoles: Role[]) => {
   return hasRoleInScopes(user, bypassRoles) || (!!user.role && bypassRoles.includes(user.role));
 };
 
@@ -184,21 +184,21 @@ export const hasImportProjectPermission = (user: User) => {
 /**
  * Retrieves the specific role a user holds within a given department, if any.
  */
-export const getRoleInDept = (user: User, departmentId?: string): Role | null => {
-  if (!departmentId) return null;
+export const getRolesInDept = (user: User, departmentId?: string): Role[] => {
+  if (!departmentId) return [];
 
   const scopes = getAllScopes(user);
-  const deptScope = scopes.find((scope) => scope.dept_id === departmentId);
-  return deptScope ? deptScope.role : null;
+  const deptScope = scopes.filter((scope) => scope.dept_id === departmentId);
+  return deptScope.map((s) => s.role);
 };
 
 /**
  * Retrieves the specific role a user holds within a given unit, if any.
  */
-export const getRoleInUnit = (user: User, unitId?: string): Role | null => {
-  if (!unitId) return null;
+export const getRolesInUnit = (user: User, unitId?: string): Role[] => {
+  if (!unitId) return [];
 
   const scopes = getAllScopes(user);
-  const unitScope = scopes.find((scope) => scope.unit_id === unitId);
-  return unitScope ? unitScope.role : null;
+  const unitScope = scopes.filter((scope) => scope.unit_id === unitId);
+  return unitScope.map((s) => s.role);
 };

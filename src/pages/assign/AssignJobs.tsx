@@ -17,8 +17,6 @@ import { AssignedTable, UnassignTable, WaitingCancelTable } from '@/features/pro
 import { WorkloadChart } from '@/features/projects/components/tables/unassign-table/WorkloadChart';
 import { SUPPLY_OPERATION_DEPARTMENT_ID } from '@/features/settings/constants';
 import {
-  ManageUnitRoles,
-  SupervisorRoles,
   hasDepartmentPermission,
   hasSelfManagePermission,
   hasUnitPermission,
@@ -85,10 +83,7 @@ export default function AssignJobs() {
         </div>
       </div>
 
-      {(ManageUnitRoles.includes(user?.role ?? 'GUEST') ||
-        SupervisorRoles.includes(user?.role ?? 'GUEST')) && (
-        <WorkloadChart pendingChanges={pendingChanges} unitId={id} />
-      )}
+      <WorkloadChart pendingChanges={pendingChanges} unitId={id} />
       <WaitingCancelTable unitId={id} />
       <UnassignTable
         unitId={id}

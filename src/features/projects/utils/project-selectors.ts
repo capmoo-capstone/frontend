@@ -40,8 +40,6 @@ export const canManageAssigneeByRole = (viewAsRole: Role) => {
   return ManageUnitRoles.includes(viewAsRole) || ManageSelfRoles.includes(viewAsRole);
 };
 
-export const getCancelProjectActionLabel = (viewAsRole: Role) => {
-  return ManageUnitRoles.includes(viewAsRole) || SupervisorRoles.includes(viewAsRole)
-    ? 'ยกเลิกโครงการ'
-    : 'ขอยกเลิกโครงการ';
+export const getCancelProjectActionLabel = (unitId?: string) => {
+  return unitId ? 'ยกเลิกโครงการ' : 'ขอยกเลิกโครงการ';
 };

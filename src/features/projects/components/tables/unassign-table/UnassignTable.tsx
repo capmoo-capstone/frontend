@@ -13,10 +13,9 @@ import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
 import { TitleBar } from '@/components/ui/title-bar';
-import { usePermissions } from '@/features/auth';
-import { ManageUnitRoles } from '@/lib/permissions';
 
 import { useAssignProjects, useClaimProject } from '../../../hooks/useProjectMutations';
+import { useProjectPermissions } from '../../../hooks/useProjectPermissions';
 import { useUnassignedProjects } from '../../../hooks/useProjectQueries';
 import { type UnassignedProjectItem } from '../../../types/index';
 import { CancelProjectDialog } from '../../dialogs/CancelProjectDialog';
@@ -30,8 +29,7 @@ interface UnassignTableProps {
 }
 
 export function UnassignTable({ unitId, pendingChanges, setPendingChanges }: UnassignTableProps) {
-  const { roleInUnit } = usePermissions(unitId);
-  const viewAsRole = roleInUnit ?? 'GUEST';
+  const { canAssignProjects, canClaimProjects } = useProjectPermissions(unitId);
 
   const { data: projects, isLoading, isError } = useUnassignedProjects(unitId);
   const { mutateAsync: assignProjectsMutation } = useAssignProjects();
@@ -61,9 +59,10 @@ export function UnassignTable({ unitId, pendingChanges, setPendingChanges }: Una
         unitId,
         onOpenCancelDialog: (project) => setProjectToCancel(project),
         onClaimProject: (project) => handleClaimProject(project),
-        viewAsRole,
+        canAssignProjects,
+        canClaimProjects,
       }),
-    [pendingChanges, unitId, viewAsRole, handleClaimProject]
+    [pendingChanges, unitId, canClaimProjects, canAssignProjects, handleClaimProject]
   );
 
   const table = useReactTable({
@@ -121,7 +120,7 @@ export function UnassignTable({ unitId, pendingChanges, setPendingChanges }: Una
         toolbar={
           <div className="flex w-full items-center justify-between space-x-4">
             <TitleBar title="งานที่ยังไม่ได้มอบหมาย" />
-            {ManageUnitRoles.includes(viewAsRole) && (
+            {canAssignProjects && (
               <Button
                 variant="brand"
                 onClick={handleSave}

@@ -12,20 +12,18 @@ import { AlertTriangle, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { TitleBar } from '@/components/ui/title-bar';
-import { usePermissions } from '@/features/auth/hooks/usePermissions';
-import { ManageUnitRoles, SupervisorRoles } from '@/lib/permissions';
 
 import {
   useApproveProjectCancellation,
   useRejectProjectCancellation,
 } from '../../../hooks/useProjectMutations';
+import { useProjectPermissions } from '../../../hooks/useProjectPermissions';
 import { useWaitingCancelProjects } from '../../../hooks/useProjectQueries';
 import { ProjectDataTable } from '../DataTable';
 import { getColumns } from './columns';
 
 export function WaitingCancelTable({ unitId }: { unitId?: string }) {
-  const { roleInUnit } = usePermissions(unitId);
-  const viewAsRole = roleInUnit ?? 'GUEST';
+  const { canCancelProjects } = useProjectPermissions(unitId);
 
   const { data: projects, isLoading, isError } = useWaitingCancelProjects(unitId);
   const { mutateAsync: approveMutation } = useApproveProjectCancellation();
@@ -33,7 +31,9 @@ export function WaitingCancelTable({ unitId }: { unitId?: string }) {
 
   const [sorting, setSorting] = useState<SortingState>([]);
 
-  const canManage = ManageUnitRoles.includes(viewAsRole) || SupervisorRoles.includes(viewAsRole);
+  if (!canCancelProjects && (!projects || projects.length === 0)) {
+    return null;
+  }
 
   const columns = useMemo(
     () =>
@@ -54,9 +54,8 @@ export function WaitingCancelTable({ unitId }: { unitId?: string }) {
             error: 'ไม่สามารถปฏิเสธการยกเลิกได้',
           });
         },
-        viewAsRole,
       }),
-    [viewAsRole, approveMutation, rejectMutation]
+    [approveMutation, rejectMutation]
   );
 
   const table = useReactTable({
@@ -67,10 +66,6 @@ export function WaitingCancelTable({ unitId }: { unitId?: string }) {
     getSortedRowModel: getSortedRowModel(),
     state: { sorting },
   });
-
-  if (!canManage) {
-    return null;
-  }
 
   if (isLoading) {
     return (

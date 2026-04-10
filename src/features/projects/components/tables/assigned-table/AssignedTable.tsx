@@ -14,10 +14,9 @@ import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { DatePicker } from '@/components/ui/date-picker';
 import { TitleBar } from '@/components/ui/title-bar';
-import { usePermissions } from '@/features/auth';
-import { ManageSelfRoles } from '@/lib/permissions';
 
 import { useAcceptProjects } from '../../../hooks/useProjectMutations';
+import { useProjectPermissions } from '../../../hooks/useProjectPermissions';
 import { useAssignedProjects } from '../../../hooks/useProjectQueries';
 import type { AssignedProjectItem } from '../../../types/index';
 import { CancelProjectDialog } from '../../dialogs/CancelProjectDialog';
@@ -26,8 +25,7 @@ import { ProjectDataTable } from '../DataTable';
 import { getColumns } from './columns';
 
 export function AssignedTable({ unitId }: { unitId?: string }) {
-  const { roleInUnit } = usePermissions(unitId);
-  const viewAsRole = roleInUnit ?? 'GUEST';
+  const { canClaimProjects, canChangeProjectAssignee } = useProjectPermissions(unitId);
 
   const [date, setDate] = useState<Date | undefined>(new Date());
 
@@ -59,9 +57,11 @@ export function AssignedTable({ unitId }: { unitId?: string }) {
         onChangeAssignee: (project: AssignedProjectItem) => setProjectToChangeAssignee(project),
         onAcceptProject: handleAcceptProject,
         isAcceptPending: isAccepting,
-        viewAsRole,
+        canClaimProjects,
+        canChangeProjectAssignee,
+        unitId,
       }),
-    [viewAsRole, handleAcceptProject, isAccepting]
+    [handleAcceptProject, isAccepting, canClaimProjects, canChangeProjectAssignee, unitId]
   );
 
   const waitingProjectIds = useMemo(
@@ -134,8 +134,7 @@ export function AssignedTable({ unitId }: { unitId?: string }) {
           <div className="flex w-full items-center justify-between space-x-4">
             <TitleBar title="งานที่ถูกมอบหมายแล้ว" variant="grey" />
             <div className="flex items-center gap-2">
-              <DatePicker date={date} setDate={setDate} />
-              {ManageSelfRoles.includes(viewAsRole) ? (
+              {canClaimProjects ? (
                 <Button
                   variant="outline"
                   onClick={handleAcceptAll}
@@ -144,10 +143,13 @@ export function AssignedTable({ unitId }: { unitId?: string }) {
                   รับทราบทั้งหมด
                 </Button>
               ) : (
-                <Button variant="outline" onClick={handlePrint} disabled={false}>
-                  <Upload className="mr-2 h-4 w-4" />
-                  ส่งออกรายงาน
-                </Button>
+                <>
+                  <DatePicker date={date} setDate={setDate} />
+                  <Button variant="outline" onClick={handlePrint} disabled={false}>
+                    <Upload className="mr-2 h-4 w-4" />
+                    ส่งออกรายงาน
+                  </Button>
+                </>
               )}
             </div>
           </div>

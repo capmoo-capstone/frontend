@@ -16,6 +16,8 @@ import {
 } from '@/components/ui/chart';
 import { useWorkloadStats } from '@/features/projects/hooks/useProjectQueries';
 
+import { useProjectPermissions } from '../../../hooks/useProjectPermissions';
+
 const chartConfig = {
   current: {
     label: 'งานปัจจุบัน',
@@ -33,7 +35,12 @@ interface WorkloadChartProps {
 }
 
 export function WorkloadChart({ pendingChanges, unitId }: WorkloadChartProps) {
+  const { canViewWorkloadChart } = useProjectPermissions(unitId);
   const { data, isLoading, isError } = useWorkloadStats(unitId);
+
+  if (!canViewWorkloadChart) {
+    return null;
+  }
 
   const chartData = useMemo(() => {
     if (!data) {

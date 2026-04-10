@@ -9,13 +9,15 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { type Role } from '@/features/auth';
 import { formatDateThaiShort, getResponsibleTypeFormat } from '@/lib/formatters';
-import { ManageSelfRoles, ManageUnitRoles } from '@/lib/permissions';
 
 import type { UnassignedProjectItem } from '../../../types/index';
 import { getCancelProjectActionLabel } from '../../../utils/project-selectors';
-import { renderSortableHeader, renderUrgentText } from '../column-helpers';
+import {
+  renderAssignedStatusBadge,
+  renderSortableHeader,
+  renderUrgentText,
+} from '../column-helpers';
 import { AssigneeCell } from './AssigneeCell';
 
 interface GetColumnsProps {
@@ -24,7 +26,8 @@ interface GetColumnsProps {
   unitId?: string;
   onOpenCancelDialog: (project: UnassignedProjectItem) => void;
   onClaimProject: (project: UnassignedProjectItem) => void;
-  viewAsRole: Role;
+  canAssignProjects: boolean;
+  canClaimProjects: boolean;
 }
 
 export const getColumns = ({
@@ -33,7 +36,8 @@ export const getColumns = ({
   unitId,
   onOpenCancelDialog,
   onClaimProject,
-  viewAsRole,
+  canAssignProjects,
+  canClaimProjects,
 }: GetColumnsProps): ColumnDef<UnassignedProjectItem>[] => [
   {
     accessorKey: 'receive_no',
@@ -83,9 +87,9 @@ export const getColumns = ({
   },
   {
     id: 'assignee',
-    header: ManageUnitRoles.includes(viewAsRole) ? 'มอบหมายให้' : undefined,
+    header: canClaimProjects ? undefined : 'มอบหมายให้',
     cell: ({ row }) => {
-      return ManageUnitRoles.includes(viewAsRole) ? (
+      return canAssignProjects ? (
         <AssigneeCell
           rowId={row.original.id}
           originalValue={null}
@@ -93,11 +97,13 @@ export const getColumns = ({
           setPendingChanges={setPendingChanges}
           unitId={unitId}
         />
-      ) : ManageSelfRoles.includes(viewAsRole) ? (
+      ) : canClaimProjects ? (
         <Button variant="outline" size="sm" onClick={() => onClaimProject(row.original)}>
           เลือกงาน
         </Button>
-      ) : null;
+      ) : (
+        renderAssignedStatusBadge('UNASSIGNED')
+      );
     },
   },
   {
@@ -117,7 +123,7 @@ export const getColumns = ({
           <DropdownMenuContent align="end">
             <DropdownMenuItem onClick={() => onOpenCancelDialog(project)} variant="destructive">
               <Trash2 className="text-destructive h-4 w-4" />
-              {getCancelProjectActionLabel(viewAsRole)}
+              {getCancelProjectActionLabel(unitId)}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

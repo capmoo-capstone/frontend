@@ -8,14 +8,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import type { Role } from '@/features/auth';
 import { formatDateThaiShort, getResponsibleTypeFormat } from '@/lib/formatters';
-import {
-  ManageSelfRoles,
-  ManageUnitRoles,
-  SupervisorRoles,
-  ViewUnitRoles,
-} from '@/lib/permissions';
 
 import type { AssignedProjectItem } from '../../../types/index';
 import { getCancelProjectActionLabel } from '../../../utils/project-selectors';
@@ -26,19 +19,23 @@ import {
 } from '../column-helpers';
 
 interface GetColumnsProps {
+  unitId?: string;
   onCancelProject: (project: AssignedProjectItem) => void;
   onChangeAssignee: (project: AssignedProjectItem) => void;
   onAcceptProject: (project: AssignedProjectItem) => void;
   isAcceptPending: boolean;
-  viewAsRole: Role;
+  canClaimProjects: boolean;
+  canChangeProjectAssignee: boolean;
 }
 
 export const getColumns = ({
+  unitId,
   onCancelProject,
   onChangeAssignee,
   onAcceptProject,
   isAcceptPending,
-  viewAsRole,
+  canClaimProjects,
+  canChangeProjectAssignee,
 }: GetColumnsProps): ColumnDef<AssignedProjectItem>[] => [
   {
     accessorKey: 'receive_no',
@@ -87,13 +84,9 @@ export const getColumns = ({
   },
   {
     id: 'assignee',
-    header: viewAsRole !== 'GENERAL_STAFF' ? 'มอบหมายให้' : undefined,
+    header: canClaimProjects ? undefined : 'มอบหมายให้',
     cell: ({ row }) => {
-      return SupervisorRoles.includes(viewAsRole) ||
-        ManageUnitRoles.includes(viewAsRole) ||
-        ViewUnitRoles.includes(viewAsRole) ? (
-        <div>{row.original.assignee_full_name ?? '-'}</div>
-      ) : ManageSelfRoles.includes(viewAsRole) && row.original.status === 'WAITING_ACCEPT' ? (
+      return canClaimProjects ? (
         <Button
           variant="outline"
           size="sm"
@@ -102,7 +95,9 @@ export const getColumns = ({
         >
           รับทราบ
         </Button>
-      ) : null;
+      ) : (
+        <div>{row.original.assignee_full_name ?? '-'}</div>
+      );
     },
   },
   {
@@ -126,7 +121,7 @@ export const getColumns = ({
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            {ManageUnitRoles.includes(viewAsRole) && (
+            {canChangeProjectAssignee && (
               <DropdownMenuItem onClick={() => onChangeAssignee(project)} disabled={!canEdit}>
                 <UserCog className="h-4 w-4" />
                 เปลี่ยนผู้รับผิดชอบ
@@ -135,7 +130,7 @@ export const getColumns = ({
 
             <DropdownMenuItem onClick={() => onCancelProject(project)} variant="destructive">
               <Trash2 className="text-destructive h-4 w-4" />
-              {getCancelProjectActionLabel(viewAsRole)}
+              {getCancelProjectActionLabel(unitId)}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

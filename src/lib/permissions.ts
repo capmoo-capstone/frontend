@@ -189,3 +189,30 @@ export const getRolesInUnit = (user: User, unitId?: string): Role[] => {
   const unitScope = scopes.filter((scope) => scope.unit_id === unitId);
   return unitScope.map((s) => s.role);
 };
+
+// ============================================================================
+// 5. ROLE RETRIEVAL UTILITIES
+// ============================================================================
+// Functions for extracting specific data points from the user's scope.
+
+/**
+ * Retrieves the specific role a user holds within a given department, if any.
+ */
+export const getRoleInDept = (user: User, departmentId?: string): Role | null => {
+  if (!departmentId) return null;
+
+  const scopes = getAllScopes(user);
+  const deptScope = scopes.find((scope) => scope.dept_id === departmentId);
+  return deptScope ? deptScope.role : null;
+};
+
+/**
+ * Retrieves the specific role a user holds within a given unit, if any.
+ */
+export const getRoleInUnit = (user: User, unitId?: string): Role | null => {
+  if (!unitId) return null;
+
+  const scopes = getAllScopes(user);
+  const unitScope = scopes.find((scope) => scope.unit_id === unitId);
+  return unitScope ? unitScope.role : null;
+};

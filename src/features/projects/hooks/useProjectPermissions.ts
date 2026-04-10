@@ -1,11 +1,13 @@
 import { useAuth } from '@/context/AuthContext';
 import { usePermissions } from '@/features/auth';
+import { useProjectImportPermissions } from '@/features/project-import';
 import { SUPPLY_OPERATION_DEPARTMENT_ID } from '@/features/settings/constants';
 import { hasRoleInScopes } from '@/lib/permissions';
 
 export const useProjectPermissions = (unitId?: string) => {
   const { user } = useAuth();
-  const { isProcurementStaff, canImportProject, canImportOptions } = usePermissions();
+  const { isProcurementStaff } = usePermissions();
+  const { canImportProject, canImportOptions } = useProjectImportPermissions();
 
   return {
     isProcurementStaff,

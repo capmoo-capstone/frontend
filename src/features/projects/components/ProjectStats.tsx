@@ -32,14 +32,14 @@ export function ProjectStats() {
   }
 
   const total = data.total;
-  const inProgress = data.in_progress;
-  const closed = data.closed;
-  const cancelled = data.cancelled;
-  const notStarted = data.role === 'EXTERNAL' ? data.not_started : 0;
-  const urgent = data.urgent;
-  const superUrgent = data.super_urgent;
-  const veryUrgent = data.very_urgent;
-  const unassigned = data.role === 'SUPPLY' ? data.unassigned : data.not_started;
+  const inProgress = data.IN_PROGRESS;
+  const closed = data.CLOSED;
+  const cancelled = data.CANCELLED;
+  const notStarted = data.role === 'EXTERNAL' ? (data as any).NOT_STARTED : 0;
+  const urgent = data.URGENT;
+  const superUrgent = data.SUPER_URGENT;
+  const veryUrgent = data.VERY_URGENT;
+  const unassigned = data.role === 'SUPPLY' ? (data as any).UNASSIGNED : (data as any).NOT_STARTED;
 
   if (!isProcurementStaff) {
     return (

@@ -18,6 +18,7 @@ export const ProjectStatusByTypeEnum = z.enum([
   'WAITING_SIGNATURE',
   'COMPLETED',
   'REJECTED',
+  'NOT_EXPORT',
 ]);
 
 export const ProjectUrgentStatusEnum = z.enum(['NORMAL', 'URGENT', 'VERY_URGENT', 'SUPER_URGENT']);

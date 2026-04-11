@@ -70,8 +70,8 @@ export const getColumns = ({
   },
   {
     id: 'cancel_reason',
-    header: 'เหตุผล',
-    cell: ({ row }) => <div className="text-sm">{row.original.cancel_reason ?? '-'}</div>,
+    header: () => <div className="text-error">เหตุผล</div>,
+    cell: ({ row }) => <div className="text-error">{row.original.cancel_reason ?? '-'}</div>,
   },
   {
     id: 'actions',

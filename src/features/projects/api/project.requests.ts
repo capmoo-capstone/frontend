@@ -17,8 +17,24 @@ import {
 } from '../types/index';
 import type { OwnProjectQueryParams, ProjectFilterParams } from './types';
 
-const toProjectsQueryParams = (params?: ProjectFilterParams) => {
-  const query: Record<string, unknown> = {
+type ProjectsQueryParams = {
+  page: number;
+  limit: number;
+  search?: string;
+  title?: string;
+  fiscalYear?: string | number;
+  myTasks?: boolean;
+  dateFrom?: string;
+  dateTo?: string;
+  procurementType?: ProjectFilterParams['procurementType'];
+  status?: ProjectFilterParams['status'];
+  urgentStatus?: ProjectFilterParams['urgentStatus'];
+  assignees?: ProjectFilterParams['assignees'];
+  units?: ProjectFilterParams['units'];
+};
+
+const toProjectsQueryParams = (params?: ProjectFilterParams): ProjectsQueryParams => {
+  const query: ProjectsQueryParams = {
     page: 1,
     limit: 50,
   };
@@ -43,9 +59,19 @@ const toProjectsQueryParams = (params?: ProjectFilterParams) => {
 };
 
 export const fetchProjectsPage = async (params?: ProjectFilterParams) => {
-  const { data } = await api.get('/projects', {
-    params: toProjectsQueryParams(params),
-  });
+  const queryParams = toProjectsQueryParams(params);
+  const { page = 1, limit = 50, ...filter } = queryParams;
+
+  const { data } = await api.post(
+    '/projects',
+    { filter },
+    {
+      params: {
+        page,
+        limit,
+      },
+    }
+  );
 
   return PaginatedProjectListApiResponseSchema.parse(data);
 };

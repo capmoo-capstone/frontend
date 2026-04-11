@@ -12,7 +12,7 @@ interface StatusCardProps {
 
 export function StatusCard({ icon, label, count, iconColor, className }: StatusCardProps) {
   return (
-    <div className={cn('flex flex-col gap-3 px-2', className)}>
+    <div className={cn('flex flex-col gap-3 px-4', className)}>
       <div className="flex items-center gap-2">
         <div className={cn('flex h-4 w-4 shrink-0 items-center justify-center', iconColor)}>
           {icon}

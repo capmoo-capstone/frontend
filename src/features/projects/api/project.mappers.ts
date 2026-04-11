@@ -125,6 +125,7 @@ export const mapWaitingCancelProjectItem = (
     template_type: item.current_workflow_type,
     assignee_id: getWorklistAssignee(item)?.id ?? null,
     assignee_full_name: getWorklistAssignee(item)?.full_name ?? null,
+    requester_full_name: item.project_cancellation?.[0]?.requester?.full_name ?? null,
     urgent_status: item.is_urgent,
     cancel_reason: item.project_cancellation?.[0]?.reason ?? null,
     expected_approval_date: item.expected_approval_date,

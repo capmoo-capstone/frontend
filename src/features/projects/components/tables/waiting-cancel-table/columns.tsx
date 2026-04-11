@@ -65,13 +65,13 @@ export const getColumns = ({
   },
   {
     id: 'assignee',
-    header: 'มอบหมายให้',
-    cell: ({ row }) => <div>{row.original.assignee_full_name ?? '-'}</div>,
+    header: 'ผู้ส่งคำขออนุมัติ',
+    cell: ({ row }) => <div>{row.original.requester_full_name ?? '-'}</div>,
   },
   {
     id: 'cancel_reason',
-    header: 'เหตุผล',
-    cell: ({ row }) => <div className="text-sm">{row.original.cancel_reason ?? '-'}</div>,
+    header: () => <div className="text-error">เหตุผล</div>,
+    cell: ({ row }) => <div className="text-error">{row.original.cancel_reason ?? '-'}</div>,
   },
   {
     id: 'actions',

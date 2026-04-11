@@ -45,6 +45,10 @@ const getPhaseLabel = (status: ProjectStatusByType, step?: number | null) => {
       return step != null ? `เสนอลงนามขั้นตอนที่ ${step}` : 'เสนอลงนาม';
     case 'REJECTED':
       return step != null ? `แก้ไขขั้นตอนที่ ${step}` : 'ยกเลิก';
+    case 'NOT_EXPORT':
+      return 'รอส่งเบิกการเงิน';
+    case 'COMPLETED':
+      return 'เสร็จสิ้น';
     default:
       return status;
   }
@@ -61,60 +65,65 @@ const getPhaseFormat = (
 ): StatusFormat => {
   if (!status) return { label: '-', variant: 'secondary' };
 
+  const isContractPhase = phaseType === 'CONTRACT';
   const isContractWorkflow = currentWorkflowType === 'CONTRACT';
-  const isUnassigned =
-    overallStatus === 'UNASSIGNED' &&
-    status === 'NOT_STARTED' &&
-    ((phaseType === 'PROCUREMENT' && !isContractWorkflow) ||
-      (phaseType === 'CONTRACT' && isContractWorkflow));
-  const isWaitingAccept =
-    overallStatus === 'WAITING_ACCEPT' &&
-    ((phaseType === 'PROCUREMENT' && !isContractWorkflow) ||
-      (phaseType === 'CONTRACT' && isContractWorkflow));
 
+  // Logic for External (Non-Staff)
   if (!isProcurementStaff) {
-    if (overallStatus === 'CANCELLED') return { label: 'ยกเลิก', variant: 'destructive' };
     if (overallStatus === 'CLOSED') return { label: 'ปิดโครงการ', variant: 'success' };
+    if (overallStatus === 'CANCELLED') return { label: 'ยกเลิก', variant: 'destructive' };
     if (status === 'NOT_STARTED') return { label: 'ยังไม่เริ่ม', variant: 'secondary' };
-    if (status === 'COMPLETED') return { label: 'เสร็จสิ้น', variant: 'success' };
+    if (status === 'COMPLETED') {
+      return isContractPhase
+        ? { label: 'กำลังดำเนินการ', variant: 'warning' }
+        : { label: 'เสร็จสิ้น', variant: 'success' };
+    }
     return { label: 'กำลังดำเนินการ', variant: 'warning' };
   }
 
-  if (overallStatus === 'CLOSED') {
-    return { label: 'ปิดโครงการ', variant: 'success' };
-  }
-
-  if (overallStatus === 'CANCELLED') {
-    return { label: 'ยกเลิก', variant: 'destructive' };
-  }
+  // Logic for Staff Roles
+  if (overallStatus === 'CLOSED') return { label: 'ปิดโครงการ', variant: 'success' };
+  if (overallStatus === 'CANCELLED') return { label: 'ยกเลิก', variant: 'destructive' };
 
   if (overallStatus === 'WAITING_CANCEL') {
-    if (role === 'HEAD_OF_UNIT' || role === 'HEAD_OF_DEPARTMENT') {
-      return { label: 'รออนุมัติยกเลิก', variant: 'warning' };
+    const isHead = role === 'HEAD_OF_UNIT' || role === 'HEAD_OF_DEPARTMENT';
+    return { label: 'รออนุมัติยกเลิก', variant: isHead ? 'warning' : 'info' };
+  }
+
+  if (overallStatus === 'UNASSIGNED' && status === 'NOT_STARTED') {
+    const isActivePhase =
+      (phaseType === 'PROCUREMENT' && !isContractWorkflow) ||
+      (isContractPhase && isContractWorkflow);
+    if (isActivePhase) return { label: 'ยังไม่ได้มอบหมาย', variant: 'secondary' };
+  }
+
+  if (overallStatus === 'WAITING_ACCEPT') {
+    const isActivePhase =
+      (phaseType === 'PROCUREMENT' && !isContractWorkflow) ||
+      (isContractPhase && isContractWorkflow);
+    if (isActivePhase) {
+      return { label: 'รอการตอบรับ', variant: role === 'GENERAL_STAFF' ? 'warning' : 'info' };
     }
-    return { label: 'รออนุมัติยกเลิก', variant: 'info' };
   }
 
-  if (isUnassigned) {
-    return { label: 'ยังไม่ได้มอบหมาย', variant: 'secondary' };
+  if (overallStatus === 'REQUEST_EDIT' && isContractPhase) {
+    return {
+      label: 'การเงินส่งคืนแก้ไข',
+      variant: role === 'GENERAL_STAFF' || role === 'FINANCE_STAFF' ? 'destructive' : 'info',
+    };
   }
 
-  if (isWaitingAccept) {
-    if (role === 'GENERAL_STAFF') {
-      return { label: 'รอการตอบรับ', variant: 'warning' };
-    }
-    return { label: 'รอการตอบรับ', variant: 'info' };
-  }
-
-  if (overallStatus === 'REQUEST_EDIT' && phaseType === 'CONTRACT') {
-    if (role === 'GENERAL_STAFF') {
-      return { label: 'การเงินส่งคืนแก้ไข', variant: 'destructive' };
-    }
-    return { label: 'การเงินส่งคืนแก้ไข', variant: 'info' };
-  }
-
+  // Normal States Logic
   if (status === 'NOT_STARTED') return { label: 'ยังไม่ได้มอบหมาย', variant: 'secondary' };
-  if (status === 'COMPLETED') return { label: 'เสร็จสิ้น', variant: 'success' };
+
+  if (status === 'COMPLETED') {
+    if (!isContractPhase) return { label: 'เสร็จสิ้น', variant: 'success' };
+    return { label: 'ส่งเบิกการเงินแล้ว', variant: role === 'FINANCE_STAFF' ? 'warning' : 'info' };
+  }
+
+  if (status === 'NOT_EXPORT' && isContractPhase) {
+    return { label: 'รอส่งเบิกการเงิน', variant: role === 'FINANCE_STAFF' ? 'warning' : 'info' };
+  }
 
   const label = getPhaseLabel(status, step);
 
@@ -124,13 +133,12 @@ const getPhaseFormat = (
     case 'WAITING_APPROVAL':
       return { label, variant: role === 'HEAD_OF_UNIT' ? 'warning' : 'info' };
     case 'WAITING_PROPOSAL':
-      return { label, variant: role === 'DOCUMENT_STAFF' ? 'warning' : 'info' };
     case 'WAITING_SIGNATURE':
       return { label, variant: role === 'DOCUMENT_STAFF' ? 'warning' : 'info' };
     case 'REJECTED':
       return { label, variant: role === 'GENERAL_STAFF' ? 'destructive' : 'info' };
     default:
-      return { label: status, variant: 'secondary' };
+      return { label, variant: 'secondary' };
   }
 };
 

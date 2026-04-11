@@ -56,6 +56,7 @@ export const WaitingCancelProjectItemSchema = z.object({
   template_type: UnitResponsibleTypeEnum,
   assignee_id: z.string().nullable(),
   assignee_full_name: z.string().nullable(),
+  requester_full_name: z.string().nullable(),
   urgent_status: ProjectUrgentStatusEnum,
   cancel_reason: z.string().nullable(),
   expected_approval_date: z.string().datetime().nullable(),
@@ -86,6 +87,12 @@ export const ProjectWorklistApiItemSchema = z.object({
     .array(
       z.object({
         reason: z.string().nullable().optional(),
+        requester: z
+          .object({
+            id: z.string().optional(),
+            full_name: z.string().nullable().optional(),
+          })
+          .optional(),
       })
     )
     .optional(),

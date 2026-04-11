@@ -28,6 +28,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Textarea } from '@/components/ui/textarea';
+import { ImportBudgetPlanItemSchema } from '@/features/budgets';
 import { RESPONSIBLE_SELECT_OPTIONS } from '@/lib/formatters';
 import { cn } from '@/lib/utils';
 
@@ -42,6 +43,7 @@ interface EditableImportTableProps {
   onBack: () => void;
   departments: Array<{ id: string; name: string }> | undefined;
   fiscalYears: string[];
+  units: Array<{ id: string; name: string }> | undefined;
   mode: ImportMode;
 }
 
@@ -54,6 +56,7 @@ interface ValidationError {
 interface EditableTableMeta {
   updateData: (index: number, id: string, value: unknown) => void;
   departments: Array<{ id: string; name: string }> | undefined;
+  units: Array<{ id: string; name: string }> | undefined;
   fiscalYears: string[];
   errors: ValidationError[];
 }
@@ -71,6 +74,7 @@ const EditableCell = ({
   const updateData = meta?.updateData;
   const departments = meta?.departments;
   const fiscalYears = meta?.fiscalYears;
+  const units = meta?.units;
   const errors = meta?.errors || [];
 
   const [value, setValue] = useState(initialTextValue);
@@ -83,7 +87,7 @@ const EditableCell = ({
     if (!updateData) return;
 
     let finalValue: unknown = value;
-    if (id === 'budget') {
+    if (id === 'budget' || id === 'amount') {
       finalValue = value === '' ? '' : Number(value);
     }
     updateData(index, id, finalValue);
@@ -98,7 +102,7 @@ const EditableCell = ({
     return (
       <div className="flex w-full flex-col gap-1">
         <Select
-          value={initialTextValue}
+          value={initialTextValue || undefined}
           onValueChange={(val) => updateData && updateData(index, id, val)}
         >
           <SelectTrigger
@@ -123,7 +127,7 @@ const EditableCell = ({
     return (
       <div className="flex w-full flex-col gap-1">
         <Select
-          value={initialTextValue}
+          value={initialTextValue || undefined}
           onValueChange={(val) => updateData && updateData(index, id, val)}
         >
           <SelectTrigger
@@ -149,7 +153,7 @@ const EditableCell = ({
     return (
       <div className="flex w-full flex-col gap-1">
         <Select
-          value={initialTextValue}
+          value={initialTextValue || undefined}
           onValueChange={(val) => updateData && updateData(index, id, val)}
         >
           <SelectTrigger
@@ -207,6 +211,46 @@ const EditableCell = ({
     );
   }
 
+  if (id === 'unit_id') {
+    return (
+      <div className="flex w-full flex-col gap-1">
+        <Select
+          value={initialTextValue || undefined}
+          onValueChange={(val) => updateData && updateData(index, id, val)}
+        >
+          <SelectTrigger
+            className={cn('bg-background h-9 w-full', hasError && 'border-destructive')}
+          >
+            <SelectValue placeholder="กรุณาเลือกชื่อศูนย์ต้นทุน" />
+          </SelectTrigger>
+          <SelectContent>
+            {units &&
+              units.map((unit: { id: string; name: string }) => (
+                <SelectItem key={unit.id} value={unit.id}>
+                  {unit.name}
+                </SelectItem>
+              ))}
+          </SelectContent>
+        </Select>
+        {cellError && <p className="text-destructive text-xs">{cellError.message}</p>}
+      </div>
+    );
+  }
+
+  if (id === 'amount') {
+    return (
+      <div className="flex w-full flex-col gap-1">
+        <Input
+          type="number"
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
+          onBlur={onBlur}
+          className={cn('h-9 w-full', hasError && 'border-destructive')}
+        />
+        {cellError && <p className="text-destructive text-xs">{cellError.message}</p>}
+      </div>
+    );
+  }
   return (
     <div className="flex w-full flex-col gap-1">
       <Input
@@ -229,26 +273,47 @@ export function EditableImportTable({
   onBack,
   departments,
   fiscalYears,
+  units,
   mode,
 }: EditableImportTableProps) {
   const [validationErrors, setValidationErrors] = useState<ValidationError[]>([]);
 
   const validateData = useCallback(() => {
     const errors: ValidationError[] = [];
-    const schema = mode === 'lesspaper' ? LesspaperImportSchema : FioriImportSchema;
+    const schema =
+      mode === 'budget'
+        ? ImportBudgetPlanItemSchema
+        : mode === 'lesspaper'
+          ? LesspaperImportSchema
+          : FioriImportSchema;
 
     data.forEach((row, index) => {
-      const rowData = {
-        pr_no: row.pr_no ?? '',
-        lesspaper_no: row.lesspaper_no ?? '',
-        title: row.title ?? '',
-        description: row.description ?? '',
-        procurement_type: row.procurement_type ?? '',
-        budget: row.budget ?? '',
-        department_id: row.department_id ?? '',
-        fiscal_year: row.fiscal_year ?? '',
-        delivery_date: row.delivery_date_str ? new Date(row.delivery_date_str) : undefined,
-      };
+      const rowData =
+        mode === 'budget'
+          ? {
+              id: row._rowId,
+              budget_year: row.budget_year ?? '',
+              unit_no: row.unit_no ?? '',
+              unit_id: row.unit_id ?? row.department_id ?? '',
+              activity_type: row.activity_type ?? '',
+              activity_type_name: row.activity_type_name ?? '',
+              description: row.description ?? '',
+              budget_no: row.budget_no ?? '',
+              budget_name: row.budget_name ?? '',
+              budget_amount: row.budget_amount ?? '',
+              project_id: null,
+            }
+          : {
+              pr_no: row.pr_no ?? '',
+              lesspaper_no: row.lesspaper_no ?? '',
+              title: row.title ?? '',
+              description: row.description ?? '',
+              procurement_type: row.procurement_type ?? '',
+              budget: row.budget ?? '',
+              department_id: row.department_id ?? '',
+              fiscal_year: row.fiscal_year ?? '',
+              delivery_date: row.delivery_date_str ? new Date(row.delivery_date_str) : undefined,
+            };
 
       const result = schema.safeParse(rowData);
 
@@ -285,96 +350,201 @@ export function EditableImportTable({
 
   const columns = useMemo<ColumnDef<EditableImportRow>[]>(
     () => [
-      {
-        accessorKey: 'pr_no',
-        header: () => (
-          <>
-            เลขที่ใบขอซื้อขอจ้าง (PR) <span className="text-destructive">*</span>
-          </>
-        ),
-        cell: EditableCell,
-        size: 180,
-      },
-      ...(mode === 'lesspaper'
+      ...(mode === 'budget'
         ? [
             {
-              accessorKey: 'lesspaper_no' as const,
+              accessorKey: 'budget_year',
               header: () => (
                 <>
-                  เลขที่หนังสือ Lesspaper <span className="text-destructive">*</span>
+                  ปีงบประมาณ <span className="text-destructive">*</span>
+                </>
+              ),
+              cell: EditableCell,
+              size: 140,
+            },
+            {
+              accessorKey: 'unit_no',
+              header: () => (
+                <>
+                  ศูนย์ต้นทุน <span className="text-destructive">*</span>
+                </>
+              ),
+              cell: EditableCell,
+              size: 140,
+            },
+            {
+              accessorKey: 'unit_id',
+              header: () => (
+                <>
+                  ชื่อศูนย์ต้นทุน <span className="text-destructive">*</span>
+                </>
+              ),
+              cell: EditableCell,
+              size: 320,
+            },
+            {
+              accessorKey: 'department_id',
+              header: () => (
+                <>
+                  หน่วยงาน <span className="text-destructive">*</span>
+                </>
+              ),
+              cell: EditableCell,
+              size: 220,
+            },
+            {
+              accessorKey: 'budget_no',
+              header: () => (
+                <>
+                  เงินทุน <span className="text-destructive">*</span>
+                </>
+              ),
+              cell: EditableCell,
+              size: 140,
+            },
+            {
+              accessorKey: 'budget_name',
+              header: () => (
+                <>
+                  ชื่อเงินทุน <span className="text-destructive">*</span>
+                </>
+              ),
+              cell: EditableCell,
+              size: 220,
+            },
+            {
+              accessorKey: 'activity_type',
+              header: () => (
+                <>
+                  ประเภทกิจกรรม <span className="text-destructive">*</span>
+                </>
+              ),
+              cell: EditableCell,
+              size: 140,
+            },
+            {
+              accessorKey: 'activity_type_name',
+              header: () => (
+                <>
+                  ชื่อประเภทกิจกรรม <span className="text-destructive">*</span>
+                </>
+              ),
+              cell: EditableCell,
+              size: 200,
+            },
+            {
+              accessorKey: 'description',
+              header: () => (
+                <>
+                  รายละเอียด <span className="text-destructive">*</span>
+                </>
+              ),
+              cell: EditableCell,
+              size: 350,
+            },
+            {
+              accessorKey: 'budget_amount',
+              header: () => (
+                <>
+                  วงเงินงบประมาณ (บาท) <span className="text-destructive">*</span>
                 </>
               ),
               cell: EditableCell,
               size: 180,
             },
           ]
-        : []),
-      {
-        accessorKey: 'title',
-        header: () => (
-          <>
-            โครงการ <span className="text-destructive">*</span>
-          </>
-        ),
-        cell: EditableCell,
-        size: 350,
-      },
-      {
-        accessorKey: 'description',
-        header: () => (
-          <>
-            รายละเอียด <span className="text-destructive">*</span>
-          </>
-        ),
-        cell: EditableCell,
-        size: 350,
-      },
-      {
-        accessorKey: 'procurement_type',
-        header: () => (
-          <>
-            วิธีการจัดหา <span className="text-destructive">*</span>
-          </>
-        ),
-        cell: EditableCell,
-        size: 250,
-      },
-      {
-        accessorKey: 'delivery_date_str',
-        header: 'วันที่ส่งมอบ',
-        cell: EditableCell,
-        size: 180,
-      },
-      {
-        accessorKey: 'budget',
-        header: () => (
-          <>
-            วงเงินงบประมาณ (บาท) <span className="text-destructive">*</span>
-          </>
-        ),
-        cell: EditableCell,
-        size: 180,
-      },
-      {
-        accessorKey: 'department_id',
-        header: () => (
-          <>
-            หน่วยงาน <span className="text-destructive">*</span>
-          </>
-        ),
-        cell: EditableCell,
-        size: 220,
-      },
-      {
-        accessorKey: 'fiscal_year',
-        header: () => (
-          <>
-            ปีงบประมาณ <span className="text-destructive">*</span>
-          </>
-        ),
-        cell: EditableCell,
-        size: 140,
-      },
+        : [
+            {
+              accessorKey: 'pr_no',
+              header: () => (
+                <>
+                  เลขที่ใบขอซื้อขอจ้าง (PR) <span className="text-destructive">*</span>
+                </>
+              ),
+              cell: EditableCell,
+              size: 180,
+            },
+            ...(mode === 'lesspaper'
+              ? [
+                  {
+                    accessorKey: 'lesspaper_no' as const,
+                    header: () => (
+                      <>
+                        เลขที่หนังสือ Lesspaper <span className="text-destructive">*</span>
+                      </>
+                    ),
+                    cell: EditableCell,
+                    size: 180,
+                  },
+                ]
+              : []),
+            {
+              accessorKey: 'title',
+              header: () => (
+                <>
+                  โครงการ <span className="text-destructive">*</span>
+                </>
+              ),
+              cell: EditableCell,
+              size: 350,
+            },
+            {
+              accessorKey: 'description',
+              header: () => (
+                <>
+                  รายละเอียด <span className="text-destructive">*</span>
+                </>
+              ),
+              cell: EditableCell,
+              size: 350,
+            },
+            {
+              accessorKey: 'procurement_type',
+              header: () => (
+                <>
+                  วิธีการจัดหา <span className="text-destructive">*</span>
+                </>
+              ),
+              cell: EditableCell,
+              size: 250,
+            },
+            {
+              accessorKey: 'delivery_date_str',
+              header: 'วันที่ส่งมอบ',
+              cell: EditableCell,
+              size: 180,
+            },
+            {
+              accessorKey: 'budget',
+              header: () => (
+                <>
+                  วงเงินงบประมาณ (บาท) <span className="text-destructive">*</span>
+                </>
+              ),
+              cell: EditableCell,
+              size: 180,
+            },
+            {
+              accessorKey: 'department_id',
+              header: () => (
+                <>
+                  หน่วยงาน <span className="text-destructive">*</span>
+                </>
+              ),
+              cell: EditableCell,
+              size: 220,
+            },
+            {
+              accessorKey: 'fiscal_year',
+              header: () => (
+                <>
+                  ปีงบประมาณ <span className="text-destructive">*</span>
+                </>
+              ),
+              cell: EditableCell,
+              size: 140,
+            },
+          ]),
       {
         id: 'actions',
         header: '',
@@ -401,6 +571,7 @@ export function EditableImportTable({
     meta: {
       updateData: updateRow,
       departments,
+      units,
       fiscalYears,
       errors: validationErrors,
     },
@@ -457,7 +628,7 @@ export function EditableImportTable({
 
       <div className="flex justify-end gap-3">
         <Button onClick={handleSubmit} disabled={data.length === 0} variant="brand">
-          ยืนยันการนำเข้าโครงการ
+          ยืนยันการนำเข้า{mode === 'budget' ? 'แผน' : 'โครงการ'}
         </Button>
         <Button variant="outline" onClick={onBack} className="border-slate-200 px-8">
           ยกเลิก

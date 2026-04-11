@@ -22,6 +22,9 @@ const ProjectDetail = lazy(() => import('@/pages/projects/ProjectDetail'));
 const ProjectImport = lazy(() => import('@/pages/projects/ProjectImport'));
 const ProjectImportSuccess = lazy(() => import('@/pages/projects/ProjectImportSuccess'));
 
+// Budget Plan
+const BudgetPlanImport = lazy(() => import('@/pages/projects/BudgetPlanImport'));
+
 // Exports
 const FinanceExportPage = lazy(() => import('@/pages/projects/FinanceExport'));
 
@@ -51,12 +54,10 @@ export const PrivateRoutes = () => {
             <Routes>
               {/* --- Redirect Root to Home --- */}
               <Route path="/" element={<Navigate to="/app/home" replace />} />
-
               {/* --- Main Entry Points --- */}
               <Route path="/app/home" element={<Home />} />
               <Route path="/app/dashboards/overview" element={<OverallDashboard />} />
               <Route path="/app/me/dashboard" element={<MyToDoDashboard />} />
-
               {/* --- Projects (The Unified View) --- */}
               <Route path="/app/projects" element={<ProjectList />} />
               <Route path="/app/projects/:id" element={<ProjectDetail />} />
@@ -68,19 +69,17 @@ export const PrivateRoutes = () => {
                 <Route path="/app/project-import" element={<ProjectImport />} />
                 <Route path="/app/project-import/success" element={<ProjectImportSuccess />} />
               </Route>
-
               {/* --- Exports --- */}
               <Route path="/app/exports/finance" element={<FinanceExportPage />} />
-
               {/* --- Specific Workflows --- */}
               <Route path="/app/assign" element={<ProcurementJobs />} />
               <Route path="/app/assign/:id" element={<ProcurementJobs />} />
-
+              {/* --- Budget Plan --- */}
+              <Route path="/app/budget-import" element={<BudgetPlanImport />} />z
               {/* --- Vendor Management --- */}
               <Route path="/app/vendor-response" element={<VendorSubmission />} />
               <Route path="/app/vendor-form" element={<VendorForm />} />
               <Route path="/vendor-form" element={<Navigate to="/app/vendor-form" replace />} />
-
               {/* --- Management / Admin --- */}
               <Route path="/app/management/employees/kpi" element={<StaffKpi />} />
               <Route path="/app/management/organization" element={<OrganizationManagement />} />
@@ -96,7 +95,6 @@ export const PrivateRoutes = () => {
                 <Route path="/app/settings/department-reps" element={<DepartmentRepsPage />} />
                 <Route path="/app/settings/procurement-staff" element={<ProcurementStaffPage />} />
               </Route>
-
               {/* --- Fallback --- */}
               <Route path="*" element={<PageNotFound />} />
             </Routes>

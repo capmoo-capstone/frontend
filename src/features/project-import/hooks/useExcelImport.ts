@@ -28,6 +28,28 @@ export function useExcelImport(mode: ImportMode) {
           deliveryDateStr = excelDate.toISOString().split('T')[0];
         }
 
+        if (mode === 'budget') {
+          return {
+            _rowId: Math.random().toString(36).substring(7),
+            budget_year: rowObj['ปีงบประมาณ']?.toString() || new Date().getFullYear().toString(),
+            unit_no: rowObj['ศูนย์ต้นทุน']?.toString() || '',
+            unit_id: rowObj['ชื่อศูนย์ต้นทุน']?.toString() || '',
+            department_id: rowObj['หน่วยงาน']?.toString() || '',
+            budget_no: rowObj['เงินทุน']?.toString() || '',
+            budget_name: rowObj['ชื่อเงินทุน']?.toString() || '',
+            activity_type: rowObj['ประเภทกิจกรรม']?.toString() || '',
+            activity_type_name: rowObj['ชื่อประเภทกิจกรรม']?.toString() || '',
+            description:
+              rowObj['รายละเอียด']?.toString() ||
+              rowObj['คำอธิบายเพิ่มเติมประเภทกิจกรรม']?.toString() ||
+              '',
+            budget_amount:
+              Number(
+                rowObj['วงเงินงบประมาณ'] ?? rowObj['วงเงินงบประมาณ (บาท)'] ?? rowObj['ราคารวม']
+              ) || 0,
+          };
+        }
+
         return {
           _rowId: Math.random().toString(36).substring(7),
           pr_no: rowObj['เลขที่ใบขอซื้อขอจ้าง']?.toString() || '',

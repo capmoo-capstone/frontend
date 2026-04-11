@@ -101,6 +101,12 @@ const menuGroups: MenuGroup[] = [
         icon: Import,
       },
       {
+        title: 'นำเข้าแผนงบประมาณ',
+        url: '/app/budget-import',
+        icon: Import,
+        allowedRoles: ['ADMIN', 'SUPER_ADMIN'],
+      },
+      {
         title: 'การตอบกลับจากคู่ค้า',
         url: '/app/vendor-response',
         icon: Truck,

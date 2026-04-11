@@ -2,13 +2,13 @@ import { z } from 'zod';
 
 export const BudgetPlanSchema = z.object({
   id: z.string(),
-  fiscal_year: z.string().min(1, 'กรุณากรอกปีงบประมาณ'),
-  cost_center: z.string().min(1, 'กรุณากรอกศูนย์ต้นทุน'),
-  unit_id: z.string().min(1, 'กรุณาเลือกฝ่าย'),
+  budget_year: z.string().min(1, 'กรุณากรอกปีงบประมาณ'),
+  unit_id: z.string().min(1, 'กรุณาเลือกชื่อศูนย์ต้นทุน'),
+  unit_no: z.string().min(1, 'กรุณากรอกศูนย์ต้นทุน'),
   activity_type: z.string().min(1, 'กรุณากรอกประเภทกิจกรรม'),
-  activity_name: z.string().min(1, 'กรุณากรอกชื่อประเภทกิจกรรม'),
+  activity_type_name: z.string().min(1, 'กรุณากรอกชื่อประเภทกิจกรรม'),
   description: z.string(),
-  amount: z.number().positive('วงเงินงบประมาณต้องมากกว่า 0'),
+  budget_amount: z.number().positive('วงเงินงบประมาณต้องมากกว่า 0'),
   project_id: z.string().nullable().optional(),
 });
 
@@ -44,11 +44,13 @@ export type BudgetPlanListResponse = z.infer<typeof BudgetPlanListResponseSchema
 
 export const ImportBudgetPlanItemSchema = z.object({
   budget_year: z.string().min(1, 'กรุณากรอกปีงบประมาณ'),
-  cost_center_no: z.string().min(1, 'กรุณากรอกเลขศูนย์ต้นทุน'),
-  cost_center_name: z.string().min(1, 'กรุณากรอกชื่อศูนย์ต้นทุน'),
+  unit_no: z.string().min(1, 'กรุณากรอกเลขศูนย์ต้นทุน'),
+  unit_id: z.string().min(1, 'กรุณาเลือกศูนย์ต้นทุน'),
   activity_type: z.string().min(1, 'กรุณากรอกประเภทกิจกรรม'),
   activity_type_name: z.string().min(1, 'กรุณากรอกชื่อประเภทกิจกรรม'),
-  description: z.string().optional(),
+  description: z.string().min(1, 'กรุณากรอกรายละเอียด'),
+  budget_no: z.string().min(1, 'กรุณาเลือกเงินทุน'),
+  budget_name: z.string().min(1, 'กรุณาเลือกชื่อเงินทุน'),
   budget_amount: z.number().positive('วงเงินงบประมาณต้องมากกว่า 0'),
 });
 

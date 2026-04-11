@@ -1,6 +1,8 @@
 import { z } from 'zod';
 
-export type ImportMode = 'none' | 'lesspaper' | 'fiori' | 'manual';
+import type { ImportBudgetPlanItem } from '../budgets';
+
+export type ImportMode = 'none' | 'lesspaper' | 'fiori' | 'manual' | 'budget';
 
 export const PROCUREMENT_MIN_DAYS: Record<string, number> = {
   LT100K: 15,
@@ -48,7 +50,8 @@ export const LesspaperImportSchema = ProjectImportSchema.omit({
 
 export type LesspaperImportPayload = z.infer<typeof LesspaperImportSchema>;
 
-export interface EditableImportRow extends Partial<ProjectImportPayload> {
+export interface EditableImportRow
+  extends Partial<ProjectImportPayload>, Partial<ImportBudgetPlanItem> {
   _rowId: string;
   delivery_date_str?: string;
   isValid?: boolean;

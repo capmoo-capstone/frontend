@@ -77,7 +77,7 @@ export function ProjectStats() {
             <StatusCard label="ยกเลิก" count={cancelled} icon={<Inbox />} iconColor="text-error" />
           </div>
 
-          <div className="md:border-r">
+          <div className="md:border-r xl:border-r-0">
             <StatusCard
               label="ด่วน"
               count={urgent}
@@ -135,7 +135,7 @@ export function ProjectStats() {
           <StatusCard label="ยกเลิก" count={cancelled} icon={<Inbox />} iconColor="text-error" />
         </div>
 
-        <div className="md:border-r">
+        <div className="md:border-r xl:border-r-0">
           <StatusCard label="ด่วน" count={urgent} icon={<AlertTriangle />} iconColor="text-error" />
         </div>
       </div>

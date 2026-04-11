@@ -109,7 +109,7 @@ const getPhaseFormat = (
   if (overallStatus === 'REQUEST_EDIT' && isContractPhase) {
     return {
       label: 'การเงินส่งคืนแก้ไข',
-      variant: role === 'GENERAL_STAFF' ? 'destructive' : 'info',
+      variant: role === 'GENERAL_STAFF' || role === 'FINANCE_STAFF' ? 'destructive' : 'info',
     };
   }
 

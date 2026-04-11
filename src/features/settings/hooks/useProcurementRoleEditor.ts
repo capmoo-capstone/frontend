@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import type { ProcurementRoleSetting } from '@/features/settings/types';
 import { type DelegationPayload, createProcurementRoleSchema } from '@/features/settings/types';
@@ -31,6 +31,16 @@ export function useProcurementRoleEditor({
   const isDirectorRole = role.id === DIRECTOR_ROLE_ID;
   const directorMemberId = draftMemberIds[0] ?? '';
 
+  useEffect(() => {
+    if (!isEditing) {
+      setDraftMemberIds(role.member_ids);
+      setDraftDelegations(role.delegation);
+      setDelegationToAdd(null);
+      setMemberToAdd('');
+      setError('');
+    }
+  }, [isEditing, role.member_ids, role.delegation]);
+
   const resetEditorState = () => {
     setDraftMemberIds(role.member_ids);
     setDraftDelegations(role.delegation);
@@ -39,10 +49,10 @@ export function useProcurementRoleEditor({
     setError('');
   };
 
-  const selectedNames = useMemo(
-    () => draftMemberIds.map((memberId) => getPersonNameById(memberId)).join(', '),
-    [draftMemberIds, getPersonNameById]
-  );
+  const selectedNames = useMemo(() => {
+    const ids = isEditing ? draftMemberIds : role.member_ids;
+    return ids.map((memberId) => getPersonNameById(memberId)).join(', ');
+  }, [isEditing, draftMemberIds, role.member_ids, getPersonNameById]);
 
   const handleAddMember = () => {
     if (!memberToAdd) return;

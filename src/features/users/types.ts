@@ -118,7 +118,7 @@ export const BackendUpdateUserRoleResponseSchema = z.object({
   id: z.string(),
   role: UserRoleEnum,
   dept_id: z.string(),
-  unit_id: z.string().optional(),
+  unit_id: z.string().nullable().optional(),
 });
 
 export type BackendUpdateUserRoleResponse = z.infer<typeof BackendUpdateUserRoleResponseSchema>;

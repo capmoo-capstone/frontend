@@ -3,12 +3,10 @@ import { AlertTriangle, Inbox, Loader2 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { StatusCard } from '@/components/ui/status-card';
 
-import { useProjectPermissions } from '../hooks/useProjectPermissions';
 import { useProjectSummary } from '../hooks/useProjectQueries';
 
 export function ProjectStats() {
   const { data, isLoading, isError } = useProjectSummary();
-  const { isProcurementStaff } = useProjectPermissions();
 
   if (isLoading) {
     return (
@@ -35,16 +33,15 @@ export function ProjectStats() {
   const inProgress = data.IN_PROGRESS;
   const closed = data.CLOSED;
   const cancelled = data.CANCELLED;
-  const notStarted = data.role === 'EXTERNAL' ? (data as any).NOT_STARTED : 0;
   const urgent = data.URGENT;
-  const superUrgent = data.SUPER_URGENT;
-  const veryUrgent = data.VERY_URGENT;
-  const unassigned = data.role === 'SUPPLY' ? (data as any).UNASSIGNED : (data as any).NOT_STARTED;
+  const isExternal = data.role === 'EXTERNAL';
 
-  if (!isProcurementStaff) {
+  if (isExternal) {
+    const notStarted = data.NOT_STARTED;
+
     return (
       <Card className="py-6">
-        <div className="grid grid-cols-2 items-center md:grid-cols-4 xl:grid-cols-8">
+        <div className="grid grid-cols-2 items-center md:grid-cols-3 xl:grid-cols-6">
           <div className="border-r border-b md:border-b xl:border-b-0">
             <StatusCard label="ทั้งหมด" count={total} icon={<Inbox />} iconColor="text-primary" />
           </div>
@@ -88,32 +85,17 @@ export function ProjectStats() {
               iconColor="text-error"
             />
           </div>
-
-          <div className="border-r">
-            <StatusCard
-              label="ด่วนที่สุด"
-              count={superUrgent}
-              icon={<AlertTriangle />}
-              iconColor="text-error-dark"
-            />
-          </div>
-
-          <div>
-            <StatusCard
-              label="ด่วนพิเศษ"
-              count={veryUrgent}
-              icon={<AlertTriangle />}
-              iconColor="text-error-dark"
-            />
-          </div>
         </div>
       </Card>
     );
   }
 
+  const unassigned = data.UNASSIGNED;
+  const waitingAccept = data.WAITING_ACCEPT;
+
   return (
     <Card className="py-6">
-      <div className="grid grid-cols-2 items-center md:grid-cols-4 xl:grid-cols-8">
+      <div className="grid grid-cols-2 items-center md:grid-cols-4 xl:grid-cols-7">
         <div className="border-r">
           <StatusCard label="ทั้งหมด" count={total} icon={<Inbox />} iconColor="text-primary" />
         </div>
@@ -122,6 +104,15 @@ export function ProjectStats() {
           <StatusCard
             label="ยังไม่มอบหมาย"
             count={unassigned}
+            icon={<Inbox />}
+            iconColor="text-primary/70"
+          />
+        </div>
+
+        <div className="border-r">
+          <StatusCard
+            label="รอการตอบรับ"
+            count={waitingAccept}
             icon={<Inbox />}
             iconColor="text-primary/70"
           />
@@ -146,22 +137,6 @@ export function ProjectStats() {
 
         <div className="md:border-r">
           <StatusCard label="ด่วน" count={urgent} icon={<AlertTriangle />} iconColor="text-error" />
-        </div>
-        <div className="border-r">
-          <StatusCard
-            label="ด่วนที่สุด"
-            count={superUrgent}
-            icon={<AlertTriangle />}
-            iconColor="text-error-dark"
-          />
-        </div>
-        <div>
-          <StatusCard
-            label="ด่วนพิเศษ"
-            count={veryUrgent}
-            icon={<AlertTriangle />}
-            iconColor="text-error-dark"
-          />
         </div>
       </div>
     </Card>

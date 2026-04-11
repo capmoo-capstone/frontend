@@ -37,8 +37,6 @@ export const SummaryResponseSchema = z.union([
     CLOSED: z.number(),
     CANCELLED: z.number(),
     URGENT: z.number(),
-    SUPER_URGENT: z.number().default(0),
-    VERY_URGENT: z.number(),
   }),
   z.object({
     role: z.literal('EXTERNAL'),
@@ -48,8 +46,6 @@ export const SummaryResponseSchema = z.union([
     CLOSED: z.number(),
     CANCELLED: z.number(),
     URGENT: z.number(),
-    SUPER_URGENT: z.number().default(0),
-    VERY_URGENT: z.number(),
   }),
 ]);
 

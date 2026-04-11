@@ -65,8 +65,8 @@ export const getColumns = ({
   },
   {
     id: 'assignee',
-    header: 'มอบหมายให้',
-    cell: ({ row }) => <div>{row.original.assignee_full_name ?? '-'}</div>,
+    header: 'ผู้ส่งคำขออนุมัติ',
+    cell: ({ row }) => <div>{row.original.requester_full_name ?? '-'}</div>,
   },
   {
     id: 'cancel_reason',

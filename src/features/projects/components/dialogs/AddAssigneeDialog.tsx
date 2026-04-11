@@ -93,6 +93,7 @@ export function AddAssigneeDialog({ isOpen, onClose, project }: AddAssigneeDialo
                 placeholder="เลือกเจ้าหน้าที่..."
                 hasClearButton={false}
                 unitId={unitId}
+                excludeHeadOfUnit
               />
             )}
           />

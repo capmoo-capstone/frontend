@@ -43,9 +43,19 @@ const toProjectsQueryParams = (params?: ProjectFilterParams) => {
 };
 
 export const fetchProjectsPage = async (params?: ProjectFilterParams) => {
-  const { data } = await api.get('/projects', {
-    params: toProjectsQueryParams(params),
-  });
+  const queryParams = toProjectsQueryParams(params);
+  const { page = 1, limit = 50, ...filter } = queryParams;
+
+  const { data } = await api.post(
+    '/projects',
+    { filter },
+    {
+      params: {
+        page,
+        limit,
+      },
+    }
+  );
 
   return PaginatedProjectListApiResponseSchema.parse(data);
 };

@@ -1,4 +1,4 @@
-import { useDepartmentUnits } from '../../hooks/useDepartmentReps';
+import { useDepartmentUnits, useRepresentative } from '../../hooks/useDepartmentReps';
 import { DepartmentUnitRepRow } from './DepartmentUnitRepRow';
 
 interface DepartmentUnitListProps {

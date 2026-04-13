@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { useUpdateUnitRepresentative } from './useDepartmentReps';
+import { useUpdateRepresentative } from './useDepartmentReps';
 
 export interface UnitItem {
   id: string;
@@ -14,10 +14,9 @@ interface UseUnitRepresentativeEditorParams {
 }
 
 export function useUnitRepresentativeEditor({
-  departmentId,
   unit,
 }: UseUnitRepresentativeEditorParams) {
-  const updateRepresentative = useUpdateUnitRepresentative();
+  const updateRepresentative = useUpdateRepresentative();
 
   const [isEditing, setIsEditing] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState(unit.representative?.id || '');
@@ -38,10 +37,9 @@ export function useUnitRepresentativeEditor({
 
     updateRepresentative.mutate(
       {
-        departmentId,
         unitId: unit.id,
-        userId: selectedUserId,
-        userName: selectedUserName,
+        newUserId: selectedUserId,
+        removeUserId: unit.representative?.id || '',
       },
       {
         onSuccess: () => {

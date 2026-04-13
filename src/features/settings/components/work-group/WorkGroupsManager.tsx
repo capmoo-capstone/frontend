@@ -6,7 +6,16 @@ import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { useUnitDetailsByIds, useUnits, useUpdateUnit } from '@/features/organization';
 import { type WorkGroupSetting } from '@/features/settings/types';
-import { useUsersForSelection, useUsersForUnitsSelection } from '@/features/users';
+import {
+  type UserRole,
+  useActiveDelegationByUnit,
+  useAddDelegation,
+  useCancelDelegation,
+  useUpdateUserRole,
+  useUpdateUsersInUnit,
+  useUsersForSelection,
+  useUsersForUnitsSelection,
+} from '@/features/users';
 
 import {
   DIRECTOR_ROLE_ID,
@@ -21,10 +30,15 @@ export function WorkGroupsManager() {
 
   const { data: units } = useUnits(SUPPLY_OPERATION_DEPARTMENT_ID);
   const updateUnitMutation = useUpdateUnit();
+  const updateUsersInUnitMutation = useUpdateUsersInUnit();
+  const addDelegationMutation = useAddDelegation();
+  const cancelDelegationMutation = useCancelDelegation();
+  const updateUserRoleMutation = useUpdateUserRole();
 
   const unitIds = useMemo(() => (units ?? []).map((unit) => unit.id), [units]);
   const unitDetailQueries = useUnitDetailsByIds(unitIds);
   const unitUsersQueries = useUsersForUnitsSelection(unitIds);
+  const delegationQueries = useActiveDelegationByUnit(unitIds);
 
   const { data: procurementUsersResponse } = useUsersForSelection({
     deptId: SUPPLY_OPERATION_DEPARTMENT_ID,
@@ -43,6 +57,7 @@ export function WorkGroupsManager() {
       const detail = unitDetailQueries[index]?.data;
       const users = unitUsersQueries[index]?.data?.data ?? [];
       const headId = users.find((user) => user.role === HEAD_OF_UNIT_ROLE_ID)?.id ?? '';
+      const delegation = delegationQueries[index]?.data ?? null;
 
       return {
         id: unit.id,
@@ -50,10 +65,17 @@ export function WorkGroupsManager() {
         workflow_types: detail?.type ?? [],
         head_id: headId,
         member_ids: users.filter((user) => user.id !== headId).map((user) => user.id),
-        delegation: null, // TODO: Replace with real delegation fetching hook when available
+        delegation: delegation
+          ? {
+              id: delegation.id,
+              user_id: delegation.delegatee_id,
+              start_date: new Date(delegation.start_date),
+              end_date: delegation.end_date ? new Date(delegation.end_date) : new Date(),
+            }
+          : null,
       };
     });
-  }, [units, unitDetailQueries, unitUsersQueries]);
+  }, [units, unitDetailQueries, unitUsersQueries, delegationQueries]);
 
   const handleSaveGroup = useCallback(
     async (updated: WorkGroupSetting) => {
@@ -89,10 +111,50 @@ export function WorkGroupsManager() {
           await updateUnitMutation.mutateAsync(changedPayload);
         }
 
-        // TODO: Backend Migration required here.
-        // We need endpoints to handle the member assignments, head updates, and delegations.
-        // e.g., await updateUnitMembersMutation.mutateAsync(...)
-        // e.g., await updateDelegationMutation.mutateAsync(...)
+        const currentAssignedUsers = new Set(
+          [...currentGroup.member_ids].filter(Boolean)
+        );
+        const nextAssignedUsers = Array.from(
+          new Set([...updated.member_ids].filter(Boolean))
+        );
+
+        const newUserIds = nextAssignedUsers.filter((userId) => !currentAssignedUsers.has(userId));
+        const removeUserIds = Array.from(currentAssignedUsers).filter(
+          (userId) => !nextAssignedUsers.includes(userId)
+        );
+
+        if (newUserIds.length > 0 || removeUserIds.length > 0) {
+          await updateUsersInUnitMutation.mutateAsync({
+            unitId: updated.id,
+            newUserIds,
+            removeUserIds,
+          });
+        }
+
+        if (updated.delegation && !currentGroup.delegation) {
+          await addDelegationMutation.mutateAsync({
+            delegatorId: updated.head_id,
+            delegateeId: updated.delegation.user_id,
+            startDate: new Date(updated.delegation.start_date),
+            endDate: new Date(updated.delegation.end_date),
+          });
+        }
+
+        if (!updated.delegation && currentGroup.delegation) {
+          await cancelDelegationMutation.mutateAsync({
+            delegationId: currentGroup.delegation.id!,
+          });
+        }
+
+        if (updated.head_id !== currentGroup.head_id) {
+          await updateUserRoleMutation.mutateAsync({
+            role: 'HEAD_OF_UNIT' as UserRole,
+            newUserIds: updated.head_id ? [updated.head_id] : [],
+            removeUserIds: [currentGroup.head_id],
+            deptId: SUPPLY_OPERATION_DEPARTMENT_ID,
+            unitId: updated.id,
+          });
+        }
 
         toast.success('บันทึกกลุ่มงานเรียบร้อยแล้ว');
       } catch (error) {
@@ -100,7 +162,14 @@ export function WorkGroupsManager() {
         throw error;
       }
     },
-    [groups, updateUnitMutation]
+    [
+      groups,
+      updateUnitMutation,
+      updateUsersInUnitMutation,
+      addDelegationMutation,
+      cancelDelegationMutation,
+      updateUserRoleMutation,
+    ]
   );
 
   const handleCreateGroup = useCallback((_newGroup: WorkGroupSetting) => {

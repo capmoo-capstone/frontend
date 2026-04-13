@@ -3,8 +3,8 @@ import api from '@/lib/axios';
 import {
   type AddDelegationRequest,
   AddDelegationSchema,
-  type AddUsersToUnitRequest,
-  AddUsersToUnitSchema,
+  type BackendRepresentativeResponse,
+  BackendRepresentativeResponseSchema,
   type BackendUpdateUserRoleResponse,
   BackendUpdateUserRoleResponseSchema,
   type BackendUserDelegationDetailResponse,
@@ -16,8 +16,12 @@ import {
   BackendUserSelectionResponseSchema,
   type GetUsersParams,
   type GetUsersSelectionParams,
+  type UpdateRepresentativeRequest,
+  UpdateRepresentativeRequestSchema,
   type UpdateUserRoleRequest,
   UpdateUserRoleSchema,
+  type UpdateUsersToUnitRequest,
+  UpdateUsersToUnitSchema,
   type UserListResponse,
   UserListResponseSchema,
   type UserSelectionResponse,
@@ -67,34 +71,73 @@ export const getUserById = async (userId: string): Promise<BackendUserDetailResp
   return parsed;
 };
 
-export const addUsersToUnit = async (request: AddUsersToUnitRequest): Promise<any> => {
-  const requestData = AddUsersToUnitSchema.parse(request);
-  const { data } = await api.patch(`/users/add-unit/${requestData.unitId}`, {
-    users: requestData.userIds,
+export const updateUsersInUnit = async (request: UpdateUsersToUnitRequest): Promise<BackendUpdateUserRoleResponse> => {
+  console.log('updateUsersInUnit request', request);
+  const requestData = UpdateUsersToUnitSchema.parse(request);
+  const { data } = await api.patch(`/units/${requestData.unitId}/users`, {
+    new_users: requestData.newUserIds,
+    remove_users: requestData.removeUserIds,
   });
-  return data;
-};
-
-export const addRepresentativeToUnit = async (
-  userId: string,
-  unitId: string
-): Promise<BackendUpdateUserRoleResponse> => {
-  const { data } = await api.patch(`/users/${userId}/rep/${unitId}`);
   const parsed = BackendUpdateUserRoleResponseSchema.parse(data);
   return parsed;
 };
+
+export const getRepresentative = async (unitId: string): Promise<BackendRepresentativeResponse> => {
+  const { data } = await api.get(`/units/${unitId}/rep`);
+  const parsed = BackendRepresentativeResponseSchema.parse(data);
+  return parsed;
+};
+
+export const updateRepresentative = async (
+  request: UpdateRepresentativeRequest
+): Promise<BackendUpdateUserRoleResponse> => {
+  const requestData = UpdateRepresentativeRequestSchema.parse(request);
+  const { data } = await api.patch(`/units/${requestData.unitId}/rep`, {
+    new_users: [requestData.newUserId],
+    remove_users: [requestData.removeUserId],
+  });
+  const parsed = BackendUpdateUserRoleResponseSchema.parse(data);
+  return parsed;
+};
+
+export const updateSupplyRole = async (request: UpdateUserRoleRequest): Promise<BackendUpdateUserRoleResponse> => {
+  const { data } = await api.patch(`/users/roles/supply`, {
+    role: request.role,
+    new_users: request.newUserIds,
+    remove_users: request.removeUserIds,
+  });
+  const parsed = BackendUpdateUserRoleResponseSchema.parse(data);
+  return parsed;
+}
 
 export const updateUserRole = async (
   request: UpdateUserRoleRequest
 ): Promise<BackendUpdateUserRoleResponse> => {
   const requestData = UpdateUserRoleSchema.parse(request);
-  const { data } = await api.patch(`/users/${requestData.userId}/role`, {
-    role: requestData.role,
-    dept_id: requestData.deptId,
-    unit_id: requestData.unitId,
-  });
-  const parsed = BackendUpdateUserRoleResponseSchema.parse(data);
-  return parsed;
+
+  await Promise.all([
+    ...requestData.newUserIds.map((userId) =>
+      api.post(`/users/${userId}/role`, {
+        role: requestData.role,
+        dept_id: requestData.deptId,
+        unit_id: requestData.unitId,
+      })
+    ),
+    ...requestData.removeUserIds.map((userId) =>
+      api.delete(`/users/${userId}/role`, {
+        data: {
+          role: requestData.role,
+          dept_id: requestData.deptId,
+          unit_id: requestData.unitId,
+        },
+      })
+    ),
+  ]);
+
+  return {
+    added: requestData.newUserIds.length,
+    removed: requestData.removeUserIds.length,
+  };
 };
 
 export const removeUser = async (userId: string): Promise<void> => {
@@ -113,7 +156,7 @@ export const addDelegation = async (
 export const cancelDelegation = async (
   delegationId: string
 ): Promise<BackendUserDelegationResponse> => {
-  const { data } = await api.patch(`/delegations/${delegationId}`);
+  const { data } = await api.patch(`/delegations/${delegationId}/cancel`);
   const parsed = BackendUserDelegationResponseSchema.parse(data);
   return parsed;
 };
@@ -122,6 +165,14 @@ export const getDelegationById = async (
   delegationId: string
 ): Promise<BackendUserDelegationDetailResponse> => {
   const { data } = await api.get(`/delegations/${delegationId}`);
+  const parsed = BackendUserDelegationDetailResponseSchema.parse(data);
+  return parsed;
+};
+
+export const getActiveDelegationByUnit = async (
+  unitId: string
+): Promise<BackendUserDelegationDetailResponse> => {
+  const { data } = await api.get(`/delegations/active?unitId=${unitId}`);
   const parsed = BackendUserDelegationDetailResponseSchema.parse(data);
   return parsed;
 };

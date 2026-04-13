@@ -73,7 +73,7 @@ export function useWorkGroupCardEditor({
   // Enforce staff uniqueness: Cannot be director, cannot be in ANY other group
   const availableMembers = useMemo(() => {
     const assignedElsewhereIds = new Set(
-      groups.filter((g) => g.id !== group.id).flatMap((g) => [g.head_id, ...g.member_ids])
+      groups.filter((g) => g.id).flatMap((g) => [g.head_id, ...g.member_ids])
     );
 
     return procurementUsers.filter((person) => {

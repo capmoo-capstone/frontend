@@ -8,15 +8,16 @@ import {
 
 import {
   addDelegation,
-  addRepresentativeToUnit,
-  addUsersToUnit,
   cancelDelegation,
+  getActiveDelegationByUnit,
   getDelegationById,
   getUserById,
   getUsers,
   getUsersForSelection,
   removeUser,
+  updateSupplyRole,
   updateUserRole,
+  updateUsersInUnit,
 } from '../api';
 import type { GetUsersParams, GetUsersSelectionParams, UserRole } from '../types';
 
@@ -65,31 +66,44 @@ export const useUserById = (userId: string) => {
   });
 };
 
-export const useAddUserToUnit = () => {
+export const useUpdateUsersInUnit = () => {
+  const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (data: { unitId: string; userIds: string[] }) => addUsersToUnit(data),
-    onError: (error) => {
-      throw new Error('Failed to add users to unit:' + error.message);
+    mutationFn: (data: { unitId: string; newUserIds: string[]; removeUserIds: string[] }) =>
+      updateUsersInUnit(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['users', 'selection'] });
     },
   });
 };
+
+export const useUpdateSupplyRole = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: { role: UserRole; newUserIds: string[]; removeUserIds: string[]; }) =>
+      updateSupplyRole(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['users', 'selection', { deptId: 'DEPT-SUP-OPS' }] });
+    },
+  });
+}
 
 export const useUpdateUserRole = () => {
+  const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (data: { userId: string; role: UserRole; deptId: string; unitId?: string }) =>
-      updateUserRole(data),
+    mutationFn: (data: {
+      role: UserRole;
+      newUserIds: string[];
+      removeUserIds: string[];
+      deptId?: string;
+      unitId?: string;
+    }) => updateUserRole(data),
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['users', 'selection', { deptId: variables.deptId }] });
+      queryClient.invalidateQueries({ queryKey: ['users', 'selection', { unitId: variables.unitId }] });
+    },
     onError: (error) => {
       throw new Error('Failed to update user role:' + error.message);
-    },
-  });
-};
-
-export const useAddRepresentativeToUnit = () => {
-  return useMutation({
-    mutationFn: (data: { userId: string; unitId: string }) =>
-      addRepresentativeToUnit(data.userId, data.unitId),
-    onError: (error) => {
-      throw new Error('Failed to add representative to unit:' + error.message);
     },
   });
 };
@@ -101,6 +115,7 @@ export const useRemoveUser = () => {
 };
 
 export const useAddDelegation = () => {
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (data: {
       delegatorId: string;
@@ -114,6 +129,9 @@ export const useAddDelegation = () => {
         start_date: data.startDate,
         end_date: data.endDate,
       }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['delegations'] });
+    },
   });
 };
 
@@ -135,8 +153,23 @@ export const useCancelDelegation = () => {
 
   return useMutation({
     mutationFn: (data: { delegationId: string }) => cancelDelegation(data.delegationId),
-    onSuccess: (_, { delegationId }) => {
-      queryClient.invalidateQueries({ queryKey: ['delegations', delegationId] });
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['delegations'] });
     },
+  });
+};
+
+export const useActiveDelegationByUnit = (unitIds: string[]) => {
+  return useQueries({
+    queries: unitIds.map((unitId) => ({
+      queryKey: ['delegations', { unitId }],
+      queryFn: () => {
+        if (unitId) {
+          return getActiveDelegationByUnit(unitId);
+        }
+        throw new Error('unitId is required');
+      },
+      enabled: !!unitId,
+    })),
   });
 };

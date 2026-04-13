@@ -97,27 +97,35 @@ export const BackendUserDetailResponseSchema = z.object({
 
 export type BackendUserDetailResponse = z.infer<typeof BackendUserDetailResponseSchema>;
 
-export const AddUsersToUnitSchema = z.object({
+export const UpdateUsersToUnitSchema = z.object({
   unitId: z.string(),
-  userIds: z.array(z.string()),
+  newUserIds: z.array(z.string()),
+  removeUserIds: z.array(z.string()),
 });
 
-export type AddUsersToUnitRequest = z.infer<typeof AddUsersToUnitSchema>;
+export type UpdateUsersToUnitRequest = z.infer<typeof UpdateUsersToUnitSchema>;
 
 export const UpdateUserRoleSchema = z.object({
-  userId: z.string(),
-  deptId: z.string(),
-  unitId: z.string().optional(),
   role: UserRoleEnum,
+  newUserIds: z.array(z.string()),
+  removeUserIds: z.array(z.string()),
+  deptId: z.string().optional(),
+  unitId: z.string().optional(),
 });
 
 export type UpdateUserRoleRequest = z.infer<typeof UpdateUserRoleSchema>;
 
+export const UpdateRepresentativeRequestSchema = z.object({
+  unitId: z.string(),
+  newUserId: z.uuid(),
+  removeUserId: z.uuid(),
+});
+
+export type UpdateRepresentativeRequest = z.infer<typeof UpdateRepresentativeRequestSchema>;
+
 export const BackendUpdateUserRoleResponseSchema = z.object({
-  id: z.string(),
-  role: UserRoleEnum,
-  dept_id: z.string(),
-  unit_id: z.string().optional(),
+  added: z.number(),
+  removed: z.number(),
 });
 
 export type BackendUpdateUserRoleResponse = z.infer<typeof BackendUpdateUserRoleResponseSchema>;
@@ -168,8 +176,16 @@ export const BackendUserDelegationDetailResponseSchema = BackendUserDelegationRe
       ),
     }),
   }
-);
+).nullable();
 
 export type BackendUserDelegationDetailResponse = z.infer<
   typeof BackendUserDelegationDetailResponseSchema
 >;
+
+export const BackendRepresentativeResponseSchema = z.object({
+  id: z.string(),
+  full_name: z.string(),
+  unit_id: z.string(),
+});
+
+export type BackendRepresentativeResponse = z.infer<typeof BackendRepresentativeResponseSchema>;

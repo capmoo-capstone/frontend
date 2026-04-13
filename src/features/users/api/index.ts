@@ -16,6 +16,8 @@ import {
   BackendUserSelectionResponseSchema,
   type GetUsersParams,
   type GetUsersSelectionParams,
+  type UpdateRepresentativeRequest,
+  UpdateRepresentativeRequestSchema,
   type UpdateUserRoleRequest,
   UpdateUserRoleSchema,
   type UpdateUsersToUnitRequest,
@@ -69,13 +71,15 @@ export const getUserById = async (userId: string): Promise<BackendUserDetailResp
   return parsed;
 };
 
-export const updateUsersInUnit = async (request: UpdateUsersToUnitRequest): Promise<any> => {
+export const updateUsersInUnit = async (request: UpdateUsersToUnitRequest): Promise<BackendUpdateUserRoleResponse> => {
+  console.log('updateUsersInUnit request', request);
   const requestData = UpdateUsersToUnitSchema.parse(request);
   const { data } = await api.patch(`/units/${requestData.unitId}/users`, {
     new_users: requestData.newUserIds,
     remove_users: requestData.removeUserIds,
   });
-  return data;
+  const parsed = BackendUpdateUserRoleResponseSchema.parse(data);
+  return parsed;
 };
 
 export const getRepresentative = async (unitId: string): Promise<BackendRepresentativeResponse> => {
@@ -85,25 +89,55 @@ export const getRepresentative = async (unitId: string): Promise<BackendRepresen
 };
 
 export const updateRepresentative = async (
-  userId: string,
-  unitId: string
+  request: UpdateRepresentativeRequest
 ): Promise<BackendUpdateUserRoleResponse> => {
-  const { data } = await api.patch(`/units/${unitId}/rep/${userId}`);
+  const requestData = UpdateRepresentativeRequestSchema.parse(request);
+  const { data } = await api.patch(`/units/${requestData.unitId}/rep`, {
+    new_users: [requestData.newUserId],
+    remove_users: [requestData.removeUserId],
+  });
   const parsed = BackendUpdateUserRoleResponseSchema.parse(data);
   return parsed;
 };
+
+export const updateSupplyRole = async (request: UpdateUserRoleRequest): Promise<BackendUpdateUserRoleResponse> => {
+  const { data } = await api.patch(`/users/roles/supply`, {
+    role: request.role,
+    new_users: request.newUserIds,
+    remove_users: request.removeUserIds,
+  });
+  const parsed = BackendUpdateUserRoleResponseSchema.parse(data);
+  return parsed;
+}
 
 export const updateUserRole = async (
   request: UpdateUserRoleRequest
 ): Promise<BackendUpdateUserRoleResponse> => {
   const requestData = UpdateUserRoleSchema.parse(request);
-  const { data } = await api.patch(`/users/${requestData.userId}/role`, {
-    role: requestData.role,
-    dept_id: requestData.deptId,
-    unit_id: requestData.unitId,
-  });
-  const parsed = BackendUpdateUserRoleResponseSchema.parse(data);
-  return parsed;
+
+  await Promise.all([
+    ...requestData.newUserIds.map((userId) =>
+      api.post(`/users/${userId}/role`, {
+        role: requestData.role,
+        dept_id: requestData.deptId,
+        unit_id: requestData.unitId,
+      })
+    ),
+    ...requestData.removeUserIds.map((userId) =>
+      api.delete(`/users/${userId}/role`, {
+        data: {
+          role: requestData.role,
+          dept_id: requestData.deptId,
+          unit_id: requestData.unitId,
+        },
+      })
+    ),
+  ]);
+
+  return {
+    added: requestData.newUserIds.length,
+    removed: requestData.removeUserIds.length,
+  };
 };
 
 export const removeUser = async (userId: string): Promise<void> => {
@@ -139,8 +173,6 @@ export const getActiveDelegationByUnit = async (
   unitId: string
 ): Promise<BackendUserDelegationDetailResponse> => {
   const { data } = await api.get(`/delegations/active?unitId=${unitId}`);
-  console.log('getActiveDelegationByUnit response', data);
   const parsed = BackendUserDelegationDetailResponseSchema.parse(data);
-  console.log('getActiveDelegationByUnit parsed', parsed);
   return parsed;
 };

@@ -112,10 +112,10 @@ export function WorkGroupsManager() {
         }
 
         const currentAssignedUsers = new Set(
-          [currentGroup.head_id, ...currentGroup.member_ids].filter(Boolean)
+          [...currentGroup.member_ids].filter(Boolean)
         );
         const nextAssignedUsers = Array.from(
-          new Set([updated.head_id, ...updated.member_ids].filter(Boolean))
+          new Set([...updated.member_ids].filter(Boolean))
         );
 
         const newUserIds = nextAssignedUsers.filter((userId) => !currentAssignedUsers.has(userId));
@@ -148,16 +148,11 @@ export function WorkGroupsManager() {
 
         if (updated.head_id !== currentGroup.head_id) {
           await updateUserRoleMutation.mutateAsync({
-            userId: updated.head_id,
             role: 'HEAD_OF_UNIT' as UserRole,
+            newUserIds: updated.head_id ? [updated.head_id] : [],
+            removeUserIds: [currentGroup.head_id],
             deptId: SUPPLY_OPERATION_DEPARTMENT_ID,
             unitId: updated.id,
-          });
-
-          await updateUserRoleMutation.mutateAsync({
-            userId: currentGroup.head_id,
-            role: 'GUEST' as UserRole,
-            deptId: SUPPLY_OPERATION_DEPARTMENT_ID,
           });
         }
 

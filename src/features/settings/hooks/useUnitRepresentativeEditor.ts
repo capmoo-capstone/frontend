@@ -38,7 +38,8 @@ export function useUnitRepresentativeEditor({
     updateRepresentative.mutate(
       {
         unitId: unit.id,
-        userId: selectedUserId,
+        newUserId: selectedUserId,
+        removeUserId: unit.representative?.id || '',
       },
       {
         onSuccess: () => {

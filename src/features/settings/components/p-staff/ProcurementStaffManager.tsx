@@ -8,6 +8,7 @@ import { type ProcurementRoleSetting, type SettingsUserOption } from '@/features
 import {
   type UserRole,
   UserSelect,
+  useUpdateSupplyRole,
   useAddDelegation,
   useCancelDelegation,
   useUpdateUserRole,
@@ -27,7 +28,7 @@ export function ProcurementStaffManager() {
   });
   const addDelegationMutation = useAddDelegation();
   const cancelDelegationMutation = useCancelDelegation();
-  const updateUserRoleMutation = useUpdateUserRole();
+  const updateSupplyRole = useUpdateSupplyRole();
 
   const queryClient = useQueryClient();
 
@@ -51,8 +52,6 @@ export function ProcurementStaffManager() {
 
   const submitRoleChanges = useCallback(
     async (_updatedRole: ProcurementRoleSetting) => {
-      // TODO (BACKEND): Connect this UI action to the corresponding API endpoint.
-      // Example: await updateUserRolesMutation.mutateAsync({ roleId: _updatedRole.id, userIds: _updatedRole.member_ids });
       const current = procurementRoles.find((role) => role.id === _updatedRole.id);
 
       if (!current) {
@@ -73,60 +72,28 @@ export function ProcurementStaffManager() {
             delegationId: current.delegation[0].id!,
           });
         }
+      }
 
-        if (current.member_ids[0] !== _updatedRole.member_ids[0]) {
-          await updateUserRoleMutation.mutateAsync({
-            userId: _updatedRole.member_ids[0],
-            role: _updatedRole.id as UserRole,
-            deptId: SUPPLY_OPERATION_DEPARTMENT_ID,
-          });
+      const newUserIds = _updatedRole.member_ids.filter(
+        (id) => !current.member_ids.includes(id)
+      ) ?? [];
+      const removeUserIds = current.member_ids.filter(
+        (id) => !_updatedRole.member_ids.includes(id)
+      ) ?? [];
 
-          await updateUserRoleMutation.mutateAsync({
-            userId: current.member_ids[0],
-            role: 'GUEST' as UserRole,
-            deptId: SUPPLY_OPERATION_DEPARTMENT_ID,
-          });
-        }
-      } else {
-        const addedUserIds = _updatedRole.member_ids.filter(
-          (id) => !current.member_ids.includes(id)
-        );
-        const removedUserIds = current.member_ids.filter(
-          (id) => !_updatedRole.member_ids.includes(id)
-        );
-
-        if (addedUserIds.length > 0) {
-          await Promise.all([
-            ...addedUserIds.map((userId) =>
-              updateUserRoleMutation.mutateAsync({
-                userId,
-                role: _updatedRole.id as UserRole,
-                deptId: SUPPLY_OPERATION_DEPARTMENT_ID,
-              })
-            ),
-          ]);
-        }
-
-        if (removedUserIds.length > 0) {
-          await Promise.all([
-            ...removedUserIds.map((userId) =>
-              updateUserRoleMutation.mutateAsync({
-                userId,
-                role: 'GUEST' as UserRole,
-                deptId: SUPPLY_OPERATION_DEPARTMENT_ID,
-              })
-            ),
-          ]);
-        }
-
-        await queryClient.invalidateQueries({ queryKey: ['users', 'selection'] });
+      if (newUserIds.length > 0 || removeUserIds.length > 0) {
+        await updateSupplyRole.mutateAsync({
+          role: _updatedRole.id as UserRole,
+          newUserIds,
+          removeUserIds,
+        });
       }
     },
     [
       procurementRoles,
       addDelegationMutation,
       cancelDelegationMutation,
-      updateUserRoleMutation,
+      updateSupplyRole,
       queryClient,
     ]
   );

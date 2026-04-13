@@ -106,19 +106,26 @@ export const UpdateUsersToUnitSchema = z.object({
 export type UpdateUsersToUnitRequest = z.infer<typeof UpdateUsersToUnitSchema>;
 
 export const UpdateUserRoleSchema = z.object({
-  userId: z.string(),
-  deptId: z.string(),
-  unitId: z.string().optional(),
   role: UserRoleEnum,
+  newUserIds: z.array(z.string()),
+  removeUserIds: z.array(z.string()),
+  deptId: z.string().optional(),
+  unitId: z.string().optional(),
 });
 
 export type UpdateUserRoleRequest = z.infer<typeof UpdateUserRoleSchema>;
 
+export const UpdateRepresentativeRequestSchema = z.object({
+  unitId: z.string(),
+  newUserId: z.uuid(),
+  removeUserId: z.uuid(),
+});
+
+export type UpdateRepresentativeRequest = z.infer<typeof UpdateRepresentativeRequestSchema>;
+
 export const BackendUpdateUserRoleResponseSchema = z.object({
-  id: z.string(),
-  role: UserRoleEnum,
-  dept_id: z.string(),
-  unit_id: z.string().nullable().optional(),
+  added: z.number(),
+  removed: z.number(),
 });
 
 export type BackendUpdateUserRoleResponse = z.infer<typeof BackendUpdateUserRoleResponseSchema>;

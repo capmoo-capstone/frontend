@@ -42,8 +42,8 @@ export const useRepresentative = (unitIds: string[]) => {
 export const useUpdateRepresentative = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (data: { userId: string; unitId: string }) =>
-      updateRepresentative(data.userId, data.unitId),
+    mutationFn: (data: { unitId: string, newUserId: string, removeUserId: string }) =>
+      updateRepresentative(data),
     onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({
         queryKey: ['representative', { id: variables.unitId }],

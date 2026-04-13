@@ -11,12 +11,11 @@ import {
   cancelDelegation,
   getActiveDelegationByUnit,
   getDelegationById,
-  getRepresentative,
   getUserById,
   getUsers,
   getUsersForSelection,
   removeUser,
-  updateRepresentative,
+  updateSupplyRole,
   updateUserRole,
   updateUsersInUnit,
 } from '../api';
@@ -78,13 +77,30 @@ export const useUpdateUsersInUnit = () => {
   });
 };
 
+export const useUpdateSupplyRole = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: { role: UserRole; newUserIds: string[]; removeUserIds: string[]; }) =>
+      updateSupplyRole(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['users', 'selection', { deptId: 'DEPT-SUP-OPS' }] });
+    },
+  });
+}
+
 export const useUpdateUserRole = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (data: { userId: string; role: UserRole; deptId: string; unitId?: string }) =>
-      updateUserRole(data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['users', 'selection'] });
+    mutationFn: (data: {
+      role: UserRole;
+      newUserIds: string[];
+      removeUserIds: string[];
+      deptId?: string;
+      unitId?: string;
+    }) => updateUserRole(data),
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['users', 'selection', { deptId: variables.deptId }] });
+      queryClient.invalidateQueries({ queryKey: ['users', 'selection', { unitId: variables.unitId }] });
     },
     onError: (error) => {
       throw new Error('Failed to update user role:' + error.message);

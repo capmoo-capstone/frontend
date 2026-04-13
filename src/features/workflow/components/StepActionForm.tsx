@@ -10,6 +10,7 @@ import { cn } from '@/lib/utils';
 
 interface StepActionFormProps {
   isActive?: boolean;
+  isBusy?: boolean;
   stepStatus: StepStatus;
   viewAsRole: Role;
   onSubmit?: () => void;
@@ -24,6 +25,7 @@ interface StepActionFormProps {
 
 export function StepActionForm({
   isActive = true,
+  isBusy = false,
   stepStatus,
   viewAsRole,
   onSubmit,
@@ -93,7 +95,7 @@ export function StepActionForm({
       <div className="mt-8 space-y-2 border-t pt-6 empty:hidden">
         {['GENERAL_STAFF'].includes(viewAsRole) &&
           ['in_progress', 'rejected'].includes(stepStatus) && (
-            <Button className="w-full" variant="brand" onClick={onSubmit}>
+            <Button className="w-full" variant="brand" onClick={onSubmit} disabled={isBusy}>
               <Send className="mr-2 h-4 w-4" />
               ส่งงาน
             </Button>
@@ -114,7 +116,12 @@ export function StepActionForm({
                   />
                 </div>
                 <div className="flex gap-2">
-                  <Button className="flex-1" variant="outline" onClick={handleCancelReject}>
+                  <Button
+                    className="flex-1"
+                    variant="outline"
+                    onClick={handleCancelReject}
+                    disabled={isBusy}
+                  >
                     <X className="mr-2 h-4 w-4" />
                     ยกเลิก
                   </Button>
@@ -122,7 +129,7 @@ export function StepActionForm({
                     className="flex-1"
                     variant="destructive"
                     onClick={handleSubmitReject}
-                    disabled={!rejectReason.trim()}
+                    disabled={!rejectReason.trim() || isBusy}
                   >
                     <SquareArrowLeft className="mr-2 h-4 w-4" />
                     ส่งกลับเพื่อแก้ไข
@@ -131,11 +138,16 @@ export function StepActionForm({
               </div>
             ) : (
               <>
-                <Button className="w-full" variant="outline" onClick={handleRejectClick}>
+                <Button
+                  className="w-full"
+                  variant="outline"
+                  onClick={handleRejectClick}
+                  disabled={isBusy}
+                >
                   <SquareArrowLeft className="mr-2 h-4 w-4" />
                   ส่งกลับเพื่อแก้ไข
                 </Button>
-                <Button className="w-full" variant="brand" onClick={onApprove}>
+                <Button className="w-full" variant="brand" onClick={onApprove} disabled={isBusy}>
                   <CircleCheckBig className="mr-2 h-4 w-4" />
                   อนุมัติขั้นตอน
                 </Button>
@@ -146,11 +158,11 @@ export function StepActionForm({
 
         {['DOCUMENT_STAFF'].includes(viewAsRole) && ['approved'].includes(stepStatus) && (
           <>
-            <Button className="w-full" variant="outline" onClick={onDownloadAll}>
+            <Button className="w-full" variant="outline" onClick={onDownloadAll} disabled={isBusy}>
               <Download className="mr-2 h-4 w-4" />
               ดาวน์โหลดเอกสารทั้งหมด
             </Button>
-            <Button className="w-full" variant="brand" onClick={onSupApprove}>
+            <Button className="w-full" variant="brand" onClick={onSupApprove} disabled={isBusy}>
               <CircleCheckBig className="mr-2 h-4 w-4" />
               เสนอผู้อำนวยการเรียบร้อยแล้ว
             </Button>

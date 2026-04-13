@@ -79,6 +79,9 @@ export const SubmissionDocumentSchema = z.object({
 export type SubmissionDocument = z.infer<typeof SubmissionDocumentSchema>;
 
 export const SubmissionSchema = z.object({
+  id: z.string().optional(),
+  project_id: z.string().optional(),
+  workflow_type: z.string().optional(),
   step_name: z.string(),
   step_order: z.number(),
   submission_round: z.number(),
@@ -88,7 +91,7 @@ export const SubmissionSchema = z.object({
   action_by: z.string().nullable().optional(),
   action_at: z.string().nullable().optional(),
   documents: z.array(SubmissionDocumentSchema),
-  meta_data: z.record(z.string(), z.any()),
+  meta_data: z.union([z.record(z.string(), z.any()), z.array(z.unknown())]).default({}),
   comments: z.string().optional(),
 });
 

@@ -7,6 +7,8 @@ import {
   ProjectSummaryView,
   ProjectWorkflowSteps,
   type WorkflowStepConfig,
+  normalizeWorkflowSubmissions,
+  useWorkflowSubmissions,
 } from '@/features/workflow';
 import { cn } from '@/lib/utils';
 
@@ -24,6 +26,7 @@ interface ProjectDetailTabsProps {
 
 export function ProjectDetailTabs({ project, workflowConfigs }: ProjectDetailTabsProps) {
   const [workflowTab, setWorkflowTab] = useState<'PROCUREMENT' | 'CONTRACT'>('PROCUREMENT');
+  const { data: workflowSubmissions } = useWorkflowSubmissions(project.id);
 
   const activeSteps = useMemo(() => {
     if (workflowTab === 'PROCUREMENT') {
@@ -32,6 +35,20 @@ export function ProjectDetailTabs({ project, workflowConfigs }: ProjectDetailTab
       return workflowConfigs.find((w) => w.type === 'CONTRACT')?.steps || [];
     }
   }, [project.procurement_type, workflowConfigs, workflowTab]);
+
+  const projectWithSubmissions = useMemo(() => {
+    const procurementSteps =
+      workflowConfigs.find((w) => w.type === project.procurement_type)?.steps || [];
+    const contractSteps = workflowConfigs.find((w) => w.type === 'CONTRACT')?.steps || [];
+
+    return {
+      ...project,
+      submissions: [
+        ...normalizeWorkflowSubmissions(workflowSubmissions?.procurement ?? [], procurementSteps),
+        ...normalizeWorkflowSubmissions(workflowSubmissions?.contract ?? [], contractSteps),
+      ],
+    };
+  }, [project, workflowConfigs, workflowSubmissions]);
 
   const getResponsiblePerson = () => {
     if (workflowTab === 'PROCUREMENT') {
@@ -101,11 +118,11 @@ export function ProjectDetailTabs({ project, workflowConfigs }: ProjectDetailTab
 
       {/* --- Content Area --- */}
       <TabsContent value="timeline">
-        <ProjectWorkflowSteps project={project} steps={activeSteps} />
+        <ProjectWorkflowSteps project={projectWithSubmissions} steps={activeSteps} />
       </TabsContent>
 
       <TabsContent value="summary">
-        <ProjectSummaryView project={project} steps={activeSteps} />
+        <ProjectSummaryView project={projectWithSubmissions} steps={activeSteps} />
       </TabsContent>
     </Tabs>
   );

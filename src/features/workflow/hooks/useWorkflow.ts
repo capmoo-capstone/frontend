@@ -34,21 +34,25 @@ export function useWorkflow(project: ProjectDetail | undefined, activeSteps: Wor
   const getStepStatus = useCallback(
     (stepOrder: number): StepStatus => {
       if (!project) return 'not_started';
-      // --- TESTING MODE START ---
-      // Uncomment this line to force all steps to be open and editable
-      return 'in_progress';
-      // --- TESTING MODE END ---
 
-      // Note: project.current_step might belong to Procurement or Contract.
-      // Ideally, the backend should provide separate current steps or we infer it.
-      // For now, we assume standard logic:
       const submissions = getStepSubmissions(stepOrder);
 
       if (submissions.length === 0) {
-        // Logic: If previous step is done, this one is in_progress.
-        // For simplicity, if it has no submissions, check if it's the very first step or previous is done.
-        if (stepOrder === 1) return 'in_progress'; // Simplified
-        return 'not_started';
+        const step = activeSteps.find((item) => item.order === stepOrder);
+        if (!step) return 'not_started';
+
+        const previousSteps = step.required_step ?? [];
+        if (previousSteps.length === 0) {
+          return stepOrder === 1 ? 'in_progress' : 'not_started';
+        }
+
+        const previousStepsCompleted = previousSteps.every((previousOrder) => {
+          const previousSubmissions = getStepSubmissions(previousOrder);
+          const latestPrevious = previousSubmissions[previousSubmissions.length - 1];
+          return latestPrevious && ['ACCEPTED', 'APPROVED'].includes(latestPrevious.status);
+        });
+
+        return previousStepsCompleted ? 'in_progress' : 'not_started';
       }
 
       const latest = submissions[submissions.length - 1];

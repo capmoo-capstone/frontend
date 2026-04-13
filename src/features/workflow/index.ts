@@ -2,7 +2,10 @@
 export * from './api';
 
 // Hooks
+export { workflowKeys } from './hooks/queryKeys';
 export { useWorkflow } from './hooks/useWorkflow';
+export { useWorkflowMutations } from './hooks/useWorkflowMutations';
+export { useWorkflowSubmissions } from './hooks/useWorkflowSubmissions';
 
 // Components
 export { DynamicStepForm } from './components/DynamicStepForm';

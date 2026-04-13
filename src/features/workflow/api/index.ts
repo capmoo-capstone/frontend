@@ -3,9 +3,9 @@ import { z } from 'zod';
 import api from '@/lib/axios';
 
 import type { WorkflowStepConfig } from '../types';
-import { type Submission, SubmissionDocumentSchema } from '../types';
+import type { Submission } from '../types';
 
-const WorkflowSubmissionBackendStatusSchema = z.enum([
+export const WorkflowSubmissionBackendStatusSchema = z.enum([
   'WAITING_APPROVAL',
   'WAITING_PROPOSAL',
   'WAITING_SIGNATURE',
@@ -26,6 +26,20 @@ const WorkflowSubmissionMetaSchema = z.union([
   ),
 ]);
 
+const WorkflowSubmissionDocumentSchema = z.object({
+  id: z.string().optional(),
+  submission_id: z.string().optional(),
+  field_key: z.string().nullable().optional(),
+  file_name: z.string().nullable().optional(),
+  file_path: z.string().nullable().optional(),
+  value: z
+    .string()
+    .optional()
+    .or(z.number().optional())
+    .or(z.boolean().optional())
+    .or(z.array(z.string()).optional()),
+});
+
 const WorkflowSubmissionApiSchema = z.object({
   id: z.string().optional(),
   project_id: z.string().optional(),
@@ -43,7 +57,7 @@ const WorkflowSubmissionApiSchema = z.object({
   completed_by: z.string().nullable().optional(),
   completed_at: z.string().nullable().optional(),
   comment: z.string().nullable().optional(),
-  documents: z.array(SubmissionDocumentSchema).default([]),
+  documents: z.array(WorkflowSubmissionDocumentSchema).default([]),
   meta_data: WorkflowSubmissionMetaSchema.default({}),
 });
 
@@ -122,10 +136,18 @@ const getSubmissionActionAt = (submission: WorkflowSubmissionApiRecord) => {
 };
 
 const toUiSubmission = (submission: WorkflowSubmissionApiRecord, stepName: string): Submission => {
+  const normalizedDocuments = submission.documents.map((document, index) => ({
+    field_key: document.field_key ?? `__document_${index + 1}`,
+    file_name: document.file_name ?? undefined,
+    file_path: document.file_path ?? undefined,
+    value: document.value,
+  }));
+
   return {
     id: submission.id,
     project_id: submission.project_id,
     workflow_type: submission.workflow_type,
+    backend_status: submission.status,
     step_name: stepName,
     step_order: submission.step_order,
     submission_round: submission.submission_round,
@@ -134,7 +156,7 @@ const toUiSubmission = (submission: WorkflowSubmissionApiRecord, stepName: strin
     submitted_at: submission.submitted_at ?? new Date().toISOString(),
     action_by: getSubmissionActionBy(submission),
     action_at: getSubmissionActionAt(submission),
-    documents: submission.documents,
+    documents: normalizedDocuments,
     meta_data: toMetaDataRecord(submission.meta_data),
     comments: submission.comment ?? undefined,
   };

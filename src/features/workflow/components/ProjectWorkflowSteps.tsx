@@ -107,8 +107,8 @@ export function ProjectWorkflowSteps({ project, steps }: ProjectWorkflowStepsPro
         const fields = step.required_documents;
 
         const userCanAct = isActionRequired(viewAsRole, status);
-        const isCompleted = status === 'completed';
-        const showForm = userCanAct || viewSubmission || isCompleted || status === 'not_started';
+        const isCompleted = status === 'COMPLETED';
+        const showForm = userCanAct || viewSubmission || isCompleted || status === 'NOT_STARTED';
         const isGuest = viewAsRole === 'GUEST' || viewAsRole === 'REPRESENTATIVE';
 
         return (
@@ -172,6 +172,11 @@ export function ProjectWorkflowSteps({ project, steps }: ProjectWorkflowStepsPro
                       }}
                       onSupApprove={async () => {
                         if (!latestSubmission?.id) return;
+                        if (latestSubmission.backend_status === 'WAITING_SIGNATURE') {
+                          await workflowMutations.signSubmission.mutateAsync(latestSubmission.id);
+                          return;
+                        }
+
                         await workflowMutations.proposeSubmission.mutateAsync(latestSubmission.id);
                       }}
                       onDownloadAll={() => {

@@ -6,18 +6,18 @@ import type { StepStatus } from '@/features/projects';
 export const isActionRequired = (role: Role, status: StepStatus): boolean => {
   switch (role) {
     case 'GENERAL_STAFF':
-      return ['in_progress', 'rejected'].includes(status);
+      return ['IN_PROGRESS', 'REJECTED'].includes(status);
     case 'HEAD_OF_UNIT':
-      return status === 'submitted';
+      return status === 'WAITING_APPROVAL';
     case 'DOCUMENT_STAFF':
-      return status === 'approved';
+      return ['WAITING_PROPOSAL', 'WAITING_SIGNATURE'].includes(status);
     default:
       return false;
   }
 };
 
 export const getStepColor = (status: StepStatus, role: Role) => {
-  if (status === 'completed') {
+  if (status === 'COMPLETED') {
     return {
       line: 'bg-success',
       bubble: 'bg-success text-white',
@@ -37,7 +37,7 @@ export const getStepColor = (status: StepStatus, role: Role) => {
   }
 
   switch (status) {
-    case 'in_progress': {
+    case 'IN_PROGRESS': {
       return {
         line: 'bg-info',
         bubble: 'bg-info text-white',
@@ -47,7 +47,7 @@ export const getStepColor = (status: StepStatus, role: Role) => {
         icon: CircleCheckBig,
       };
     }
-    case 'not_started': {
+    case 'NOT_STARTED': {
       return {
         line: 'bg-muted',
         bubble: 'bg-muted text-primary',
@@ -57,7 +57,8 @@ export const getStepColor = (status: StepStatus, role: Role) => {
         icon: Clock,
       };
     }
-    case 'submitted':
+    case 'WAITING_APPROVAL':
+    case 'WAITING_PROPOSAL':
       return {
         line: 'bg-info',
         bubble: 'bg-info text-white',
@@ -66,7 +67,7 @@ export const getStepColor = (status: StepStatus, role: Role) => {
         description: 'หัวหน้ากลุ่มงานกำลังตรวจสอบความถูกต้อง',
         icon: UserCheck,
       };
-    case 'approved':
+    case 'WAITING_SIGNATURE':
       return {
         line: 'bg-info',
         bubble: 'bg-info text-white',
@@ -75,7 +76,7 @@ export const getStepColor = (status: StepStatus, role: Role) => {
         description: 'เจ้าหน้าที่งานระเบียบกำลังเตรียมเสนอผู้อำนวยการ',
         icon: FileCheck,
       };
-    case 'rejected':
+    case 'REJECTED':
       return {
         line: 'bg-error',
         bubble: 'bg-error text-white',

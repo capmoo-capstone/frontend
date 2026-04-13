@@ -33,35 +33,39 @@ export function useWorkflow(project: ProjectDetail | undefined, activeSteps: Wor
 
   const getStepStatus = useCallback(
     (stepOrder: number): StepStatus => {
-      if (!project) return 'not_started';
+      if (!project) return 'NOT_STARTED';
 
       const submissions = getStepSubmissions(stepOrder);
 
-      if (submissions.length === 0) {
-        const step = activeSteps.find((item) => item.order === stepOrder);
-        if (!step) return 'not_started';
-
-        const previousSteps = step.required_step ?? [];
-        if (previousSteps.length === 0) {
-          return stepOrder === 1 ? 'in_progress' : 'not_started';
+      // If submission exists, use its backend_status (which reflects the real workflow state)
+      if (submissions.length > 0) {
+        const latest = submissions[submissions.length - 1];
+        if (latest.backend_status) {
+          return latest.backend_status as StepStatus;
         }
-
-        const previousStepsCompleted = previousSteps.every((previousOrder) => {
-          const previousSubmissions = getStepSubmissions(previousOrder);
-          const latestPrevious = previousSubmissions[previousSubmissions.length - 1];
-          return latestPrevious && ['ACCEPTED', 'APPROVED'].includes(latestPrevious.status);
-        });
-
-        return previousStepsCompleted ? 'in_progress' : 'not_started';
       }
 
-      const latest = submissions[submissions.length - 1];
-      if (latest.status === 'SUBMITTED') return 'submitted';
-      if (latest.status === 'REJECTED') return 'rejected';
-      if (latest.status === 'ACCEPTED') return 'approved';
-      if (latest.status === 'APPROVED') return 'completed';
+      // No submission yet: check if prerequisites are met
+      const step = activeSteps.find((item) => item.order === stepOrder);
+      if (!step) return 'NOT_STARTED';
 
-      return 'not_started';
+      const previousSteps = step.required_step ?? [];
+      if (previousSteps.length === 0) {
+        return stepOrder === 1 ? 'IN_PROGRESS' : 'NOT_STARTED';
+      }
+
+      const previousStepsCompleted = previousSteps.every((previousOrder) => {
+        const previousSubmissions = getStepSubmissions(previousOrder);
+        const latestPrevious = previousSubmissions[previousSubmissions.length - 1];
+        return (
+          latestPrevious &&
+          (latestPrevious.backend_status === 'COMPLETED' ||
+            latestPrevious.status === 'ACCEPTED' ||
+            latestPrevious.status === 'APPROVED')
+        );
+      });
+
+      return previousStepsCompleted ? 'IN_PROGRESS' : 'NOT_STARTED';
     },
     [project, getStepSubmissions]
   );

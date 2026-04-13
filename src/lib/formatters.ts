@@ -320,29 +320,37 @@ export const getResponsibleTypeFormat = (type: UnitResponsibleType) => {
 
 export const getWaitingStatusInfo = (status: StepStatus) => {
   switch (status) {
-    case 'in_progress':
-    case 'rejected':
+    case 'NOT_STARTED':
+      return {
+        title: 'ยังไม่ถึงขั้นตอนนี้',
+        description: 'กรุณารอการดำเนินการจากขั้นตอนก่อนหน้า',
+        icon: Clock,
+        color: 'text-muted-foreground bg-muted',
+      };
+    case 'IN_PROGRESS':
+    case 'REJECTED':
       return {
         title: 'อยู่ระหว่างดำเนินการ',
         description: 'เจ้าหน้าที่พัสดุกำลังจัดทำหรือแก้ไขเอกสาร',
         icon: UserCog,
         color: 'text-error bg-error-light',
       };
-    case 'submitted':
+    case 'WAITING_APPROVAL':
+    case 'WAITING_PROPOSAL':
       return {
         title: 'รอการตรวจสอบ',
         description: 'หัวหน้ากลุ่มงานกำลังตรวจสอบความถูกต้อง',
         icon: UserCheck,
         color: 'text-info bg-info-light',
       };
-    case 'approved':
+    case 'WAITING_SIGNATURE':
       return {
         title: 'รอเสนอลงนาม',
         description: 'เจ้าหน้าที่งานระเบียบกำลังเตรียมเสนอผู้อำนวยการ',
         icon: FileCheck,
         color: 'text-info bg-info-light',
       };
-    case 'completed':
+    case 'COMPLETED':
       return {
         title: 'ดำเนินการเสร็จสิ้น',
         description: 'ขั้นตอนนี้เสร็จสมบูรณ์แล้ว',

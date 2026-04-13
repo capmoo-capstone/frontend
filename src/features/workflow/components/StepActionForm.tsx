@@ -94,14 +94,14 @@ export function StepActionForm({
       {/* Footer Actions */}
       <div className="mt-8 space-y-2 border-t pt-6 empty:hidden">
         {['GENERAL_STAFF'].includes(viewAsRole) &&
-          ['in_progress', 'rejected'].includes(stepStatus) && (
+          ['IN_PROGRESS', 'REJECTED'].includes(stepStatus) && (
             <Button className="w-full" variant="brand" onClick={onSubmit} disabled={isBusy}>
               <Send className="mr-2 h-4 w-4" />
               ส่งงาน
             </Button>
           )}
 
-        {['HEAD_OF_UNIT'].includes(viewAsRole) && ['submitted'].includes(stepStatus) && (
+        {['HEAD_OF_UNIT'].includes(viewAsRole) && ['WAITING_APPROVAL'].includes(stepStatus) && (
           <>
             {showRejectInput ? (
               <div className="space-y-3">
@@ -156,18 +156,26 @@ export function StepActionForm({
           </>
         )}
 
-        {['DOCUMENT_STAFF'].includes(viewAsRole) && ['approved'].includes(stepStatus) && (
-          <>
-            <Button className="w-full" variant="outline" onClick={onDownloadAll} disabled={isBusy}>
-              <Download className="mr-2 h-4 w-4" />
-              ดาวน์โหลดเอกสารทั้งหมด
-            </Button>
-            <Button className="w-full" variant="brand" onClick={onSupApprove} disabled={isBusy}>
-              <CircleCheckBig className="mr-2 h-4 w-4" />
-              เสนอผู้อำนวยการเรียบร้อยแล้ว
-            </Button>
-          </>
-        )}
+        {['DOCUMENT_STAFF'].includes(viewAsRole) &&
+          ['WAITING_PROPOSAL', 'WAITING_SIGNATURE'].includes(stepStatus) && (
+            <>
+              <Button
+                className="w-full"
+                variant="outline"
+                onClick={onDownloadAll}
+                disabled={isBusy}
+              >
+                <Download className="mr-2 h-4 w-4" />
+                ดาวน์โหลดเอกสารทั้งหมด
+              </Button>
+              <Button className="w-full" variant="brand" onClick={onSupApprove} disabled={isBusy}>
+                <CircleCheckBig className="mr-2 h-4 w-4" />
+                {stepStatus === 'WAITING_SIGNATURE'
+                  ? 'ลงนามเอกสาร'
+                  : 'เสนอผู้อำนวยการเรียบร้อยแล้ว'}
+              </Button>
+            </>
+          )}
       </div>
     </div>
   );

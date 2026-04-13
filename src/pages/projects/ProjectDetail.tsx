@@ -9,12 +9,15 @@ import {
   ApproveCancelDialog,
   CancelProjectDialog,
   CancellationRequestBanner,
+  CancelledProjectBanner,
   type EditProjectData,
   EditProjectDialog,
   ProjectDetailTabs,
   ProjectHeader,
   ProjectInfoGrid,
+  useApproveProjectCancellation,
   useProjectDetail,
+  useRejectProjectCancellation,
   useUpdateProject,
 } from '@/features/projects';
 import { useProjectPermissions } from '@/features/projects/hooks/useProjectPermissions';
@@ -31,6 +34,8 @@ export default function ProjectDetail() {
 
   const { data: project, isLoading, isError, error } = useProjectDetail(id);
   const { mutateAsync: updateProjectMutation } = useUpdateProject();
+  const { mutateAsync: approveCancellationMutation } = useApproveProjectCancellation();
+  const { mutateAsync: rejectCancellationMutation } = useRejectProjectCancellation();
   const { canCancelProjects } = useProjectPermissions(project?.requester.unit_id ?? undefined);
 
   if (!id || !user) return null;
@@ -56,6 +61,27 @@ export default function ProjectDetail() {
     }
   };
 
+  const activeCancellation = project.cancellation?.[0] ?? null;
+
+  const handleApproveCancellation = async () => {
+    try {
+      await approveCancellationMutation(id);
+      toast.success('อนุมัติการยกเลิกโครงการสำเร็จ');
+      setIsApproveCancelDialogOpen(false);
+    } catch {
+      toast.error('ไม่สามารถอนุมัติการยกเลิกโครงการได้ กรุณาลองใหม่อีกครั้ง');
+    }
+  };
+
+  const handleRejectCancellation = async () => {
+    try {
+      await rejectCancellationMutation(id);
+      toast.success('ปฏิเสธคำขอยกเลิกโครงการสำเร็จ');
+    } catch {
+      toast.error('ไม่สามารถปฏิเสธคำขอยกเลิกโครงการได้ กรุณาลองใหม่อีกครั้ง');
+    }
+  };
+
   return (
     <>
       <ProjectHeader
@@ -67,12 +93,13 @@ export default function ProjectDetail() {
 
       {/* --- Project Alerts --- */}
       <div className="space-y-6">
-        {/* Example: Logic to show banners based on project status would go here */}
-        <CancellationRequestBanner
-          onRequestApprove={() => setIsApproveCancelDialogOpen(true)}
-          onRequestReject={() => {}}
-        />
-        {/* <CancelledProjectBanner /> */}
+        {project.status === 'WAITING_CANCEL' && activeCancellation && (
+          <CancellationRequestBanner
+            onRequestApprove={() => setIsApproveCancelDialogOpen(true)}
+            onRequestReject={handleRejectCancellation}
+          />
+        )}
+        {project.status === 'CANCELLED' && <CancelledProjectBanner />}
       </div>
 
       <ProjectInfoGrid project={project} />
@@ -83,12 +110,9 @@ export default function ProjectDetail() {
       <ApproveCancelDialog
         isOpen={isApproveCancelDialogOpen}
         onClose={() => setIsApproveCancelDialogOpen(false)}
-        onConfirm={async () => {
-          toast.success('อนุมัติการยกเลิกโครงการสำเร็จ');
-          setIsApproveCancelDialogOpen(false);
-        }}
+        onConfirm={handleApproveCancellation}
         projectTitle={project.title}
-        requesterName="นางสาว เจ้าหน้าที่"
+        requesterName={activeCancellation?.requester.full_name}
       />
 
       <EditProjectDialog

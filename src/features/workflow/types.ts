@@ -1,5 +1,7 @@
 import { z } from 'zod';
 
+import { WorkflowSubmissionBackendStatusSchema } from './api';
+
 // ============================================================================
 // Workflow Field Types
 // ============================================================================
@@ -32,12 +34,13 @@ export interface FieldConfig {
 // ============================================================================
 
 export const StepStatusSchema = z.enum([
-  'not_started',
-  'in_progress',
-  'submitted',
-  'approved',
-  'rejected',
-  'completed',
+  'NOT_STARTED',
+  'IN_PROGRESS',
+  'WAITING_APPROVAL',
+  'WAITING_PROPOSAL',
+  'WAITING_SIGNATURE',
+  'COMPLETED',
+  'REJECTED',
 ]);
 
 export type StepStatus = z.infer<typeof StepStatusSchema>;
@@ -82,6 +85,7 @@ export const SubmissionSchema = z.object({
   id: z.string().optional(),
   project_id: z.string().optional(),
   workflow_type: z.string().optional(),
+  backend_status: WorkflowSubmissionBackendStatusSchema.optional(),
   step_name: z.string(),
   step_order: z.number(),
   submission_round: z.number(),

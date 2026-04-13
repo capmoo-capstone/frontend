@@ -23,7 +23,7 @@ export default function MyToDoDashboard() {
       </div>
 
       {/* Middle Section: Stats */}
-      <ProjectStats variant="summary" />
+      <ProjectStats />
 
       {/* Bottom Section: Jobs Table */}
       <MyTasksTable user={user ?? undefined} />

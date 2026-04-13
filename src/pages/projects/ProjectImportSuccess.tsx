@@ -3,23 +3,22 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { FileCheck } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
-import { useAuth } from '@/context/AuthContext';
 import type { ImportMode } from '@/features/project-import';
-import { hasImportOptionsPermission } from '@/lib/permissions';
+import { useProjectImportPermissions } from '@/features/project-import/hooks/useProjectImportPermissions';
 
 export default function ProjectImportSuccess() {
   const navigate = useNavigate();
   const searchParams = useSearchParams()[0];
-  const { user } = useAuth();
+  const { canImportOptions } = useProjectImportPermissions();
 
   const modeParam = searchParams.get('mode') as ImportMode | null;
   const mode: ImportMode = modeParam ?? 'manual';
 
   const handleCreateMore = () => {
-    if (user && hasImportOptionsPermission(user)) {
-      navigate('/app/projects/import');
+    if (canImportOptions) {
+      navigate('/app/project-import');
     } else {
-      navigate('/app/projects/import?mode=manual');
+      navigate('/app/project-import?mode=manual');
     }
   };
 

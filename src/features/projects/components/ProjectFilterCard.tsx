@@ -12,13 +12,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { useAuth } from '@/context/AuthContext';
-import { useDepartments } from '@/features/organization';
+import { useUnitsList } from '@/features/organization';
+import { SUPPLY_OPERATION_DEPARTMENT_ID } from '@/features/settings/constants';
 import { useUsersForSelection } from '@/features/users';
 import { getResponsibleTypeFormat } from '@/lib/formatters';
 
 import { type ProjectFilterParams } from '../api';
-import type { ProcurementType, ProjectStatus, ProjectUrgentStatus } from '../types';
+import { useProjectPermissions } from '../hooks/useProjectPermissions';
+import { ProcurementTypeEnum, ProjectStatusEnum, ProjectUrgentStatusEnum } from '../types/index';
 import { FilterCheckbox } from './FilterCheckbox';
 import { SearchCheckbox } from './SearchCheckbox';
 
@@ -28,7 +29,7 @@ interface ProjectFilterCardProps {
 }
 
 export function ProjectFilterCard({ filters, setFilters }: ProjectFilterCardProps) {
-  const { user } = useAuth();
+  const { isProcurementStaff } = useProjectPermissions();
 
   const handleToggleFilter = (key: keyof ProjectFilterParams, value: string) => {
     setFilters((prev) => {
@@ -40,16 +41,12 @@ export function ProjectFilterCard({ filters, setFilters }: ProjectFilterCardProp
     });
   };
 
-  const procurementTypes: ProcurementType[] = [
-    'LT100K',
-    'LT500K',
-    'MT500K',
-    'SELECTION',
-    'EBIDDING',
-  ];
+  const procurementTypes = ProcurementTypeEnum.options;
+  const projectStatuses = ProjectStatusEnum.options;
+  const urgentStatuses = ProjectUrgentStatusEnum.options;
 
-  const departments = useDepartments();
-  const { data: users } = useUsersForSelection({ deptId: 'procurement' });
+  const { data: units } = useUnitsList();
+  const { data: users } = useUsersForSelection({ deptId: SUPPLY_OPERATION_DEPARTMENT_ID });
   const generalStaff = useMemo(() => {
     if (!users?.data) return [];
 
@@ -123,7 +120,7 @@ export function ProjectFilterCard({ filters, setFilters }: ProjectFilterCardProp
 
       <div className="grid grid-cols-4 gap-4">
         <div className="flex flex-col gap-0.5">
-          <span className="normal-b">ประเภทงาน</span>
+          <span className="normal-b">วิธีการจัดหา</span>
           {procurementTypes.map((type) => {
             const format = getResponsibleTypeFormat(type);
 
@@ -141,48 +138,55 @@ export function ProjectFilterCard({ filters, setFilters }: ProjectFilterCardProp
 
         <div className="flex flex-col gap-0.5">
           <span className="normal-b">สถานะ</span>
-          {[
-            { id: 'UNASSIGNED', label: 'ยังไม่ได้มอบหมาย' },
-            { id: 'WAITING_ACCEPT', label: 'รอการตอบรับ' },
-            { id: 'IN_PROGRESS', label: 'กำลังดำเนินการ' },
-            { id: 'CLOSED', label: 'เสร็จสิ้น' },
-            { id: 'CANCELLED', label: 'ยกเลิก' },
-          ].map((item) => (
+          {projectStatuses.map((status) => (
             <FilterCheckbox
-              key={item.id}
-              id={item.id as ProjectStatus}
-              label={item.label}
-              checked={filters.status?.includes(item.id as ProjectStatus)}
-              onCheckedChange={() => handleToggleFilter('status', item.id)}
+              key={status}
+              id={status}
+              label={
+                {
+                  UNASSIGNED: 'ยังไม่ได้มอบหมาย',
+                  WAITING_ACCEPT: 'รอการตอบรับ',
+                  IN_PROGRESS: 'กำลังดำเนินการ',
+                  WAITING_CANCEL: 'รอยกเลิก',
+                  REQUEST_EDIT: 'ขอแก้ไข',
+                  CLOSED: 'เสร็จสิ้น',
+                  CANCELLED: 'ยกเลิก',
+                }[status]
+              }
+              checked={filters.status?.includes(status)}
+              onCheckedChange={() => handleToggleFilter('status', status)}
             />
           ))}
         </div>
 
         <div className="flex flex-col gap-0.5">
           <span className="normal-b">ความเร่งด่วน</span>
-          {[
-            { id: 'NORMAL', label: 'ปกติ' },
-            { id: 'URGENT', label: 'ด่วน' },
-            { id: 'VERY_URGENT', label: 'ด่วนพิเศษ' },
-          ].map((item) => (
+          {urgentStatuses.map((status) => (
             <FilterCheckbox
-              key={item.id}
-              id={item.id as ProjectUrgentStatus}
-              label={item.label}
-              checked={filters.urgentStatus?.includes(item.id as ProjectUrgentStatus)}
-              onCheckedChange={() => handleToggleFilter('urgentStatus', item.id)}
+              key={status}
+              id={status}
+              label={
+                {
+                  NORMAL: 'ปกติ',
+                  URGENT: 'ด่วน',
+                  VERY_URGENT: 'ด่วนที่สุด',
+                  SUPER_URGENT: 'ด่วนพิเศษ',
+                }[status]
+              }
+              checked={filters.urgentStatus?.includes(status)}
+              onCheckedChange={() => handleToggleFilter('urgentStatus', status)}
             />
           ))}
         </div>
 
-        {user?.department?.name === 'procurement' && (
+        {isProcurementStaff && (
           <div className="flex flex-col gap-0.5">
             <span className="normal-b">หน่วยงาน</span>
             <SearchCheckbox
-              items={departments.data ?? []}
+              items={units?.data ?? []}
               placeholder="ค้นหาหน่วยงาน"
-              value={filters.departments}
-              onChange={(val) => setFilters((p) => ({ ...p, departments: val }))}
+              value={filters.units}
+              onChange={(val) => setFilters((p) => ({ ...p, units: val }))}
             />
           </div>
         )}

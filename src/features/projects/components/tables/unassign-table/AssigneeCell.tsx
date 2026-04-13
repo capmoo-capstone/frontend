@@ -69,6 +69,7 @@ export function AssigneeCell({
       onReset={handleReset}
       className="h-8 w-48 flex-1 text-sm"
       hasClearButton={true}
+      excludeHeadOfUnit
     />
   );
 }

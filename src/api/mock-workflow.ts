@@ -8,7 +8,7 @@ const getWorkflow = (type: string) => ProcurementWorkflows.find((w) => w.type ==
 
 // Shared metadata for cleaner code
 const COMMON_META = {
-  is_urgent: false,
+  is_urgent: 'NORMAL' as const,
   description: 'รายละเอียดโครงการตัวอย่างสำหรับการทดสอบระบบจัดซื้อจัดจ้าง',
   created_at: '2026-02-01T08:00:00Z',
   updated_at: '2026-02-03T10:00:00Z',

@@ -13,33 +13,29 @@ import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
 import { TitleBar } from '@/components/ui/title-bar';
-import { useAuth } from '@/context/AuthContext';
-import { ManageUnitRoles, SupervisorRoles } from '@/lib/permissions';
 
-import {
-  useAssignProjects,
-  useCancelProject,
-  useClaimProject,
-  useUnassignedProjects,
-} from '../../../hooks/useProjects';
-import { type UnassignedProjectItem } from '../../../types';
+import { useAssignProjects, useClaimProject } from '../../../hooks/useProjectMutations';
+import { useProjectPermissions } from '../../../hooks/useProjectPermissions';
+import { useUnassignedProjects } from '../../../hooks/useProjectQueries';
+import { type UnassignedProjectItem } from '../../../types/index';
 import { CancelProjectDialog } from '../../dialogs/CancelProjectDialog';
 import { ProjectDataTable } from '../DataTable';
-import { WorkloadChart } from './WorkloadChart';
 import { getColumns } from './columns';
 
-export function UnassignTable({ unitId }: { unitId?: string }) {
-  const { user } = useAuth();
-  const viewAsRole = user?.role ?? 'GUEST';
+interface UnassignTableProps {
+  unitId?: string;
+  pendingChanges: Record<string, string>;
+  setPendingChanges: React.Dispatch<React.SetStateAction<Record<string, string>>>;
+}
+
+export function UnassignTable({ unitId, pendingChanges, setPendingChanges }: UnassignTableProps) {
+  const { canAssignProjects, canClaimProjects, canCancelProjects } = useProjectPermissions(unitId);
 
   const { data: projects, isLoading, isError } = useUnassignedProjects(unitId);
   const { mutateAsync: assignProjectsMutation } = useAssignProjects();
-  const { mutateAsync: cancelProjectMutation } = useCancelProject();
   const { mutateAsync: claimProjectMutation } = useClaimProject();
 
   const [projectToCancel, setProjectToCancel] = useState<UnassignedProjectItem | null>(null);
-
-  const [pendingChanges, setPendingChanges] = useState<Record<string, string>>({});
   const [sorting, setSorting] = useState<SortingState>([]);
 
   const handleClaimProject = useCallback(
@@ -63,9 +59,18 @@ export function UnassignTable({ unitId }: { unitId?: string }) {
         unitId,
         onOpenCancelDialog: (project) => setProjectToCancel(project),
         onClaimProject: (project) => handleClaimProject(project),
-        viewAsRole,
+        canAssignProjects,
+        canClaimProjects,
+        canCancelProjects,
       }),
-    [pendingChanges, unitId, viewAsRole, handleClaimProject]
+    [
+      pendingChanges,
+      unitId,
+      canClaimProjects,
+      canAssignProjects,
+      canCancelProjects,
+      handleClaimProject,
+    ]
   );
 
   const table = useReactTable({
@@ -76,29 +81,6 @@ export function UnassignTable({ unitId }: { unitId?: string }) {
     getSortedRowModel: getSortedRowModel(),
     state: { sorting },
   });
-
-  const handleConfirmCancel = async (reason: string) => {
-    if (!projectToCancel) return;
-
-    const cancelPromise = cancelProjectMutation({
-      projectId: projectToCancel.id,
-      reason,
-    });
-
-    const actionLabel =
-      ManageUnitRoles.includes(viewAsRole) || SupervisorRoles.includes(viewAsRole)
-        ? 'ยกเลิก'
-        : 'ขอยกเลิก';
-
-    toast.promise(cancelPromise, {
-      loading: `กำลัง${actionLabel}โครงการ...`,
-      success: () => {
-        setProjectToCancel(null);
-        return `${actionLabel}โครงการเรียบร้อยแล้ว`;
-      },
-      error: 'ไม่สามารถยกเลิกโครงการได้',
-    });
-  };
 
   const handleSave = async () => {
     if (Object.keys(pendingChanges).length === 0) return;
@@ -138,14 +120,15 @@ export function UnassignTable({ unitId }: { unitId?: string }) {
 
   return (
     <>
-      {ManageUnitRoles.includes(viewAsRole) && <WorkloadChart pendingChanges={pendingChanges} />}
       <ProjectDataTable
         table={table}
         columnsLength={columns.length}
+        hasPagination={false}
+        emptyStateText="ตอนนี้ได้มอบหมายงานทุกงานแล้ว"
         toolbar={
           <div className="flex w-full items-center justify-between space-x-4">
             <TitleBar title="งานที่ยังไม่ได้มอบหมาย" />
-            {ManageUnitRoles.includes(viewAsRole) && (
+            {canAssignProjects && (
               <Button
                 variant="brand"
                 onClick={handleSave}
@@ -159,13 +142,13 @@ export function UnassignTable({ unitId }: { unitId?: string }) {
           </div>
         }
       />
-      <CancelProjectDialog
-        isOpen={!!projectToCancel}
-        onClose={() => setProjectToCancel(null)}
-        onConfirm={handleConfirmCancel}
-        projectTitle={projectToCancel?.title}
-        isAuthorized={ManageUnitRoles.includes(viewAsRole) || SupervisorRoles.includes(viewAsRole)}
-      />
+      {projectToCancel && (
+        <CancelProjectDialog
+          isOpen={!!projectToCancel}
+          onClose={() => setProjectToCancel(null)}
+          project={projectToCancel as any}
+        />
+      )}
     </>
   );
 }

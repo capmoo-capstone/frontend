@@ -1,94 +1,118 @@
-import { AlertTriangle, Inbox } from 'lucide-react';
+import { AlertTriangle, Inbox, Loader2 } from 'lucide-react';
 
 import { Card } from '@/components/ui/card';
 import { StatusCard } from '@/components/ui/status-card';
 
-type ProjectStatsVariant = 'all' | 'summary' | 'minimal';
+import { useProjectSummary } from '../hooks/useProjectQueries';
 
-interface ProjectStatsProps {
-  variant?: ProjectStatsVariant;
-}
+export function ProjectStats() {
+  const { data, isLoading, isError } = useProjectSummary();
 
-export function ProjectStats({ variant = 'all' }: ProjectStatsProps) {
-  if (variant === 'minimal') {
+  if (isLoading) {
     return (
       <Card className="py-6">
-        <div className="grid grid-cols-2 items-center md:grid-cols-3">
-          <div className="border-r">
-            <StatusCard
-              label="กำลังดำเนินการ"
-              count={320}
-              icon={<Inbox />}
-              iconColor="text-warning"
-            />
-          </div>
-
-          <div className="md:border-r">
-            <StatusCard label="เสร็จสิ้น" count={2800} icon={<Inbox />} iconColor="text-success" />
-          </div>
-
-          <div>
-            <StatusCard label="ด่วน" count={12} icon={<AlertTriangle />} iconColor="text-error" />
-          </div>
+        <div className="flex h-24 items-center justify-center">
+          <Loader2 className="text-muted-foreground h-6 w-6 animate-spin" />
         </div>
       </Card>
     );
   }
 
-  if (variant === 'summary') {
+  if (isError || !data) {
     return (
       <Card className="py-6">
-        <div className="grid grid-cols-2 items-center md:grid-cols-3 xl:grid-cols-5">
+        <div className="text-destructive flex h-24 items-center justify-center gap-2">
+          <AlertTriangle className="h-5 w-5" />
+          <span>เกิดข้อผิดพลาดในการโหลดสถิติโครงการ</span>
+        </div>
+      </Card>
+    );
+  }
+
+  const total = data.total;
+  const inProgress = data.IN_PROGRESS;
+  const closed = data.CLOSED;
+  const cancelled = data.CANCELLED;
+  const urgent = data.URGENT;
+  const isExternal = data.role === 'EXTERNAL';
+
+  if (isExternal) {
+    const notStarted = data.NOT_STARTED;
+
+    return (
+      <Card className="py-6">
+        <div className="grid grid-cols-2 items-center md:grid-cols-3 xl:grid-cols-6">
           <div className="border-r border-b md:border-b xl:border-b-0">
-            <StatusCard
-              label="โครงการทั้งหมด"
-              count={3156}
-              icon={<Inbox />}
-              iconColor="text-primary"
-            />
+            <StatusCard label="ทั้งหมด" count={total} icon={<Inbox />} iconColor="text-primary" />
           </div>
 
           <div className="border-b md:border-r md:border-b xl:border-b-0">
             <StatusCard
+              label="ยังไม่เริ่ม"
+              count={notStarted}
+              icon={<Inbox />}
+              iconColor="text-primary/70"
+            />
+          </div>
+
+          <div className="border-r border-b md:border-b xl:border-b-0">
+            <StatusCard
               label="กำลังดำเนินการ"
-              count={320}
+              count={inProgress}
               icon={<Inbox />}
               iconColor="text-warning"
             />
           </div>
 
-          <div className="border-r border-b md:border-b xl:border-b-0">
-            <StatusCard label="เสร็จสิ้น" count={2800} icon={<Inbox />} iconColor="text-success" />
-          </div>
-
           <div className="border-b md:border-r xl:border-b-0">
-            <StatusCard label="ยกเลิก" count={32} icon={<Inbox />} iconColor="text-error" />
+            <StatusCard
+              label="ปิดโครงการ"
+              count={closed}
+              icon={<Inbox />}
+              iconColor="text-success"
+            />
           </div>
 
-          <div>
-            <StatusCard label="ด่วน" count={12} icon={<AlertTriangle />} iconColor="text-error" />
+          <div className="border-r">
+            <StatusCard label="ยกเลิก" count={cancelled} icon={<Inbox />} iconColor="text-error" />
+          </div>
+
+          <div className="md:border-r xl:border-r-0">
+            <StatusCard
+              label="ด่วน"
+              count={urgent}
+              icon={<AlertTriangle />}
+              iconColor="text-error"
+            />
           </div>
         </div>
       </Card>
     );
   }
+
+  const unassigned = data.UNASSIGNED;
+  const waitingAccept = data.WAITING_ACCEPT;
 
   return (
     <Card className="py-6">
       <div className="grid grid-cols-2 items-center md:grid-cols-4 xl:grid-cols-7">
         <div className="border-r">
-          <StatusCard
-            label="โครงการทั้งหมด"
-            count={3156}
-            icon={<Inbox />}
-            iconColor="text-primary"
-          />
+          <StatusCard label="ทั้งหมด" count={total} icon={<Inbox />} iconColor="text-primary" />
         </div>
 
         <div className="md:border-r">
           <StatusCard
-            label="ยังไม่ได้มอบหมาย"
-            count={4}
+            label="ยังไม่มอบหมาย"
+            count={unassigned}
+            icon={<Inbox />}
+            iconColor="text-primary/70"
+          />
+        </div>
+
+        <div className="border-r">
+          <StatusCard
+            label="รอการตอบรับ"
+            count={waitingAccept}
             icon={<Inbox />}
             iconColor="text-primary/70"
           />
@@ -97,30 +121,22 @@ export function ProjectStats({ variant = 'all' }: ProjectStatsProps) {
         <div className="border-r">
           <StatusCard
             label="กำลังดำเนินการ"
-            count={320}
+            count={inProgress}
             icon={<Inbox />}
             iconColor="text-warning"
           />
         </div>
 
         <div className="md:border-r">
-          <StatusCard label="เสร็จสิ้น" count={2800} icon={<Inbox />} iconColor="text-success" />
+          <StatusCard label="ปิดโครงการ" count={closed} icon={<Inbox />} iconColor="text-success" />
         </div>
 
         <div className="border-r">
-          <StatusCard label="ยกเลิก" count={32} icon={<Inbox />} iconColor="text-error" />
+          <StatusCard label="ยกเลิก" count={cancelled} icon={<Inbox />} iconColor="text-error" />
         </div>
 
-        <div className="md:border-r">
-          <StatusCard label="ด่วน" count={12} icon={<AlertTriangle />} iconColor="text-error" />
-        </div>
-        <div>
-          <StatusCard
-            label="ด่วนพิเศษ"
-            count={12}
-            icon={<AlertTriangle />}
-            iconColor="text-error-dark"
-          />
+        <div className="md:border-r xl:border-r-0">
+          <StatusCard label="ด่วน" count={urgent} icon={<AlertTriangle />} iconColor="text-error" />
         </div>
       </div>
     </Card>

@@ -2,8 +2,179 @@ import { format } from 'date-fns';
 import { th } from 'date-fns/locale';
 import { Clock, FileCheck, UserCheck, UserCog } from 'lucide-react';
 
-import { type UnitResponsibleType } from '@/features/projects';
+import type { Role as UserRole } from '@/features/auth';
+import {
+  type ProjectStatus,
+  type ProjectStatusByType,
+  type UnitResponsibleType,
+} from '@/features/projects';
 import type { Project, StepStatus } from '@/features/projects';
+
+export type StatusVariant = 'warning' | 'info' | 'destructive' | 'secondary' | 'success';
+
+export interface StatusFormat {
+  label: string;
+  variant: StatusVariant;
+}
+
+export interface ProjectStatusesResult {
+  procurement: StatusFormat;
+  contract: StatusFormat;
+}
+
+interface FormatParams {
+  overallStatus: ProjectStatus;
+  currentWorkflowType: UnitResponsibleType;
+  procurementStatus?: ProjectStatusByType | null;
+  procurementStep?: number | null;
+  contractStatus?: ProjectStatusByType | null;
+  contractStep?: number | null;
+  isProcurementStaff: boolean;
+  role?: UserRole;
+}
+
+const getPhaseLabel = (status: ProjectStatusByType, step?: number | null) => {
+  switch (status) {
+    case 'IN_PROGRESS':
+      return step != null ? `ขั้นตอนที่ ${step}` : 'กำลังดำเนินการ';
+    case 'WAITING_APPROVAL':
+      return step != null ? `รออนุมัติขั้นตอนที่ ${step}` : 'รออนุมัติ';
+    case 'WAITING_PROPOSAL':
+      return step != null ? `รอจัดทำแบบเสนอขั้นตอนที่ ${step}` : 'รอจัดทำแบบเสนอ';
+    case 'WAITING_SIGNATURE':
+      return step != null ? `เสนอลงนามขั้นตอนที่ ${step}` : 'เสนอลงนาม';
+    case 'REJECTED':
+      return step != null ? `แก้ไขขั้นตอนที่ ${step}` : 'ยกเลิก';
+    case 'NOT_EXPORT':
+      return 'รอส่งเบิกการเงิน';
+    case 'COMPLETED':
+      return 'เสร็จสิ้น';
+    default:
+      return status;
+  }
+};
+
+const getPhaseFormat = (
+  phaseType: 'PROCUREMENT' | 'CONTRACT',
+  status: ProjectStatusByType | null | undefined,
+  step: number | null | undefined,
+  overallStatus: ProjectStatus,
+  currentWorkflowType: UnitResponsibleType,
+  isProcurementStaff: boolean,
+  role?: UserRole
+): StatusFormat => {
+  if (!status) return { label: '-', variant: 'secondary' };
+
+  const isContractPhase = phaseType === 'CONTRACT';
+  const isContractWorkflow = currentWorkflowType === 'CONTRACT';
+
+  // Logic for External (Non-Staff)
+  if (!isProcurementStaff) {
+    if (overallStatus === 'CLOSED') return { label: 'ปิดโครงการ', variant: 'success' };
+    if (overallStatus === 'CANCELLED') return { label: 'ยกเลิก', variant: 'destructive' };
+    if (status === 'NOT_STARTED') return { label: 'ยังไม่เริ่ม', variant: 'secondary' };
+    if (status === 'COMPLETED') {
+      return isContractPhase
+        ? { label: 'กำลังดำเนินการ', variant: 'warning' }
+        : { label: 'เสร็จสิ้น', variant: 'success' };
+    }
+    return { label: 'กำลังดำเนินการ', variant: 'warning' };
+  }
+
+  // Logic for Staff Roles
+  if (overallStatus === 'CLOSED') return { label: 'ปิดโครงการ', variant: 'success' };
+  if (overallStatus === 'CANCELLED') return { label: 'ยกเลิก', variant: 'destructive' };
+
+  if (overallStatus === 'WAITING_CANCEL') {
+    const isHead = role === 'HEAD_OF_UNIT' || role === 'HEAD_OF_DEPARTMENT';
+    return { label: 'รออนุมัติยกเลิก', variant: isHead ? 'warning' : 'info' };
+  }
+
+  if (overallStatus === 'UNASSIGNED' && status === 'NOT_STARTED') {
+    const isActivePhase =
+      (phaseType === 'PROCUREMENT' && !isContractWorkflow) ||
+      (isContractPhase && isContractWorkflow);
+    if (isActivePhase) return { label: 'ยังไม่ได้มอบหมาย', variant: 'secondary' };
+  }
+
+  if (overallStatus === 'WAITING_ACCEPT') {
+    const isActivePhase =
+      (phaseType === 'PROCUREMENT' && !isContractWorkflow) ||
+      (isContractPhase && isContractWorkflow);
+    if (isActivePhase) {
+      return { label: 'รอการตอบรับ', variant: role === 'GENERAL_STAFF' ? 'warning' : 'info' };
+    }
+  }
+
+  if (overallStatus === 'REQUEST_EDIT' && isContractPhase) {
+    return {
+      label: 'การเงินส่งคืนแก้ไข',
+      variant: role === 'GENERAL_STAFF' || role === 'FINANCE_STAFF' ? 'destructive' : 'info',
+    };
+  }
+
+  // Normal States Logic
+  if (status === 'NOT_STARTED') return { label: 'ยังไม่ได้มอบหมาย', variant: 'secondary' };
+
+  if (status === 'COMPLETED') {
+    if (!isContractPhase) return { label: 'เสร็จสิ้น', variant: 'success' };
+    return { label: 'ส่งเบิกการเงินแล้ว', variant: role === 'FINANCE_STAFF' ? 'warning' : 'info' };
+  }
+
+  if (status === 'NOT_EXPORT' && isContractPhase) {
+    return { label: 'รอส่งเบิกการเงิน', variant: role === 'FINANCE_STAFF' ? 'warning' : 'info' };
+  }
+
+  const label = getPhaseLabel(status, step);
+
+  switch (status) {
+    case 'IN_PROGRESS':
+      return { label, variant: role === 'GENERAL_STAFF' ? 'warning' : 'info' };
+    case 'WAITING_APPROVAL':
+      return { label, variant: role === 'HEAD_OF_UNIT' ? 'warning' : 'info' };
+    case 'WAITING_PROPOSAL':
+    case 'WAITING_SIGNATURE':
+      return { label, variant: role === 'DOCUMENT_STAFF' ? 'warning' : 'info' };
+    case 'REJECTED':
+      return { label, variant: role === 'GENERAL_STAFF' ? 'destructive' : 'info' };
+    default:
+      return { label, variant: 'secondary' };
+  }
+};
+
+export const getProjectStatusesFormat = ({
+  overallStatus,
+  procurementStatus,
+  procurementStep,
+  contractStatus,
+  contractStep,
+  currentWorkflowType,
+  isProcurementStaff,
+  role,
+}: FormatParams): ProjectStatusesResult => {
+  const resolvedRole = role ?? undefined;
+
+  return {
+    procurement: getPhaseFormat(
+      'PROCUREMENT',
+      procurementStatus,
+      procurementStep,
+      overallStatus,
+      currentWorkflowType,
+      isProcurementStaff,
+      resolvedRole
+    ),
+    contract: getPhaseFormat(
+      'CONTRACT',
+      contractStatus,
+      contractStep,
+      overallStatus,
+      currentWorkflowType,
+      isProcurementStaff,
+      resolvedRole
+    ),
+  };
+};
 
 // ==================== PROJECT HELPERS ====================
 
@@ -22,9 +193,6 @@ export const getResponsiblePerson = (project: Project): string => {
   if (project.assignee_contract && project.assignee_contract.length > 0) {
     const assignee = project.assignee_contract[0];
     return `${assignee.full_name}`;
-  }
-  if (project.creator) {
-    return `${project.creator.full_name}`;
   }
   return 'ไม่ระบุ';
 };
@@ -204,7 +372,7 @@ export const getProjectStatusFormat = (
   userDepartmentName: string | undefined,
   procure_status?: string
 ) => {
-  let variant: 'secondary' | 'destructive' | 'warning' | 'success' | 'ghost' = 'secondary';
+  let variant: 'secondary' | 'destructive' | 'warning' | 'success' | 'ghost' | 'info' = 'secondary';
   let label: string;
 
   if (userDepartmentName !== 'procurement') {

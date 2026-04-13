@@ -11,7 +11,7 @@ import { z } from 'zod';
 import { CustomContentDialog } from '@/components/shared-dialog';
 import { UserSelect } from '@/features/users';
 
-import { useChangeProjectAssignee } from '../../hooks/useProjects';
+import { useChangeProjectAssignee } from '../../hooks/useProjectMutations';
 
 const ChangeAssigneeFormSchema = z.object({
   userId: z.string().min(1, 'กรุณาเลือกผู้รับผิดชอบ'),
@@ -108,6 +108,7 @@ export function ChangeAssigneeDialog({
             className="w-full"
             placeholder="เลือกเจ้าหน้าที่..."
             hasClearButton={false}
+            excludeHeadOfUnit
           />
         )}
       />

@@ -14,29 +14,24 @@ import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { DatePicker } from '@/components/ui/date-picker';
 import { TitleBar } from '@/components/ui/title-bar';
-import { useAuth } from '@/context/AuthContext';
-import { ManageSelfRoles, ManageUnitRoles, SupervisorRoles } from '@/lib/permissions';
 
-import {
-  useAcceptProjects,
-  useAssignedProjects,
-  useCancelProject,
-} from '../../../hooks/useProjects';
-import type { AssignedProjectItem } from '../../../types';
+import { useAcceptProjects } from '../../../hooks/useProjectMutations';
+import { useProjectPermissions } from '../../../hooks/useProjectPermissions';
+import { useAssignedProjects } from '../../../hooks/useProjectQueries';
+import type { AssignedProjectItem } from '../../../types/index';
 import { CancelProjectDialog } from '../../dialogs/CancelProjectDialog';
 import { ChangeAssigneeDialog } from '../../dialogs/ChangeAssigneeDialog';
 import { ProjectDataTable } from '../DataTable';
 import { getColumns } from './columns';
 
 export function AssignedTable({ unitId }: { unitId?: string }) {
-  const { user } = useAuth();
-  const viewAsRole = user?.role ?? 'GUEST';
+  const { canClaimProjects, canChangeProjectAssignee, canCancelProjects } =
+    useProjectPermissions(unitId);
 
   const [date, setDate] = useState<Date | undefined>(new Date());
 
-  const { data: projects, isLoading, isError } = useAssignedProjects(unitId, date);
-  const { mutateAsync: cancelProjectMutation } = useCancelProject();
-  const { mutateAsync: acceptProjectsMutation } = useAcceptProjects();
+  const { data: projects, isLoading, isError } = useAssignedProjects(date);
+  const { mutateAsync: acceptProjectsMutation, isPending: isAccepting } = useAcceptProjects();
 
   const [sorting, setSorting] = useState<SortingState>([{ id: 'status', desc: true }]);
   const [projectToCancel, setProjectToCancel] = useState<AssignedProjectItem | null>(null);
@@ -62,9 +57,26 @@ export function AssignedTable({ unitId }: { unitId?: string }) {
         onCancelProject: (project: AssignedProjectItem) => setProjectToCancel(project),
         onChangeAssignee: (project: AssignedProjectItem) => setProjectToChangeAssignee(project),
         onAcceptProject: handleAcceptProject,
-        viewAsRole,
+        isAcceptPending: isAccepting,
+        canClaimProjects,
+        canChangeProjectAssignee,
+        canCancelProjects,
       }),
-    [viewAsRole, handleAcceptProject]
+    [
+      handleAcceptProject,
+      isAccepting,
+      canClaimProjects,
+      canChangeProjectAssignee,
+      canCancelProjects,
+    ]
+  );
+
+  const waitingProjectIds = useMemo(
+    () =>
+      (projects ?? [])
+        .filter((project) => project.status === 'WAITING_ACCEPT')
+        .map((project) => project.id),
+    [projects]
   );
 
   const table = useReactTable({
@@ -76,41 +88,28 @@ export function AssignedTable({ unitId }: { unitId?: string }) {
     state: { sorting },
   });
 
-  const handleConfirmCancel = async (reason: string) => {
-    if (!projectToCancel) return;
-
-    const cancelPromise = cancelProjectMutation({
-      projectId: projectToCancel.id,
-      reason,
-    });
-
-    const actionLabel =
-      ManageUnitRoles.includes(viewAsRole) || SupervisorRoles.includes(viewAsRole)
-        ? 'ยกเลิก'
-        : 'ขอยกเลิก';
-
-    toast.promise(cancelPromise, {
-      loading: `กำลัง${actionLabel}โครงการ...`,
-      success: () => {
-        setProjectToCancel(null);
-        return `${actionLabel}โครงการเรียบร้อยแล้ว`;
-      },
-      error: 'ไม่สามารถยกเลิกโครงการได้',
-    });
-  };
-
   const handlePrint = async () => {
     toast.info('สมมตว่ากำลังส่งออกรายงาน...');
   };
 
   const handleAcceptAll = async () => {
-    if (!projects || projects.length === 0) return;
-
-    const waitingProjects = projects.filter((p) => p.status === 'WAITING_ACCEPT').map((p) => p.id);
-
-    if (waitingProjects.length === 0) {
+    if (waitingProjectIds.length === 0) {
       toast.info('ไม่มีโครงการที่ต้องรับทราบ');
       return;
+    }
+
+    const acceptAllPromise = acceptProjectsMutation(waitingProjectIds);
+
+    toast.promise(acceptAllPromise, {
+      loading: `กำลังรับทราบโครงการ ${waitingProjectIds.length} รายการ...`,
+      success: 'รับทราบโครงการทั้งหมดสำเร็จ',
+      error: 'ไม่สามารถรับทราบโครงการทั้งหมดได้',
+    });
+
+    try {
+      await acceptAllPromise;
+    } catch (error) {
+      console.error(error);
     }
   };
 
@@ -136,33 +135,41 @@ export function AssignedTable({ unitId }: { unitId?: string }) {
       <ProjectDataTable
         table={table}
         columnsLength={columns.length}
+        hasPagination={false}
+        emptyStateText="ไม่มีงานที่ถูกมอบหมายแล้วในช่วงวันที่ที่เลือก"
         toolbar={
           <div className="flex w-full items-center justify-between space-x-4">
             <TitleBar title="งานที่ถูกมอบหมายแล้ว" variant="grey" />
             <div className="flex items-center gap-2">
-              <DatePicker date={date} setDate={setDate} />
-              {ManageSelfRoles.includes(viewAsRole) ? (
-                <Button variant="outline" onClick={handleAcceptAll} disabled={false}>
+              {canClaimProjects ? (
+                <Button
+                  variant="outline"
+                  onClick={handleAcceptAll}
+                  disabled={waitingProjectIds.length === 0 || isAccepting}
+                >
                   รับทราบทั้งหมด
                 </Button>
               ) : (
-                <Button variant="outline" onClick={handlePrint} disabled={false}>
-                  <Upload className="mr-2 h-4 w-4" />
-                  ส่งออกรายงาน
-                </Button>
+                <>
+                  <DatePicker date={date} setDate={setDate} />
+                  <Button variant="outline" onClick={handlePrint} disabled={false}>
+                    <Upload className="mr-2 h-4 w-4" />
+                    ส่งออกรายงาน
+                  </Button>
+                </>
               )}
             </div>
           </div>
         }
       />
 
-      <CancelProjectDialog
-        isOpen={!!projectToCancel}
-        onClose={() => setProjectToCancel(null)}
-        onConfirm={handleConfirmCancel}
-        projectTitle={projectToCancel?.title}
-        isAuthorized={ManageUnitRoles.includes(viewAsRole) || SupervisorRoles.includes(viewAsRole)}
-      />
+      {projectToCancel && (
+        <CancelProjectDialog
+          isOpen={!!projectToCancel}
+          onClose={() => setProjectToCancel(null)}
+          project={projectToCancel}
+        />
+      )}
 
       {projectToChangeAssignee && (
         <ChangeAssigneeDialog

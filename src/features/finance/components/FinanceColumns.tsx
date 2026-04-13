@@ -181,7 +181,7 @@ export const getFinanceColumns = (
         className="flex cursor-pointer items-center"
         onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
       >
-        ประเภทงาน
+        วิธีการจัดหา
         <ArrowUpDown
           className={cn(
             'ml-2 h-4 w-4',

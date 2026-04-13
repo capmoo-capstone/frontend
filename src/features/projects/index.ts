@@ -31,18 +31,34 @@ export {
 
 // Hooks
 export { useProjectFilters } from './hooks/useProjectFilters';
+export { projectKeys } from './hooks/queryKeys';
+export {
+  useAssignedProjects,
+  useOwnProjects,
+  useProjectDetail,
+  useProjectSummary,
+  useProjects,
+  useUnassignedProjects,
+  useWorkloadStats,
+  type OwnProjectQueryParams,
+  type ProjectFilterParams,
+} from './hooks/useProjectQueries';
 export {
   useAcceptProjects,
-  useAssignedProjects,
+  useAddProjectAssignee,
+  useApproveProjectCancellation,
   useAssignProjects,
   useCancelProject,
   useChangeProjectAssignee,
   useClaimProject,
-  useProjectDetail,
-  useProjects,
+  useCloseProject,
+  useCompleteProjectProcurement,
+  useDeleteProject,
+  useRejectProjectCancellation,
+  useRequestProjectEdit,
+  useReturnProject,
   useUpdateProject,
-  useUnassignedProjects,
-} from './hooks/useProjects';
+} from './hooks/useProjectMutations';
 
 // Types
 export type {
@@ -53,17 +69,25 @@ export type {
   Project,
   ProjectDetail,
   ProjectStatus,
+  ProjectStatusByType,
   ProjectUrgentStatus,
+  SummaryResponse,
   StepStatus,
+  StaffWorkload,
   Submission,
   SubmissionDocument,
   UpdateProjectPayload,
   UnassignedProjectItem,
   UnitResponsibleType,
+  UnitWorkload,
+  WorkloadStatsResponse,
   WorkflowDocumentConfig,
-  WorkflowStatus,
   WorkflowStepConfig,
-} from './types';
+} from './types/index';
 
 // Schemas (for validation)
-export { AssignedProjectItemSchema, ProjectListSchema, UnassignedProjectItemSchema } from './types';
+export {
+  AssignedProjectItemSchema,
+  ProjectListSchema,
+  UnassignedProjectItemSchema,
+} from './types/index';

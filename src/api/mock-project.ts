@@ -100,7 +100,7 @@ const WORKFLOW_STEPS: WorkflowStepConfig[] = [
 
 // --- Shared User/Meta Data ---
 const COMMON_META = {
-  is_urgent: false,
+  is_urgent: 'NORMAL' as const,
   budget: 450000,
   procurement_type: 'EBIDDING' as const,
   current_template_type: 'MT500K' as const,

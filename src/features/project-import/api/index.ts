@@ -36,6 +36,6 @@ const toCreateProjectPayload = (payload: ProjectImportPayload): CreateProjectReq
 
 export const createProject = async (payload: ProjectImportPayload) => {
   const requestPayload = toCreateProjectPayload(payload);
-  const { data } = await api.post('/project/create', requestPayload);
+  const { data } = await api.post('/projects/create', requestPayload);
   return data;
 };

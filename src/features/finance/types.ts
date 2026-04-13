@@ -1,10 +1,6 @@
-import type {
-  ProcurementType,
-  ProjectStatus,
-  ProjectUrgentStatus,
-} from '@/features/projects/types';
+import type { ProcurementType, ProjectStatus, ProjectUrgentStatus } from '@/features/projects';
 
-export type FinanceExportStatus = 'NOT_EXPORTED' | 'EXPORTED' | 'CLOSED' | 'WAITING_EDIT';
+export type FinanceExportStatus = 'NOT_EXPORT' | 'EXPORTED' | 'CLOSED' | 'WAITING_EDIT';
 
 export interface FinanceExportItem {
   id: string;

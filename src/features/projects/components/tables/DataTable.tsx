@@ -1,7 +1,9 @@
 import { useNavigate } from 'react-router-dom';
 
 import { type Cell, type Table as ReactTable, type Row, flexRender } from '@tanstack/react-table';
+import { Inbox } from 'lucide-react';
 
+import { Card } from '@/components/ui/card';
 import {
   Table,
   TableBody,
@@ -18,6 +20,7 @@ interface ProjectDataTableProps<TData extends { id?: string }> {
   columnsLength: number;
   toolbar?: React.ReactNode;
   hasPagination?: boolean;
+  emptyStateText?: string;
 }
 
 export function ProjectDataTable<TData extends { id?: string }>({
@@ -25,6 +28,7 @@ export function ProjectDataTable<TData extends { id?: string }>({
   columnsLength,
   toolbar,
   hasPagination = true,
+  emptyStateText = 'No results.',
 }: ProjectDataTableProps<TData>) {
   const navigate = useNavigate();
 
@@ -67,24 +71,29 @@ export function ProjectDataTable<TData extends { id?: string }>({
         <div className="flex items-center gap-2">{toolbar}</div>
       </div>
 
-      <div className="bg-background overflow-hidden">
-        <Table>
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id}>
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(header.column.columnDef.header, header.getContext())}
-                  </TableHead>
-                ))}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
+      {table.getRowModel().rows.length === 0 ? (
+        <Card className="flex items-center justify-center gap-2">
+          <Inbox className="text-primary h-12 w-12" />
+          <p className="text-primary normal">{emptyStateText}</p>
+        </Card>
+      ) : (
+        <div className="bg-background overflow-hidden">
+          <Table>
+            <TableHeader>
+              {table.getHeaderGroups().map((headerGroup) => (
+                <TableRow key={headerGroup.id}>
+                  {headerGroup.headers.map((header) => (
+                    <TableHead key={header.id}>
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(header.column.columnDef.header, header.getContext())}
+                    </TableHead>
+                  ))}
+                </TableRow>
+              ))}
+            </TableHeader>
+            <TableBody>
+              {table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && 'selected'}
@@ -101,19 +110,13 @@ export function ProjectDataTable<TData extends { id?: string }>({
                     </TableCell>
                   ))}
                 </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell colSpan={columnsLength} className="h-24 text-center">
-                  No results.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </div>
+              ))}
+            </TableBody>
+          </Table>
 
-      {hasPagination && <DataTablePagination table={table} />}
+          {hasPagination && <DataTablePagination table={table} />}
+        </div>
+      )}
     </div>
   );
 }

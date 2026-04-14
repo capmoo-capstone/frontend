@@ -43,14 +43,13 @@ export const BudgetPlanListResponseSchema = z.object({
 export type BudgetPlanListResponse = z.infer<typeof BudgetPlanListResponseSchema>;
 
 export const ImportBudgetPlanItemSchema = z.object({
-  fiscal_year: z.string().min(1, 'กรุณากรอกปีงบประมาณ'),
-  unit_no: z.string().min(1, 'กรุณากรอกเลขศูนย์ต้นทุน'),
-  unit_id: z.string().min(1, 'กรุณาเลือกศูนย์ต้นทุน'),
-  activity_type: z.string().min(1, 'กรุณากรอกประเภทกิจกรรม'),
-  activity_type_name: z.string().min(1, 'กรุณากรอกชื่อประเภทกิจกรรม'),
-  description: z.string().min(1, 'กรุณากรอกรายละเอียด'),
-  budget_no: z.string().min(1, 'กรุณาเลือกเงินทุน'),
-  budget_name: z.string().min(1, 'กรุณาเลือกชื่อเงินทุน'),
+  fiscal_year: z.string().trim().min(1, 'กรุณากรอกปีงบประมาณ'),
+  unit_id: z.string().trim().min(1, 'กรุณาเลือกศูนย์ต้นทุน'),
+  department_id: z.string().trim().min(1, 'กรุณาเลือกหน่วยงาน'),
+  activity_type: z.string().trim().min(1, 'กรุณากรอกประเภทกิจกรรม'),
+  activity_type_name: z.string().trim().min(1, 'กรุณากรอกชื่อประเภทกิจกรรม'),
+  description: z.string().trim().min(1, 'กรุณากรอกรายละเอียด'),
+  budget_name: z.string().trim().min(1, 'กรุณาเลือกชื่อเงินทุน'),
   amount: z.number().positive('วงเงินงบประมาณต้องมากกว่า 0'),
 });
 

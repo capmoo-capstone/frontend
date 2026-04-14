@@ -4,6 +4,14 @@ import readXlsxFile from 'read-excel-file';
 
 import { type EditableImportRow, type ImportMode } from '../types';
 
+const parseExcelNumber = (value: unknown) => {
+  if (value === null || value === undefined || value === '') return 0;
+  if (typeof value === 'number') return value;
+  const cleanValue = String(value).replace(/,/g, '').trim();
+  const num = Number(cleanValue);
+  return isNaN(num) ? 0 : num;
+};
+
 export function useExcelImport(mode: ImportMode) {
   const [data, setData] = useState<EditableImportRow[]>([]);
   const [isParsing, setIsParsing] = useState(false);
@@ -27,14 +35,6 @@ export function useExcelImport(mode: ImportMode) {
         if (excelDate instanceof Date) {
           deliveryDateStr = excelDate.toISOString().split('T')[0];
         }
-
-        const parseExcelNumber = (value: any) => {
-          if (value === null || value === undefined || value === '') return 0;
-          if (typeof value === 'number') return value;
-          const cleanValue = String(value).replace(/,/g, '').trim();
-          const num = Number(cleanValue);
-          return isNaN(num) ? 0 : num;
-        };
 
         if (mode === 'budget') {
           return {

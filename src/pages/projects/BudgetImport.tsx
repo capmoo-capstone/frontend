@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { useDepartments, useUnitsList } from '@/features/organization';
@@ -9,14 +9,20 @@ export default function BudgetPlanImport() {
   const navigate = useNavigate();
 
   const { data: departments } = useDepartments();
-  const filteredDepartments = departments?.filter((dept) => dept.name !== 'Supply Operation');
+  const filteredDepartments = useMemo(
+    () => departments?.filter((dept) => dept.name !== 'Supply Operation'),
+    [departments]
+  );
 
   const { data: unitsResponse } = useUnitsList();
   const units = unitsResponse?.data;
 
   const mode = 'budget';
   const currentYear = getFiscalYear(new Date());
-  const fiscalYears = Array.from({ length: 7 }, (_, i) => (currentYear - 3 + i).toString());
+  const fiscalYears = useMemo(
+    () => Array.from({ length: 7 }, (_, i) => (currentYear - 3 + i).toString()),
+    [currentYear]
+  );
 
   const { data, setData, handleFileUpload, updateRow, deleteRow, isParsing } = useExcelImport(mode);
 
@@ -29,7 +35,7 @@ export default function BudgetPlanImport() {
   };
 
   const handleBack = () => {
-    navigate('/app/budget-import');
+    setData([]);
   };
 
   return (

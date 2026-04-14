@@ -59,13 +59,19 @@ interface EditableTableMeta {
   departments: Array<{ id: string; name: string }> | undefined;
   units: Array<{ id: string; name: string }> | undefined;
   fiscalYears: string[];
-  errors: ValidationError[];
+  errorMap: Map<string, string>;
+  departmentIdSet: Set<string>;
+  departmentNameToId: Map<string, string>;
+  unitIdSet: Set<string>;
+  unitNameToId: Map<string, string>;
 }
 
 type PendingDelete = {
   index: number;
   title: string;
 };
+
+const buildErrorKey = (rowIndex: number, field: string) => `${rowIndex}:${field}`;
 
 // Editable Cell Component
 const EditableCell = ({
@@ -91,7 +97,11 @@ const EditableCell = ({
   const departments = meta?.departments;
   const fiscalYears = meta?.fiscalYears;
   const units = meta?.units;
-  const errors = meta?.errors || [];
+  const errorMap = meta?.errorMap;
+  const departmentIdSet = meta?.departmentIdSet;
+  const departmentNameToId = meta?.departmentNameToId;
+  const unitIdSet = meta?.unitIdSet;
+  const unitNameToId = meta?.unitNameToId;
 
   const [value, setValue] = useState(
     isCurrencyField ? formatWithComma(initialValue) : initialTextValue
@@ -111,10 +121,17 @@ const EditableCell = ({
     updateData(index, id, finalValue);
   };
 
-  const cellError = errors.find(
-    (err: ValidationError) => err.rowIndex === index && err.field === id
-  );
-  const hasError = !!cellError;
+  const cellError = errorMap?.get(buildErrorKey(index, id));
+  const hasError = Boolean(cellError);
+
+  const resolveSelectValue = (
+    rawValue: string,
+    idSet: Set<string> | undefined,
+    nameToId: Map<string, string> | undefined
+  ) => {
+    const displayValue = nameToId?.get(rawValue) ?? rawValue;
+    return idSet?.has(displayValue) ? displayValue : undefined;
+  };
 
   if (id === 'procurement_type') {
     return (
@@ -136,19 +153,17 @@ const EditableCell = ({
             ))}
           </SelectContent>
         </Select>
-        {cellError && <p className="text-destructive text-xs">{cellError.message}</p>}
+        {hasError && <p className="text-destructive text-xs">{cellError}</p>}
       </div>
     );
   }
 
   if (id === 'department_id') {
-    const matchedDepartment = departments?.find((dept) => dept.name === initialTextValue);
-    const displayValue = matchedDepartment ? matchedDepartment.id : initialTextValue;
-    const isValidId = departments?.some((dept) => dept.id === displayValue);
+    const displayValue = resolveSelectValue(initialTextValue, departmentIdSet, departmentNameToId);
     return (
       <div className="flex w-full flex-col gap-1">
         <Select
-          value={isValidId ? displayValue : undefined}
+          value={displayValue}
           onValueChange={(val) => updateData && updateData(index, id, val)}
         >
           <SelectTrigger
@@ -165,7 +180,7 @@ const EditableCell = ({
               ))}
           </SelectContent>
         </Select>
-        {cellError && <p className="text-destructive text-xs">{cellError.message}</p>}
+        {hasError && <p className="text-destructive text-xs">{cellError}</p>}
       </div>
     );
   }
@@ -199,7 +214,7 @@ const EditableCell = ({
               ))}
           </SelectContent>
         </Select>
-        {cellError && <p className="text-destructive text-xs">{cellError.message}</p>}
+        {hasError && <p className="text-destructive text-xs">{cellError}</p>}
       </div>
     );
   }
@@ -220,7 +235,7 @@ const EditableCell = ({
           }}
           className={cn('bg-background h-9 w-full', hasError && 'border-destructive')}
         />
-        {cellError && <p className="text-destructive text-xs">{cellError.message}</p>}
+        {hasError && <p className="text-destructive text-xs">{cellError}</p>}
       </div>
     );
   }
@@ -235,19 +250,17 @@ const EditableCell = ({
           className={cn('min-h-10 w-full resize-y py-1.5', hasError && 'border-destructive')}
           rows={2}
         />
-        {cellError && <p className="text-destructive text-xs">{cellError.message}</p>}
+        {hasError && <p className="text-destructive text-xs">{cellError}</p>}
       </div>
     );
   }
 
   if (id === 'unit_id') {
-    const matchedUnit = units?.find((unit) => unit.name === initialTextValue);
-    const displayValue = matchedUnit ? matchedUnit.id : initialTextValue;
-    const isValidId = units?.some((unit) => unit.id === displayValue);
+    const displayValue = resolveSelectValue(initialTextValue, unitIdSet, unitNameToId);
     return (
       <div className="flex w-full flex-col gap-1">
         <Select
-          value={isValidId ? displayValue : undefined}
+          value={displayValue}
           onValueChange={(val) => updateData && updateData(index, id, val)}
         >
           <SelectTrigger
@@ -264,7 +277,7 @@ const EditableCell = ({
               ))}
           </SelectContent>
         </Select>
-        {cellError && <p className="text-destructive text-xs">{cellError.message}</p>}
+        {hasError && <p className="text-destructive text-xs">{cellError}</p>}
       </div>
     );
   }
@@ -293,7 +306,7 @@ const EditableCell = ({
             setValue(formatWithComma(numValue));
           }}
         />
-        {cellError && <p className="text-destructive text-xs">{cellError.message}</p>}
+        {hasError && <p className="text-destructive text-xs">{cellError}</p>}
       </div>
     );
   }
@@ -307,7 +320,7 @@ const EditableCell = ({
         onBlur={onBlur}
         className={cn('h-9 w-full', hasError && 'border-destructive')}
       />
-      {cellError && <p className="text-destructive text-xs">{cellError.message}</p>}
+      {cellError && <p className="text-destructive text-xs">{cellError}</p>}
     </div>
   );
 };
@@ -326,6 +339,28 @@ export function EditableImportTable({
   const [validationErrors, setValidationErrors] = useState<ValidationError[]>([]);
   const [pendingDelete, setPendingDelete] = useState<PendingDelete | null>(null);
 
+  const departmentIdSet = useMemo(
+    () => new Set((departments ?? []).map((dept) => dept.id)),
+    [departments]
+  );
+  const departmentNameToId = useMemo(
+    () => new Map((departments ?? []).map((dept) => [dept.name, dept.id])),
+    [departments]
+  );
+  const unitIdSet = useMemo(() => new Set((units ?? []).map((unit) => unit.id)), [units]);
+  const unitNameToId = useMemo(
+    () => new Map((units ?? []).map((unit) => [unit.name, unit.id])),
+    [units]
+  );
+
+  const errorMap = useMemo(() => {
+    const map = new Map<string, string>();
+    for (const err of validationErrors) {
+      map.set(buildErrorKey(err.rowIndex, err.field), err.message);
+    }
+    return map;
+  }, [validationErrors]);
+
   const handleConfirmDelete = () => {
     if (pendingDelete !== null) {
       deleteRow(pendingDelete.index);
@@ -335,6 +370,18 @@ export function EditableImportTable({
 
   const validateData = useCallback(() => {
     const errors: ValidationError[] = [];
+
+    const normalizeOptionId = (
+      value: string | undefined,
+      idSet: Set<string>,
+      nameToId: Map<string, string>
+    ) => {
+      const raw = value?.trim();
+      if (!raw) return '';
+      if (idSet.has(raw)) return raw;
+      return nameToId.get(raw) ?? '';
+    };
+
     const schema =
       mode === 'budget'
         ? ImportBudgetPlanItemSchema
@@ -348,14 +395,17 @@ export function EditableImportTable({
           ? {
               id: row._rowId,
               fiscal_year: row.fiscal_year ?? '',
-              unit_no: row.unit_no ?? '',
-              unit_id: row.unit_id ?? row.department_id ?? '',
+              unit_id: normalizeOptionId(row.unit_id, unitIdSet, unitNameToId),
+              department_id: normalizeOptionId(
+                row.department_id,
+                departmentIdSet,
+                departmentNameToId
+              ),
               activity_type: row.activity_type ?? '',
               activity_type_name: row.activity_type_name ?? '',
               description: row.description ?? '',
-              budget_no: row.budget_no ?? '',
               budget_name: row.budget_name ?? '',
-              amount: row.amount ?? '',
+              amount: Number(row.amount ?? 0),
               project_id: null,
             }
           : {
@@ -364,7 +414,7 @@ export function EditableImportTable({
               title: row.title ?? '',
               description: row.description ?? '',
               procurement_type: row.procurement_type ?? '',
-              budget: row.budget ?? '',
+              budget: Number(row.budget ?? 0),
               department_id: row.department_id ?? '',
               fiscal_year: row.fiscal_year ?? '',
               delivery_date: row.delivery_date_str ? new Date(row.delivery_date_str) : undefined,
@@ -387,7 +437,7 @@ export function EditableImportTable({
 
     setValidationErrors(errors);
     return errors.length === 0;
-  }, [data, mode]);
+  }, [data, mode, unitIdSet, unitNameToId, departmentIdSet, departmentNameToId]);
 
   useEffect(() => {
     if (data.length > 0) {
@@ -418,16 +468,6 @@ export function EditableImportTable({
               size: 140,
             },
             {
-              accessorKey: 'unit_no',
-              header: () => (
-                <>
-                  ศูนย์ต้นทุน <span className="text-destructive">*</span>
-                </>
-              ),
-              cell: EditableCell,
-              size: 140,
-            },
-            {
               accessorKey: 'unit_id',
               header: () => (
                 <>
@@ -446,16 +486,6 @@ export function EditableImportTable({
               ),
               cell: EditableCell,
               size: 220,
-            },
-            {
-              accessorKey: 'budget_no',
-              header: () => (
-                <>
-                  เงินทุน <span className="text-destructive">*</span>
-                </>
-              ),
-              cell: EditableCell,
-              size: 140,
             },
             {
               accessorKey: 'budget_name',
@@ -633,7 +663,11 @@ export function EditableImportTable({
       departments,
       units,
       fiscalYears,
-      errors: validationErrors,
+      errorMap,
+      departmentIdSet,
+      departmentNameToId,
+      unitIdSet,
+      unitNameToId,
     },
   });
 

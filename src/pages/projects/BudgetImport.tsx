@@ -9,6 +9,8 @@ export default function BudgetPlanImport() {
   const navigate = useNavigate();
 
   const { data: departments } = useDepartments();
+  const filteredDepartments = departments?.filter((dept) => dept.name !== 'Supply Operation');
+
   const { data: unitsResponse } = useUnitsList();
   const units = unitsResponse?.data;
 
@@ -23,7 +25,7 @@ export default function BudgetPlanImport() {
   }, [mode, setData]);
 
   const handleSuccess = () => {
-    navigate('/app/budget-import/success?mode=' + mode);
+    navigate('/app/budget-import/success');
   };
 
   const handleBack = () => {
@@ -62,7 +64,7 @@ export default function BudgetPlanImport() {
             deleteRow={deleteRow}
             onSubmit={handleSuccess}
             onBack={handleBack}
-            departments={departments}
+            departments={filteredDepartments}
             units={units}
             fiscalYears={fiscalYears}
             mode={mode}

@@ -28,13 +28,22 @@ export function useExcelImport(mode: ImportMode) {
           deliveryDateStr = excelDate.toISOString().split('T')[0];
         }
 
+        const parseExcelNumber = (value: any) => {
+          if (value === null || value === undefined || value === '') return 0;
+          if (typeof value === 'number') return value;
+          const cleanValue = String(value).replace(/,/g, '').trim();
+          const num = Number(cleanValue);
+          return isNaN(num) ? 0 : num;
+        };
+
         if (mode === 'budget') {
           return {
             _rowId: Math.random().toString(36).substring(7),
-            budget_year: rowObj['ปีงบประมาณ']?.toString() || new Date().getFullYear().toString(),
+            fiscal_year: rowObj['ปีงบประมาณ']?.toString() || new Date().getFullYear().toString(),
             unit_no: rowObj['ศูนย์ต้นทุน']?.toString() || '',
             unit_id: rowObj['ชื่อศูนย์ต้นทุน']?.toString() || '',
-            department_id: rowObj['หน่วยงาน']?.toString() || '',
+            department_id:
+              rowObj['หน่วยงาน']?.toString() || rowObj['สำนัก/หน่วยงาน']?.toString() || '',
             budget_no: rowObj['เงินทุน']?.toString() || '',
             budget_name: rowObj['ชื่อเงินทุน']?.toString() || '',
             activity_type: rowObj['ประเภทกิจกรรม']?.toString() || '',
@@ -43,9 +52,9 @@ export function useExcelImport(mode: ImportMode) {
               rowObj['รายละเอียด']?.toString() ||
               rowObj['คำอธิบายเพิ่มเติมประเภทกิจกรรม']?.toString() ||
               '',
-            budget_amount:
-              Number(
-                rowObj['วงเงินงบประมาณ'] ?? rowObj['วงเงินงบประมาณ (บาท)'] ?? rowObj['ราคารวม']
+            amount:
+              parseExcelNumber(
+                rowObj['ราคารวม'] ?? rowObj['วงเงินงบประมาณ'] ?? rowObj['วงเงินงบประมาณ (บาท)']
               ) || 0,
           };
         }

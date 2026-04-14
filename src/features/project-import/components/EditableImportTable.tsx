@@ -43,7 +43,7 @@ interface EditableImportTableProps {
   onBack: () => void;
   departments: Array<{ id: string; name: string }> | undefined;
   fiscalYears: string[];
-  units: Array<{ id: string; name: string }> | undefined;
+  units?: Array<{ id: string; name: string }> | undefined;
   mode: ImportMode;
 }
 
@@ -124,10 +124,13 @@ const EditableCell = ({
   }
 
   if (id === 'department_id') {
+    const matchedDepartment = departments?.find((dept) => dept.name === initialTextValue);
+    const displayValue = matchedDepartment ? matchedDepartment.id : initialTextValue;
+    const isValidId = departments?.some((dept) => dept.id === displayValue);
     return (
       <div className="flex w-full flex-col gap-1">
         <Select
-          value={initialTextValue || undefined}
+          value={isValidId ? displayValue : undefined}
           onValueChange={(val) => updateData && updateData(index, id, val)}
         >
           <SelectTrigger
@@ -150,10 +153,18 @@ const EditableCell = ({
   }
 
   if (id === 'fiscal_year') {
+    const excelYearNum = parseInt(initialTextValue);
+    const matchedYear = fiscalYears?.find((year) => {
+      const yearNum = parseInt(year);
+      return (
+        year === initialTextValue || yearNum === excelYearNum + 543 || yearNum === excelYearNum
+      );
+    });
+    const displayValue = matchedYear ? matchedYear : undefined;
     return (
       <div className="flex w-full flex-col gap-1">
         <Select
-          value={initialTextValue || undefined}
+          value={displayValue}
           onValueChange={(val) => updateData && updateData(index, id, val)}
         >
           <SelectTrigger
@@ -212,10 +223,13 @@ const EditableCell = ({
   }
 
   if (id === 'unit_id') {
+    const matchedUnit = units?.find((unit) => unit.name === initialTextValue);
+    const displayValue = matchedUnit ? matchedUnit.id : initialTextValue;
+    const isValidId = units?.some((unit) => unit.id === displayValue);
     return (
       <div className="flex w-full flex-col gap-1">
         <Select
-          value={initialTextValue || undefined}
+          value={isValidId ? displayValue : undefined}
           onValueChange={(val) => updateData && updateData(index, id, val)}
         >
           <SelectTrigger
@@ -237,7 +251,7 @@ const EditableCell = ({
     );
   }
 
-  if (id === 'amount') {
+  if (id === 'amount' || id === 'budget') {
     return (
       <div className="flex w-full flex-col gap-1">
         <Input
@@ -251,10 +265,11 @@ const EditableCell = ({
       </div>
     );
   }
+
   return (
     <div className="flex w-full flex-col gap-1">
       <Input
-        type={id === 'budget' ? 'number' : 'text'}
+        type="text"
         value={value}
         onChange={(e) => setValue(e.target.value)}
         onBlur={onBlur}
@@ -292,7 +307,7 @@ export function EditableImportTable({
         mode === 'budget'
           ? {
               id: row._rowId,
-              budget_year: row.budget_year ?? '',
+              fiscal_year: row.fiscal_year ?? '',
               unit_no: row.unit_no ?? '',
               unit_id: row.unit_id ?? row.department_id ?? '',
               activity_type: row.activity_type ?? '',
@@ -300,7 +315,7 @@ export function EditableImportTable({
               description: row.description ?? '',
               budget_no: row.budget_no ?? '',
               budget_name: row.budget_name ?? '',
-              budget_amount: row.budget_amount ?? '',
+              amount: row.amount ?? '',
               project_id: null,
             }
           : {
@@ -353,7 +368,7 @@ export function EditableImportTable({
       ...(mode === 'budget'
         ? [
             {
-              accessorKey: 'budget_year',
+              accessorKey: 'fiscal_year',
               header: () => (
                 <>
                   ปีงบประมาณ <span className="text-destructive">*</span>
@@ -443,7 +458,7 @@ export function EditableImportTable({
               size: 350,
             },
             {
-              accessorKey: 'budget_amount',
+              accessorKey: 'amount',
               header: () => (
                 <>
                   วงเงินงบประมาณ (บาท) <span className="text-destructive">*</span>

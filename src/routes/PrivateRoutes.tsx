@@ -4,8 +4,10 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import PermissionGuard from '@/components/guards/PermissionGuard';
 import { useAuth } from '@/context/AuthContext';
 import { useProjectImportPermissions } from '@/features/project-import';
+import { useBudgetImportPermissions } from '@/features/project-import/hooks/useBudgetImportPermissions';
 import AppLayout from '@/layouts/AppLayout';
 import { hasSettingsPermission } from '@/lib/permissions';
+import BudgetImportSuccess from '@/pages/projects/BudgetImportSuccess';
 
 // --- Lazy Load Pages ---
 const Home = lazy(() => import('@/pages/home/Home'));
@@ -23,7 +25,7 @@ const ProjectImport = lazy(() => import('@/pages/projects/ProjectImport'));
 const ProjectImportSuccess = lazy(() => import('@/pages/projects/ProjectImportSuccess'));
 
 // Budget Plan
-const BudgetPlanImport = lazy(() => import('@/pages/projects/BudgetPlanImport'));
+const BudgetPlanImport = lazy(() => import('@/pages/projects/BudgetImport'));
 
 // Exports
 const FinanceExportPage = lazy(() => import('@/pages/projects/FinanceExport'));
@@ -43,6 +45,7 @@ export const PrivateRoutes = () => {
 
   // permission checks
   const { canImportProject } = useProjectImportPermissions();
+  const { canImportBudget } = useBudgetImportPermissions();
   const canManageSettings = user ? hasSettingsPermission(user) : false;
 
   return (
@@ -75,7 +78,12 @@ export const PrivateRoutes = () => {
               <Route path="/app/assign" element={<ProcurementJobs />} />
               <Route path="/app/assign/:id" element={<ProcurementJobs />} />
               {/* --- Budget Plan --- */}
-              <Route path="/app/budget-import" element={<BudgetPlanImport />} />z
+              <Route
+                element={<PermissionGuard isAllowed={canImportBudget} redirectPath="/app/home" />}
+              >
+                <Route path="/app/budget-import" element={<BudgetPlanImport />} />
+                <Route path="/app/budget-import/success" element={<BudgetImportSuccess />} />
+              </Route>
               {/* --- Vendor Management --- */}
               <Route path="/app/vendor-response" element={<VendorSubmission />} />
               <Route path="/app/vendor-form" element={<VendorForm />} />

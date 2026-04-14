@@ -52,10 +52,9 @@ export function useExcelImport(mode: ImportMode) {
               rowObj['รายละเอียด']?.toString() ||
               rowObj['คำอธิบายเพิ่มเติมประเภทกิจกรรม']?.toString() ||
               '',
-            amount:
-              parseExcelNumber(
-                rowObj['ราคารวม'] ?? rowObj['วงเงินงบประมาณ'] ?? rowObj['วงเงินงบประมาณ (บาท)']
-              ) || 0,
+            amount: parseExcelNumber(
+              rowObj['ราคารวม'] ?? rowObj['วงเงินงบประมาณ'] ?? rowObj['วงเงินงบประมาณ (บาท)']
+            ),
           };
         }
 

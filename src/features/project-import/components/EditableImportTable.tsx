@@ -9,6 +9,7 @@ import {
 } from '@tanstack/react-table';
 import { File, Trash2 } from 'lucide-react';
 
+import { ConfirmDialog } from '@/components/shared-dialog';
 import { Button } from '@/components/ui/button';
 import { DatePicker } from '@/components/ui/date-picker';
 import { Input } from '@/components/ui/input';
@@ -61,6 +62,11 @@ interface EditableTableMeta {
   errors: ValidationError[];
 }
 
+type PendingDelete = {
+  index: number;
+  title: string;
+};
+
 // Editable Cell Component
 const EditableCell = ({
   getValue,
@@ -70,6 +76,16 @@ const EditableCell = ({
 }: CellContext<EditableImportRow, unknown>) => {
   const initialValue = getValue();
   const initialTextValue = initialValue == null ? '' : String(initialValue);
+  const isCurrencyField = id === 'amount' || id === 'budget';
+  const formatWithComma = (val: unknown) => {
+    if (val === null || val === undefined || val === '') return '';
+    const num = Number(String(val).replace(/,/g, ''));
+    if (isNaN(num)) return '';
+    return num.toLocaleString('en-US', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+  };
   const meta = table.options.meta as EditableTableMeta | undefined;
   const updateData = meta?.updateData;
   const departments = meta?.departments;
@@ -77,11 +93,13 @@ const EditableCell = ({
   const units = meta?.units;
   const errors = meta?.errors || [];
 
-  const [value, setValue] = useState(initialTextValue);
+  const [value, setValue] = useState(
+    isCurrencyField ? formatWithComma(initialValue) : initialTextValue
+  );
 
   useEffect(() => {
-    setValue(initialTextValue);
-  }, [initialTextValue]);
+    setValue(isCurrencyField ? formatWithComma(initialValue) : initialTextValue);
+  }, [initialTextValue, initialValue, isCurrencyField]);
 
   const onBlur = () => {
     if (!updateData) return;
@@ -255,11 +273,25 @@ const EditableCell = ({
     return (
       <div className="flex w-full flex-col gap-1">
         <Input
-          type="number"
+          type="text"
+          className={cn('h-9 w-full text-right font-mono', hasError && 'border-destructive')}
           value={value}
-          onChange={(e) => setValue(e.target.value)}
-          onBlur={onBlur}
-          className={cn('h-9 w-full', hasError && 'border-destructive')}
+          onChange={(e) => {
+            const rawValue = e.target.value.replace(/,/g, '');
+            if (/^\d*\.?\d*$/.test(rawValue)) {
+              setValue(e.target.value);
+            }
+          }}
+          onFocus={() => {
+            setValue(value.replace(/,/g, ''));
+          }}
+          onBlur={() => {
+            if (!updateData) return;
+            const rawValue = value.replace(/,/g, '');
+            const numValue = rawValue === '' ? 0 : Number(rawValue);
+            updateData(index, id, numValue);
+            setValue(formatWithComma(numValue));
+          }}
         />
         {cellError && <p className="text-destructive text-xs">{cellError.message}</p>}
       </div>
@@ -292,6 +324,14 @@ export function EditableImportTable({
   mode,
 }: EditableImportTableProps) {
   const [validationErrors, setValidationErrors] = useState<ValidationError[]>([]);
+  const [pendingDelete, setPendingDelete] = useState<PendingDelete | null>(null);
+
+  const handleConfirmDelete = () => {
+    if (pendingDelete !== null) {
+      deleteRow(pendingDelete.index);
+      setPendingDelete(null);
+    }
+  };
 
   const validateData = useCallback(() => {
     const errors: ValidationError[] = [];
@@ -567,7 +607,12 @@ export function EditableImportTable({
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => deleteRow(row.index)}
+            onClick={() =>
+              setPendingDelete({
+                index: row.index,
+                title: row.original.title || row.original.activity_type_name || '',
+              })
+            }
             className="mx-auto block hover:bg-transparent"
           >
             <Trash2 className="h-4 w-4 text-red-400" />
@@ -640,6 +685,29 @@ export function EditableImportTable({
           </Table>
         </div>
       </div>
+
+      <ConfirmDialog
+        isOpen={!!pendingDelete}
+        onClose={() => setPendingDelete(null)}
+        onConfirm={handleConfirmDelete}
+        title={`ลบ${mode === 'budget' ? 'แผน' : 'โครงการ'}`}
+        description={
+          pendingDelete ? (
+            <>
+              คุณกำลังจะลบ{mode === 'budget' ? 'แผน' : 'โครงการ'}{' '}
+              <strong className="text-foreground">&quot;{pendingDelete.title}&quot;</strong>
+              <br />
+              <br />
+              การลบ{mode === 'budget' ? 'แผน' : 'โครงการ'}นี้เป็นการลบแบบถาวร ไม่สามารถนำ
+              {mode === 'budget' ? 'แผน' : 'โครงการ'}กลับมาได้ หากต้องการนำกลับมา
+              คุณต้องทำการนำเข้าใหม่
+            </>
+          ) : undefined
+        }
+        confirmLabel={`ลบ${mode === 'budget' ? 'แผน' : 'โครงการ'}`}
+        cancelLabel="ยกเลิก"
+        destructive={true}
+      />
 
       <div className="flex justify-end gap-3">
         <Button onClick={handleSubmit} disabled={data.length === 0} variant="brand">

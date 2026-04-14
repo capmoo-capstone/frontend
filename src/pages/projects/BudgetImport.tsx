@@ -1,9 +1,12 @@
 import { useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import { toast } from 'sonner';
+
+import { type ImportBudgetPlanPayload, useImportBudgetPlans } from '@/features/budgets';
 import { useDepartments, useUnitsList } from '@/features/organization';
-import { SUPPLY_OPERATION_DEPARTMENT_ID } from '@/features/settings/constants';
 import { EditableImportTable, useExcelImport } from '@/features/project-import';
+import { SUPPLY_OPERATION_DEPARTMENT_ID } from '@/features/settings/constants';
 import { getFiscalYear } from '@/lib/formatters';
 
 export default function BudgetPlanImport() {
@@ -17,6 +20,7 @@ export default function BudgetPlanImport() {
 
   const { data: unitsResponse } = useUnitsList({ limit: 1000 });
   const units = unitsResponse?.data ?? [];
+  const { mutateAsync: importBudgetPlans } = useImportBudgetPlans();
   const mode = 'budget';
   const currentYear = getFiscalYear(new Date());
   const fiscalYears = useMemo(
@@ -30,8 +34,25 @@ export default function BudgetPlanImport() {
     setData([]);
   }, [mode, setData]);
 
-  const handleSuccess = () => {
-    navigate('/app/budget-import/success');
+  const handleSuccess = async () => {
+    try {
+      const payload: ImportBudgetPlanPayload = data.map((row) => ({
+        budget_year: row.budget_year ?? '',
+        unit_id: row.unit_id ?? '',
+        department_id: row.department_id ?? '',
+        activity_type: row.activity_type ?? '',
+        activity_type_name: row.activity_type_name ?? '',
+        description: row.description ?? '',
+        budget_name: row.budget_name ?? '',
+        amount: Number(row.amount ?? 0),
+      }));
+
+      await importBudgetPlans(payload);
+      navigate('/app/budget-import/success');
+    } catch (error) {
+      console.error('Budget import failed:', error);
+      toast.error('นำเข้าแผนงบประมาณไม่สำเร็จ กรุณาลองใหม่อีกครั้ง');
+    }
   };
 
   const handleBack = () => {

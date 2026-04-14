@@ -185,7 +185,7 @@ const EditableCell = ({
     );
   }
 
-  if (id === 'fiscal_year') {
+  if (id === 'fiscal_year' || id === 'budget_year') {
     const excelYearNum = parseInt(initialTextValue);
     const matchedYear = fiscalYears?.find((year) => {
       const yearNum = parseInt(year);
@@ -394,7 +394,7 @@ export function EditableImportTable({
         mode === 'budget'
           ? {
               id: row._rowId,
-              fiscal_year: row.fiscal_year ?? '',
+              budget_year: row.budget_year ?? '',
               unit_id: normalizeOptionId(row.unit_id, unitIdSet, unitNameToId),
               department_id: normalizeOptionId(
                 row.department_id,
@@ -458,7 +458,7 @@ export function EditableImportTable({
       ...(mode === 'budget'
         ? [
             {
-              accessorKey: 'fiscal_year',
+              accessorKey: 'budget_year',
               header: () => (
                 <>
                   ปีงบประมาณ <span className="text-destructive">*</span>

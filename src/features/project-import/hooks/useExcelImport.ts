@@ -42,7 +42,7 @@ export function useExcelImport(mode: ImportMode) {
         if (mode === 'budget') {
           return {
             _rowId: Math.random().toString(36).substring(7),
-            fiscal_year: rowObj['ปีงบประมาณ']?.toString() || defaultFiscalYear,
+            budget_year: rowObj['ปีงบประมาณ']?.toString() || defaultFiscalYear,
             unit_no: rowObj['ศูนย์ต้นทุน']?.toString() || '',
             unit_id: rowObj['ชื่อศูนย์ต้นทุน']?.toString() || '',
             department_id:

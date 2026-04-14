@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import type { ImportBudgetPlanItem } from '../budgets';
+import type { ImportBudgetPlanItem } from '@/features/budgets';
 
 export type ImportMode = 'none' | 'lesspaper' | 'fiori' | 'manual' | 'budget';
 

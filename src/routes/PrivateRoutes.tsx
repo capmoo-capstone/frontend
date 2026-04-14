@@ -3,11 +3,9 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 
 import PermissionGuard from '@/components/guards/PermissionGuard';
 import { useAuth } from '@/context/AuthContext';
-import { useProjectImportPermissions } from '@/features/project-import';
-import { useBudgetImportPermissions } from '@/features/project-import/hooks/useBudgetImportPermissions';
+import { useBudgetImportPermissions, useProjectImportPermissions } from '@/features/project-import';
 import AppLayout from '@/layouts/AppLayout';
 import { hasSettingsPermission } from '@/lib/permissions';
-import BudgetImportSuccess from '@/pages/projects/BudgetImportSuccess';
 
 // --- Lazy Load Pages ---
 const Home = lazy(() => import('@/pages/home/Home'));
@@ -26,6 +24,7 @@ const ProjectImportSuccess = lazy(() => import('@/pages/projects/ProjectImportSu
 
 // Budget Plan
 const BudgetPlanImport = lazy(() => import('@/pages/projects/BudgetImport'));
+const BudgetImportSuccess = lazy(() => import('@/pages/projects/BudgetImportSuccess'));
 
 // Exports
 const FinanceExportPage = lazy(() => import('@/pages/projects/FinanceExport'));

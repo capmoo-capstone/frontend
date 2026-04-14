@@ -2,6 +2,7 @@ import { useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { useDepartments, useUnitsList } from '@/features/organization';
+import { SUPPLY_OPERATION_DEPARTMENT_ID } from '@/features/settings/constants';
 import { EditableImportTable, useExcelImport } from '@/features/project-import';
 import { getFiscalYear } from '@/lib/formatters';
 
@@ -10,13 +11,12 @@ export default function BudgetPlanImport() {
 
   const { data: departments } = useDepartments();
   const filteredDepartments = useMemo(
-    () => departments?.filter((dept) => dept.name !== 'Supply Operation'),
+    () => departments?.filter((dept) => dept.id !== SUPPLY_OPERATION_DEPARTMENT_ID),
     [departments]
   );
 
-  const { data: unitsResponse } = useUnitsList();
-  const units = unitsResponse?.data;
-
+  const { data: unitsResponse } = useUnitsList({ limit: 1000 });
+  const units = unitsResponse?.data ?? [];
   const mode = 'budget';
   const currentYear = getFiscalYear(new Date());
   const fiscalYears = useMemo(

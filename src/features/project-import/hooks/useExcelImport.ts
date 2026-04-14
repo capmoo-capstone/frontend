@@ -2,6 +2,8 @@ import { useState } from 'react';
 
 import readXlsxFile from 'read-excel-file';
 
+import { getFiscalYear } from '@/lib/formatters';
+
 import { type EditableImportRow, type ImportMode } from '../types';
 
 const parseExcelNumber = (value: unknown) => {
@@ -23,6 +25,7 @@ export function useExcelImport(mode: ImportMode) {
 
       const headers = rows[0] as string[];
       const dataRows = rows.slice(1);
+      const defaultFiscalYear = getFiscalYear(new Date()).toString();
 
       const formattedData: EditableImportRow[] = dataRows.map((row) => {
         const rowObj: Record<string, unknown> = {};
@@ -39,7 +42,7 @@ export function useExcelImport(mode: ImportMode) {
         if (mode === 'budget') {
           return {
             _rowId: Math.random().toString(36).substring(7),
-            fiscal_year: rowObj['ปีงบประมาณ']?.toString() || new Date().getFullYear().toString(),
+            fiscal_year: rowObj['ปีงบประมาณ']?.toString() || defaultFiscalYear,
             unit_no: rowObj['ศูนย์ต้นทุน']?.toString() || '',
             unit_id: rowObj['ชื่อศูนย์ต้นทุน']?.toString() || '',
             department_id:
@@ -71,7 +74,7 @@ export function useExcelImport(mode: ImportMode) {
           budget: Number(rowObj['วงเงินงบประมาณ']) || 0,
           department_id: rowObj['หน่วยงาน']?.toString() || '',
           unit_id: rowObj['ฝ่าย']?.toString() || '',
-          fiscal_year: rowObj['ปีงบประมาณ']?.toString() || new Date().getFullYear().toString(),
+          fiscal_year: rowObj['ปีงบประมาณ']?.toString() || defaultFiscalYear,
         };
       });
 

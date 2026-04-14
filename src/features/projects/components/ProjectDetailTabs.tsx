@@ -52,14 +52,9 @@ export function ProjectDetailTabs({ project, workflowConfigs }: ProjectDetailTab
 
   const getResponsiblePerson = () => {
     if (workflowTab === 'PROCUREMENT') {
-      const names = [
-        project.assignee_procurement?.full_name,
-        'นางสาวพิมพ์ชนก ใจดีนามสกุลยาว',
-      ].filter(Boolean);
-      return names.join(', ');
+      return project.assignee_procurement?.full_name ?? 'ยังไม่มีผู้รับผิดชอบ';
     } else {
-      const names = [project.assignee_contract?.full_name, 'นายสมชาย รักงาน'].filter(Boolean);
-      return names.join(', ');
+      return project.assignee_contract?.full_name ?? 'ยังไม่มีผู้รับผิดชอบ';
     }
   };
 

@@ -328,12 +328,18 @@ export const getWaitingStatusInfo = (status: StepStatus) => {
         color: 'text-muted-foreground bg-muted',
       };
     case 'IN_PROGRESS':
-    case 'REJECTED':
       return {
         title: 'อยู่ระหว่างดำเนินการ',
         description: 'เจ้าหน้าที่พัสดุกำลังจัดทำหรือแก้ไขเอกสาร',
         icon: UserCog,
-        color: 'text-error bg-error-light',
+        color: 'text-info bg-info-light',
+      };
+    case 'REJECTED':
+      return {
+        title: 'รอการแก้ไขเอกสาร',
+        description: 'รอเจ้าหน้าที่พัสดุปรับปรุงเอกสารและส่งใหม่',
+        icon: UserCheck,
+        color: 'text-info bg-info-light',
       };
     case 'WAITING_APPROVAL':
     case 'WAITING_PROPOSAL':

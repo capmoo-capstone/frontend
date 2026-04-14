@@ -1,7 +1,7 @@
 import { useAuth } from '@/context/AuthContext';
 import type { ProjectDetail } from '@/features/projects';
 import { type WorkflowStepConfig, useWorkflow, useWorkflowMutations } from '@/features/workflow';
-import { isActionRequired } from '@/lib/workflow-utils';
+import { isActionRequired, isWorkflowProjectLocked } from '@/lib/workflow-utils';
 
 import { DynamicStepForm } from './DynamicStepForm';
 import { StatusWaitingCard } from './StatusWaitingCard';
@@ -93,6 +93,9 @@ export function ProjectWorkflowSteps({ project, steps }: ProjectWorkflowStepsPro
 
   if (!user) return null;
   const viewAsRole = user.role ?? 'GUEST';
+  const availableRoles = [...user.roles.own, ...user.roles.delegated].map(
+    (roleDetail) => roleDetail.role
+  );
 
   const sortedSteps = [...steps].sort((a, b) => a.order - b.order);
   const lastStepOrder = sortedSteps[sortedSteps.length - 1]?.order;
@@ -106,21 +109,40 @@ export function ProjectWorkflowSteps({ project, steps }: ProjectWorkflowStepsPro
         const latestSubmission = submissions[submissions.length - 1];
         const fields = step.required_documents;
 
-        const userCanAct = isActionRequired(viewAsRole, status);
+        const actionRole =
+          viewAsRole === 'HEAD_OF_DEPARTMENT'
+            ? 'HEAD_OF_DEPARTMENT'
+            : availableRoles.includes('GENERAL_STAFF') &&
+                ['IN_PROGRESS', 'REJECTED'].includes(status)
+              ? 'GENERAL_STAFF'
+              : viewAsRole;
+
+        const isSelfSubmittedWaitingApproval =
+          status === 'WAITING_APPROVAL' &&
+          actionRole === 'HEAD_OF_UNIT' &&
+          latestSubmission?.submitted_by === user.id;
+
+        const userCanAct =
+          isActionRequired(actionRole, status, project.status) && !isSelfSubmittedWaitingApproval;
+        const projectLocked = isWorkflowProjectLocked(project.status);
         const isCompleted = status === 'COMPLETED';
-        const showForm = userCanAct || viewSubmission || isCompleted || status === 'NOT_STARTED';
-        const isGuest = viewAsRole === 'GUEST' || viewAsRole === 'REPRESENTATIVE';
+        const showForm = userCanAct || viewSubmission || isCompleted;
+        const isGuest = actionRole === 'GUEST' || actionRole === 'REPRESENTATIVE';
+        const isStepLocked = status === 'NOT_STARTED';
 
         return (
           <WorkflowStep
             key={`step-${step.order}`}
             id={`step-${step.order}`}
             index={step.order}
-            viewAsRole={viewAsRole}
+            viewAsRole={actionRole}
             isLast={step.order === lastStepOrder}
             title={step.name}
             status={status}
+            projectStatus={project.status}
+            canAct={userCanAct}
             isGuest={isGuest}
+            isLocked={isStepLocked}
           >
             {!isGuest && (
               <div className="grid grid-cols-1 gap-8 pt-2 lg:grid-cols-12">
@@ -144,7 +166,7 @@ export function ProjectWorkflowSteps({ project, steps }: ProjectWorkflowStepsPro
                       isActive={!viewSubmission && !isCompleted}
                       isBusy={isMutating}
                       stepStatus={status}
-                      viewAsRole={viewAsRole}
+                      viewAsRole={actionRole}
                       viewSubmission={viewSubmission || null}
                       onBackToEdit={() => handleBackToEdit(step.order)}
                       onSubmit={async () => {
@@ -167,7 +189,7 @@ export function ProjectWorkflowSteps({ project, steps }: ProjectWorkflowStepsPro
                         if (!latestSubmission?.id) return;
                         await workflowMutations.approveSubmission.mutateAsync({
                           submissionId: latestSubmission.id,
-                          requiredSignature: false,
+                          requiredSignature: true,
                         });
                       }}
                       onSupApprove={async () => {
@@ -192,10 +214,11 @@ export function ProjectWorkflowSteps({ project, steps }: ProjectWorkflowStepsPro
                         }
                         onChange={(key, val) => handleStepFormChange(step.order, key, val)}
                         disabled={
+                          projectLocked ||
                           isCompleted ||
                           viewSubmission !== undefined ||
                           !userCanAct ||
-                          viewAsRole !== 'GENERAL_STAFF'
+                          actionRole !== 'GENERAL_STAFF'
                         }
                       />
                     </StepActionForm>

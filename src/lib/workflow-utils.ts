@@ -1,9 +1,25 @@
-import { CircleCheckBig, Clock, FileCheck, UserCheck, UserCog } from 'lucide-react';
+// workflow-utils.ts
+import { CircleCheckBig, Clock, FileCheck, UserCheck } from 'lucide-react';
 
 import type { Role } from '@/features/auth';
 import type { StepStatus } from '@/features/projects';
 
-export const isActionRequired = (role: Role, status: StepStatus): boolean => {
+const LOCKED_PROJECT_STATUSES = new Set(['CANCELLED', 'CLOSED', 'UNASSIGNED', 'WAITING_ACCEPT']);
+
+export const isWorkflowProjectLocked = (projectStatus?: string) => {
+  if (!projectStatus) return false;
+  return LOCKED_PROJECT_STATUSES.has(projectStatus);
+};
+
+export const isActionRequired = (
+  role: Role,
+  status: StepStatus,
+  projectStatus?: string
+): boolean => {
+  if (isWorkflowProjectLocked(projectStatus)) {
+    return false;
+  }
+
   switch (role) {
     case 'GENERAL_STAFF':
       return ['IN_PROGRESS', 'REJECTED'].includes(status);
@@ -16,7 +32,14 @@ export const isActionRequired = (role: Role, status: StepStatus): boolean => {
   }
 };
 
-export const getStepColor = (status: StepStatus, role: Role) => {
+export const getStepColor = (
+  status: StepStatus,
+  role: Role,
+  projectStatus?: string,
+  canActOverride?: boolean
+) => {
+  const projectLocked = isWorkflowProjectLocked(projectStatus);
+
   if (status === 'COMPLETED') {
     return {
       line: 'bg-success',
@@ -28,7 +51,10 @@ export const getStepColor = (status: StepStatus, role: Role) => {
     };
   }
 
-  if (isActionRequired(role, status)) {
+  const canActNow =
+    canActOverride === undefined ? isActionRequired(role, status, projectStatus) : canActOverride;
+
+  if (!projectLocked && canActNow) {
     return {
       line: 'bg-warning/50',
       bubble: 'bg-warning text-white',
@@ -78,12 +104,12 @@ export const getStepColor = (status: StepStatus, role: Role) => {
       };
     case 'REJECTED':
       return {
-        line: 'bg-error',
-        bubble: 'bg-error text-white',
-        container: 'border-error bg-error-light text-error',
-        title: 'อยู่ระหว่างดำเนินการ',
-        description: 'เจ้าหน้าที่พัสดุกำลังจัดทำหรือแก้ไขเอกสาร',
-        icon: UserCog,
+        line: 'bg-info',
+        bubble: 'bg-info text-white',
+        container: 'border-info bg-info-light text-info',
+        title: 'รอการแก้ไขเอกสาร',
+        description: 'รอเจ้าหน้าที่พัสดุส่งเอกสารฉบับแก้ไข',
+        icon: UserCheck,
       };
     default:
       return {

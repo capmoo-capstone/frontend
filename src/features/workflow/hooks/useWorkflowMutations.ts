@@ -33,7 +33,7 @@ export const useWorkflowMutations = (projectId?: string) => {
   const approveSubmission = useMutation({
     mutationFn: ({
       submissionId,
-      requiredSignature = false,
+      requiredSignature = true,
     }: {
       submissionId: string;
       requiredSignature?: boolean;

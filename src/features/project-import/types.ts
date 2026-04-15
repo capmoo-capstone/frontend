@@ -13,8 +13,11 @@ export const PROCUREMENT_MIN_DAYS: Record<string, number> = {
 };
 
 export const ProjectImportSchema = z.object({
-  pr_no: z.string().optional(),
-  lesspaper_no: z.string().optional(),
+  pr_no: z.string().regex(/^\d*$/, 'เลขที่ใบขอซื้อขอจ้างต้องเป็นตัวเลขเท่านั้น').optional(),
+  lesspaper_no: z
+    .string()
+    .regex(/^\d*$/, 'เลขที่หนังสือ Lesspaper ต้องเป็นตัวเลขเท่านั้น')
+    .optional(),
   title: z.string().min(1, 'กรุณาระบุชื่อโครงการ'),
   description: z.string().min(1, 'กรุณาระบุรายละเอียดโครงการ'),
   procurement_type: z.string().min(1, 'กรุณาเลือกวิธีการจัดหา'),
@@ -45,7 +48,10 @@ export const LesspaperImportSchema = ProjectImportSchema.omit({
   budget_plan_ids: true,
   lesspaper_no: true,
 }).extend({
-  lesspaper_no: z.string().min(1, 'กรุณาระบุเลขที่หนังสือ Lesspaper'),
+  lesspaper_no: z
+    .string()
+    .min(1, 'กรุณาระบุเลขที่หนังสือ Lesspaper')
+    .regex(/^\d+$/, 'เลขที่หนังสือ Lesspaper ต้องเป็นตัวเลขเท่านั้น'),
 });
 
 export type LesspaperImportPayload = z.infer<typeof LesspaperImportSchema>;

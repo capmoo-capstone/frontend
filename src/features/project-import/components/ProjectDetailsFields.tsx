@@ -119,10 +119,19 @@ export function ProjectDetailsFields({
           <Field data-invalid={fieldState.invalid}>
             <FieldLabel htmlFor={field.name}>เลขที่ใบขอซื้อขอจ้าง (ถ้ามี)</FieldLabel>
             <Input
-              {...field}
+              name={field.name}
+              value={field.value ?? ''}
+              onBlur={field.onBlur}
+              ref={field.ref}
               id={field.name}
               placeholder="กรุณากรอกเลขที่ใบขอซื้อขอจ้าง"
               aria-invalid={fieldState.invalid}
+              inputMode="numeric"
+              pattern="[0-9]*"
+              onChange={(e) => {
+                const digitsOnly = e.target.value.replace(/\D/g, '');
+                field.onChange(digitsOnly);
+              }}
             />
             {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
           </Field>

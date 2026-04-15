@@ -30,7 +30,7 @@ import {
 } from '@/components/ui/table';
 import { Textarea } from '@/components/ui/textarea';
 import { ImportBudgetPlanItemSchema } from '@/features/budgets';
-import { RESPONSIBLE_SELECT_OPTIONS } from '@/lib/formatters';
+import { RESPONSIBLE_SELECT_OPTIONS, formatDateThai, parseThaiDateString } from '@/lib/formatters';
 import { cn } from '@/lib/utils';
 
 import type { EditableImportRow, ImportMode } from '../types';
@@ -220,7 +220,9 @@ const EditableCell = ({
   }
 
   if (id === 'delivery_date_str') {
-    const dateValue = initialTextValue ? new Date(initialTextValue) : undefined;
+    const dateValue = initialTextValue
+      ? parseThaiDateString(initialTextValue, 'ymd', '-')
+      : undefined;
 
     return (
       <div className="flex w-full flex-col gap-1">
@@ -228,12 +230,31 @@ const EditableCell = ({
           date={dateValue}
           disabledDays={{ before: new Date() }}
           setDate={(date) => {
-            const dateStr = date ? date.toISOString().split('T')[0] : '';
+            const dateStr = date ? formatDateThai(date, 'yyyy-MM-dd') : '';
             if (updateData) {
               updateData(index, id, dateStr);
             }
           }}
           className={cn('bg-background h-9 w-full', hasError && 'border-destructive')}
+        />
+        {hasError && <p className="text-destructive text-xs">{cellError}</p>}
+      </div>
+    );
+  }
+
+  if (id === 'pr_no' || id === 'lesspaper_no') {
+    return (
+      <div className="flex w-full flex-col gap-1">
+        <Input
+          type="text"
+          inputMode="numeric"
+          pattern="[0-9]*"
+          value={value}
+          onChange={(e) => {
+            setValue(e.target.value.replace(/\D/g, ''));
+          }}
+          onBlur={onBlur}
+          className={cn('h-9 w-full', hasError && 'border-destructive')}
         />
         {hasError && <p className="text-destructive text-xs">{cellError}</p>}
       </div>
@@ -415,9 +436,15 @@ export function EditableImportTable({
               description: row.description ?? '',
               procurement_type: row.procurement_type ?? '',
               budget: Number(row.budget ?? 0),
-              department_id: row.department_id ?? '',
+              department_id: normalizeOptionId(
+                row.department_id,
+                departmentIdSet,
+                departmentNameToId
+              ),
               fiscal_year: row.fiscal_year ?? '',
-              delivery_date: row.delivery_date_str ? new Date(row.delivery_date_str) : undefined,
+              delivery_date: row.delivery_date_str
+                ? parseThaiDateString(row.delivery_date_str, 'ymd', '-')
+                : undefined,
             };
 
       const result = schema.safeParse(rowData);
@@ -541,11 +568,7 @@ export function EditableImportTable({
         : [
             {
               accessorKey: 'pr_no',
-              header: () => (
-                <>
-                  เลขที่ใบขอซื้อขอจ้าง (PR) <span className="text-destructive">*</span>
-                </>
-              ),
+              header: () => <>เลขที่ใบขอซื้อขอจ้าง (PR)</>,
               cell: EditableCell,
               size: 180,
             },

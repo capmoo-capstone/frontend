@@ -1,4 +1,4 @@
-import { format } from 'date-fns';
+import { format, startOfDay } from 'date-fns';
 import { th } from 'date-fns/locale';
 import { Clock, FileCheck, UserCheck, UserCog } from 'lucide-react';
 
@@ -235,6 +235,45 @@ export const formatDateThai = (
  */
 export const formatDateThaiShort = (date: Date | string | undefined | null) => {
   return formatDateThai(date, 'd MMM yyyy');
+};
+
+type ParseThaiDateOrder = 'dmy' | 'ymd';
+
+export const parseThaiDateString = (
+  value: string,
+  order: ParseThaiDateOrder = 'dmy',
+  separator: '/' | '-' = '/'
+): Date | undefined => {
+  const trimmedValue = value.trim();
+  if (!trimmedValue) return undefined;
+
+  const parts = trimmedValue.split(separator);
+  if (parts.length !== 3) return undefined;
+
+  const [first, second, third] = parts;
+  const numbers = [first, second, third].map((part) => Number(part));
+  if (numbers.some((part) => Number.isNaN(part))) return undefined;
+
+  const [dayValue, monthValue, yearValue] =
+    order === 'dmy' ? numbers : [numbers[2], numbers[1], numbers[0]];
+  const normalizedYear = yearValue > 2400 ? yearValue - 543 : yearValue;
+
+  if (monthValue < 1 || monthValue > 12) return undefined;
+  if (dayValue < 1 || dayValue > 31) return undefined;
+  if (normalizedYear < 1) return undefined;
+
+  const parsed = new Date(normalizedYear, monthValue - 1, dayValue);
+  if (isNaN(parsed.getTime())) return undefined;
+
+  if (
+    parsed.getFullYear() !== normalizedYear ||
+    parsed.getMonth() !== monthValue - 1 ||
+    parsed.getDate() !== dayValue
+  ) {
+    return undefined;
+  }
+
+  return startOfDay(parsed);
 };
 
 export const getFiscalYear = (date: Date | string) => {

@@ -1,7 +1,8 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
 import { useDepartments } from '@/features/organization';
+import { SUPPLY_OPERATION_DEPARTMENT_ID } from '@/features/settings/constants';
 import { getFiscalYear } from '@/lib/formatters';
 
 import { useExcelImport } from '../hooks/useExcelImport';
@@ -23,6 +24,10 @@ export function ProjectImportContainer() {
   const mode: ImportMode = isImportMode(modeParam) ? modeParam : 'none';
 
   const { data: departments } = useDepartments();
+  const filteredDepartments = useMemo(
+    () => departments?.filter((dept) => dept.id !== SUPPLY_OPERATION_DEPARTMENT_ID),
+    [departments]
+  );
 
   const currentYear = getFiscalYear(new Date());
   const fiscalYears = Array.from({ length: 7 }, (_, i) => (currentYear - 3 + i).toString());
@@ -86,7 +91,7 @@ export function ProjectImportContainer() {
               deleteRow={deleteRow}
               onSubmit={handleSuccess}
               onBack={handleBack}
-              departments={departments}
+              departments={filteredDepartments}
               fiscalYears={fiscalYears}
               mode={mode}
             />

@@ -10,8 +10,6 @@ import {
   CancelProjectDialog,
   CancellationRequestBanner,
   CancelledProjectBanner,
-  type EditProjectData,
-  EditProjectDialog,
   ProjectDetailTabs,
   ProjectHeader,
   ProjectInfoGrid,
@@ -30,7 +28,8 @@ export default function ProjectDetail() {
   // View States
   const [isCancelDialogOpen, setIsCancelDialogOpen] = useState(false);
   const [isApproveCancelDialogOpen, setIsApproveCancelDialogOpen] = useState(false);
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isSavingHeader, setIsSavingHeader] = useState(false);
+  const [isSavingVendorInfo, setIsSavingVendorInfo] = useState(false);
 
   const { data: project, isLoading, isError, error } = useProjectDetail(id);
   const { mutateAsync: updateProjectMutation } = useUpdateProject();
@@ -48,16 +47,35 @@ export default function ProjectDetail() {
   if (isError) return <div className="p-8 text-center text-red-500">Error: {error?.message}</div>;
   if (!project) return null;
 
-  const handleEditProject = async (data: EditProjectData) => {
+  const handleSaveProjectHeader = async (data: { title: string; description: string | null }) => {
+    setIsSavingHeader(true);
     try {
       await updateProjectMutation({
         projectId: id,
         payload: data,
       });
       toast.success('อัปเดตข้อมูลโครงการสำเร็จ');
-      setIsEditDialogOpen(false);
-    } catch {
+    } catch (error) {
       toast.error('ไม่สามารถอัปเดตข้อมูลโครงการได้ กรุณาลองใหม่อีกครั้ง');
+      throw error;
+    } finally {
+      setIsSavingHeader(false);
+    }
+  };
+
+  const handleSaveVendorInfo = async (data: { vendor_name: string; vendor_email: string }) => {
+    setIsSavingVendorInfo(true);
+    try {
+      await updateProjectMutation({
+        projectId: id,
+        payload: data,
+      });
+      toast.success('อัปเดตข้อมูลผู้ค้าสำเร็จ');
+    } catch (error) {
+      toast.error('ไม่สามารถอัปเดตข้อมูลผู้ค้าได้ กรุณาลองใหม่อีกครั้ง');
+      throw error;
+    } finally {
+      setIsSavingVendorInfo(false);
     }
   };
 
@@ -86,13 +104,14 @@ export default function ProjectDetail() {
     <>
       <ProjectHeader
         project={project}
-        onEditProject={() => setIsEditDialogOpen(true)}
+        onSaveProjectHeader={handleSaveProjectHeader}
+        isSaving={isSavingHeader}
         onCancelProject={() => setIsCancelDialogOpen(true)}
         canCancelProjects={canCancelProjects}
       />
 
       {/* --- Project Alerts --- */}
-      <div className="space-y-6">
+      {/* <div className="space-y-6">
         {project.status === 'WAITING_CANCEL' && activeCancellation && (
           <CancellationRequestBanner
             onRequestApprove={() => setIsApproveCancelDialogOpen(true)}
@@ -100,9 +119,13 @@ export default function ProjectDetail() {
           />
         )}
         {project.status === 'CANCELLED' && <CancelledProjectBanner />}
-      </div>
+      </div> */}
 
-      <ProjectInfoGrid project={project} />
+      <ProjectInfoGrid
+        project={project}
+        onSaveVendorInfo={handleSaveVendorInfo}
+        isSavingVendorInfo={isSavingVendorInfo}
+      />
 
       <ProjectDetailTabs project={project} workflowConfigs={ProcurementWorkflows} />
 
@@ -113,13 +136,6 @@ export default function ProjectDetail() {
         onConfirm={handleApproveCancellation}
         projectTitle={project.title}
         requesterName={activeCancellation?.requester.full_name}
-      />
-
-      <EditProjectDialog
-        isOpen={isEditDialogOpen}
-        onClose={() => setIsEditDialogOpen(false)}
-        onConfirm={handleEditProject}
-        project={project}
       />
 
       <CancelProjectDialog

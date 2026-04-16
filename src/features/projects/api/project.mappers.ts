@@ -147,6 +147,7 @@ export const mapProjectDetail = (parsed: ProjectDetailApi): ProjectDetail => ({
   po_no: parsed.po_no,
   contract_no: parsed.contract_no,
   migo_no: parsed.migo_no,
+  budget_plan_id: parsed.budget_plan_id ?? [],
   expected_approval_date: parsed.expected_approval_date,
   created_at: parsed.created_at,
   updated_at: parsed.updated_at ?? parsed.created_at,

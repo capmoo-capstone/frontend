@@ -14,6 +14,22 @@ import { getCancelProjectActionLabel } from '../utils/project-selectors';
 const isUrgentProject = (value: ProjectUrgentStatus) =>
   value === 'URGENT' || value === 'VERY_URGENT' || value === 'SUPER_URGENT';
 
+const getUrgentLabel = (value: ProjectUrgentStatus) => {
+  if (value === 'URGENT') {
+    return 'ด่วน';
+  }
+
+  if (value === 'VERY_URGENT') {
+    return 'ด่วนที่สุด';
+  }
+
+  if (value === 'SUPER_URGENT') {
+    return 'ด่วนพิเศษ';
+  }
+
+  return null;
+};
+
 interface ProjectHeaderProps {
   project: ProjectDetail;
   canCancelProjects: boolean;
@@ -34,11 +50,13 @@ export const ProjectHeader = ({
       <div className="space-y-4">
         <div className="space-y-1">
           <h1 className="text-primary h1-topic">
-            {isUrgentProject(project.is_urgent) && <span className="text-destructive">ด่วน </span>}
+            {isUrgentProject(project.is_urgent) && (
+              <span className="text-destructive mr-2">{getUrgentLabel(project.is_urgent)}</span>
+            )}
             {project.title}
           </h1>
           {project.description && (
-            <p className="text-muted-foreground normal-l">{project.description}</p>
+            <p className="text-muted-foreground normal">{project.description}</p>
           )}
         </div>
       </div>

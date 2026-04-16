@@ -4,13 +4,18 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { FileCard } from '@/components/ui/file-card';
 import type { ProjectDetail } from '@/features/projects';
-import type { SubmissionDocument, WorkflowStepConfig } from '@/features/workflow';
+import type { SubmissionDocument, SubmissionStatus, WorkflowStepConfig } from '@/features/workflow';
 import { formatDateThai } from '@/lib/formatters';
 import { cn } from '@/lib/utils';
+
+import { isCompletedLikeSubmissionStatus } from '../lib/submission-presentation';
+import { normalizeStoredSubmissionValue } from '../lib/submission-values';
+import { isSameWorkflowType } from '../lib/workflow-identity';
 
 interface ProjectSummaryViewProps {
   project: ProjectDetail;
   steps: WorkflowStepConfig[];
+  activeWorkflowType: string;
 }
 
 interface EnrichedSubmissionDocument extends SubmissionDocument {
@@ -20,18 +25,25 @@ interface EnrichedSubmissionDocument extends SubmissionDocument {
 
 interface StepWithDocuments extends WorkflowStepConfig {
   documents: EnrichedSubmissionDocument[];
-  status: string;
+  status: SubmissionStatus | 'PENDING';
 }
 
-export function ProjectSummaryView({ project, steps }: ProjectSummaryViewProps) {
+export function ProjectSummaryView({
+  project,
+  steps,
+  activeWorkflowType,
+}: ProjectSummaryViewProps) {
   const stepsWithDocs = steps
     .map((step) => {
-      // Filter submissions by Step Order AND Step Name
+      // Filter submissions by step order so name changes do not hide history.
       const submissions = project.submissions
-        .filter((s) => s.step_order === step.order && s.step_name === step.name)
+        .filter(
+          (s) =>
+            s.step_order === step.order && isSameWorkflowType(s.workflow_type, activeWorkflowType)
+        )
         .sort((a, b) => b.submission_round - a.submission_round);
 
-      const approved = submissions.find((s) => ['APPROVED', 'ACCEPTED'].includes(s.status));
+      const approved = submissions.find((s) => isCompletedLikeSubmissionStatus(s.status));
       const latest = submissions[0];
       const targetSubmission = approved || latest;
 
@@ -41,12 +53,45 @@ export function ProjectSummaryView({ project, steps }: ProjectSummaryViewProps) 
           ...doc,
           label: docConfig?.label || doc.field_key,
           type: docConfig?.type || 'TEXT',
+          value: normalizeStoredSubmissionValue(doc.value, docConfig?.type),
         };
       });
 
+      const metaDataSource = targetSubmission?.meta_data ?? {};
+      const metaDataDocuments = Array.isArray(metaDataSource)
+        ? metaDataSource.flatMap((item) => {
+            if (!item || typeof item !== 'object') return [];
+
+            const fieldKey = (item as { field_key?: unknown }).field_key;
+            const value = (item as { value?: unknown }).value;
+
+            if (typeof fieldKey !== 'string') return [];
+
+            const docConfig = step.required_documents?.find((d) => d.field_key === fieldKey);
+
+            return [
+              {
+                field_key: fieldKey,
+                label: docConfig?.label || fieldKey,
+                type: docConfig?.type || 'TEXT',
+                value: normalizeStoredSubmissionValue(value, docConfig?.type),
+              },
+            ];
+          })
+        : Object.entries(metaDataSource).map(([fieldKey, value]) => {
+            const docConfig = step.required_documents?.find((d) => d.field_key === fieldKey);
+
+            return {
+              field_key: fieldKey,
+              label: docConfig?.label || fieldKey,
+              type: docConfig?.type || 'TEXT',
+              value: normalizeStoredSubmissionValue(value, docConfig?.type),
+            };
+          });
+
       return {
         ...step,
-        documents: enrichedDocuments,
+        documents: [...enrichedDocuments, ...metaDataDocuments],
         status: targetSubmission?.status || 'PENDING',
       };
     })
@@ -57,12 +102,18 @@ export function ProjectSummaryView({ project, steps }: ProjectSummaryViewProps) 
   };
 
   const renderValue = (doc: EnrichedSubmissionDocument) => {
-    if (!doc.value && !doc.file_path) return <span className="text-muted-foreground">-</span>;
+    if (!doc.value && !doc.file_path && !doc.file_name) {
+      return <span className="text-muted-foreground">-</span>;
+    }
 
     switch (doc.type) {
       case 'FILE':
         return (
-          <FileCard file={doc.file_path || 'Unknown File'} disabled={true} className="max-w-xs" />
+          <FileCard
+            file={doc.file_path || doc.file_name || 'Unknown File'}
+            disabled={true}
+            className="max-w-xs"
+          />
         );
 
       case 'DATE':
@@ -74,7 +125,7 @@ export function ProjectSummaryView({ project, steps }: ProjectSummaryViewProps) 
         );
 
       case 'BOOLEAN':
-        return doc.value ? (
+        return doc.value === true ? (
           <span className="flex items-center gap-1 text-green-600">
             <Check className="h-4 w-4" /> ใช่
           </span>
@@ -157,7 +208,7 @@ export function ProjectSummaryView({ project, steps }: ProjectSummaryViewProps) 
               </div>
 
               {/* Simple Status Indicator */}
-              {['APPROVED', 'ACCEPTED'].includes(step.status) && (
+              {step.status !== 'PENDING' && isCompletedLikeSubmissionStatus(step.status) && (
                 <Badge variant="success">เสร็จสมบูรณ์</Badge>
               )}
             </div>

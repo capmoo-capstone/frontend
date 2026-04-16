@@ -2,33 +2,34 @@ import { useCallback, useState } from 'react';
 
 import type { ProjectDetail } from '@/features/projects';
 
+import { buildSubmissionFormData } from '../lib/submission-values';
+import { isSameWorkflowType } from '../lib/workflow-identity';
 import type { StepStatus, Submission, WorkflowStepConfig } from '../types';
 
 // Now accepts 'activeSteps' to know which workflow we are dealing with
-export function useWorkflow(project: ProjectDetail | undefined, activeSteps: WorkflowStepConfig[]) {
+export function useWorkflow(
+  project: ProjectDetail | undefined,
+  activeSteps: WorkflowStepConfig[],
+  activeWorkflowType?: string
+) {
   const [stepFormData, setStepFormData] = useState<Record<string, Record<string, unknown>>>({});
   const [viewingSubmissions, setViewingSubmissions] = useState<Record<number, Submission | null>>(
     {}
   );
 
-  // Helper to find the name of the step at a given order
-  const getStepName = useCallback(
-    (order: number) => {
-      return activeSteps.find((s) => s.order === order)?.name;
-    },
-    [activeSteps]
-  );
-
   const getStepSubmissions = useCallback(
     (stepOrder: number) => {
       if (!project) return [];
-      const targetName = getStepName(stepOrder);
 
       return project.submissions
-        .filter((sub) => sub.step_order === stepOrder && sub.step_name === targetName) // Strict check by name
+        .filter(
+          (sub) =>
+            sub.step_order === stepOrder &&
+            isSameWorkflowType(sub.workflow_type, activeWorkflowType)
+        )
         .sort((a, b) => a.submission_round - b.submission_round);
     },
-    [project, getStepName]
+    [project, activeWorkflowType]
   );
 
   const getStepStatus = useCallback(
@@ -51,7 +52,7 @@ export function useWorkflow(project: ProjectDetail | undefined, activeSteps: Wor
 
       const previousSteps = step.required_step ?? [];
       if (previousSteps.length === 0) {
-        return stepOrder === 1 ? 'IN_PROGRESS' : 'NOT_STARTED';
+        return 'IN_PROGRESS';
       }
 
       const previousStepsCompleted = previousSteps.every((previousOrder) => {
@@ -61,6 +62,7 @@ export function useWorkflow(project: ProjectDetail | undefined, activeSteps: Wor
           latestPrevious &&
           (latestPrevious.backend_status === 'COMPLETED' ||
             latestPrevious.status === 'ACCEPTED' ||
+            latestPrevious.status === 'COMPLETED' ||
             latestPrevious.status === 'APPROVED')
         );
       });
@@ -78,14 +80,11 @@ export function useWorkflow(project: ProjectDetail | undefined, activeSteps: Wor
       if (submissions.length === 0) return {};
 
       const targetSubmission = submissions[submissions.length - 1];
+      const currentStep = activeSteps.find((item) => item.order === stepOrder);
 
-      const formData: Record<string, unknown> = {};
-      targetSubmission?.documents.forEach((doc) => {
-        formData[doc.field_key] = doc.file_path || doc.value;
-      });
-      return formData;
+      return buildSubmissionFormData(targetSubmission, currentStep?.required_documents);
     },
-    [stepFormData, getStepSubmissions]
+    [stepFormData, getStepSubmissions, activeSteps]
   );
 
   const handleStepFormChange = useCallback(
@@ -115,15 +114,10 @@ export function useWorkflow(project: ProjectDetail | undefined, activeSteps: Wor
 
   const getSubmissionFormData = useCallback(
     (submission: Submission | null): Record<string, unknown> => {
-      if (!submission) return {};
-
-      const formData: Record<string, unknown> = {};
-      submission.documents.forEach((doc) => {
-        formData[doc.field_key] = doc.file_path || doc.value;
-      });
-      return formData;
+      const currentStep = activeSteps.find((item) => item.order === submission?.step_order);
+      return buildSubmissionFormData(submission, currentStep?.required_documents);
     },
-    []
+    [activeSteps]
   );
 
   return {

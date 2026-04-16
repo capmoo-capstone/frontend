@@ -4,6 +4,13 @@ import type { Submission } from '@/features/workflow';
 import { formatDateThai } from '@/lib/formatters';
 import { cn } from '@/lib/utils';
 
+import {
+  getActorDisplayName,
+  isCompletedLikeSubmissionStatus,
+  isSignedLikeSubmissionStatus,
+} from '../lib/submission-presentation';
+import { getSubmissionStableKey } from '../lib/workflow-identity';
+
 interface StepHistoryProps {
   submissions?: Submission[];
   onSelectSubmission?: (submission: Submission) => void;
@@ -27,7 +34,7 @@ export function StepHistory({
   return (
     <div className="divide-border flex flex-col divide-y rounded-md border">
       {submissions.map((submission) => {
-        const uniqueId = `${submission.step_order}-${submission.submission_round}`;
+        const uniqueId = getSubmissionStableKey(submission);
         const isSelected = selectedSubmissionId === uniqueId;
 
         return (
@@ -44,7 +51,7 @@ export function StepHistory({
               <div className="flex flex-col space-y-1">
                 <span className="h4-topic">ส่งครั้งที่ {submission.submission_round}</span>
                 <p className="text-muted-foreground caption">
-                  โดย {submission.submitted_by || 'ไม่ทราบชื่อ'}
+                  โดย {getActorDisplayName(submission.submitted_by)}
                 </p>
               </div>
               <span className="text-muted-foreground caption">
@@ -66,12 +73,12 @@ export function StepHistory({
                   </div>
                   <p className="caption ml-6">&quot;{submission.comments}&quot;</p>
                   <p className="text-muted-foreground caption ml-6">
-                    โดย {submission.action_by || 'ไม่ทราบชื่อ'}
+                    โดย {getActorDisplayName(submission.action_by)}
                   </p>
                 </div>
               </>
             )}
-            {['ACCEPTED', 'APPROVED'].includes(submission.status) && (
+            {isCompletedLikeSubmissionStatus(submission.status) && (
               <>
                 <hr />
                 <div className="flex flex-col items-start gap-1">
@@ -83,12 +90,12 @@ export function StepHistory({
                     </span>
                   </div>
                   <p className="text-muted-foreground caption ml-6">
-                    โดย {submission.action_by || 'ไม่ทราบชื่อ'}
+                    โดย {getActorDisplayName(submission.action_by)}
                   </p>
                 </div>
               </>
             )}
-            {submission.status === 'APPROVED' && (
+            {isSignedLikeSubmissionStatus(submission.status) && (
               <>
                 <hr />
                 <div className="flex flex-col items-start gap-1">

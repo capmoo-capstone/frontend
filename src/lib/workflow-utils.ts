@@ -2,7 +2,7 @@
 import { CircleCheckBig, Clock, FileCheck, UserCheck } from 'lucide-react';
 
 import type { Role } from '@/features/auth';
-import type { StepStatus } from '@/features/projects';
+import type { StepStatus } from '@/features/workflow';
 
 const LOCKED_PROJECT_STATUSES = new Set(['CANCELLED', 'CLOSED', 'UNASSIGNED', 'WAITING_ACCEPT']);
 

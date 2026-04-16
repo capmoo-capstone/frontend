@@ -8,6 +8,8 @@ import type { Role } from '@/features/auth';
 import type { StepStatus, Submission } from '@/features/workflow';
 import { cn } from '@/lib/utils';
 
+import type { DocumentStaffAction } from '../lib/workflow-actions';
+
 interface StepActionFormProps {
   isActive?: boolean;
   isBusy?: boolean;
@@ -18,6 +20,7 @@ interface StepActionFormProps {
   onApprove?: () => void;
   onDownloadAll?: () => void;
   onSupApprove?: () => void;
+  documentStaffAction?: DocumentStaffAction;
   viewSubmission?: Submission | null;
   onBackToEdit?: () => void;
   children: React.ReactNode;
@@ -33,6 +36,7 @@ export function StepActionForm({
   onApprove,
   onDownloadAll,
   onSupApprove,
+  documentStaffAction = null,
   viewSubmission,
   onBackToEdit,
   children,
@@ -163,16 +167,19 @@ export function StepActionForm({
                 className="w-full"
                 variant="outline"
                 onClick={onDownloadAll}
-                disabled={isBusy}
+                disabled={isBusy || !onDownloadAll}
               >
                 <Download className="mr-2 h-4 w-4" />
                 ดาวน์โหลดเอกสารทั้งหมด
               </Button>
-              <Button className="w-full" variant="brand" onClick={onSupApprove} disabled={isBusy}>
+              <Button
+                className="w-full"
+                variant="brand"
+                onClick={onSupApprove}
+                disabled={isBusy || !onSupApprove || documentStaffAction === null}
+              >
                 <CircleCheckBig className="mr-2 h-4 w-4" />
-                {stepStatus === 'WAITING_SIGNATURE'
-                  ? 'ลงนามเอกสาร'
-                  : 'เสนอผู้อำนวยการเรียบร้อยแล้ว'}
+                {documentStaffAction === 'sign' ? 'ลงนามเอกสาร' : 'เสนอผู้อำนวยการเรียบร้อยแล้ว'}
               </Button>
             </>
           )}

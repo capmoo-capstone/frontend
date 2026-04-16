@@ -2,8 +2,7 @@ import { z } from 'zod';
 
 import api from '@/lib/axios';
 
-import type { WorkflowStepConfig } from '../types';
-import type { Submission } from '../types';
+import type { Submission, WorkflowStepConfig } from '../types';
 
 export const WorkflowSubmissionBackendStatusSchema = z.enum([
   'WAITING_APPROVAL',
@@ -103,14 +102,18 @@ const mapBackendStatusToSubmissionStatus = (
     case 'WAITING_PROPOSAL':
       return 'ACCEPTED';
     case 'WAITING_SIGNATURE':
-    case 'COMPLETED':
     case 'APPROVED':
       return 'APPROVED';
+    case 'COMPLETED':
+      return 'COMPLETED';
     case 'ACCEPTED':
       return 'ACCEPTED';
     case 'REJECTED':
-    default:
       return 'REJECTED';
+    default: {
+      const _unreachable: never = status;
+      return _unreachable;
+    }
   }
 };
 
@@ -135,7 +138,7 @@ const getSubmissionActionAt = (submission: WorkflowSubmissionApiRecord) => {
   return submission.approved_at ?? submission.proposing_at ?? submission.completed_at ?? null;
 };
 
-const toUiSubmission = (submission: WorkflowSubmissionApiRecord, stepName: string): Submission => {
+const toUiSubmission = (submission: WorkflowSubmissionApiRecord, stepName?: string): Submission => {
   const normalizedDocuments = submission.documents.map((document, index) => ({
     field_key: document.field_key ?? `__document_${index + 1}`,
     file_name: document.file_name ?? undefined,
@@ -152,7 +155,7 @@ const toUiSubmission = (submission: WorkflowSubmissionApiRecord, stepName: strin
     step_order: submission.step_order,
     submission_round: submission.submission_round,
     status: mapBackendStatusToSubmissionStatus(submission.status),
-    submitted_by: submission.submitted_by ?? 'ไม่ทราบชื่อ',
+    submitted_by: submission.submitted_by ?? null,
     submitted_at: submission.submitted_at ?? new Date().toISOString(),
     action_by: getSubmissionActionBy(submission),
     action_at: getSubmissionActionAt(submission),
@@ -166,14 +169,12 @@ export const normalizeWorkflowSubmissions = (
   submissions: WorkflowSubmissionApiRecord[],
   steps: WorkflowStepConfig[]
 ): Submission[] => {
-  return submissions
-    .map((submission) => {
-      const stepName =
-        submission.step_name ?? steps.find((step) => step.order === submission.step_order)?.name;
-      if (!stepName) return null;
-      return toUiSubmission(submission, stepName);
-    })
-    .filter((submission): submission is Submission => Boolean(submission));
+  return submissions.map((submission) => {
+    const stepName =
+      submission.step_name ?? steps.find((step) => step.order === submission.step_order)?.name;
+
+    return toUiSubmission(submission, stepName);
+  });
 };
 
 export const fetchWorkflowSubmissions = async (projectId: string) => {

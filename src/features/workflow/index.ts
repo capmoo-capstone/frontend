@@ -24,6 +24,7 @@ export { ProcurementWorkflows } from './config/procurement-workflows';
 export {
   FieldTypeSchema,
   StepStatusSchema,
+  UiOnlyStepStatusSchema,
   SubmissionDocumentSchema,
   SubmissionSchema,
   WorkflowDocumentConfigSchema,
@@ -31,11 +32,14 @@ export {
 } from './types';
 
 export type {
+  BackendSubmissionStatus,
   FieldConfig,
   FieldType,
   StepStatus,
   Submission,
   SubmissionDocument,
+  SubmissionStatus,
+  UiOnlyStepStatus,
   WorkflowDocumentConfig,
   WorkflowStepConfig,
 } from './types';

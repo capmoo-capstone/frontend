@@ -3,6 +3,8 @@ import type { ProjectDetail } from '@/features/projects';
 import { type WorkflowStepConfig, useWorkflow, useWorkflowMutations } from '@/features/workflow';
 import { isActionRequired, isWorkflowProjectLocked } from '@/lib/workflow-utils';
 
+import { resolveDocumentStaffAction } from '../lib/workflow-actions';
+import { getSubmissionStableKey } from '../lib/workflow-identity';
 import { DynamicStepForm } from './DynamicStepForm';
 import { StatusWaitingCard } from './StatusWaitingCard';
 import { StepActionForm } from './StepActionForm';
@@ -13,9 +15,14 @@ import { WorkflowStep } from './WorkflowStep';
 interface ProjectWorkflowStepsProps {
   project: ProjectDetail;
   steps: WorkflowStepConfig[];
+  activeWorkflowType: string;
 }
 
-export function ProjectWorkflowSteps({ project, steps }: ProjectWorkflowStepsProps) {
+export function ProjectWorkflowSteps({
+  project,
+  steps,
+  activeWorkflowType,
+}: ProjectWorkflowStepsProps) {
   const { user } = useAuth();
   const workflowMutations = useWorkflowMutations(project.id);
 
@@ -28,7 +35,7 @@ export function ProjectWorkflowSteps({ project, steps }: ProjectWorkflowStepsPro
     handleSelectSubmission,
     handleBackToEdit,
     viewingSubmissions,
-  } = useWorkflow(project, steps);
+  } = useWorkflow(project, steps, activeWorkflowType);
 
   const isMutating =
     workflowMutations.createSubmission.isPending ||
@@ -108,6 +115,7 @@ export function ProjectWorkflowSteps({ project, steps }: ProjectWorkflowStepsPro
         const viewSubmission = viewingSubmissions[step.order];
         const latestSubmission = submissions[submissions.length - 1];
         const fields = step.required_documents;
+        const documentStaffAction = resolveDocumentStaffAction(latestSubmission?.backend_status);
 
         const actionRole =
           viewAsRole === 'HEAD_OF_DEPARTMENT'
@@ -152,9 +160,7 @@ export function ProjectWorkflowSteps({ project, steps }: ProjectWorkflowStepsPro
                     submissions={submissions}
                     onSelectSubmission={(sub) => handleSelectSubmission(step.order, sub)}
                     selectedSubmissionId={
-                      viewSubmission
-                        ? `${step.order}-${viewSubmission.submission_round}`
-                        : undefined
+                      viewSubmission ? getSubmissionStableKey(viewSubmission) : undefined
                     }
                   />
                 </div>
@@ -194,16 +200,30 @@ export function ProjectWorkflowSteps({ project, steps }: ProjectWorkflowStepsPro
                       }}
                       onSupApprove={async () => {
                         if (!latestSubmission?.id) return;
-                        if (latestSubmission.backend_status === 'WAITING_SIGNATURE') {
+
+                        if (documentStaffAction === 'propose') {
+                          await workflowMutations.proposeSubmission.mutateAsync(
+                            latestSubmission.id
+                          );
+                          return;
+                        }
+
+                        if (documentStaffAction === 'sign') {
                           await workflowMutations.signSubmission.mutateAsync(latestSubmission.id);
                           return;
                         }
 
-                        await workflowMutations.proposeSubmission.mutateAsync(latestSubmission.id);
+                        console.warn(
+                          'Unsupported supervisor action state',
+                          latestSubmission.backend_status
+                        );
                       }}
                       onDownloadAll={() => {
-                        void 0;
+                        console.warn(
+                          'Download all is not implemented yet for workflow submissions'
+                        );
                       }}
+                      documentStaffAction={documentStaffAction}
                     >
                       <DynamicStepForm
                         fields={fields}

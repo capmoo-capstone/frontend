@@ -36,6 +36,8 @@ export function ProjectDetailTabs({ project, workflowConfigs }: ProjectDetailTab
     }
   }, [project.procurement_type, workflowConfigs, workflowTab]);
 
+  const activeWorkflowType = workflowTab === 'PROCUREMENT' ? project.procurement_type : 'CONTRACT';
+
   const projectWithSubmissions = useMemo(() => {
     const procurementSteps =
       workflowConfigs.find((w) => w.type === project.procurement_type)?.steps || [];
@@ -113,11 +115,19 @@ export function ProjectDetailTabs({ project, workflowConfigs }: ProjectDetailTab
 
       {/* --- Content Area --- */}
       <TabsContent value="timeline">
-        <ProjectWorkflowSteps project={projectWithSubmissions} steps={activeSteps} />
+        <ProjectWorkflowSteps
+          project={projectWithSubmissions}
+          steps={activeSteps}
+          activeWorkflowType={activeWorkflowType}
+        />
       </TabsContent>
 
       <TabsContent value="summary">
-        <ProjectSummaryView project={projectWithSubmissions} steps={activeSteps} />
+        <ProjectSummaryView
+          project={projectWithSubmissions}
+          steps={activeSteps}
+          activeWorkflowType={activeWorkflowType}
+        />
       </TabsContent>
     </Tabs>
   );

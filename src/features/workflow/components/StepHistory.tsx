@@ -109,7 +109,7 @@ export function StepHistory({
                 </div>
               </>
             )}
-            {submission.completed_by && (
+            {submission.proposing_by && submission.completed_by && (
               <>
                 <hr />
                 <div className="flex flex-col items-start gap-1">

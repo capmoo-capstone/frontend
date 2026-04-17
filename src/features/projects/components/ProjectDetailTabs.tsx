@@ -28,6 +28,8 @@ export function ProjectDetailTabs({ project, workflowConfigs }: ProjectDetailTab
   const [workflowTab, setWorkflowTab] = useState<'PROCUREMENT' | 'CONTRACT'>('PROCUREMENT');
   const { data: workflowSubmissions } = useWorkflowSubmissions(project.id);
 
+  const isContractWorkflowAvailable = project.current_template_type === 'CONTRACT';
+
   const activeSteps = useMemo(() => {
     if (workflowTab === 'PROCUREMENT') {
       return workflowConfigs.find((w) => w.type === project.procurement_type)?.steps || [];
@@ -80,9 +82,11 @@ export function ProjectDetailTabs({ project, workflowConfigs }: ProjectDetailTab
             </div>
           </button>
           <button
-            onClick={() => setWorkflowTab('CONTRACT')}
+            onClick={() => isContractWorkflowAvailable && setWorkflowTab('CONTRACT')}
+            disabled={!isContractWorkflowAvailable}
             className={cn(
               'caption flex flex-col items-start gap-1 border-b-2 px-1 pb-3 transition-colors',
+              !isContractWorkflowAvailable && 'cursor-not-allowed opacity-50',
               workflowTab === 'CONTRACT'
                 ? 'border-brand-9 text-brand-11'
                 : 'text-muted-foreground hover:text-foreground border-transparent'

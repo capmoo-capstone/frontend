@@ -44,7 +44,7 @@ interface EditableImportTableProps {
   onBack: () => void;
   departments: Array<{ id: string; name: string }> | undefined;
   fiscalYears: string[];
-  units?: Array<{ id: string; name: string }> | undefined;
+  units?: Array<{ id: string; name: string; dept_id?: string }> | undefined;
   mode: ImportMode;
 }
 
@@ -58,7 +58,7 @@ interface EditableTableMeta {
   updateData: (index: number, id: string, value: unknown) => void;
   mode: ImportMode;
   departments: Array<{ id: string; name: string }> | undefined;
-  units: Array<{ id: string; name: string }> | undefined;
+  units: Array<{ id: string; name: string; dept_id?: string }> | undefined;
   fiscalYears: string[];
   errorMap: Map<string, string>;
   departmentIdSet: Set<string>;
@@ -77,10 +77,11 @@ const buildErrorKey = (rowIndex: number, field: string) => `${rowIndex}:${field}
 // Editable Cell Component
 const EditableCell = ({
   getValue,
-  row: { index },
+  row,
   column: { id },
   table,
 }: CellContext<EditableImportRow, unknown>) => {
+  const { index, original } = row;
   const initialValue = getValue();
   const initialTextValue = initialValue == null ? '' : String(initialValue);
   const isCurrencyField = id === 'amount' || id === 'budget';
@@ -166,7 +167,13 @@ const EditableCell = ({
       <div className="flex w-full flex-col gap-1">
         <Select
           value={displayValue}
-          onValueChange={(val) => updateData && updateData(index, id, val)}
+          onValueChange={(val) => {
+            if (!updateData) return;
+
+            updateData(index, id, val);
+            // Keep row data consistent: selecting a new department invalidates previous unit selection.
+            updateData(index, 'unit_id', '');
+          }}
         >
           <SelectTrigger
             className={cn('bg-background h-9 w-full', hasError && 'border-destructive')}
@@ -279,11 +286,26 @@ const EditableCell = ({
   }
 
   if (id === 'unit_id') {
-    const displayValue = resolveSelectValue(initialTextValue, unitIdSet, unitNameToId);
+    const rawDepartmentValue = String(original.department_id ?? '').trim();
+    const selectedDepartmentId = departmentIdSet?.has(rawDepartmentValue)
+      ? rawDepartmentValue
+      : (departmentNameToId?.get(rawDepartmentValue) ?? '');
+    const filteredUnits = selectedDepartmentId
+      ? (units ?? []).filter((unit) => unit.dept_id === selectedDepartmentId)
+      : [];
+    const filteredUnitIdSet = new Set(filteredUnits.map((unit) => unit.id));
+
+    const normalizedUnitValue = resolveSelectValue(initialTextValue, unitIdSet, unitNameToId);
+    const displayValue =
+      normalizedUnitValue && filteredUnitIdSet.has(normalizedUnitValue)
+        ? normalizedUnitValue
+        : undefined;
+    const controlledUnitValue = displayValue ?? '';
     return (
       <div className="flex w-full flex-col gap-1">
         <Select
-          value={displayValue}
+          value={controlledUnitValue}
+          disabled={!selectedDepartmentId}
           onValueChange={(val) => updateData && updateData(index, id, val)}
         >
           <SelectTrigger
@@ -294,12 +316,11 @@ const EditableCell = ({
             />
           </SelectTrigger>
           <SelectContent>
-            {units &&
-              units.map((unit: { id: string; name: string }) => (
-                <SelectItem key={unit.id} value={unit.id}>
-                  {unit.name}
-                </SelectItem>
-              ))}
+            {filteredUnits.map((unit) => (
+              <SelectItem key={unit.id} value={unit.id}>
+                {unit.name}
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
         {hasError && <p className="text-destructive text-xs">{cellError}</p>}
@@ -445,6 +466,7 @@ export function EditableImportTable({
                 departmentIdSet,
                 departmentNameToId
               ),
+              unit_id: normalizeOptionId(row.unit_id, unitIdSet, unitNameToId),
               fiscal_year: row.fiscal_year ?? '',
               delivery_date: row.delivery_date_str
                 ? parseThaiDateString(row.delivery_date_str, 'ymd', '-')
@@ -499,16 +521,6 @@ export function EditableImportTable({
               size: 140,
             },
             {
-              accessorKey: 'unit_id',
-              header: () => (
-                <>
-                  ชื่อศูนย์ต้นทุน <span className="text-destructive">*</span>
-                </>
-              ),
-              cell: EditableCell,
-              size: 320,
-            },
-            {
               accessorKey: 'department_id',
               header: () => (
                 <>
@@ -517,6 +529,16 @@ export function EditableImportTable({
               ),
               cell: EditableCell,
               size: 220,
+            },
+            {
+              accessorKey: 'unit_id',
+              header: () => (
+                <>
+                  ชื่อศูนย์ต้นทุน <span className="text-destructive">*</span>
+                </>
+              ),
+              cell: EditableCell,
+              size: 320,
             },
             {
               accessorKey: 'budget_name',

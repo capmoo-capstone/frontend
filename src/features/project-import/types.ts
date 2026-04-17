@@ -36,7 +36,6 @@ export type ProjectImportFormValues = z.input<typeof ProjectImportSchema>;
 export type ProjectImportPayload = z.infer<typeof ProjectImportSchema>;
 
 export const FioriImportSchema = ProjectImportSchema.omit({
-  unit_id: true,
   budget_plan_ids: true,
   lesspaper_no: true,
 });
@@ -44,7 +43,6 @@ export const FioriImportSchema = ProjectImportSchema.omit({
 export type FioriImportPayload = z.infer<typeof FioriImportSchema>;
 
 export const LesspaperImportSchema = ProjectImportSchema.omit({
-  unit_id: true,
   budget_plan_ids: true,
   lesspaper_no: true,
 }).extend({

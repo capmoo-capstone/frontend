@@ -56,6 +56,7 @@ interface ValidationError {
 
 interface EditableTableMeta {
   updateData: (index: number, id: string, value: unknown) => void;
+  mode: ImportMode;
   departments: Array<{ id: string; name: string }> | undefined;
   units: Array<{ id: string; name: string }> | undefined;
   fiscalYears: string[];
@@ -94,6 +95,7 @@ const EditableCell = ({
   };
   const meta = table.options.meta as EditableTableMeta | undefined;
   const updateData = meta?.updateData;
+  const mode = meta?.mode;
   const departments = meta?.departments;
   const fiscalYears = meta?.fiscalYears;
   const units = meta?.units;
@@ -287,7 +289,9 @@ const EditableCell = ({
           <SelectTrigger
             className={cn('bg-background h-9 w-full', hasError && 'border-destructive')}
           >
-            <SelectValue placeholder="กรุณาเลือกชื่อศูนย์ต้นทุน" />
+            <SelectValue
+              placeholder={`กรุณาเลือก${mode === 'budget' ? 'ชื่อศูนย์ต้นทุน' : 'ฝ่าย'}`}
+            />
           </SelectTrigger>
           <SelectContent>
             {units &&
@@ -643,6 +647,16 @@ export function EditableImportTable({
               size: 220,
             },
             {
+              accessorKey: 'unit_id',
+              header: () => (
+                <>
+                  ฝ่าย <span className="text-destructive">*</span>
+                </>
+              ),
+              cell: EditableCell,
+              size: 320,
+            },
+            {
               accessorKey: 'fiscal_year',
               header: () => (
                 <>
@@ -683,6 +697,7 @@ export function EditableImportTable({
     getCoreRowModel: getCoreRowModel(),
     meta: {
       updateData: updateRow,
+      mode,
       departments,
       units,
       fiscalYears,

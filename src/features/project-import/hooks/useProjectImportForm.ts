@@ -35,6 +35,8 @@ export function useProjectImportForm({ onSuccess }: UseProjectImportFormOptions)
 
   const form = useForm<ProjectImportFormValues, unknown, ProjectImportPayload>({
     resolver: zodResolver(ProjectImportSchema),
+    mode: 'onChange',
+    reValidateMode: 'onChange',
     defaultValues: {
       pr_no: '',
       title: '',
@@ -44,7 +46,7 @@ export function useProjectImportForm({ onSuccess }: UseProjectImportFormOptions)
       department_id: canSelectEveryUnits ? '' : user?.department?.id || '',
       unit_id: canSelectEveryUnits ? '' : user?.unit?.id || '',
       budget_plan_ids: [],
-      budget: 0,
+      budget: '',
     },
   });
 
@@ -99,8 +101,6 @@ export function useProjectImportForm({ onSuccess }: UseProjectImportFormOptions)
         .filter((p) => selectedPlans.includes(p.id))
         .reduce((acc, curr) => acc + curr.budget_amount, 0);
       form.setValue('budget', sum, { shouldValidate: true });
-    } else {
-      form.setValue('budget', 0, { shouldValidate: true });
     }
   }, [selectedPlans, budgetPlans, form]);
 

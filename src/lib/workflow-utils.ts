@@ -73,7 +73,7 @@ export const getStepColor = (
   }
 
   if (isWorkflowProjectLocked(projectStatus)) {
-    return TOKENS.info;
+    return TOKENS.secondary;
   }
 
   const canAct =

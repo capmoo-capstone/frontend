@@ -57,14 +57,7 @@ export function useWorkflow(
 
       const previousStepsCompleted = previousSteps.every((previousOrder) => {
         const previousSubmissions = getStepSubmissions(previousOrder);
-        const latestPrevious = previousSubmissions[previousSubmissions.length - 1];
-        return (
-          latestPrevious &&
-          (latestPrevious.backend_status === 'COMPLETED' ||
-            latestPrevious.status === 'ACCEPTED' ||
-            latestPrevious.status === 'COMPLETED' ||
-            latestPrevious.status === 'APPROVED')
-        );
+        return previousSubmissions.length > 0;
       });
 
       return previousStepsCompleted ? 'IN_PROGRESS' : 'NOT_STARTED';

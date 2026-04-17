@@ -1,18 +1,35 @@
+import type { Role } from '@/features/auth';
+import type { ProjectStatus } from '@/features/projects';
 import type { StepStatus } from '@/features/workflow';
 import { getWaitingStatusInfo } from '@/lib/formatters';
 import { cn } from '@/lib/utils';
+import { getStepColor } from '@/lib/workflow-utils';
 
 interface StatusWaitingCardProps {
   status: StepStatus;
+  viewAsRole: Role;
+  projectStatus?: ProjectStatus;
+  canAct?: boolean;
 }
 
-export function StatusWaitingCard({ status }: StatusWaitingCardProps) {
+export function StatusWaitingCard({
+  status,
+  viewAsRole,
+  projectStatus,
+  canAct,
+}: StatusWaitingCardProps) {
   const info = getWaitingStatusInfo(status);
   const Icon = info.icon;
+  const colors = getStepColor(status, viewAsRole, projectStatus, canAct);
 
   return (
-    <div className="animate-in fade-in flex h-full flex-col items-center justify-center space-y-4 rounded-lg border border-dashed p-8 text-center duration-500">
-      <div className={cn('rounded-full border-none p-4', info.color)}>
+    <div
+      className={cn(
+        'animate-in fade-in flex h-full flex-col items-center justify-center space-y-4 rounded-lg p-8 text-center duration-500',
+        colors.container
+      )}
+    >
+      <div className={cn('rounded-full border-none p-4', colors.bubble)}>
         {Icon && <Icon className="h-8 w-8" />}
       </div>
       <div className="space-y-1">

@@ -1,124 +1,102 @@
-// workflow-utils.ts
-import { CircleCheckBig, Clock, FileCheck, UserCheck } from 'lucide-react';
-
 import type { Role } from '@/features/auth';
+import type { ProjectStatus } from '@/features/projects';
 import type { StepStatus } from '@/features/workflow';
 
 const LOCKED_PROJECT_STATUSES = new Set(['CANCELLED', 'CLOSED', 'UNASSIGNED', 'WAITING_ACCEPT']);
 
-export const isWorkflowProjectLocked = (projectStatus?: string) => {
+export interface StepColorTokens {
+  line: string;
+  bubble: string;
+  container: string;
+}
+
+const TOKENS = {
+  success: {
+    line: 'bg-success',
+    bubble: 'bg-success text-white',
+    container: 'border-success bg-success-light text-success-dark',
+  },
+  warning: {
+    line: 'bg-warning/50',
+    bubble: 'bg-warning text-white',
+    container: 'border-warning bg-warning-light text-warning-dark',
+  },
+  error: {
+    line: 'bg-red-200',
+    bubble: 'bg-red-100 text-red-700',
+    container: 'border-red-200 bg-red-50 text-red-700',
+  },
+  info: {
+    line: 'bg-info',
+    bubble: 'bg-info text-white',
+    container: 'border-info bg-info-light text-info',
+  },
+  secondary: {
+    line: 'bg-muted',
+    bubble: 'bg-muted text-primary',
+    container: 'border-muted bg-secondary text-muted-dark',
+  },
+} satisfies Record<string, StepColorTokens>;
+
+const ROLE_ACTION_STATUSES: Partial<Record<Role, StepStatus[]>> = {
+  GENERAL_STAFF: ['IN_PROGRESS', 'REJECTED'],
+  HEAD_OF_UNIT: ['WAITING_APPROVAL'],
+  DOCUMENT_STAFF: ['WAITING_PROPOSAL', 'WAITING_SIGNATURE'],
+};
+
+export const isWorkflowProjectLocked = (projectStatus?: ProjectStatus | string): boolean => {
   if (!projectStatus) return false;
   return LOCKED_PROJECT_STATUSES.has(projectStatus);
 };
 
 export const isActionRequired = (
-  role: Role,
+  role: Role | string,
   status: StepStatus,
-  projectStatus?: string
+  projectStatus?: ProjectStatus | string
 ): boolean => {
   if (isWorkflowProjectLocked(projectStatus)) {
     return false;
   }
 
-  switch (role) {
-    case 'GENERAL_STAFF':
-      return ['IN_PROGRESS', 'REJECTED'].includes(status);
-    case 'HEAD_OF_UNIT':
-      return status === 'WAITING_APPROVAL';
-    case 'DOCUMENT_STAFF':
-      return ['WAITING_PROPOSAL', 'WAITING_SIGNATURE'].includes(status);
-    default:
-      return false;
-  }
+  const actionableStatuses = ROLE_ACTION_STATUSES[role as Role];
+  return actionableStatuses?.includes(status) ?? false;
 };
 
 export const getStepColor = (
   status: StepStatus,
-  role: Role,
-  projectStatus?: string,
+  role: Role | string,
+  projectStatus?: ProjectStatus | string,
   canActOverride?: boolean
-) => {
-  const projectLocked = isWorkflowProjectLocked(projectStatus);
-
+): StepColorTokens => {
   if (status === 'COMPLETED') {
-    return {
-      line: 'bg-success',
-      bubble: 'bg-success text-white',
-      container: 'border-success bg-success-light text-success-dark',
-      title: 'ดำเนินการเสร็จสิ้น',
-      description: 'ขั้นตอนนี้เสร็จสมบูรณ์แล้ว',
-      icon: FileCheck,
-    };
+    return TOKENS.success;
   }
 
-  const canActNow =
+  if (isWorkflowProjectLocked(projectStatus)) {
+    return TOKENS.info;
+  }
+
+  const canAct =
     canActOverride === undefined ? isActionRequired(role, status, projectStatus) : canActOverride;
 
-  if (!projectLocked && canActNow) {
-    return {
-      line: 'bg-warning/50',
-      bubble: 'bg-warning text-white',
-      container: 'border-warning bg-warning-light text-warning-dark',
-    };
-  }
-
   switch (status) {
-    case 'IN_PROGRESS': {
-      return {
-        line: 'bg-info',
-        bubble: 'bg-info text-white',
-        container: 'border-info bg-info-light text-info',
-        title: 'กำลังดำเนินการ',
-        description: 'เจ้าหน้าที่พัสดุกำลังจัดทำเอกสาร',
-        icon: CircleCheckBig,
-      };
-    }
-    case 'NOT_STARTED': {
-      return {
-        line: 'bg-muted',
-        bubble: 'bg-muted text-primary',
-        container: 'border-muted bg-secondary text-muted-dark',
-        title: 'ยังไม่ถึงขั้นตอนนี้',
-        description: 'กรุณารอการดำเนินการจากขั้นตอนก่อนหน้า',
-        icon: Clock,
-      };
-    }
-    case 'WAITING_APPROVAL':
-    case 'WAITING_PROPOSAL':
-      return {
-        line: 'bg-info',
-        bubble: 'bg-info text-white',
-        container: 'border-info bg-info-light text-info',
-        title: 'รอการตรวจสอบ',
-        description: 'หัวหน้ากลุ่มงานกำลังตรวจสอบความถูกต้อง',
-        icon: UserCheck,
-      };
-    case 'WAITING_SIGNATURE':
-      return {
-        line: 'bg-info',
-        bubble: 'bg-info text-white',
-        container: 'border-info bg-info-light text-info',
-        title: 'รอเสนอลงนาม',
-        description: 'เจ้าหน้าที่งานระเบียบกำลังเตรียมเสนอผู้อำนวยการ',
-        icon: FileCheck,
-      };
+    case 'NOT_STARTED':
+      return TOKENS.secondary;
+
+    case 'IN_PROGRESS':
+      return canAct ? TOKENS.warning : TOKENS.info;
+
     case 'REJECTED':
-      return {
-        line: 'bg-info',
-        bubble: 'bg-info text-white',
-        container: 'border-info bg-info-light text-info',
-        title: 'รอการแก้ไขเอกสาร',
-        description: 'รอเจ้าหน้าที่พัสดุส่งเอกสารฉบับแก้ไข',
-        icon: UserCheck,
-      };
+      return canAct ? TOKENS.warning : TOKENS.error;
+
+    case 'WAITING_APPROVAL':
+      return canAct ? TOKENS.warning : TOKENS.info;
+
+    case 'WAITING_PROPOSAL':
+    case 'WAITING_SIGNATURE':
+      return canAct ? TOKENS.warning : TOKENS.info;
+
     default:
-      return {
-        line: 'bg-muted',
-        bubble: 'bg-muted text-primary',
-        container: 'border-muted bg-secondary text-muted-dark',
-        title: 'ยังไม่ถึงขั้นตอนนี้',
-        description: 'กรุณารอการดำเนินการจากขั้นตอนก่อนหน้า',
-        icon: Clock,
-      };
+      return TOKENS.secondary;
   }
 };

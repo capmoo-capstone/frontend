@@ -70,7 +70,7 @@ export const hasRoleInScopes = (
   const scopes = getAllScopes(user);
   if (scopes.length === 0) return false;
 
-  allowedRoles.push('SUPER_ADMIN');
+  // allowedRoles.push('SUPER_ADMIN');
 
   return scopes.some((scope) => {
     if (!allowedRoles.includes(scope.role)) return false;

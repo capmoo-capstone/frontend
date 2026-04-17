@@ -16,6 +16,8 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
         name: 'จัดทำแผนจัดการจัดซื้อจัดจ้าง และจัดทำคำสั่งแต่งตั้งคณะกรรมการฯ TOR',
         order: 1,
         required_step: [],
+        require_approval: true,
+        requiredSignature: true,
         required_documents: [
           {
             type: 'FILE',
@@ -35,6 +37,8 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
         name: 'จัดทำรายงานขอซื้อหรือขอจ้าง, คำสั่งแต่งตั้งคณะกรรมการซื้อหรือจ้าง และหนังสือเชิญชวน',
         order: 2,
         required_step: [1],
+        require_approval: true,
+        requiredSignature: true,
         required_documents: [
           {
             type: 'FILE',
@@ -60,6 +64,8 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
         name: 'จัดทำรายงานผลการพิจารณาจัดซื้อจัดจ้าง, รายงานผลฯ อนุมัติ ประกาศผู้ชนะ และหนังสือสนองรับราคาฯ',
         order: 3,
         required_step: [2],
+        require_approval: true,
+        requiredSignature: true,
         required_documents: [
           {
             type: 'FILE',
@@ -91,6 +97,8 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
         name: 'จัดทำร่างสัญญา / ใบสั่งซื้อสั่งจ้าง / หนังสือข้อตกลง',
         order: 4,
         required_step: [3],
+        require_approval: true,
+        requiredSignature: true,
         required_documents: [
           {
             type: 'GEN_CONT_NO',
@@ -116,6 +124,8 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
         name: 'แจ้งเตือนผู้ค้าให้เข้ามาลงนามในเอกสารสั่งซื้อ/จ้าง',
         order: 5,
         required_step: [4],
+        require_approval: false,
+        requiredSignature: false,
         required_documents: [
           {
             type: 'VENDOR_EMAIL',
@@ -128,7 +138,9 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
       {
         name: 'ส่งไปยังฝ่ายตรวจรับ',
         order: 6,
-        required_step: [5],
+        required_step: [1, 2, 3, 4, 5],
+        require_approval: true,
+        requiredSignature: false,
         required_documents: [
           {
             type: 'NUMBER',
@@ -167,6 +179,8 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
         name: 'จัดทำแผนจัดการจัดซื้อจัดจ้าง',
         order: 1,
         required_step: [],
+        require_approval: true,
+        requiredSignature: true,
         required_documents: [
           {
             type: 'FILE',
@@ -180,6 +194,8 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
         name: 'จัดทำรายงานขอมอบหมายผู้จัดทำขอบเขตของงาน และคำสั่งแต่งตั้ง',
         order: 2,
         required_step: [1],
+        require_approval: true,
+        requiredSignature: true,
         required_documents: [
           {
             type: 'FILE',
@@ -199,6 +215,8 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
         name: 'จัดประชุมคณะกรรมการจัดทำขอบเขตของงาน',
         order: 3,
         required_step: [2],
+        require_approval: true,
+        requiredSignature: true,
         required_documents: [
           {
             type: 'DATE',
@@ -224,6 +242,8 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
         name: 'จัดทำรายงานขอซื้อ / จ้าง, คำสั่งแต่งตั้งคณะกรรมการพิจารณาผลและตรวจรับ, เอกสารประกวดราคาจ้างฯ และร่างประกาศ',
         order: 4,
         required_step: [3],
+        require_approval: true,
+        requiredSignature: true,
         required_documents: [
           {
             type: 'FILE',
@@ -261,6 +281,8 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
         name: 'จัดทำรายงานผลการรับฟังความเห็น, เอกสารประกวดราคาฯ และประกาศฉบับจริง',
         order: 5,
         required_step: [4],
+        require_approval: true,
+        requiredSignature: true,
         required_documents: [
           {
             type: 'FILE',
@@ -287,6 +309,8 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
         name: 'จัดประชุมคณะกรรมการพิจารณาผลฯ',
         order: 6,
         required_step: [5],
+        require_approval: false,
+        requiredSignature: false,
         required_documents: [
           {
             type: 'DATE',
@@ -312,6 +336,8 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
         name: 'จัดทำรายงานผลการพิจารณาจัดซื้อจัดจ้าง, รายงานผลฯอนุมัติ, แบบแจ้งผลการจัดซื้อ / จ้าง, แบบแจ้งเหตุผลเพิ่มเติม ประกาศผู้ชนะ และหนังสือสนองรับราคาฯ',
         order: 7,
         required_step: [6],
+        require_approval: true,
+        requiredSignature: true,
         required_documents: [
           {
             type: 'FILE',
@@ -349,6 +375,8 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
         name: 'จัดทำร่างสัญญา พร้อมเอกสารประกอบสัญญา และหลักประกันสัญญา',
         order: 8,
         required_step: [7],
+        require_approval: true,
+        requiredSignature: true,
         required_documents: [
           {
             type: 'FILE',
@@ -368,6 +396,8 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
         name: 'แจ้งเตือนผู้ค้าให้เข้ามาลงนามในเอกสารสั่งซื้อ/จ้าง',
         order: 9,
         required_step: [8],
+        require_approval: false,
+        requiredSignature: false,
         required_documents: [
           {
             type: 'VENDOR_EMAIL',
@@ -380,7 +410,9 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
       {
         name: 'ส่งไปยังฝ่ายตรวจรับ',
         order: 10,
-        required_step: [9],
+        required_step: [1, 2, 3, 4, 5, 6, 7, 8, 9],
+        require_approval: true,
+        requiredSignature: false,
         required_documents: [
           {
             type: 'NUMBER',
@@ -414,6 +446,8 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
         name: 'แผนจัดการจัดซื้อจัดจ้าง และจัดทำคำสั่งแต่งตั้งคณะกรรมการฯ TOR',
         order: 1,
         required_step: [],
+        require_approval: true,
+        requiredSignature: true,
         required_documents: [
           {
             type: 'FILE',
@@ -433,6 +467,8 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
         name: 'รายงานขอซื้อ / จ้าง, คำสั่งคณะกรรมการซื้อ / จ้าง โดยวิธีคัดเลือก, หนังสือเชิญชวน',
         order: 2,
         required_step: [1],
+        require_approval: true,
+        requiredSignature: true,
         required_documents: [
           {
             type: 'FILE',
@@ -458,6 +494,8 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
         name: 'จัดประชุมคณะกรรมการจ้างโดยวิธีคัดเลือก',
         order: 3,
         required_step: [2],
+        require_approval: false,
+        requiredSignature: false,
         required_documents: [
           {
             type: 'DATE',
@@ -483,6 +521,8 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
         name: 'จัดทำรายงานผลการพิจารณาจัดซื้อจัดจ้าง, รายงานผลฯ อนุมัติ, แบบแจ้งผลการจัดซื้อ / จ้าง, แบบแจ้งเหตุผลเพิ่มเติม ประกาศผู้ชนะ และหนังสือสนองรับราคาฯ',
         order: 4,
         required_step: [3],
+        require_approval: true,
+        requiredSignature: true,
         required_documents: [
           {
             type: 'FILE',
@@ -520,6 +560,8 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
         name: 'จัดทำร่างสัญญา / ใบสั่งซื้อ/จ้าง',
         order: 5,
         required_step: [4],
+        require_approval: true,
+        requiredSignature: true,
         required_documents: [
           {
             type: 'FILE',
@@ -539,6 +581,8 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
         name: 'แจ้งเตือนผู้ค้าให้เข้ามาลงนามในเอกสารสั่งซื้อ/จ้าง',
         order: 6,
         required_step: [5],
+        require_approval: false,
+        requiredSignature: false,
         required_documents: [
           {
             type: 'VENDOR_EMAIL',
@@ -551,7 +595,9 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
       {
         name: 'ส่งไปยังฝ่ายตรวจรับ',
         order: 7,
-        required_step: [6],
+        required_step: [1, 2, 3, 4, 5, 6],
+        require_approval: true,
+        requiredSignature: false,
         required_documents: [
           {
             type: 'NUMBER',
@@ -590,6 +636,8 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
         name: 'จัดทำรายงานขอซื้อ/จ้าง ,รายงานผลฯอนุมัติ ประกาศผู้ชนะ',
         order: 1,
         required_step: [],
+        require_approval: true,
+        requiredSignature: true,
         required_documents: [
           {
             type: 'FILE',
@@ -621,6 +669,8 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
         name: 'จัดทำใบสั่งซื้อสั่งจ้าง',
         order: 2,
         required_step: [1],
+        require_approval: true,
+        requiredSignature: true,
         required_documents: [
           {
             type: 'GEN_CONT_NO',
@@ -646,6 +696,8 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
         name: 'แจ้งเตือนผู้ค้าให้เข้ามาลงนามในเอกสารสั่งซื้อ/จ้าง',
         order: 3,
         required_step: [2],
+        require_approval: false,
+        requiredSignature: false,
         required_documents: [
           {
             type: 'VENDOR_EMAIL',
@@ -658,7 +710,9 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
       {
         name: 'ส่งไปยังฝ่ายตรวจรับ',
         order: 4,
-        required_step: [3],
+        required_step: [1, 2, 3],
+        require_approval: true,
+        requiredSignature: false,
         required_documents: [
           {
             type: 'NUMBER',
@@ -697,6 +751,8 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
         name: 'จัดใบขอซื้อ',
         order: 1,
         required_step: [],
+        require_approval: true,
+        requiredSignature: true,
         required_documents: [
           {
             type: 'TEXT',
@@ -716,6 +772,8 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
         name: 'จัดทำใบสั่งซื้อสั่งจ้าง',
         order: 2,
         required_step: [1],
+        require_approval: true,
+        requiredSignature: true,
         required_documents: [
           {
             type: 'TEXT',
@@ -735,6 +793,8 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
         name: 'แจ้งเตือนผู้ค้าให้เข้ามาลงนามในเอกสารสั่งซื้อ/จ้าง',
         order: 3,
         required_step: [2],
+        require_approval: false,
+        requiredSignature: false,
         required_documents: [
           {
             type: 'VENDOR_EMAIL',
@@ -747,7 +807,9 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
       {
         name: 'ส่งไปยังฝ่ายตรวจรับ',
         order: 4,
-        required_step: [3],
+        required_step: [1, 2, 3],
+        require_approval: true,
+        requiredSignature: false,
         required_documents: [
           {
             type: 'NUMBER',
@@ -778,6 +840,139 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
     ],
   },
 
+  // --- No 18 ---
+  {
+    type: 'INTERNAL' as UnitResponsibleType,
+    steps: [
+      {
+        name: 'จัดทำรายงานขอให้จัดทำเองและจัดทำคำสั่งแต่งตั้งคณะกรรมการฯ TOR',
+        order: 1,
+        required_step: [],
+        require_approval: true,
+        requiredSignature: true,
+        required_documents: [
+          {
+            type: 'TEXT',
+            label: 'เลขที่ใบขอซื้อ (PR Number)',
+            field_key: 'reg18_pr_number',
+            mark_as_done: false,
+          },
+          {
+            type: 'FILE',
+            label: 'รายงานขอให้จัดทำเอง',
+            field_key: 'reg18_report',
+            mark_as_done: true,
+          },
+          {
+            type: 'FILE',
+            label: 'เอกสารเพิ่มเติม',
+            field_key: 'reg18_pr_doc',
+            mark_as_done: true,
+          },
+        ],
+      },
+      {
+        name: 'จัดทำหนังสือสั่งงานจัดทำเอง',
+        order: 2,
+        required_step: [1],
+        require_approval: true,
+        requiredSignature: true,
+        required_documents: [
+          {
+            type: 'TEXT',
+            label: 'เลขที่ใบสั่งซื้อ (PO Number)',
+            field_key: 'reg18_po_number',
+            mark_as_done: false,
+          },
+          {
+            type: 'FILE',
+            label: 'หนังสือสั่งงานจัดทำเอง',
+            field_key: 'reg18_instruction_letter',
+            mark_as_done: true,
+          },
+          {
+            type: 'FILE',
+            label: 'เอกสารเพิ่มเติม',
+            field_key: 'reg18_po_doc',
+            mark_as_done: true,
+          },
+        ],
+      },
+      {
+        name: 'แจ้งเตือนผู้ค้าให้เข้ามาลงนามในเอกสารสั่งซื้อ/จ้าง',
+        order: 3,
+        required_step: [2],
+        require_approval: false,
+        requiredSignature: false,
+        required_documents: [
+          {
+            type: 'TEXT',
+            label: 'ชื่อบริษัทผู้ค้า',
+            field_key: 'reg18_vendor_name',
+            mark_as_done: false,
+          },
+          {
+            type: 'VENDOR_EMAIL',
+            label: 'อีเมลผู้ค้า',
+            field_key: 'reg18_vendor_email',
+            mark_as_done: false,
+          },
+        ],
+      },
+      {
+        name: 'ส่งไปยังฝ่ายตรวจรับ',
+        order: 4,
+        required_step: [1, 2, 3],
+        require_approval: true,
+        requiredSignature: false,
+        required_documents: [
+          {
+            type: 'NUMBER',
+            label: 'จำนวนงวด',
+            field_key: 'reg18_installment_count',
+            mark_as_done: false,
+          },
+          {
+            type: 'NUMBER',
+            label: 'วงเงิน',
+            field_key: 'reg18_credit_limit',
+            mark_as_done: false,
+          },
+          {
+            type: 'DATE',
+            label: 'วันเริ่มต้นสัญญา',
+            field_key: 'reg18_contract_start_date',
+            mark_as_done: false,
+          },
+          {
+            type: 'DATE',
+            label: 'วันสิ้นสุดสัญญา',
+            field_key: 'reg18_contract_end_date',
+            mark_as_done: false,
+          },
+          {
+            type: 'BOOLEAN',
+            label: 'มีรหัสสินทรัพย์หรือไม่',
+            field_key: 'reg18_contract_asset_code',
+            mark_as_done: false,
+          },
+          {
+            type: 'SELECT_BUDGET_PLAN',
+            label: '(ถ้ามีรหัสสินทรัพย์) แผนงบประมาณ',
+            field_key: 'reg18_asset_budget_plan',
+            mark_as_done: false,
+          },
+          {
+            type: 'TEXT',
+            label: 'เจ้าหน้าที่บริหารสัญญา',
+            field_key: 'reg18_contract_assignee',
+            mark_as_done: false,
+          },
+        ],
+      },
+    ],
+  },
+
   // --- CONTRACT (Standard) ---
   {
     type: 'CONTRACT' as UnitResponsibleType,
@@ -786,6 +981,8 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
         name: 'ระบบแจ้งเตือน',
         order: 1,
         required_step: [],
+        require_approval: false,
+        requiredSignature: false,
         required_documents: [
           {
             type: 'DATE',
@@ -817,6 +1014,8 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
         name: 'ตรวจสอบและบันทึกข้อมูลการส่งมอบงาน',
         order: 2,
         required_step: [1],
+        require_approval: true,
+        requiredSignature: false,
         required_documents: [
           {
             type: 'SELECT_CONTRACT_STATUS',
@@ -831,6 +1030,8 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
         name: 'บันทึกข้อมูลการตรวจรับ',
         order: 3,
         required_step: [2],
+        require_approval: true,
+        requiredSignature: false,
         required_documents: [
           {
             type: 'TEXT',
@@ -844,6 +1045,8 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
         name: 'บันทึกรายงานผลการตรวจรับพัสดุเสนอผู้บริหาร',
         order: 4,
         required_step: [3],
+        require_approval: true,
+        requiredSignature: false,
         required_documents: [
           {
             type: 'SELECT_DELIVERY_STATUS',
@@ -906,7 +1109,7 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
       {
         name: 'กรณีแก้ไข',
         order: 7,
-        required_step: [],
+        required_step: [6],
         required_documents: [
           {
             type: 'TEXT',

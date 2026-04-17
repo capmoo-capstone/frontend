@@ -18,6 +18,7 @@ export const FieldTypeSchema = z.enum([
   'COMMITTEE_EMAIL',
   'SELECT_CONTRACT_STATUS',
   'SELECT_DELIVERY_STATUS',
+  'SELECT_BUDGET_PLAN',
 ]);
 
 export type FieldType = z.infer<typeof FieldTypeSchema>;
@@ -58,6 +59,8 @@ export const WorkflowStepConfigSchema = z.object({
   order: z.number(),
   required_step: z.array(z.number()),
   required_documents: z.array(WorkflowDocumentConfigSchema),
+  require_approval: z.boolean().optional(),
+  requiredSignature: z.boolean().optional(),
 });
 
 export type WorkflowStepConfig = z.infer<typeof WorkflowStepConfigSchema>;
@@ -91,6 +94,9 @@ export const SubmissionSchema = z.object({
   status: z.enum(['SUBMITTED', 'APPROVED', 'ACCEPTED', 'COMPLETED', 'REJECTED']),
   submitted_by: z.string().nullable().optional(),
   submitted_at: z.string(),
+  approved_by: z.string().nullable().optional(),
+  proposing_by: z.string().nullable().optional(),
+  completed_by: z.string().nullable().optional(),
   action_by: z.string().nullable().optional(),
   action_at: z.string().nullable().optional(),
   documents: z.array(SubmissionDocumentSchema),

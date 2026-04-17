@@ -106,6 +106,26 @@ export default function ProjectDetail() {
 
   return (
     <>
+      {/* --- Project Alerts --- */}
+      {project.status === 'WAITING_CANCEL' && activeCancellation && (
+        <CancellationRequestBanner
+          requesterName={activeCancellation.requester.full_name}
+          reason={activeCancellation.reason}
+          requestedAt={activeCancellation.requested_at}
+          canCancelProjects={canCancelProjects}
+          onRequestApprove={() => setIsApproveCancelDialogOpen(true)}
+          onRequestReject={handleRejectCancellation}
+        />
+      )}
+      {project.status === 'CANCELLED' && (
+        <CancelledProjectBanner
+          requesterName={activeCancellation?.requester.full_name}
+          approverName={activeCancellation?.approver?.full_name}
+          reason={activeCancellation?.reason}
+          approvedAt={activeCancellation?.approved_at}
+        />
+      )}
+
       <ProjectHeader
         project={project}
         canEditProjectDetails={canEditProjectDetails}
@@ -115,28 +135,6 @@ export default function ProjectDetail() {
         onAddAssignee={handleAddAssignee}
         canCancelProjects={canCancelProjects}
       />
-
-      {/* --- Project Alerts --- */}
-      <div className="space-y-6">
-        {project.status === 'WAITING_CANCEL' && activeCancellation && (
-          <CancellationRequestBanner
-            requesterName={activeCancellation.requester.full_name}
-            reason={activeCancellation.reason}
-            requestedAt={activeCancellation.requested_at}
-            canCancelProjects={canCancelProjects}
-            onRequestApprove={() => setIsApproveCancelDialogOpen(true)}
-            onRequestReject={handleRejectCancellation}
-          />
-        )}
-        {project.status === 'CANCELLED' && (
-          <CancelledProjectBanner
-            requesterName={activeCancellation?.requester.full_name}
-            approverName={activeCancellation?.approver?.full_name}
-            reason={activeCancellation?.reason}
-            approvedAt={activeCancellation?.approved_at}
-          />
-        )}
-      </div>
 
       <ProjectInfoGrid
         project={project}

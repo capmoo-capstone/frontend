@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { MoreVertical, Pencil, Trash2 } from 'lucide-react';
+import { MoreVertical, Pencil, Trash2, Users } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -37,8 +37,10 @@ const getUrgentLabel = (value: ProjectUrgentStatus) => {
 interface ProjectHeaderProps {
   project: ProjectDetail;
   canCancelProjects: boolean;
+  canEditProjectDetails?: boolean;
   onSaveProjectHeader?: (data: { title: string; description: string | null }) => Promise<void>;
   onCancelProject?: () => void;
+  onAddAssignee?: () => void;
   onExportReport?: () => void;
   isSaving?: boolean;
 }
@@ -46,8 +48,10 @@ interface ProjectHeaderProps {
 export const ProjectHeader = ({
   project,
   canCancelProjects,
+  canEditProjectDetails = false,
   onSaveProjectHeader,
   onCancelProject,
+  onAddAssignee,
   onExportReport,
   isSaving = false,
 }: ProjectHeaderProps) => {
@@ -84,7 +88,7 @@ export const ProjectHeader = ({
 
   return (
     <div className="flex items-start justify-between gap-4">
-      <div className="space-y-3">
+      <div className="flex-1 space-y-3">
         <div className="space-y-2">
           {!isEditing ? (
             <>
@@ -97,9 +101,11 @@ export const ProjectHeader = ({
                   )}
                   {project.title}
                 </h1>
-                <Button variant="outline" size="icon" onClick={() => setIsEditing(true)}>
-                  <Pencil className="h-4 w-4" />
-                </Button>
+                {canEditProjectDetails && (
+                  <Button variant="outline" size="icon" onClick={() => setIsEditing(true)}>
+                    <Pencil className="h-4 w-4" />
+                  </Button>
+                )}
               </div>
               {project.description && (
                 <p className="text-muted-foreground normal">{project.description}</p>
@@ -154,11 +160,12 @@ export const ProjectHeader = ({
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem
-              onClick={onCancelProject}
-              className="text-destructive focus:text-destructive"
-            >
-              <Trash2 className="text-destructive h-4 w-4" />
+            <DropdownMenuItem onClick={onAddAssignee}>
+              <Users className="h-4 w-4" />
+              เพิ่มผู้รับผิดชอบ
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={onCancelProject} variant="destructive">
+              <Trash2 className="h-4 w-4" />
               {getCancelProjectActionLabel(canCancelProjects)}
             </DropdownMenuItem>
           </DropdownMenuContent>

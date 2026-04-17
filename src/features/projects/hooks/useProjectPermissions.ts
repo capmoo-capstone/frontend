@@ -34,5 +34,6 @@ export const useProjectPermissions = (unitId?: string) => {
         departmentId: SUPPLY_OPERATION_DEPARTMENT_ID,
       })
     ),
+    canEditProjectDetails: !!(user && hasRoleInScopes(user, ['HEAD_OF_UNIT'], { unitId })),
   };
 };

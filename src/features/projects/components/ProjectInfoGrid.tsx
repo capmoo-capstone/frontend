@@ -16,6 +16,7 @@ import type { ProjectDetail } from '../types/index';
 
 interface ProjectInfoGridProps {
   project: ProjectDetail;
+  canEditProjectDetails?: boolean;
   onSaveVendorInfo?: (data: { vendor_name: string; vendor_email: string }) => Promise<void>;
   isSavingVendorInfo?: boolean;
 }
@@ -60,6 +61,7 @@ const ReadonlyFieldCell = ({ label, value, isCopyable = false }: ReadonlyFieldCe
 
 export const ProjectInfoGrid = ({
   project,
+  canEditProjectDetails = false,
   onSaveVendorInfo,
   isSavingVendorInfo = false,
 }: ProjectInfoGridProps) => {
@@ -164,12 +166,12 @@ export const ProjectInfoGrid = ({
       <div className="space-y-4">
         <div className="flex items-center justify-between gap-2">
           <h6 className="text-primary h3-topic">รายละเอียดโครงการ</h6>
-          {!isEditingProjectInfo ? (
+          {!isEditingProjectInfo && canEditProjectDetails ? (
             <Button variant="outline" size="sm" onClick={() => setIsEditingProjectInfo(true)}>
               <Pencil className="h-4 w-4" />
               แก้ไขข้อมูลโครงการ
             </Button>
-          ) : (
+          ) : isEditingProjectInfo ? (
             <div className="flex items-center gap-2">
               <Button variant="brand" size="sm" onClick={handleSaveProjectInfo}>
                 <Check className="h-4 w-4" />
@@ -180,7 +182,7 @@ export const ProjectInfoGrid = ({
                 ยกเลิก
               </Button>
             </div>
-          )}
+          ) : null}
         </div>
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
@@ -289,12 +291,12 @@ export const ProjectInfoGrid = ({
       <div className="space-y-4">
         <div className="flex items-center justify-between gap-2">
           <h6 className="text-primary h3-topic">ข้อมูลของผู้ค้า</h6>
-          {!isEditingVendor ? (
+          {!isEditingVendor && canEditProjectDetails ? (
             <Button variant="outline" size="sm" onClick={() => setIsEditingVendor(true)}>
               <Pencil className="h-4 w-4" />
               แก้ไขข้อมูลผู้ค้า
             </Button>
-          ) : (
+          ) : isEditingVendor ? (
             <div className="flex items-center gap-2">
               <Button
                 variant="brand"
@@ -315,7 +317,7 @@ export const ProjectInfoGrid = ({
                 ยกเลิก
               </Button>
             </div>
-          )}
+          ) : null}
         </div>
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">

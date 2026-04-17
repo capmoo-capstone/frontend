@@ -35,7 +35,7 @@ export default function ProjectDetail() {
   const { mutateAsync: updateProjectMutation } = useUpdateProject();
   const { mutateAsync: approveCancellationMutation } = useApproveProjectCancellation();
   const { mutateAsync: rejectCancellationMutation } = useRejectProjectCancellation();
-  const { canCancelProjects } = useProjectPermissions(project?.requester.unit_id ?? undefined);
+  const { canCancelProjects, canEditProjectDetails } = useProjectPermissions();
 
   if (!id || !user) return null;
   if (isLoading)
@@ -100,29 +100,47 @@ export default function ProjectDetail() {
     }
   };
 
+  const handleAddAssignee = () => {
+    toast.info('กำลังเตรียมฟีเจอร์เพิ่มผู้รับผิดชอบ');
+  };
+
   return (
     <>
       <ProjectHeader
         project={project}
+        canEditProjectDetails={canEditProjectDetails}
         onSaveProjectHeader={handleSaveProjectHeader}
         isSaving={isSavingHeader}
         onCancelProject={() => setIsCancelDialogOpen(true)}
+        onAddAssignee={handleAddAssignee}
         canCancelProjects={canCancelProjects}
       />
 
       {/* --- Project Alerts --- */}
-      {/* <div className="space-y-6">
+      <div className="space-y-6">
         {project.status === 'WAITING_CANCEL' && activeCancellation && (
           <CancellationRequestBanner
+            requesterName={activeCancellation.requester.full_name}
+            reason={activeCancellation.reason}
+            requestedAt={activeCancellation.requested_at}
+            canCancelProjects={canCancelProjects}
             onRequestApprove={() => setIsApproveCancelDialogOpen(true)}
             onRequestReject={handleRejectCancellation}
           />
         )}
-        {project.status === 'CANCELLED' && <CancelledProjectBanner />}
-      </div> */}
+        {project.status === 'CANCELLED' && (
+          <CancelledProjectBanner
+            requesterName={activeCancellation?.requester.full_name}
+            approverName={activeCancellation?.approver?.full_name}
+            reason={activeCancellation?.reason}
+            approvedAt={activeCancellation?.approved_at}
+          />
+        )}
+      </div>
 
       <ProjectInfoGrid
         project={project}
+        canEditProjectDetails={canEditProjectDetails}
         onSaveVendorInfo={handleSaveVendorInfo}
         isSavingVendorInfo={isSavingVendorInfo}
       />

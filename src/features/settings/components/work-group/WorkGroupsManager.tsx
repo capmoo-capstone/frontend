@@ -111,12 +111,8 @@ export function WorkGroupsManager() {
           await updateUnitMutation.mutateAsync(changedPayload);
         }
 
-        const currentAssignedUsers = new Set(
-          [...currentGroup.member_ids].filter(Boolean)
-        );
-        const nextAssignedUsers = Array.from(
-          new Set([...updated.member_ids].filter(Boolean))
-        );
+        const currentAssignedUsers = new Set([...currentGroup.member_ids].filter(Boolean));
+        const nextAssignedUsers = Array.from(new Set([...updated.member_ids].filter(Boolean)));
 
         const newUserIds = nextAssignedUsers.filter((userId) => !currentAssignedUsers.has(userId));
         const removeUserIds = Array.from(currentAssignedUsers).filter(

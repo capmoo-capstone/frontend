@@ -8,9 +8,9 @@ import { type ProcurementRoleSetting, type SettingsUserOption } from '@/features
 import {
   type UserRole,
   UserSelect,
-  useUpdateSupplyRole,
   useAddDelegation,
   useCancelDelegation,
+  useUpdateSupplyRole,
   useUsersForSelection,
 } from '@/features/users';
 import { formatDateThaiShort } from '@/lib/formatters';
@@ -73,12 +73,10 @@ export function ProcurementStaffManager() {
         }
       }
 
-      const newUserIds = _updatedRole.member_ids.filter(
-        (id) => !current.member_ids.includes(id)
-      ) ?? [];
-      const removeUserIds = current.member_ids.filter(
-        (id) => !_updatedRole.member_ids.includes(id)
-      ) ?? [];
+      const newUserIds =
+        _updatedRole.member_ids.filter((id) => !current.member_ids.includes(id)) ?? [];
+      const removeUserIds =
+        current.member_ids.filter((id) => !_updatedRole.member_ids.includes(id)) ?? [];
 
       if (newUserIds.length > 0 || removeUserIds.length > 0) {
         await updateSupplyRole.mutateAsync({

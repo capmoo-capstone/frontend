@@ -71,7 +71,9 @@ export const getUserById = async (userId: string): Promise<BackendUserDetailResp
   return parsed;
 };
 
-export const updateUsersInUnit = async (request: UpdateUsersToUnitRequest): Promise<BackendUpdateUserRoleResponse> => {
+export const updateUsersInUnit = async (
+  request: UpdateUsersToUnitRequest
+): Promise<BackendUpdateUserRoleResponse> => {
   const requestData = UpdateUsersToUnitSchema.parse(request);
   const { data } = await api.patch(`/units/${requestData.unitId}/users`, {
     new_users: requestData.newUserIds,
@@ -99,7 +101,9 @@ export const updateRepresentative = async (
   return parsed;
 };
 
-export const updateSupplyRole = async (request: UpdateUserRoleRequest): Promise<BackendUpdateUserRoleResponse> => {
+export const updateSupplyRole = async (
+  request: UpdateUserRoleRequest
+): Promise<BackendUpdateUserRoleResponse> => {
   const { data } = await api.patch(`/users/roles/supply`, {
     role: request.role,
     new_users: request.newUserIds,
@@ -107,7 +111,7 @@ export const updateSupplyRole = async (request: UpdateUserRoleRequest): Promise<
   });
   const parsed = BackendUpdateUserRoleResponseSchema.parse(data);
   return parsed;
-}
+};
 
 export const updateUserRole = async (
   request: UpdateUserRoleRequest
@@ -124,9 +128,9 @@ export const updateUserRole = async (
     ),
     ...requestData.removeUserIds.map((userId) =>
       api.patch(`/users/${userId}/role/remove`, {
-          role: requestData.role,
-          dept_id: requestData.deptId,
-          unit_id: requestData.unitId,
+        role: requestData.role,
+        dept_id: requestData.deptId,
+        unit_id: requestData.unitId,
       })
     ),
   ]);

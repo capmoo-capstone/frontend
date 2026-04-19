@@ -53,7 +53,7 @@ export const ManageSelfRoles: Role[] = ['GENERAL_STAFF'];
  * @param user The logged-in user object
  * @returns Array of all active role scopes for the user
  */
-const getAllScopes = (user: User) => [...user.roles.own, ...user.roles.delegated];
+const getAllScopes = (user: User) => user.roles;
 
 /**
  * Core engine to check if a user possesses any of the allowed roles,

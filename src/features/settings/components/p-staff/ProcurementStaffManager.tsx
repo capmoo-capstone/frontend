@@ -11,7 +11,6 @@ import {
   useUpdateSupplyRole,
   useAddDelegation,
   useCancelDelegation,
-  useUpdateUserRole,
   useUsersForSelection,
 } from '@/features/users';
 import { formatDateThaiShort } from '@/lib/formatters';

@@ -8,10 +8,7 @@ import { isActionRequired, isWorkflowProjectLocked } from '@/lib/workflow-utils'
 export interface AuthUser {
   id: string;
   role?: Role;
-  roles: {
-    own: Array<{ role: Role }>;
-    delegated: Array<{ role: Role }>;
-  };
+  roles: Array<{ role: Role }>;
 }
 
 export interface StepActorResult {
@@ -43,7 +40,7 @@ export function useStepActor(
 ): StepActorResult {
   return useMemo(() => {
     const viewAsRole = user.role ?? 'GUEST';
-    const availableRoles = [...user.roles.own, ...user.roles.delegated].map((r) => r.role);
+    const availableRoles = user.roles.map((r) => r.role);
 
     const actionRole = resolveActionRole(viewAsRole, availableRoles, status);
 

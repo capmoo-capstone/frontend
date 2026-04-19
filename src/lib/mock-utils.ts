@@ -18,16 +18,13 @@ export const createMockUser = (
   username,
   full_name: fullName,
   is_delegated: false,
-  roles: {
-    own: [
-      {
-        role,
-        dept_id: deptId || null,
-        dept_name: deptName || null,
-        unit_id: unitId || null,
-        unit_name: unitName || null,
-      },
-    ],
-    delegated: [],
-  },
+  roles: [
+    {
+      role,
+      dept_id: deptId || null,
+      dept_name: deptName || null,
+      unit_id: unitId || null,
+      unit_name: unitName || null,
+    },
+  ],
 });

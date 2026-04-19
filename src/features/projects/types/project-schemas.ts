@@ -100,7 +100,7 @@ export const ProjectApiSchema = z.object({
 export const ProjectListApiItemSchema = z.object({
   ...ProjectApiSchema.shape,
   budget: z.union([z.string(), z.number()]).pipe(z.coerce.number()),
-  budget_plan_id: z.array(z.string()),
+  budget_plan_id: z.array(z.string()).optional().default([]),
 });
 
 export const PaginatedProjectListApiResponseSchema = z.object({

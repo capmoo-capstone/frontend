@@ -46,7 +46,7 @@ export const mapProjectListItem = (project: ProjectListApiItem): Project =>
     procurement_step: project.procurement_step,
     contract_status: project.contract_status,
     contract_step: project.contract_step,
-    budget_plan_id: project.budget_plan_id,
+    budget_plan_id: project.budget_plan_id ?? [],
     pr_no: project.pr_no,
     po_no: project.po_no,
     less_no: project.less_no,

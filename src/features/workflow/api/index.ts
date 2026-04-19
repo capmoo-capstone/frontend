@@ -191,7 +191,7 @@ export const submitWorkflowStep = async (payload: CreateWorkflowSubmissionPayloa
     type: 'STAFF',
   });
 
-  return data.data ?? data;
+  return WorkflowSubmissionApiSchema.parse(data);
 };
 
 export const approveWorkflowStep = async (submissionId: string, requiredSignature = false) => {
@@ -199,7 +199,7 @@ export const approveWorkflowStep = async (submissionId: string, requiredSignatur
     required_signature: requiredSignature,
   });
 
-  return data.data ?? data;
+  return WorkflowSubmissionApiSchema.parse(data);
 };
 
 export const rejectWorkflowStep = async (submissionId: string, comment: string) => {
@@ -207,19 +207,19 @@ export const rejectWorkflowStep = async (submissionId: string, comment: string) 
     comment,
   });
 
-  return data.data ?? data;
+  return WorkflowSubmissionApiSchema.parse(data);
 };
 
 export const proposeWorkflowStep = async (submissionId: string) => {
   const { data } = await api.patch(`/submissions/${submissionId}/propose`);
 
-  return data.data ?? data;
+  return WorkflowSubmissionApiSchema.parse(data);
 };
 
 export const signAndCompleteWorkflowStep = async (submissionId: string) => {
   const { data } = await api.patch(`/submissions/${submissionId}/sign`);
 
-  return data.data ?? data;
+  return WorkflowSubmissionApiSchema.parse(data);
 };
 
 export type WorkflowSubmissionsResponse = WorkflowSubmissionGroup;

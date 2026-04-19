@@ -13,7 +13,7 @@ import type { RoleDetail, User } from '../types';
 const OPS_DEPT_ID = 'DEPT-SUP-OPS';
 
 export const getRoleInDeptSupOps = (u?: User): RoleDetail | undefined => {
-  const allRoles = u ? [...u.roles.own, ...u.roles.delegated] : [];
+  const allRoles = u?.roles ?? [];
 
   return allRoles.find((role) => role.dept_id === OPS_DEPT_ID && role.role !== 'GUEST');
 };

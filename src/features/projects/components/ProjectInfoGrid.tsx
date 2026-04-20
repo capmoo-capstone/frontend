@@ -68,9 +68,9 @@ export const ProjectInfoGrid = ({
   const [isEditingProjectInfo, setIsEditingProjectInfo] = useState(false);
   const [isEditingVendor, setIsEditingVendor] = useState(false);
 
-  const [hasAssetCode, setHasAssetCode] = useState((project.budget_plan_id?.length ?? 0) > 0);
+  const [hasAssetCode, setHasAssetCode] = useState((project.budget_plans?.length ?? 0) > 0);
   const [selectedBudgetPlanIds, setSelectedBudgetPlanIds] = useState<string[]>(
-    project.budget_plan_id ?? []
+    project.budget_plans ?? []
   );
 
   const [vendorName, setVendorName] = useState(project.vendor.name ?? '');
@@ -83,13 +83,13 @@ export const ProjectInfoGrid = ({
   );
 
   useEffect(() => {
-    setHasAssetCode((project.budget_plan_id?.length ?? 0) > 0);
-    setSelectedBudgetPlanIds(project.budget_plan_id ?? []);
+    setHasAssetCode((project.budget_plans?.length ?? 0) > 0);
+    setSelectedBudgetPlanIds(project.budget_plans ?? []);
     setVendorName(project.vendor.name ?? '');
     setVendorEmail(project.vendor.email ?? '');
     setIsEditingProjectInfo(false);
     setIsEditingVendor(false);
-  }, [project.id, project.budget_plan_id, project.vendor.email, project.vendor.name]);
+  }, [project.id, project.budget_plans, project.vendor.email, project.vendor.name]);
 
   const selectedBudgetPlans = useMemo(
     () => budgetPlans?.filter((plan) => selectedBudgetPlanIds.includes(plan.id)) ?? [],
@@ -132,8 +132,8 @@ export const ProjectInfoGrid = ({
   };
 
   const handleCancelProjectInfo = () => {
-    setHasAssetCode((project.budget_plan_id?.length ?? 0) > 0);
-    setSelectedBudgetPlanIds(project.budget_plan_id ?? []);
+    setHasAssetCode((project.budget_plans?.length ?? 0) > 0);
+    setSelectedBudgetPlanIds(project.budget_plans ?? []);
     setIsEditingProjectInfo(false);
   };
 

@@ -27,7 +27,7 @@ export const ProjectDetailSchema = z.object({
   po_no: z.string().nullable(),
   contract_no: z.string().nullable(),
   migo_no: z.string().nullable(),
-  budget_plan_id: z.array(z.string()).optional(),
+  budget_plans: z.array(z.string()).default([]),
   expected_approval_date: z.string().nullable(),
   created_at: z.string(),
   updated_at: z.string(),
@@ -81,25 +81,11 @@ export const ProjectDetailSchema = z.object({
         requester: z.object({
           id: z.string(),
           full_name: z.string(),
-          roles: z.array(
-            z.object({
-              role: RoleEnum,
-              dept_id: z.string().nullable(),
-              unit_id: z.string().nullable(),
-            })
-          ),
         }),
         approver: z
           .object({
             id: z.string(),
             full_name: z.string(),
-            roles: z.array(
-              z.object({
-                role: RoleEnum,
-                dept_id: z.string().nullable(),
-                unit_id: z.string().nullable(),
-              })
-            ),
           })
           .nullable(),
         requested_at: z.string().datetime(),
@@ -136,25 +122,11 @@ export const ProjectDetailApiSchema = z.object({
         requester: z.object({
           id: z.string(),
           full_name: z.string(),
-          roles: z.array(
-            z.object({
-              role: RoleEnum,
-              dept_id: z.string().nullable(),
-              unit_id: z.string().nullable(),
-            })
-          ),
         }),
         approver: z
           .object({
             id: z.string(),
             full_name: z.string(),
-            roles: z.array(
-              z.object({
-                role: RoleEnum,
-                dept_id: z.string().nullable(),
-                unit_id: z.string().nullable(),
-              })
-            ),
           })
           .nullable(),
         requested_at: z.string().datetime(),
@@ -168,7 +140,7 @@ export const ProjectDetailApiSchema = z.object({
   po_no: z.string().nullable(),
   contract_no: z.string().nullable(),
   migo_no: z.string().nullable(),
-  budget_plan_id: z.array(z.string()).optional(),
+  budget_plans: z.array(z.string()).default([]),
   expected_approval_date: z.string().datetime().nullable(),
   created_at: z.string().datetime(),
   updated_at: z.string().datetime().nullable(),

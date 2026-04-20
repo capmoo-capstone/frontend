@@ -22,6 +22,7 @@ export interface StepActorResult {
 }
 
 function resolveActionRole(viewAsRole: Role, availableRoles: Role[], status: StepStatus): Role {
+  if (viewAsRole === 'FINANCE_STAFF') return 'FINANCE_STAFF';
   if (viewAsRole === 'HEAD_OF_DEPARTMENT') return 'HEAD_OF_DEPARTMENT';
 
   const stepIsStaffActionable = status === 'IN_PROGRESS' || status === 'REJECTED';

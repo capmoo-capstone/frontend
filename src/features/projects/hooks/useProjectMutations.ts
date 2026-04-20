@@ -9,6 +9,7 @@ import {
   changeProjectAssignee,
   claimProject,
   closeProject,
+  completeProjectContract,
   completeProjectProcurement,
   deleteProject,
   rejectProjectCancellation,
@@ -184,6 +185,19 @@ export const useCompleteProjectProcurement = () => {
   });
 };
 
+export const useCompleteProjectContract = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (projectId: string) => completeProjectContract(projectId),
+
+    onSuccess: (_, projectId) => {
+      queryClient.invalidateQueries({ queryKey: projectKeys.all });
+      queryClient.invalidateQueries({ queryKey: projectKeys.detail(projectId) });
+    },
+  });
+};
+
 export const useCloseProject = () => {
   const queryClient = useQueryClient();
 
@@ -201,9 +215,10 @@ export const useRequestProjectEdit = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (projectId: string) => requestProjectEdit(projectId),
+    mutationFn: ({ projectId, reason }: { projectId: string; reason: string }) =>
+      requestProjectEdit(projectId, reason),
 
-    onSuccess: (_, projectId) => {
+    onSuccess: (_, { projectId }) => {
       queryClient.invalidateQueries({ queryKey: projectKeys.all });
       queryClient.invalidateQueries({ queryKey: projectKeys.detail(projectId) });
     },

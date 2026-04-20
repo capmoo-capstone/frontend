@@ -66,7 +66,7 @@ export function StepHistory({
                       ส่งกลับ &quot;{submission.comments ?? '-'}&quot;
                     </span>
                     <span className="text-muted-foreground caption">
-                      {formatDateThai(submission.action_at, 'd MMM yyyy HH:mm น.')}
+                      {formatDateThai(submission.approved_at, 'd MMM yyyy HH:mm น.')}
                     </span>
                   </div>
                   <p className="text-muted-foreground caption ml-6">
@@ -83,7 +83,7 @@ export function StepHistory({
                     <CornerDownRight className="text-primary h-4 w-4" />
                     <span className="h4-topic flex-1">อนุมัติขั้นตอน</span>
                     <span className="text-muted-foreground caption">
-                      {formatDateThai(submission.action_at, 'd MMM yyyy HH:mm น.')}
+                      {formatDateThai(submission.approved_at, 'd MMM yyyy HH:mm น.')}
                     </span>
                   </div>
                   <p className="text-muted-foreground caption ml-6">
@@ -100,7 +100,7 @@ export function StepHistory({
                     <CornerDownRight className="text-primary h-4 w-4" />
                     <span className="h4-topic flex-1">เสนอผอ.ลงนาม</span>
                     <span className="text-muted-foreground caption">
-                      {formatDateThai(submission.action_at, 'd MMM yyyy HH:mm น.')}
+                      {formatDateThai(submission.proposing_at, 'd MMM yyyy HH:mm น.')}
                     </span>
                   </div>
                   <p className="text-muted-foreground caption ml-6">
@@ -117,7 +117,7 @@ export function StepHistory({
                     <CornerDownRight className="text-primary h-4 w-4" />
                     <span className="h4-topic flex-1">ผอ. ลงนามเรียบร้อย</span>
                     <span className="text-muted-foreground caption">
-                      {formatDateThai(submission.action_at, 'd MMM yyyy HH:mm น.')}
+                      {formatDateThai(submission.completed_at, 'd MMM yyyy HH:mm น.')}
                     </span>
                   </div>
                   <p className="text-muted-foreground caption ml-6">

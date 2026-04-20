@@ -1074,51 +1074,6 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
           },
         ],
       },
-      {
-        name: 'บันทึกส่งเบิกฝ่ายการเงิน',
-        order: 5,
-        required_step: [4],
-        required_documents: [
-          {
-            type: 'FILE',
-            label: 'บันทึกส่งเบิกฝ่ายการเงิน',
-            field_key: 'contract_finance_file',
-            mark_as_done: true,
-          },
-          {
-            type: 'BOOLEAN',
-            label: 'ต้องการส่งต่อให้ฝ่ายทะเบียนหรือไม่',
-            field_key: 'contract_forward_to_registration',
-            mark_as_done: false,
-          },
-        ],
-      },
-      {
-        name: 'กดปิดโครงการ',
-        order: 6,
-        required_step: [5],
-        required_documents: [
-          {
-            type: 'BOOLEAN',
-            label: 'ปิดโครงการ',
-            field_key: 'contract_close_project',
-            mark_as_done: false,
-          },
-        ],
-      },
-      {
-        name: 'กรณีแก้ไข',
-        order: 7,
-        required_step: [6],
-        required_documents: [
-          {
-            type: 'TEXT',
-            label: 'คอมเม้น',
-            field_key: 'contract_edit_comment',
-            mark_as_done: false,
-          },
-        ],
-      },
     ],
   },
 ];

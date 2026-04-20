@@ -141,6 +141,9 @@ export const mapProjectDetail = (parsed: ProjectDetailApi): ProjectDetail => ({
   description: parsed.description,
   budget: parsed.budget,
   status: parsed.status,
+  procurement_status: parsed.procurement_status.status,
+  contract_status: parsed.contract_status.status,
+  contract_step: parsed.contract_status.step,
   receive_no: parsed.receive_no,
   less_no: parsed.less_no,
   pr_no: parsed.pr_no,
@@ -166,8 +169,14 @@ export const mapProjectDetail = (parsed: ProjectDetailApi): ProjectDetail => ({
     full_name: parsed.assignee_contract[0]?.full_name ?? null,
   },
   current_step: {
-    name: parsed.procurement_status.status,
-    order: parsed.procurement_status.step ?? 1,
+    name:
+      parsed.current_workflow_type === 'CONTRACT'
+        ? parsed.contract_status.status
+        : parsed.procurement_status.status,
+    order:
+      parsed.current_workflow_type === 'CONTRACT'
+        ? (parsed.contract_status.step ?? 1)
+        : (parsed.procurement_status.step ?? 1),
   },
   workflow: {
     type: parsed.current_workflow_type,

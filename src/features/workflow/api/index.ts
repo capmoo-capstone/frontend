@@ -130,14 +130,6 @@ const toMetaDataRecord = (metaData: WorkflowSubmissionApiRecord['meta_data']) =>
   return metaData;
 };
 
-const getSubmissionActionBy = (submission: WorkflowSubmissionApiRecord) => {
-  return submission.approved_by ?? submission.proposing_by ?? submission.completed_by ?? null;
-};
-
-const getSubmissionActionAt = (submission: WorkflowSubmissionApiRecord) => {
-  return submission.approved_at ?? submission.proposing_at ?? submission.completed_at ?? null;
-};
-
 const toUiSubmission = (submission: WorkflowSubmissionApiRecord, stepName?: string): Submission => {
   const normalizedDocuments = submission.documents.map((document, index) => ({
     field_key: document.field_key ?? `__document_${index + 1}`,
@@ -156,12 +148,13 @@ const toUiSubmission = (submission: WorkflowSubmissionApiRecord, stepName?: stri
     submission_round: submission.submission_round,
     status: mapBackendStatusToSubmissionStatus(submission.status),
     submitted_by: submission.submitted_by ?? null,
-    approved_by: submission.approved_by ?? null,
-    proposing_by: submission.proposing_by ?? null,
-    completed_by: submission.completed_by ?? null,
     submitted_at: submission.submitted_at ?? new Date().toISOString(),
-    action_by: getSubmissionActionBy(submission),
-    action_at: getSubmissionActionAt(submission),
+    approved_by: submission.approved_by ?? null,
+    approved_at: submission.approved_at ?? null,
+    proposing_by: submission.proposing_by ?? null,
+    proposing_at: submission.proposing_at ?? null,
+    completed_by: submission.completed_by ?? null,
+    completed_at: submission.completed_at ?? null,
     documents: normalizedDocuments,
     meta_data: toMetaDataRecord(submission.meta_data),
     comments: submission.comment ?? undefined,

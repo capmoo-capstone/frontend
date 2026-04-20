@@ -25,6 +25,7 @@ import {
   changeProjectAssigneeRequest,
   claimProjectRequest,
   closeProjectRequest,
+  completeContractRequest,
   completeProcurementRequest,
   createProjectRequest,
   deleteProjectRequest,
@@ -132,12 +133,16 @@ export const completeProjectProcurement = async (projectId: string) => {
   return completeProcurementRequest(projectId);
 };
 
+export const completeProjectContract = async (projectId: string) => {
+  return completeContractRequest(projectId);
+};
+
 export const closeProject = async (projectId: string) => {
   return closeProjectRequest(projectId);
 };
 
-export const requestProjectEdit = async (projectId: string) => {
-  return requestEditProjectRequest(projectId);
+export const requestProjectEdit = async (projectId: string, reason: string) => {
+  return requestEditProjectRequest(projectId, reason);
 };
 
 export const deleteProject = async (projectId: string) => {

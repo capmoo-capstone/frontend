@@ -45,7 +45,7 @@ const getPhaseLabel = (status: ProjectStatusByType, step?: number | null) => {
       return step != null ? `เสนอลงนามขั้นตอนที่ ${step}` : 'เสนอลงนาม';
     case 'REJECTED':
       return step != null ? `แก้ไขขั้นตอนที่ ${step}` : 'ยกเลิก';
-    case 'NOT_EXPORT':
+    case 'NOT_EXPORTED':
       return 'รอส่งเบิกการเงิน';
     case 'COMPLETED':
       return 'เสร็จสิ้น';
@@ -121,7 +121,7 @@ const getPhaseFormat = (
     return { label: 'ส่งเบิกการเงินแล้ว', variant: role === 'FINANCE_STAFF' ? 'warning' : 'info' };
   }
 
-  if (status === 'NOT_EXPORT' && isContractPhase) {
+  if (status === 'NOT_EXPORTED' && isContractPhase) {
     return { label: 'รอส่งเบิกการเงิน', variant: role === 'FINANCE_STAFF' ? 'warning' : 'info' };
   }
 

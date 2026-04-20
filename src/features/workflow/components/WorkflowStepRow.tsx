@@ -118,6 +118,7 @@ export function WorkflowStepRow({
     viewingSubmission !== undefined ||
     !actor.userCanAct ||
     actor.actionRole !== 'GENERAL_STAFF';
+  const shouldShowActionForm = actor.showForm;
 
   return (
     <WorkflowStep
@@ -134,7 +135,7 @@ export function WorkflowStepRow({
     >
       {!actor.isGuest && (
         <div className="grid grid-cols-1 gap-8 pt-2 lg:grid-cols-12">
-          <div className="lg:col-span-4">
+          <div className="lg:col-span-6">
             <StepHistory
               submissions={submissions}
               onSelectSubmission={(submission) => handleSelectSubmission(step.order, submission)}
@@ -144,8 +145,8 @@ export function WorkflowStepRow({
             />
           </div>
 
-          <div className="lg:col-span-8">
-            {actor.showForm ? (
+          <div className="lg:col-span-6">
+            {shouldShowActionForm ? (
               <StepActionForm
                 isActive={!viewingSubmission && !actor.isCompleted}
                 isBusy={isMutating}

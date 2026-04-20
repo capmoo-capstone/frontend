@@ -209,13 +209,18 @@ export const completeProcurementRequest = async (projectId: string) => {
   return data;
 };
 
+export const completeContractRequest = async (projectId: string) => {
+  const { data } = await api.patch(`/projects/${projectId}/complete-contract`);
+  return data;
+};
+
 export const closeProjectRequest = async (projectId: string) => {
   const { data } = await api.patch(`/projects/${projectId}/close`);
   return data;
 };
 
-export const requestEditProjectRequest = async (projectId: string) => {
-  const { data } = await api.patch(`/projects/${projectId}/request-edit`);
+export const requestEditProjectRequest = async (projectId: string, reason: string) => {
+  const { data } = await api.patch(`/projects/${projectId}/request-edit`, { reason });
   return data;
 };
 

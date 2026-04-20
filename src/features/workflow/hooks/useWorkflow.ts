@@ -4,7 +4,29 @@ import type { ProjectDetail } from '@/features/projects';
 
 import { buildSubmissionFormData } from '../lib/submission-values';
 import { isSameWorkflowType } from '../lib/workflow-identity';
-import type { StepStatus, Submission, WorkflowStepConfig } from '../types';
+import type { BackendSubmissionStatus, StepStatus, Submission, WorkflowStepConfig } from '../types';
+
+const mapBackendStatusToStepStatus = (status: BackendSubmissionStatus): StepStatus => {
+  switch (status) {
+    case 'WAITING_APPROVAL':
+    case 'SUBMITTED':
+      return 'WAITING_APPROVAL';
+    case 'WAITING_PROPOSAL':
+      return 'WAITING_PROPOSAL';
+    case 'WAITING_SIGNATURE':
+    case 'APPROVED':
+      return 'WAITING_SIGNATURE';
+    case 'ACCEPTED':
+    case 'COMPLETED':
+      return 'COMPLETED';
+    case 'REJECTED':
+      return 'REJECTED';
+    default: {
+      const _unreachable: never = status;
+      return _unreachable;
+    }
+  }
+};
 
 // Now accepts 'activeSteps' to know which workflow we are dealing with
 export function useWorkflow(
@@ -42,7 +64,7 @@ export function useWorkflow(
       if (submissions.length > 0) {
         const latest = submissions[submissions.length - 1];
         if (latest.backend_status) {
-          return latest.backend_status as StepStatus;
+          return mapBackendStatusToStepStatus(latest.backend_status);
         }
       }
 
@@ -62,7 +84,7 @@ export function useWorkflow(
 
       return previousStepsCompleted ? 'IN_PROGRESS' : 'NOT_STARTED';
     },
-    [project, getStepSubmissions]
+    [project, getStepSubmissions, activeSteps]
   );
 
   const getStepFormData = useCallback(

@@ -41,7 +41,14 @@ export default function ProjectDetail() {
   const { mutateAsync: linkBudgetPlanMutation } = useLinkBudgetPlanToProject();
   const { mutateAsync: approveCancellationMutation } = useApproveProjectCancellation();
   const { mutateAsync: rejectCancellationMutation } = useRejectProjectCancellation();
-  const { canCancelProjects, canEditProjectDetails } = useProjectPermissions();
+  const { canCancelProjects, canEditProjectDetails } = useProjectPermissions({
+    project: project
+      ? {
+          current_template_type: project.current_template_type,
+          procurement_type: project.procurement_type,
+        }
+      : undefined,
+  });
 
   if (!id || !user) return null;
   if (isLoading)

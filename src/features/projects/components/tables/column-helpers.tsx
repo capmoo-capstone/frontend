@@ -36,11 +36,11 @@ export const renderUrgentText = (
   }
 
   if (urgentStatus === 'VERY_URGENT') {
-    return <span className={className}>ด่วนพิเศษ</span>;
+    return <span className={className}>ด่วนที่สุด</span>;
   }
 
   if (urgentStatus === 'SUPER_URGENT') {
-    return <span className={className}>ด่วนที่สุด</span>;
+    return <span className={className}>ด่วนพิเศษ</span>;
   }
 
   return null;

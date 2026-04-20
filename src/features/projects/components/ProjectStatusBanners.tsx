@@ -20,7 +20,15 @@ interface CancelledProjectBannerProps {
 }
 
 const formatDateTimeThai = (value?: string | null) => {
-  const date = value ? new Date(value) : new Date();
+  if (!value) {
+    return '-';
+  }
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return '-';
+  }
+
   return `${formatDateThai(date)} เวลา ${date.toLocaleTimeString('th-TH', {
     hour: '2-digit',
     minute: '2-digit',
@@ -35,6 +43,9 @@ export function CancellationRequestBanner({
   onRequestApprove,
   onRequestReject,
 }: CancellationRequestBannerProps) {
+  const safeRequesterName = requesterName ?? 'ไม่ทราบชื่อ';
+  const safeReason = reason ?? '-';
+
   return (
     <div className="bg-warning-light rounded-lg p-6">
       <div className="flex items-start gap-4">
@@ -50,7 +61,7 @@ export function CancellationRequestBanner({
           </div>
           <div>
             <p className="normal text-primary">
-              {requesterName} ขอยกเลิกโครงการ ด้วยเหตุผล &ldquo;{reason}&rdquo;
+              {safeRequesterName} ขอยกเลิกโครงการ ด้วยเหตุผล &ldquo;{safeReason}&rdquo;
             </p>
           </div>
           {canCancelProjects && (
@@ -75,6 +86,10 @@ export function CancelledProjectBanner({
   reason,
   approvedAt,
 }: CancelledProjectBannerProps) {
+  const safeRequesterName = requesterName ?? 'ไม่ทราบชื่อ';
+  const safeApproverName = approverName ?? 'ไม่ทราบชื่อ';
+  const safeReason = reason ?? '-';
+
   return (
     <div className="bg-destructive/10 rounded-lg p-6">
       <div className="flex items-start gap-4">
@@ -90,7 +105,8 @@ export function CancelledProjectBanner({
           </div>
           <div>
             <p className="normal text-primary">
-              โครงการนี้ถูกยกเลิกโดย {requesterName} และ {approverName} ด้วยเหตุผล &ldquo;{reason}
+              โครงการนี้ถูกยกเลิกโดย {safeRequesterName} และ {safeApproverName} ด้วยเหตุผล &ldquo;
+              {safeReason}
               &rdquo;
             </p>
           </div>

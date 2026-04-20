@@ -12,6 +12,12 @@ import {
 } from './enums';
 import { ProjectPersonSchema } from './project-schemas';
 
+const ProjectDetailBudgetPlanApiSchema = z.object({
+  id: z.string(),
+  activity_type_name: z.string().optional(),
+  budget_amount: z.union([z.string(), z.number()]).optional(),
+});
+
 export const ProjectDetailSchema = z.object({
   id: z.string(),
   procurement_type: ProcurementTypeEnum,
@@ -143,7 +149,7 @@ export const ProjectDetailApiSchema = z.object({
   po_no: z.string().nullable(),
   contract_no: z.string().nullable(),
   migo_no: z.string().nullable(),
-  budget_plans: z.array(z.string()).default([]),
+  budget_plans: z.array(z.union([z.string(), ProjectDetailBudgetPlanApiSchema])).default([]),
   expected_approval_date: z.string().datetime().nullable(),
   created_at: z.string().datetime(),
   updated_at: z.string().datetime().nullable(),

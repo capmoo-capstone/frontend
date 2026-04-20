@@ -16,9 +16,9 @@ export type BudgetPlan = z.infer<typeof BudgetPlanSchema>;
 
 export const BudgetPlanBackendSchema = z.object({
   id: z.string(),
-  budget_year: z.string(),
+  budget_year: z.number(),
   unit_id: z.string(),
-  unit_no: z.string(),
+  unit_no: z.string().optional(),
   activity_type: z.string(),
   activity_type_name: z.string(),
   description: z.string().nullable().optional(),

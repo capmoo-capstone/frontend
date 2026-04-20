@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 
+import { useQueryClient } from '@tanstack/react-query';
 import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { useAuth } from '@/context/AuthContext';
+import { useLinkBudgetPlanToProject } from '@/features/budgets';
 import {
   ApproveCancelDialog,
   CancelProjectDialog,
@@ -13,6 +15,7 @@ import {
   ProjectDetailTabs,
   ProjectHeader,
   ProjectInfoGrid,
+  projectKeys,
   useApproveProjectCancellation,
   useProjectDetail,
   useRejectProjectCancellation,
@@ -24,15 +27,18 @@ import { ProcurementWorkflows } from '@/features/workflow';
 export default function ProjectDetail() {
   const { id } = useParams();
   const { user } = useAuth();
+  const queryClient = useQueryClient();
 
   // View States
   const [isCancelDialogOpen, setIsCancelDialogOpen] = useState(false);
   const [isApproveCancelDialogOpen, setIsApproveCancelDialogOpen] = useState(false);
   const [isSavingHeader, setIsSavingHeader] = useState(false);
+  const [isSavingProjectInfo, setIsSavingProjectInfo] = useState(false);
   const [isSavingVendorInfo, setIsSavingVendorInfo] = useState(false);
 
   const { data: project, isLoading, isError, error } = useProjectDetail(id);
   const { mutateAsync: updateProjectMutation } = useUpdateProject();
+  const { mutateAsync: linkBudgetPlanMutation } = useLinkBudgetPlanToProject();
   const { mutateAsync: approveCancellationMutation } = useApproveProjectCancellation();
   const { mutateAsync: rejectCancellationMutation } = useRejectProjectCancellation();
   const { canCancelProjects, canEditProjectDetails } = useProjectPermissions();
@@ -76,6 +82,42 @@ export default function ProjectDetail() {
       throw error;
     } finally {
       setIsSavingVendorInfo(false);
+    }
+  };
+
+  const handleSaveProjectInfo = async (data: { budget_plan_id: string[] }) => {
+    setIsSavingProjectInfo(true);
+    try {
+      const existingBudgetPlanIds = new Set(project.budget_plans ?? []);
+      const nextBudgetPlanIds = new Set(data.budget_plan_id);
+
+      const addedBudgetPlanIds = [...nextBudgetPlanIds].filter(
+        (budgetPlanId) => !existingBudgetPlanIds.has(budgetPlanId)
+      );
+      const removedBudgetPlanCount = [...existingBudgetPlanIds].filter(
+        (budgetPlanId) => !nextBudgetPlanIds.has(budgetPlanId)
+      ).length;
+
+      if (addedBudgetPlanIds.length > 0) {
+        await Promise.all(
+          addedBudgetPlanIds.map((budgetPlanId) =>
+            linkBudgetPlanMutation({ id: budgetPlanId, projectId: id })
+          )
+        );
+      }
+
+      await queryClient.invalidateQueries({ queryKey: projectKeys.detail(id) });
+
+      if (removedBudgetPlanCount > 0) {
+        toast.warning('ขณะนี้ระบบยังไม่รองรับการยกเลิกผูกแผนงบประมาณจากโครงการ');
+      }
+
+      toast.success('อัปเดตข้อมูลแผนงบประมาณสำเร็จ');
+    } catch (error) {
+      toast.error('ไม่สามารถอัปเดตข้อมูลแผนงบประมาณได้ กรุณาลองใหม่อีกครั้ง');
+      throw error;
+    } finally {
+      setIsSavingProjectInfo(false);
     }
   };
 
@@ -139,6 +181,8 @@ export default function ProjectDetail() {
       <ProjectInfoGrid
         project={project}
         canEditProjectDetails={canEditProjectDetails}
+        onSaveProjectInfo={handleSaveProjectInfo}
+        isSavingProjectInfo={isSavingProjectInfo}
         onSaveVendorInfo={handleSaveVendorInfo}
         isSavingVendorInfo={isSavingVendorInfo}
       />

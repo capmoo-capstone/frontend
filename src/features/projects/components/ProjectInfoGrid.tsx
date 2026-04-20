@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 
 import { Check, ChevronDown, Copy, Pencil, X } from 'lucide-react';
-import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -17,6 +16,8 @@ import type { ProjectDetail } from '../types/index';
 interface ProjectInfoGridProps {
   project: ProjectDetail;
   canEditProjectDetails?: boolean;
+  onSaveProjectInfo?: (data: { budget_plan_id: string[] }) => Promise<void>;
+  isSavingProjectInfo?: boolean;
   onSaveVendorInfo?: (data: { vendor_name: string; vendor_email: string }) => Promise<void>;
   isSavingVendorInfo?: boolean;
 }
@@ -62,6 +63,8 @@ const ReadonlyFieldCell = ({ label, value, isCopyable = false }: ReadonlyFieldCe
 export const ProjectInfoGrid = ({
   project,
   canEditProjectDetails = false,
+  onSaveProjectInfo,
+  isSavingProjectInfo = false,
   onSaveVendorInfo,
   isSavingVendorInfo = false,
 }: ProjectInfoGridProps) => {
@@ -126,9 +129,15 @@ export const ProjectInfoGrid = ({
     },
   ];
 
-  const handleSaveProjectInfo = () => {
-    setIsEditingProjectInfo(false);
-    toast.success('บันทึกข้อมูลส่วนนี้เฉพาะในหน้าปัจจุบันแล้ว');
+  const handleSaveProjectInfo = async () => {
+    try {
+      await onSaveProjectInfo?.({
+        budget_plan_id: hasAssetCode ? selectedBudgetPlanIds : [],
+      });
+      setIsEditingProjectInfo(false);
+    } catch {
+      // Error toast is handled by parent.
+    }
   };
 
   const handleCancelProjectInfo = () => {
@@ -156,9 +165,13 @@ export const ProjectInfoGrid = ({
   };
 
   const toggleBudgetPlan = (planId: string) => {
-    setSelectedBudgetPlanIds((previous) =>
-      previous.includes(planId) ? previous.filter((id) => id !== planId) : [...previous, planId]
-    );
+    setSelectedBudgetPlanIds((previous) => {
+      if (previous.includes(planId)) {
+        return previous;
+      }
+
+      return [...previous, planId];
+    });
   };
 
   return (
@@ -173,11 +186,21 @@ export const ProjectInfoGrid = ({
             </Button>
           ) : isEditingProjectInfo ? (
             <div className="flex items-center gap-2">
-              <Button variant="brand" size="sm" onClick={handleSaveProjectInfo}>
+              <Button
+                variant="brand"
+                size="sm"
+                onClick={handleSaveProjectInfo}
+                disabled={isSavingProjectInfo}
+              >
                 <Check className="h-4 w-4" />
                 บันทึก
               </Button>
-              <Button variant="outline" size="sm" onClick={handleCancelProjectInfo}>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleCancelProjectInfo}
+                disabled={isSavingProjectInfo}
+              >
                 <X className="h-4 w-4" />
                 ยกเลิก
               </Button>
@@ -215,6 +238,10 @@ export const ProjectInfoGrid = ({
                 checked={hasAssetCode}
                 onCheckedChange={(checked) => {
                   const nextValue = Boolean(checked);
+                  if (!nextValue && hasAssetCode) {
+                    return;
+                  }
+
                   setHasAssetCode(nextValue);
                   if (!nextValue) {
                     setSelectedBudgetPlanIds([]);
@@ -263,10 +290,17 @@ export const ProjectInfoGrid = ({
                           return (
                             <div
                               key={plan.id}
-                              className="border-border flex cursor-pointer items-center gap-3 border-b px-3 py-3 last:border-b-0 hover:bg-slate-50 dark:hover:bg-slate-800/50"
+                              className={cn(
+                                'border-border flex items-center gap-3 border-b px-3 py-3 last:border-b-0',
+                                isSelected
+                                  ? 'cursor-not-allowed opacity-80'
+                                  : 'cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50'
+                              )}
                               onClick={(event) => {
                                 event.preventDefault();
-                                toggleBudgetPlan(plan.id);
+                                if (!isSelected) {
+                                  toggleBudgetPlan(plan.id);
+                                }
                               }}
                             >
                               <Checkbox checked={isSelected} className="pointer-events-none" />
@@ -281,7 +315,7 @@ export const ProjectInfoGrid = ({
                 <span className="normal">{budgetPlanDisplay}</span>
               )}
               <span className="text-muted-foreground caption">
-                ข้อมูลแผนงบประมาณบันทึกเฉพาะในหน้านี้
+                เลือกแผนงบประมาณได้เฉพาะการเพิ่มชั่วคราว และจะบันทึกเมื่อกดปุ่มบันทึก
               </span>
             </div>
           )}

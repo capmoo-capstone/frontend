@@ -21,6 +21,31 @@ type ProjectListApiItem = z.infer<typeof ProjectListApiItemSchema>;
 type ProjectWorklistApiItem = z.infer<typeof ProjectWorklistApiItemSchema>;
 type ProjectDetailApi = z.infer<typeof ProjectDetailApiSchema>;
 
+const toBudgetPlanIds = (budgetPlans: unknown): string[] => {
+  if (!Array.isArray(budgetPlans)) {
+    return [];
+  }
+
+  return budgetPlans
+    .map((budgetPlan) => {
+      if (typeof budgetPlan === 'string') {
+        return budgetPlan;
+      }
+
+      if (
+        typeof budgetPlan === 'object' &&
+        budgetPlan !== null &&
+        'id' in budgetPlan &&
+        typeof budgetPlan.id === 'string'
+      ) {
+        return budgetPlan.id;
+      }
+
+      return '';
+    })
+    .filter((id): id is string => id.length > 0);
+};
+
 const getWorklistAssignee = (item: ProjectWorklistApiItem) => {
   const assignees = item.assignee ?? item.assignee_procurement ?? item.assignee_contract ?? [];
 
@@ -150,7 +175,7 @@ export const mapProjectDetail = (parsed: ProjectDetailApi): ProjectDetail => ({
   po_no: parsed.po_no,
   contract_no: parsed.contract_no,
   migo_no: parsed.migo_no,
-  budget_plans: parsed.budget_plans ?? [],
+  budget_plans: toBudgetPlanIds(parsed.budget_plans),
   expected_approval_date: parsed.expected_approval_date,
   created_at: parsed.created_at,
   updated_at: parsed.updated_at ?? parsed.created_at,

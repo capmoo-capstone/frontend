@@ -151,7 +151,9 @@ export const claimProjectRequest = async (projectId: string) => {
 
 export const updateProjectRequest = async (projectId: string, payload: UpdateProjectPayload) => {
   const parsedPayload = UpdateProjectPayloadSchema.parse(payload);
-  const { data } = await api.patch(`/projects/${projectId}/update`, parsedPayload);
+  const { data } = await api.patch(`/projects/${projectId}/update`, {
+    updateData: parsedPayload,
+  });
   return data;
 };
 

@@ -16,7 +16,7 @@ import type { ProjectDetail } from '../types/index';
 interface ProjectInfoGridProps {
   project: ProjectDetail;
   canEditProjectDetails?: boolean;
-  onSaveProjectInfo?: (data: { budget_plan_id: string[] }) => Promise<void>;
+  onSaveProjectInfo?: (data: { budget_plan_id: string[]; budget: number }) => Promise<void>;
   isSavingProjectInfo?: boolean;
   onSaveVendorInfo?: (data: { vendor_name: string; vendor_email: string }) => Promise<void>;
   isSavingVendorInfo?: boolean;
@@ -75,6 +75,7 @@ export const ProjectInfoGrid = ({
   const [selectedBudgetPlanIds, setSelectedBudgetPlanIds] = useState<string[]>(
     project.budget_plans ?? []
   );
+  const [projectBudget, setProjectBudget] = useState<number>(project.budget ?? 0);
 
   const [vendorName, setVendorName] = useState(project.vendor.name ?? '');
   const [vendorEmail, setVendorEmail] = useState(project.vendor.email ?? '');
@@ -88,11 +89,12 @@ export const ProjectInfoGrid = ({
   useEffect(() => {
     setHasAssetCode((project.budget_plans?.length ?? 0) > 0);
     setSelectedBudgetPlanIds(project.budget_plans ?? []);
+    setProjectBudget(project.budget ?? 0);
     setVendorName(project.vendor.name ?? '');
     setVendorEmail(project.vendor.email ?? '');
     setIsEditingProjectInfo(false);
     setIsEditingVendor(false);
-  }, [project.id, project.budget_plans, project.vendor.email, project.vendor.name]);
+  }, [project.id, project.budget, project.budget_plans, project.vendor.email, project.vendor.name]);
 
   const selectedBudgetPlans = useMemo(
     () => budgetPlans?.filter((plan) => selectedBudgetPlanIds.includes(plan.id)) ?? [],
@@ -131,9 +133,15 @@ export const ProjectInfoGrid = ({
 
   const handleSaveProjectInfo = async () => {
     try {
+      const nextBudgetPlanIds = hasAssetCode ? selectedBudgetPlanIds : [];
+
       await onSaveProjectInfo?.({
-        budget_plan_id: hasAssetCode ? selectedBudgetPlanIds : [],
+        budget_plan_id: nextBudgetPlanIds,
+        budget: projectBudget,
       });
+
+      // Keep local UI state consistent when user enabled asset code but selected no plans.
+      setHasAssetCode(nextBudgetPlanIds.length > 0);
       setIsEditingProjectInfo(false);
     } catch {
       // Error toast is handled by parent.
@@ -143,6 +151,7 @@ export const ProjectInfoGrid = ({
   const handleCancelProjectInfo = () => {
     setHasAssetCode((project.budget_plans?.length ?? 0) > 0);
     setSelectedBudgetPlanIds(project.budget_plans ?? []);
+    setProjectBudget(project.budget ?? 0);
     setIsEditingProjectInfo(false);
   };
 
@@ -220,9 +229,28 @@ export const ProjectInfoGrid = ({
         </div>
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
-          {detailRowTwo.map((item) => (
-            <ReadonlyFieldCell key={item.label} label={item.label} value={item.value} />
-          ))}
+          {detailRowTwo.map((item) => {
+            if (item.label === 'วงเงินงบประมาณ (บาท)' && isEditingProjectInfo) {
+              return (
+                <div key={item.label} className="flex min-h-14 flex-col gap-1">
+                  <span className="text-muted-foreground h4-sub">{item.label}</span>
+                  <Input
+                    type="number"
+                    min={0}
+                    step="0.01"
+                    value={Number.isFinite(projectBudget) ? projectBudget : 0}
+                    onChange={(event) => {
+                      const nextBudget = Number(event.target.value);
+                      setProjectBudget(Number.isFinite(nextBudget) ? nextBudget : 0);
+                    }}
+                    disabled={isSavingProjectInfo}
+                  />
+                </div>
+              );
+            }
+
+            return <ReadonlyFieldCell key={item.label} label={item.label} value={item.value} />;
+          })}
         </div>
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
@@ -314,9 +342,6 @@ export const ProjectInfoGrid = ({
               ) : (
                 <span className="normal">{budgetPlanDisplay}</span>
               )}
-              <span className="text-muted-foreground caption">
-                เลือกแผนงบประมาณได้เฉพาะการเพิ่มชั่วคราว และจะบันทึกเมื่อกดปุ่มบันทึก
-              </span>
             </div>
           )}
         </div>

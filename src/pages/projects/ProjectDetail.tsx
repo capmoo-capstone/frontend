@@ -92,11 +92,12 @@ export default function ProjectDetail() {
     }
   };
 
-  const handleSaveProjectInfo = async (data: { budget_plan_id: string[] }) => {
+  const handleSaveProjectInfo = async (data: { budget_plan_id: string[]; budget: number }) => {
     setIsSavingProjectInfo(true);
     try {
       const existingBudgetPlanIds = new Set(project.budget_plans ?? []);
       const nextBudgetPlanIds = new Set(data.budget_plan_id);
+      const hasBudgetChanged = data.budget !== project.budget;
 
       const addedBudgetPlanIds = [...nextBudgetPlanIds].filter(
         (budgetPlanId) => !existingBudgetPlanIds.has(budgetPlanId)
@@ -111,6 +112,15 @@ export default function ProjectDetail() {
             linkBudgetPlanMutation({ id: budgetPlanId, projectId: id })
           )
         );
+      }
+
+      if (hasBudgetChanged) {
+        await updateProjectMutation({
+          projectId: id,
+          payload: {
+            budget: data.budget,
+          },
+        });
       }
 
       await queryClient.invalidateQueries({ queryKey: projectKeys.detail(id) });

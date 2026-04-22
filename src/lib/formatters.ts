@@ -341,7 +341,7 @@ export const getResponsibleTypeFormat = (type: UnitResponsibleType) => {
       };
     case 'INTERNAL':
       return {
-        label: 'ซื้อ/จ้าง ตามระเบียบฯ ข้อ 18',
+        label: 'ข้อ 18',
         indicator: 'var(--chart-7-dark)',
         bg: 'var(--chart-7-light)',
       };

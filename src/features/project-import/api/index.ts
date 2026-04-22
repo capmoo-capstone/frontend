@@ -1,8 +1,6 @@
-import type { ProjectUrgentStatus, UnitResponsibleType } from '@/features/projects/types/enums';
 import api from '@/lib/axios';
 
 import { type ProjectImportPayload, ProjectImportSchema } from '../types';
-import { calculateUrgentLevel, getDefaultDeliveryDate } from '../utils/calculateUrgentLevel';
 
 interface CreateProjectRequestPayload {
   title: string;
@@ -14,18 +12,12 @@ interface CreateProjectRequestPayload {
   requesting_dept_id: string;
   requesting_unit_id: string;
   procurement_type: string;
-  is_urgent: ProjectUrgentStatus;
+  is_urgent: 'NORMAL' | 'URGENT';
   expected_approval_date?: Date;
 }
 
 const toCreateProjectPayload = (payload: ProjectImportPayload): CreateProjectRequestPayload => {
   const parsedPayload = ProjectImportSchema.parse(payload);
-  const procurementType = parsedPayload.procurement_type as UnitResponsibleType;
-  const resolvedDeliveryDate =
-    parsedPayload.delivery_date ?? getDefaultDeliveryDate(procurementType);
-  const urgentLevel = parsedPayload.delivery_date
-    ? calculateUrgentLevel(parsedPayload.delivery_date, procurementType)
-    : 'NORMAL';
 
   return {
     title: parsedPayload.title,
@@ -37,19 +29,19 @@ const toCreateProjectPayload = (payload: ProjectImportPayload): CreateProjectReq
     requesting_dept_id: parsedPayload.department_id,
     requesting_unit_id: parsedPayload.unit_id,
     procurement_type: parsedPayload.procurement_type,
-    is_urgent: urgentLevel,
-    expected_approval_date: resolvedDeliveryDate,
+    is_urgent: 'NORMAL',
+    expected_approval_date: parsedPayload.delivery_date,
   };
 };
 
 export const createProject = async (payload: ProjectImportPayload) => {
   const requestPayload = toCreateProjectPayload(payload);
-  const data = await api.post('/projects/create', requestPayload);
+  const { data } = await api.post('/projects/create', requestPayload);
   return data;
 };
 
 export const importProjects = async (payload: ProjectImportPayload[]) => {
   const requestPayload = payload.map(toCreateProjectPayload);
-  const data = await api.post('/projects/import', requestPayload);
+  const { data } = await api.post('/projects/import', requestPayload);
   return data;
 };

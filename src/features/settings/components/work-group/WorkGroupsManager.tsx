@@ -18,10 +18,7 @@ import {
 } from '@/features/users';
 import { OPS_DEPT_ID } from '@/lib/constants';
 
-import {
-  DIRECTOR_ROLE_ID,
-  HEAD_OF_UNIT_ROLE_ID,
-} from '../../constants';
+import { DIRECTOR_ROLE_ID, HEAD_OF_UNIT_ROLE_ID } from '../../constants';
 import { CreateGroupPanel } from './CreateGroupPanel';
 import { WorkGroupCard } from './WorkGroupCard';
 

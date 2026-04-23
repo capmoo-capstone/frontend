@@ -138,7 +138,7 @@ const toUiSubmission = (submission: WorkflowSubmissionApiRecord, stepName?: stri
     submission_round: submission.submission_round,
     status: mapBackendStatusToSubmissionStatus(submission.status),
     submitted_by: submission.submitted_by ?? null,
-    submitted_at: submission.submitted_at ?? new Date().toISOString(),
+    submitted_at: submission.submitted_at ?? null,
     approved_by: submission.approved_by ?? null,
     approved_at: submission.approved_at ?? null,
     proposing_by: submission.proposing_by ?? null,

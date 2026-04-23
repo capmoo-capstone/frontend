@@ -24,7 +24,7 @@ interface ProjectInfoGridProps {
 }
 
 const formatNumberThai = (value: number | null) => {
-  if (!value) {
+  if (value === null || value === undefined) {
     return '-';
   }
 

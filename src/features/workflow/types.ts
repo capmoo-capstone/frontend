@@ -104,7 +104,7 @@ export const SubmissionSchema = z.object({
   po_no: z.string().nullable().optional(),
   status: z.enum(['SUBMITTED', 'APPROVED', 'ACCEPTED', 'COMPLETED', 'REJECTED']),
   submitted_by: z.string().nullable().optional(),
-  submitted_at: z.string(),
+  submitted_at: z.string().nullable().optional(),
   approved_by: z.string().nullable().optional(),
   approved_at: z.string().nullable().optional(),
   proposing_by: z.string().nullable().optional(),

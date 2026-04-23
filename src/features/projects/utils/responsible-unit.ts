@@ -1,3 +1,5 @@
+import { CONTRACT_UNIT_ID, PROC1_UNIT_ID, PROC2_UNIT_ID } from '@/lib/constants';
+
 const PROCUREMENT_UNIT_PROC_1_TYPES = ['LT100K', 'LT500K'] as const;
 const PROCUREMENT_UNIT_PROC_2_TYPES = ['MT500K', 'SELECTION', 'EBIDDING', 'INTERNAL'] as const;
 
@@ -10,15 +12,15 @@ export const getResponsibleUnitId = (
   }
 
   if (currentWorkflowType === 'CONTRACT') {
-    return 'UNIT-CONT';
+    return CONTRACT_UNIT_ID;
   }
 
   if (procurementType && PROCUREMENT_UNIT_PROC_1_TYPES.includes(procurementType as never)) {
-    return 'UNIT-PROC-1';
+    return PROC1_UNIT_ID;
   }
 
   if (procurementType && PROCUREMENT_UNIT_PROC_2_TYPES.includes(procurementType as never)) {
-    return 'UNIT-PROC-2';
+    return PROC2_UNIT_ID;
   }
 
   return undefined;

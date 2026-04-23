@@ -15,9 +15,9 @@ import {
   useCompleteProjectContract,
   useRequestProjectEdit,
 } from '@/features/projects/hooks/useProjectMutations';
-import { SUPPLY_OPERATION_DEPARTMENT_ID } from '@/features/settings/constants';
 import { UserSelect } from '@/features/users';
 import { type WorkflowStepConfig, useWorkflow, useWorkflowMutations } from '@/features/workflow';
+import { CONTRACT_UNIT_ID } from '@/lib/constants';
 
 import { WorkflowList } from './WorkflowList';
 import { WorkflowStepRow } from './WorkflowStepRow';
@@ -176,7 +176,7 @@ export function ProjectWorkflowSteps({
                 <UserSelect
                   value={procurementAssigneeId}
                   onChange={setProcurementAssigneeId}
-                  unitId={SUPPLY_OPERATION_DEPARTMENT_ID}
+                  unitId={CONTRACT_UNIT_ID}
                   placeholder="เลือกผู้รับผิดชอบงานบริหารสัญญา"
                   disabled={isProcurementHandoffBusy || user.role !== 'HEAD_OF_UNIT'}
                   className="w-full"

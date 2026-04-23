@@ -1,4 +1,5 @@
 import { useAuth } from '@/context/AuthContext';
+import { OPS_DEPT_ID } from '@/lib/constants';
 import {
   getRolesInDept,
   getRolesInUnit,
@@ -9,8 +10,6 @@ import {
 } from '@/lib/permissions';
 
 import type { RoleDetail, User } from '../types';
-
-const OPS_DEPT_ID = 'DEPT-SUP-OPS';
 
 export const getRoleInDeptSupOps = (u?: User): RoleDetail | undefined => {
   const allRoles = u?.roles ?? [];

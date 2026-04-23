@@ -1,7 +1,7 @@
 import { useAuth } from '@/context/AuthContext';
 import { usePermissions } from '@/features/auth';
 import { useProjectImportPermissions } from '@/features/project-import';
-import { SUPPLY_OPERATION_DEPARTMENT_ID } from '@/features/settings/constants';
+import { OPS_DEPT_ID } from '@/lib/constants';
 import { hasRoleInScopes } from '@/lib/permissions';
 
 import { getResponsibleUnitId } from '../utils/responsible-unit';
@@ -45,7 +45,7 @@ export const useProjectPermissions = (input?: UseProjectPermissionsInput) => {
       user &&
       hasRoleInScopes(user, ['HEAD_OF_UNIT', 'HEAD_OF_DEPARTMENT'], {
         unitId: resolvedUnitId,
-        departmentId: SUPPLY_OPERATION_DEPARTMENT_ID,
+        departmentId: OPS_DEPT_ID,
       })
     ),
 
@@ -63,7 +63,7 @@ export const useProjectPermissions = (input?: UseProjectPermissionsInput) => {
       user &&
       hasRoleInScopes(user, ['HEAD_OF_UNIT', 'HEAD_OF_DEPARTMENT'], {
         unitId: resolvedUnitId,
-        departmentId: SUPPLY_OPERATION_DEPARTMENT_ID,
+        departmentId: OPS_DEPT_ID,
       })
     ),
     canEditProjectDetails: !!(

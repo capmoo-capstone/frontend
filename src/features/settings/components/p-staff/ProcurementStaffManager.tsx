@@ -13,9 +13,9 @@ import {
   useUpdateSupplyRole,
   useUsersForSelection,
 } from '@/features/users';
+import { OPS_DEPT_ID } from '@/lib/constants';
 import { formatDateThaiShort } from '@/lib/formatters';
 
-import { SUPPLY_OPERATION_DEPARTMENT_ID } from '../../constants';
 import { PROCUREMENT_ROLES_CONFIG } from '../../constants';
 import { useProcurementRoleEditor } from '../../hooks/useProcurementRoleEditor';
 import { DelegationFormSection } from '../DelegationFormSection';
@@ -23,7 +23,7 @@ import { InlineActionRow } from '../InlineActionRow';
 
 export function ProcurementStaffManager() {
   const { data: procurementUsersResponse, isPending } = useUsersForSelection({
-    deptId: SUPPLY_OPERATION_DEPARTMENT_ID,
+    deptId: OPS_DEPT_ID,
   });
   const addDelegationMutation = useAddDelegation();
   const cancelDelegationMutation = useCancelDelegation();

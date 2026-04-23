@@ -15,7 +15,7 @@ import { useUnits } from '@/features/organization/hooks/useOrganization';
 import type { UnitItem } from '@/features/organization/types';
 import { AssignedTable, UnassignTable, WaitingCancelTable } from '@/features/projects/components';
 import { WorkloadChart } from '@/features/projects/components/tables/unassign-table/WorkloadChart';
-import { SUPPLY_OPERATION_DEPARTMENT_ID } from '@/features/settings/constants';
+import { OPS_DEPT_ID } from '@/lib/constants';
 import {
   hasDepartmentPermission,
   hasSelfManagePermission,
@@ -28,7 +28,7 @@ export default function AssignJobs() {
   const { user } = useAuth();
   const [pendingChanges, setPendingChanges] = useState<Record<string, string>>({});
 
-  const { data: units, isLoading } = useUnits(SUPPLY_OPERATION_DEPARTMENT_ID);
+  const { data: units, isLoading } = useUnits(OPS_DEPT_ID);
 
   const unitOptions = useMemo(() => {
     if (!units || !user) return [];

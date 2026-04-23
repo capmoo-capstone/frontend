@@ -6,6 +6,8 @@ import {
   useQueryClient,
 } from '@tanstack/react-query';
 
+import { OPS_DEPT_ID } from '@/lib/constants';
+
 import {
   addDelegation,
   cancelDelegation,
@@ -84,7 +86,7 @@ export const useUpdateSupplyRole = () => {
       updateSupplyRole(data),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ['users', 'selection', { deptId: 'DEPT-SUP-OPS' }],
+        queryKey: ['users', 'selection', { deptId: OPS_DEPT_ID }],
       });
     },
   });

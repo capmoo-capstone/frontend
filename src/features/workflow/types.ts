@@ -1,6 +1,15 @@
 import { z } from 'zod';
 
-import { WorkflowSubmissionBackendStatusSchema } from './api';
+export const WorkflowSubmissionBackendStatusSchema = z.enum([
+  'WAITING_APPROVAL',
+  'WAITING_PROPOSAL',
+  'WAITING_SIGNATURE',
+  'REJECTED',
+  'COMPLETED',
+  'SUBMITTED',
+  'APPROVED',
+  'ACCEPTED',
+]);
 
 // ============================================================================
 // Workflow Field Types

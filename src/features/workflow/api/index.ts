@@ -3,17 +3,7 @@ import { z } from 'zod';
 import api from '@/lib/axios';
 
 import type { Submission, WorkflowStepConfig } from '../types';
-
-export const WorkflowSubmissionBackendStatusSchema = z.enum([
-  'WAITING_APPROVAL',
-  'WAITING_PROPOSAL',
-  'WAITING_SIGNATURE',
-  'REJECTED',
-  'COMPLETED',
-  'SUBMITTED',
-  'APPROVED',
-  'ACCEPTED',
-]);
+import { WorkflowSubmissionBackendStatusSchema } from '../types';
 
 const WorkflowSubmissionMetaSchema = z.union([
   z.record(z.string(), z.any()),

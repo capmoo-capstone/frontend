@@ -5,8 +5,8 @@ import { getFiscalYear } from '@/lib/formatters';
 
 import type { AuthUser } from '../hooks/useStepActor';
 import { useStepActor } from '../hooks/useStepActor';
-import type { useWorkflow } from '../hooks/useWorkflow';
-import type { useWorkflowMutations } from '../hooks/useWorkflowMutations';
+import { useWorkflow } from '../hooks/useWorkflow';
+import { useWorkflowMutations } from '../hooks/useWorkflowMutations';
 import { buildSubmissionPayload } from '../lib/submission-payload';
 import { resolveDocumentStaffAction } from '../lib/workflow-actions';
 import { getSubmissionStableKey } from '../lib/workflow-identity';

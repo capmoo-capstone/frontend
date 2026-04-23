@@ -1,97 +1,102 @@
-import { CircleCheckBig, Clock, FileCheck, UserCheck, UserCog } from 'lucide-react';
-
 import type { Role } from '@/features/auth';
-import type { StepStatus } from '@/features/projects';
+import type { ProjectStatus } from '@/features/projects';
+import type { StepStatus } from '@/features/workflow';
 
-export const isActionRequired = (role: Role, status: StepStatus): boolean => {
-  switch (role) {
-    case 'GENERAL_STAFF':
-      return ['in_progress', 'rejected'].includes(status);
-    case 'HEAD_OF_UNIT':
-      return status === 'submitted';
-    case 'DOCUMENT_STAFF':
-      return status === 'approved';
-    default:
-      return false;
-  }
+const LOCKED_PROJECT_STATUSES = new Set(['CANCELLED', 'CLOSED', 'UNASSIGNED', 'WAITING_ACCEPT']);
+
+export interface StepColorTokens {
+  line: string;
+  bubble: string;
+  container: string;
+}
+
+const TOKENS = {
+  success: {
+    line: 'bg-success',
+    bubble: 'bg-success text-white',
+    container: 'border-success bg-success-light text-success-dark',
+  },
+  warning: {
+    line: 'bg-warning/50',
+    bubble: 'bg-warning text-white',
+    container: 'border-warning bg-warning-light text-warning-dark',
+  },
+  error: {
+    line: 'bg-red-200',
+    bubble: 'bg-red-100 text-red-700',
+    container: 'border-red-200 bg-red-50 text-red-700',
+  },
+  info: {
+    line: 'bg-info',
+    bubble: 'bg-info text-white',
+    container: 'border-info bg-info-light text-info',
+  },
+  secondary: {
+    line: 'bg-muted',
+    bubble: 'bg-muted text-primary',
+    container: 'border-muted bg-secondary text-muted-dark',
+  },
+} satisfies Record<string, StepColorTokens>;
+
+const ROLE_ACTION_STATUSES: Partial<Record<Role, StepStatus[]>> = {
+  GENERAL_STAFF: ['IN_PROGRESS', 'REJECTED'],
+  HEAD_OF_UNIT: ['WAITING_APPROVAL'],
+  DOCUMENT_STAFF: ['WAITING_PROPOSAL', 'WAITING_SIGNATURE'],
 };
 
-export const getStepColor = (status: StepStatus, role: Role) => {
-  if (status === 'completed') {
-    return {
-      line: 'bg-success',
-      bubble: 'bg-success text-white',
-      container: 'border-success bg-success-light text-success-dark',
-      title: 'ดำเนินการเสร็จสิ้น',
-      description: 'ขั้นตอนนี้เสร็จสมบูรณ์แล้ว',
-      icon: FileCheck,
-    };
+export const isWorkflowProjectLocked = (projectStatus?: ProjectStatus | string): boolean => {
+  if (!projectStatus) return false;
+  return LOCKED_PROJECT_STATUSES.has(projectStatus);
+};
+
+export const isActionRequired = (
+  role: Role | string,
+  status: StepStatus,
+  projectStatus?: ProjectStatus | string
+): boolean => {
+  if (isWorkflowProjectLocked(projectStatus)) {
+    return false;
   }
 
-  if (isActionRequired(role, status)) {
-    return {
-      line: 'bg-warning/50',
-      bubble: 'bg-warning text-white',
-      container: 'border-warning bg-warning-light text-warning-dark',
-    };
+  const actionableStatuses = ROLE_ACTION_STATUSES[role as Role];
+  return actionableStatuses?.includes(status) ?? false;
+};
+
+export const getStepColor = (
+  status: StepStatus,
+  role: Role | string,
+  projectStatus?: ProjectStatus | string,
+  canActOverride?: boolean
+): StepColorTokens => {
+  if (status === 'COMPLETED') {
+    return TOKENS.success;
   }
+
+  if (isWorkflowProjectLocked(projectStatus)) {
+    return TOKENS.secondary;
+  }
+
+  const canAct =
+    canActOverride === undefined ? isActionRequired(role, status, projectStatus) : canActOverride;
 
   switch (status) {
-    case 'in_progress': {
-      return {
-        line: 'bg-info',
-        bubble: 'bg-info text-white',
-        container: 'border-info bg-info-light text-info',
-        title: 'กำลังดำเนินการ',
-        description: 'เจ้าหน้าที่พัสดุกำลังจัดทำเอกสาร',
-        icon: CircleCheckBig,
-      };
-    }
-    case 'not_started': {
-      return {
-        line: 'bg-muted',
-        bubble: 'bg-muted text-primary',
-        container: 'border-muted bg-secondary text-muted-dark',
-        title: 'ยังไม่ถึงขั้นตอนนี้',
-        description: 'กรุณารอการดำเนินการจากขั้นตอนก่อนหน้า',
-        icon: Clock,
-      };
-    }
-    case 'submitted':
-      return {
-        line: 'bg-info',
-        bubble: 'bg-info text-white',
-        container: 'border-info bg-info-light text-info',
-        title: 'รอการตรวจสอบ',
-        description: 'หัวหน้ากลุ่มงานกำลังตรวจสอบความถูกต้อง',
-        icon: UserCheck,
-      };
-    case 'approved':
-      return {
-        line: 'bg-info',
-        bubble: 'bg-info text-white',
-        container: 'border-info bg-info-light text-info',
-        title: 'รอเสนอลงนาม',
-        description: 'เจ้าหน้าที่งานระเบียบกำลังเตรียมเสนอผู้อำนวยการ',
-        icon: FileCheck,
-      };
-    case 'rejected':
-      return {
-        line: 'bg-error',
-        bubble: 'bg-error text-white',
-        container: 'border-error bg-error-light text-error',
-        title: 'อยู่ระหว่างดำเนินการ',
-        description: 'เจ้าหน้าที่พัสดุกำลังจัดทำหรือแก้ไขเอกสาร',
-        icon: UserCog,
-      };
+    case 'NOT_STARTED':
+      return TOKENS.secondary;
+
+    case 'IN_PROGRESS':
+      return canAct ? TOKENS.warning : TOKENS.info;
+
+    case 'REJECTED':
+      return canAct ? TOKENS.warning : TOKENS.error;
+
+    case 'WAITING_APPROVAL':
+      return canAct ? TOKENS.warning : TOKENS.info;
+
+    case 'WAITING_PROPOSAL':
+    case 'WAITING_SIGNATURE':
+      return canAct ? TOKENS.warning : TOKENS.info;
+
     default:
-      return {
-        line: 'bg-muted',
-        bubble: 'bg-muted text-primary',
-        container: 'border-muted bg-secondary text-muted-dark',
-        title: 'ยังไม่ถึงขั้นตอนนี้',
-        description: 'กรุณารอการดำเนินการจากขั้นตอนก่อนหน้า',
-        icon: Clock,
-      };
+      return TOKENS.secondary;
   }
 };

@@ -21,6 +21,31 @@ type ProjectListApiItem = z.infer<typeof ProjectListApiItemSchema>;
 type ProjectWorklistApiItem = z.infer<typeof ProjectWorklistApiItemSchema>;
 type ProjectDetailApi = z.infer<typeof ProjectDetailApiSchema>;
 
+const toBudgetPlanIds = (budgetPlans: unknown): string[] => {
+  if (!Array.isArray(budgetPlans)) {
+    return [];
+  }
+
+  return budgetPlans
+    .map((budgetPlan) => {
+      if (typeof budgetPlan === 'string') {
+        return budgetPlan;
+      }
+
+      if (
+        typeof budgetPlan === 'object' &&
+        budgetPlan !== null &&
+        'id' in budgetPlan &&
+        typeof budgetPlan.id === 'string'
+      ) {
+        return budgetPlan.id;
+      }
+
+      return '';
+    })
+    .filter((id): id is string => id.length > 0);
+};
+
 const getWorklistAssignee = (item: ProjectWorklistApiItem) => {
   const assignees = item.assignee ?? item.assignee_procurement ?? item.assignee_contract ?? [];
 
@@ -46,7 +71,7 @@ export const mapProjectListItem = (project: ProjectListApiItem): Project =>
     procurement_step: project.procurement_step,
     contract_status: project.contract_status,
     contract_step: project.contract_step,
-    budget_plan_id: project.budget_plan_id,
+    budget_plan_id: project.budget_plan_id ?? [],
     pr_no: project.pr_no,
     po_no: project.po_no,
     less_no: project.less_no,
@@ -141,12 +166,16 @@ export const mapProjectDetail = (parsed: ProjectDetailApi): ProjectDetail => ({
   description: parsed.description,
   budget: parsed.budget,
   status: parsed.status,
+  procurement_status: parsed.procurement_status.status,
+  contract_status: parsed.contract_status.status,
+  contract_step: parsed.contract_status.step,
   receive_no: parsed.receive_no,
   less_no: parsed.less_no,
   pr_no: parsed.pr_no,
   po_no: parsed.po_no,
   contract_no: parsed.contract_no,
   migo_no: parsed.migo_no,
+  budget_plans: toBudgetPlanIds(parsed.budget_plans),
   expected_approval_date: parsed.expected_approval_date,
   created_at: parsed.created_at,
   updated_at: parsed.updated_at ?? parsed.created_at,
@@ -165,8 +194,14 @@ export const mapProjectDetail = (parsed: ProjectDetailApi): ProjectDetail => ({
     full_name: parsed.assignee_contract[0]?.full_name ?? null,
   },
   current_step: {
-    name: parsed.procurement_status.status,
-    order: parsed.procurement_status.step ?? 1,
+    name:
+      parsed.current_workflow_type === 'CONTRACT'
+        ? parsed.contract_status.status
+        : parsed.procurement_status.status,
+    order:
+      parsed.current_workflow_type === 'CONTRACT'
+        ? (parsed.contract_status.step ?? 1)
+        : (parsed.procurement_status.step ?? 1),
   },
   workflow: {
     type: parsed.current_workflow_type,

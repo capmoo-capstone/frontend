@@ -1,8 +1,7 @@
 import { useMemo, useState } from 'react';
 
 import { useDepartments } from '@/features/organization';
-
-import { SUPPLY_OPERATION_DEPARTMENT_ID } from '../constants';
+import { OPS_DEPT_ID } from '@/lib/constants';
 
 interface DepartmentItem {
   id: string;
@@ -15,9 +14,7 @@ export function useDepartmentRepsManager() {
 
   const filteredDepartments = useMemo(() => {
     // remove operation department from the list
-    const nonOperationDepartments = (departments ?? []).filter(
-      (dept) => dept.id !== SUPPLY_OPERATION_DEPARTMENT_ID
-    );
+    const nonOperationDepartments = (departments ?? []).filter((dept) => dept.id !== OPS_DEPT_ID);
 
     // TODO (BACKEND MIGRATION): Department filtering and search ranking should be handled by query params in the backend for scalability.
     if (!searchTerm.trim()) return nonOperationDepartments;

@@ -16,19 +16,16 @@ import {
   useUsersForSelection,
   useUsersForUnitsSelection,
 } from '@/features/users';
+import { OPS_DEPT_ID } from '@/lib/constants';
 
-import {
-  DIRECTOR_ROLE_ID,
-  HEAD_OF_UNIT_ROLE_ID,
-  SUPPLY_OPERATION_DEPARTMENT_ID,
-} from '../../constants';
+import { DIRECTOR_ROLE_ID, HEAD_OF_UNIT_ROLE_ID } from '../../constants';
 import { CreateGroupPanel } from './CreateGroupPanel';
 import { WorkGroupCard } from './WorkGroupCard';
 
 export function WorkGroupsManager() {
   const [isCreateVisible, setIsCreateVisible] = useState(false);
 
-  const { data: units } = useUnits(SUPPLY_OPERATION_DEPARTMENT_ID);
+  const { data: units } = useUnits(OPS_DEPT_ID);
   const updateUnitMutation = useUpdateUnit();
   const updateUsersInUnitMutation = useUpdateUsersInUnit();
   const addDelegationMutation = useAddDelegation();
@@ -41,7 +38,7 @@ export function WorkGroupsManager() {
   const delegationQueries = useActiveDelegationByUnit(unitIds);
 
   const { data: procurementUsersResponse } = useUsersForSelection({
-    deptId: SUPPLY_OPERATION_DEPARTMENT_ID,
+    deptId: OPS_DEPT_ID,
   });
 
   const procurementUsers = procurementUsersResponse?.data ?? [];
@@ -111,12 +108,8 @@ export function WorkGroupsManager() {
           await updateUnitMutation.mutateAsync(changedPayload);
         }
 
-        const currentAssignedUsers = new Set(
-          [...currentGroup.member_ids].filter(Boolean)
-        );
-        const nextAssignedUsers = Array.from(
-          new Set([...updated.member_ids].filter(Boolean))
-        );
+        const currentAssignedUsers = new Set([...currentGroup.member_ids].filter(Boolean));
+        const nextAssignedUsers = Array.from(new Set([...updated.member_ids].filter(Boolean)));
 
         const newUserIds = nextAssignedUsers.filter((userId) => !currentAssignedUsers.has(userId));
         const removeUserIds = Array.from(currentAssignedUsers).filter(
@@ -151,7 +144,7 @@ export function WorkGroupsManager() {
             role: 'HEAD_OF_UNIT' as UserRole,
             newUserIds: updated.head_id ? [updated.head_id] : [],
             removeUserIds: [currentGroup.head_id],
-            deptId: SUPPLY_OPERATION_DEPARTMENT_ID,
+            deptId: OPS_DEPT_ID,
             unitId: updated.id,
           });
         }

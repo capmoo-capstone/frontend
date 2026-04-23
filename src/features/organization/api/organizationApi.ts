@@ -1,5 +1,5 @@
-import { SUPPLY_OPERATION_DEPARTMENT_ID } from '@/features/settings/constants';
 import api from '@/lib/axios';
+import { OPS_DEPT_ID } from '@/lib/constants';
 
 import {
   type CreateDepartmentPayload,
@@ -48,7 +48,7 @@ export const getUnits = async ({ page = 1, limit = 20 }: Partial<UnitListParams>
 
   return {
     ...parsed,
-    data: parsed.data.filter((unit) => unit.dept_id !== SUPPLY_OPERATION_DEPARTMENT_ID),
+    data: parsed.data.filter((unit) => unit.dept_id !== OPS_DEPT_ID),
   };
 };
 

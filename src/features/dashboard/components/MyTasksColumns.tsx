@@ -57,6 +57,9 @@ export const myTasksColumns = ({ user }: MyTasksColumnsProps): ColumnDef<Project
           <span className="text-destructive normal-b mr-2">ด่วน</span>
         )}
         {row.original.is_urgent === 'VERY_URGENT' && (
+          <span className="text-destructive normal-b mr-2">ด่วนที่สุด</span>
+        )}
+        {row.original.is_urgent === 'SUPER_URGENT' && (
           <span className="text-destructive normal-b mr-2">ด่วนพิเศษ</span>
         )}
         {row.getValue('title')}

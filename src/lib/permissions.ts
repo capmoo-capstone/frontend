@@ -53,7 +53,7 @@ export const ManageSelfRoles: Role[] = ['GENERAL_STAFF'];
  * @param user The logged-in user object
  * @returns Array of all active role scopes for the user
  */
-const getAllScopes = (user: User) => [...user.roles.own, ...user.roles.delegated];
+const getAllScopes = (user: User) => user.roles;
 
 /**
  * Core engine to check if a user possesses any of the allowed roles,
@@ -70,7 +70,9 @@ export const hasRoleInScopes = (
   const scopes = getAllScopes(user);
   if (scopes.length === 0) return false;
 
-  allowedRoles.push('SUPER_ADMIN');
+  if (scopes.some((scope) => scope.role === 'SUPER_ADMIN')) {
+    return true;
+  }
 
   return scopes.some((scope) => {
     if (!allowedRoles.includes(scope.role)) return false;

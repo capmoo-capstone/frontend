@@ -13,9 +13,12 @@ interface WorkflowStepProps {
   index: number;
   title: string;
   status?: StepStatus;
+  projectStatus?: string;
+  canAct?: boolean;
   viewAsRole: Role;
   isLast?: boolean;
   isGuest?: boolean;
+  isLocked?: boolean;
   children: React.ReactNode;
 }
 
@@ -23,13 +26,16 @@ export function WorkflowStep({
   id,
   index,
   title,
-  status = 'not_started',
+  status = 'NOT_STARTED',
+  projectStatus,
+  canAct,
   viewAsRole,
   isLast = false,
   isGuest = false,
+  isLocked = false,
   children,
 }: WorkflowStepProps) {
-  const colors = getStepColor(status, viewAsRole);
+  const colors = getStepColor(status, viewAsRole, projectStatus, canAct);
 
   return (
     <AccordionItem value={id} className="relative border-none">
@@ -43,7 +49,7 @@ export function WorkflowStep({
       {/* --- TRIGGER HEADER --- */}
       <AccordionTrigger
         className="group py-4 hover:no-underline disabled:opacity-100 [&>svg]:hidden [&[data-state=open]>div]:rounded-b-none"
-        disabled={isGuest}
+        disabled={isGuest || isLocked}
       >
         <div className={cn('flex w-full items-center gap-4 transition-colors')}>
           {/* Number Bubble */}
@@ -66,7 +72,7 @@ export function WorkflowStep({
             <span className="h3-topic flex-1 text-left">{title}</span>
 
             {/* Chevron Icon */}
-            {!isGuest && (
+            {!isGuest && !isLocked && (
               <ChevronDown className="h-5 w-5 shrink-0 transition-transform duration-200 group-data-[state=open]:rotate-180" />
             )}
           </div>

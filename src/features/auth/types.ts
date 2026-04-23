@@ -20,10 +20,7 @@ export const RoleDetailSchema = z.object({
   unit_name: z.string().nullable(),
 });
 
-export const UserRolesSchema = z.object({
-  own: z.array(RoleDetailSchema),
-  delegated: z.array(RoleDetailSchema),
-});
+export const UserRolesSchema = z.array(RoleDetailSchema);
 
 export const LoginRequestSchema = z.object({
   username: z.string().min(1, { message: 'กรุณากรอกชื่อผู้ใช้' }),
@@ -46,9 +43,7 @@ export const BackendLoginDataSchema = z.object({
   delegated_by: z.array(BackendDelegatedBySchema),
 });
 
-export const BackendLoginResponseSchema = z.object({
-  data: BackendLoginDataSchema,
-});
+export const BackendLoginResponseSchema = BackendLoginDataSchema;
 
 export const AuthUserSchema = z.object({
   id: z.string(),
@@ -87,7 +82,7 @@ const ROLE_PRIORITY: Record<Role, number> = {
 };
 
 export const getPrimaryRole = (user: AuthUser): RoleDetail | null => {
-  const allRoles = [...user.roles.own, ...user.roles.delegated];
+  const allRoles = user.roles;
 
   if (allRoles.length === 0) return null;
 

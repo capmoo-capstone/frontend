@@ -1,20 +1,24 @@
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 
+import { useQueryClient } from '@tanstack/react-query';
 import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { useAuth } from '@/context/AuthContext';
+import { useLinkBudgetPlanToProject } from '@/features/budgets';
 import {
   ApproveCancelDialog,
   CancelProjectDialog,
   CancellationRequestBanner,
-  type EditProjectData,
-  EditProjectDialog,
+  CancelledProjectBanner,
   ProjectDetailTabs,
   ProjectHeader,
   ProjectInfoGrid,
+  projectKeys,
+  useApproveProjectCancellation,
   useProjectDetail,
+  useRejectProjectCancellation,
   useUpdateProject,
 } from '@/features/projects';
 import { useProjectPermissions } from '@/features/projects/hooks/useProjectPermissions';
@@ -23,15 +27,28 @@ import { ProcurementWorkflows } from '@/features/workflow';
 export default function ProjectDetail() {
   const { id } = useParams();
   const { user } = useAuth();
+  const queryClient = useQueryClient();
 
   // View States
   const [isCancelDialogOpen, setIsCancelDialogOpen] = useState(false);
   const [isApproveCancelDialogOpen, setIsApproveCancelDialogOpen] = useState(false);
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isSavingHeader, setIsSavingHeader] = useState(false);
+  const [isSavingProjectInfo, setIsSavingProjectInfo] = useState(false);
+  const [isSavingVendorInfo, setIsSavingVendorInfo] = useState(false);
 
   const { data: project, isLoading, isError, error } = useProjectDetail(id);
   const { mutateAsync: updateProjectMutation } = useUpdateProject();
-  const { canCancelProjects } = useProjectPermissions(project?.requester.unit_id ?? undefined);
+  const { mutateAsync: linkBudgetPlanMutation } = useLinkBudgetPlanToProject();
+  const { mutateAsync: approveCancellationMutation } = useApproveProjectCancellation();
+  const { mutateAsync: rejectCancellationMutation } = useRejectProjectCancellation();
+  const { canCancelProjects, canEditProjectDetails } = useProjectPermissions({
+    project: project
+      ? {
+          current_template_type: project.current_template_type,
+          procurement_type: project.procurement_type,
+        }
+      : undefined,
+  });
 
   if (!id || !user) return null;
   if (isLoading)
@@ -43,39 +60,149 @@ export default function ProjectDetail() {
   if (isError) return <div className="p-8 text-center text-red-500">Error: {error?.message}</div>;
   if (!project) return null;
 
-  const handleEditProject = async (data: EditProjectData) => {
+  const handleSaveProjectHeader = async (data: { title: string; description: string | null }) => {
+    setIsSavingHeader(true);
     try {
       await updateProjectMutation({
         projectId: id,
         payload: data,
       });
       toast.success('อัปเดตข้อมูลโครงการสำเร็จ');
-      setIsEditDialogOpen(false);
-    } catch {
+    } catch (error) {
       toast.error('ไม่สามารถอัปเดตข้อมูลโครงการได้ กรุณาลองใหม่อีกครั้ง');
+      throw error;
+    } finally {
+      setIsSavingHeader(false);
     }
+  };
+
+  const handleSaveVendorInfo = async (data: { vendor_name: string; vendor_email: string }) => {
+    setIsSavingVendorInfo(true);
+    try {
+      await updateProjectMutation({
+        projectId: id,
+        payload: data,
+      });
+      toast.success('อัปเดตข้อมูลผู้ค้าสำเร็จ');
+    } catch (error) {
+      toast.error('ไม่สามารถอัปเดตข้อมูลผู้ค้าได้ กรุณาลองใหม่อีกครั้ง');
+      throw error;
+    } finally {
+      setIsSavingVendorInfo(false);
+    }
+  };
+
+  const handleSaveProjectInfo = async (data: { budget_plan_id: string[]; budget: number }) => {
+    setIsSavingProjectInfo(true);
+    try {
+      const existingBudgetPlanIds = new Set(project.budget_plans ?? []);
+      const nextBudgetPlanIds = new Set(data.budget_plan_id);
+      const hasBudgetChanged = data.budget !== project.budget;
+
+      const addedBudgetPlanIds = [...nextBudgetPlanIds].filter(
+        (budgetPlanId) => !existingBudgetPlanIds.has(budgetPlanId)
+      );
+      const removedBudgetPlanCount = [...existingBudgetPlanIds].filter(
+        (budgetPlanId) => !nextBudgetPlanIds.has(budgetPlanId)
+      ).length;
+
+      if (addedBudgetPlanIds.length > 0) {
+        await Promise.all(
+          addedBudgetPlanIds.map((budgetPlanId) =>
+            linkBudgetPlanMutation({ id: budgetPlanId, projectId: id })
+          )
+        );
+      }
+
+      if (hasBudgetChanged) {
+        await updateProjectMutation({
+          projectId: id,
+          payload: {
+            budget: data.budget,
+          },
+        });
+      }
+
+      await queryClient.invalidateQueries({ queryKey: projectKeys.detail(id) });
+
+      if (removedBudgetPlanCount > 0) {
+        toast.warning('ขณะนี้ระบบยังไม่รองรับการยกเลิกผูกแผนงบประมาณจากโครงการ');
+      }
+
+      toast.success('อัปเดตข้อมูลโครงการสำเร็จ');
+    } catch (error) {
+      toast.error('ไม่สามารถอัปเดตข้อมูลโครงการได้ กรุณาลองใหม่อีกครั้ง');
+      throw error;
+    } finally {
+      setIsSavingProjectInfo(false);
+    }
+  };
+
+  const activeCancellation = project.cancellation?.[0] ?? null;
+
+  const handleApproveCancellation = async () => {
+    try {
+      await approveCancellationMutation(id);
+      toast.success('อนุมัติการยกเลิกโครงการสำเร็จ');
+      setIsApproveCancelDialogOpen(false);
+    } catch {
+      toast.error('ไม่สามารถอนุมัติการยกเลิกโครงการได้ กรุณาลองใหม่อีกครั้ง');
+    }
+  };
+
+  const handleRejectCancellation = async () => {
+    try {
+      await rejectCancellationMutation(id);
+      toast.success('ปฏิเสธคำขอยกเลิกโครงการสำเร็จ');
+    } catch {
+      toast.error('ไม่สามารถปฏิเสธคำขอยกเลิกโครงการได้ กรุณาลองใหม่อีกครั้ง');
+    }
+  };
+
+  const handleAddAssignee = () => {
+    toast.info('กำลังเตรียมฟีเจอร์เพิ่มผู้รับผิดชอบ');
   };
 
   return (
     <>
+      {/* --- Project Alerts --- */}
+      {project.status === 'WAITING_CANCEL' && activeCancellation && (
+        <CancellationRequestBanner
+          requesterName={activeCancellation.requester.full_name}
+          reason={activeCancellation.reason}
+          requestedAt={activeCancellation.requested_at}
+          canCancelProjects={canCancelProjects}
+          onRequestApprove={() => setIsApproveCancelDialogOpen(true)}
+          onRequestReject={handleRejectCancellation}
+        />
+      )}
+      {project.status === 'CANCELLED' && (
+        <CancelledProjectBanner
+          requesterName={activeCancellation?.requester.full_name}
+          approverName={activeCancellation?.approver?.full_name}
+          reason={activeCancellation?.reason}
+          approvedAt={activeCancellation?.approved_at}
+        />
+      )}
+
       <ProjectHeader
         project={project}
-        onEditProject={() => setIsEditDialogOpen(true)}
+        canEditProjectDetails={canEditProjectDetails}
+        onSaveProjectHeader={handleSaveProjectHeader}
+        isSaving={isSavingHeader}
         onCancelProject={() => setIsCancelDialogOpen(true)}
+        onAddAssignee={handleAddAssignee}
         canCancelProjects={canCancelProjects}
       />
 
-      {/* --- Project Alerts --- */}
-      <div className="space-y-6">
-        {/* Example: Logic to show banners based on project status would go here */}
-        <CancellationRequestBanner
-          onRequestApprove={() => setIsApproveCancelDialogOpen(true)}
-          onRequestReject={() => {}}
-        />
-        {/* <CancelledProjectBanner /> */}
-      </div>
-
-      <ProjectInfoGrid project={project} />
+      <ProjectInfoGrid
+        project={project}
+        canEditProjectDetails={canEditProjectDetails}
+        onSaveProjectInfo={handleSaveProjectInfo}
+        isSavingProjectInfo={isSavingProjectInfo}
+        onSaveVendorInfo={handleSaveVendorInfo}
+        isSavingVendorInfo={isSavingVendorInfo}
+      />
 
       <ProjectDetailTabs project={project} workflowConfigs={ProcurementWorkflows} />
 
@@ -83,19 +210,9 @@ export default function ProjectDetail() {
       <ApproveCancelDialog
         isOpen={isApproveCancelDialogOpen}
         onClose={() => setIsApproveCancelDialogOpen(false)}
-        onConfirm={async () => {
-          toast.success('อนุมัติการยกเลิกโครงการสำเร็จ');
-          setIsApproveCancelDialogOpen(false);
-        }}
+        onConfirm={handleApproveCancellation}
         projectTitle={project.title}
-        requesterName="นางสาว เจ้าหน้าที่"
-      />
-
-      <EditProjectDialog
-        isOpen={isEditDialogOpen}
-        onClose={() => setIsEditDialogOpen(false)}
-        onConfirm={handleEditProject}
-        project={project}
+        requesterName={activeCancellation?.requester.full_name}
       />
 
       <CancelProjectDialog

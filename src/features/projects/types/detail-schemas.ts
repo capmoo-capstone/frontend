@@ -12,6 +12,12 @@ import {
 } from './enums';
 import { ProjectPersonSchema } from './project-schemas';
 
+const ProjectDetailBudgetPlanApiSchema = z.object({
+  id: z.string(),
+  activity_type_name: z.string().optional(),
+  budget_amount: z.union([z.string(), z.number()]).optional(),
+});
+
 export const ProjectDetailSchema = z.object({
   id: z.string(),
   procurement_type: ProcurementTypeEnum,
@@ -21,13 +27,18 @@ export const ProjectDetailSchema = z.object({
   description: z.string().nullable(),
   budget: z.number().nullable(),
   status: ProjectStatusEnum,
+  procurement_status: ProjectStatusByTypeEnum,
+  contract_status: ProjectStatusByTypeEnum,
+  contract_step: z.number().nullable().optional(),
   receive_no: z.string(),
   less_no: z.string().nullable(),
   pr_no: z.string().nullable(),
   po_no: z.string().nullable(),
   contract_no: z.string().nullable(),
   migo_no: z.string().nullable(),
+  budget_plans: z.array(z.string()).default([]),
   expected_approval_date: z.string().nullable(),
+  expected_completion_procurement_date: z.string().nullable(),
   created_at: z.string(),
   updated_at: z.string(),
   vendor: z.object({
@@ -80,25 +91,11 @@ export const ProjectDetailSchema = z.object({
         requester: z.object({
           id: z.string(),
           full_name: z.string(),
-          roles: z.array(
-            z.object({
-              role: RoleEnum,
-              dept_id: z.string().nullable(),
-              unit_id: z.string().nullable(),
-            })
-          ),
         }),
         approver: z
           .object({
             id: z.string(),
             full_name: z.string(),
-            roles: z.array(
-              z.object({
-                role: RoleEnum,
-                dept_id: z.string().nullable(),
-                unit_id: z.string().nullable(),
-              })
-            ),
           })
           .nullable(),
         requested_at: z.string().datetime(),
@@ -135,25 +132,11 @@ export const ProjectDetailApiSchema = z.object({
         requester: z.object({
           id: z.string(),
           full_name: z.string(),
-          roles: z.array(
-            z.object({
-              role: RoleEnum,
-              dept_id: z.string().nullable(),
-              unit_id: z.string().nullable(),
-            })
-          ),
         }),
         approver: z
           .object({
             id: z.string(),
             full_name: z.string(),
-            roles: z.array(
-              z.object({
-                role: RoleEnum,
-                dept_id: z.string().nullable(),
-                unit_id: z.string().nullable(),
-              })
-            ),
           })
           .nullable(),
         requested_at: z.string().datetime(),
@@ -167,6 +150,7 @@ export const ProjectDetailApiSchema = z.object({
   po_no: z.string().nullable(),
   contract_no: z.string().nullable(),
   migo_no: z.string().nullable(),
+  budget_plans: z.array(z.union([z.string(), ProjectDetailBudgetPlanApiSchema])).default([]),
   expected_approval_date: z.string().datetime().nullable(),
   created_at: z.string().datetime(),
   updated_at: z.string().datetime().nullable(),

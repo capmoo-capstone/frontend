@@ -4,6 +4,9 @@ import type { Submission } from '@/features/workflow';
 import { formatDateThai } from '@/lib/formatters';
 import { cn } from '@/lib/utils';
 
+import { getActorDisplayName } from '../lib/submission-presentation';
+import { getSubmissionStableKey } from '../lib/workflow-identity';
+
 interface StepHistoryProps {
   submissions?: Submission[];
   onSelectSubmission?: (submission: Submission) => void;
@@ -27,7 +30,7 @@ export function StepHistory({
   return (
     <div className="divide-border flex flex-col divide-y rounded-md border">
       {submissions.map((submission) => {
-        const uniqueId = `${submission.step_order}-${submission.submission_round}`;
+        const uniqueId = getSubmissionStableKey(submission);
         const isSelected = selectedSubmissionId === uniqueId;
 
         return (
@@ -44,7 +47,7 @@ export function StepHistory({
               <div className="flex flex-col space-y-1">
                 <span className="h4-topic">ส่งครั้งที่ {submission.submission_round}</span>
                 <p className="text-muted-foreground caption">
-                  โดย {submission.submitted_by || 'ไม่ทราบชื่อ'}
+                  โดย {getActorDisplayName(submission.submitted_by)}
                 </p>
               </div>
               <span className="text-muted-foreground caption">
@@ -59,46 +62,67 @@ export function StepHistory({
                 <div className="flex flex-col items-start gap-1">
                   <div className="flex w-full flex-row items-center justify-between gap-2">
                     <CornerDownRight className="text-primary h-4 w-4" />
-                    <span className="h4-topic flex-1">ถูกตีกลับ</span>
+                    <span className="h4-topic flex-1">
+                      ส่งกลับ &quot;{submission.comments ?? '-'}&quot;
+                    </span>
                     <span className="text-muted-foreground caption">
-                      {formatDateThai(submission.action_at, 'd MMM yyyy HH:mm น.')}
+                      {formatDateThai(submission.approved_at, 'd MMM yyyy HH:mm น.')}
                     </span>
                   </div>
-                  <p className="caption ml-6">&quot;{submission.comments}&quot;</p>
                   <p className="text-muted-foreground caption ml-6">
-                    โดย {submission.action_by || 'ไม่ทราบชื่อ'}
+                    โดย {getActorDisplayName(submission.approved_by)}
                   </p>
                 </div>
               </>
             )}
-            {['ACCEPTED', 'APPROVED'].includes(submission.status) && (
+            {submission.status !== 'REJECTED' && submission.approved_by && (
               <>
                 <hr />
                 <div className="flex flex-col items-start gap-1">
                   <div className="flex w-full flex-row items-center justify-between gap-2">
                     <CornerDownRight className="text-primary h-4 w-4" />
-                    <span className="h4-topic flex-1">อนุมัติ</span>
+                    <span className="h4-topic flex-1">อนุมัติขั้นตอน</span>
                     <span className="text-muted-foreground caption">
-                      {formatDateThai(submission.action_at, 'd MMM yyyy HH:mm น.')}
+                      {formatDateThai(submission.approved_at, 'd MMM yyyy HH:mm น.')}
                     </span>
                   </div>
                   <p className="text-muted-foreground caption ml-6">
-                    โดย {submission.action_by || 'ไม่ทราบชื่อ'}
+                    โดย {getActorDisplayName(submission.approved_by)}
                   </p>
                 </div>
               </>
             )}
-            {submission.status === 'APPROVED' && (
+            {submission.proposing_by && (
               <>
                 <hr />
                 <div className="flex flex-col items-start gap-1">
                   <div className="flex w-full flex-row items-center justify-between gap-2">
                     <CornerDownRight className="text-primary h-4 w-4" />
-                    <span className="h4-topic flex-1">ผู้บริหารลงนามฯ</span>
+                    <span className="h4-topic flex-1">เสนอผอ.ลงนาม</span>
                     <span className="text-muted-foreground caption">
-                      {formatDateThai(submission.action_at, 'd MMM yyyy HH:mm น.')}
+                      {formatDateThai(submission.proposing_at, 'd MMM yyyy HH:mm น.')}
                     </span>
                   </div>
+                  <p className="text-muted-foreground caption ml-6">
+                    โดย {getActorDisplayName(submission.proposing_by)}
+                  </p>
+                </div>
+              </>
+            )}
+            {submission.proposing_by && submission.completed_by && (
+              <>
+                <hr />
+                <div className="flex flex-col items-start gap-1">
+                  <div className="flex w-full flex-row items-center justify-between gap-2">
+                    <CornerDownRight className="text-primary h-4 w-4" />
+                    <span className="h4-topic flex-1">ผอ. ลงนามเรียบร้อย</span>
+                    <span className="text-muted-foreground caption">
+                      {formatDateThai(submission.completed_at, 'd MMM yyyy HH:mm น.')}
+                    </span>
+                  </div>
+                  <p className="text-muted-foreground caption ml-6">
+                    โดย {getActorDisplayName(submission.completed_by)}
+                  </p>
                 </div>
               </>
             )}

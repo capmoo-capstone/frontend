@@ -45,7 +45,7 @@ const getPhaseLabel = (status: ProjectStatusByType, step?: number | null) => {
       return step != null ? `เสนอลงนามขั้นตอนที่ ${step}` : 'เสนอลงนาม';
     case 'REJECTED':
       return step != null ? `แก้ไขขั้นตอนที่ ${step}` : 'ยกเลิก';
-    case 'NOT_EXPORT':
+    case 'NOT_EXPORTED':
       return 'รอส่งเบิกการเงิน';
     case 'COMPLETED':
       return 'เสร็จสิ้น';
@@ -121,7 +121,7 @@ const getPhaseFormat = (
     return { label: 'ส่งเบิกการเงินแล้ว', variant: role === 'FINANCE_STAFF' ? 'warning' : 'info' };
   }
 
-  if (status === 'NOT_EXPORT' && isContractPhase) {
+  if (status === 'NOT_EXPORTED' && isContractPhase) {
     return { label: 'รอส่งเบิกการเงิน', variant: role === 'FINANCE_STAFF' ? 'warning' : 'info' };
   }
 
@@ -320,29 +320,43 @@ export const getResponsibleTypeFormat = (type: UnitResponsibleType) => {
 
 export const getWaitingStatusInfo = (status: StepStatus) => {
   switch (status) {
-    case 'in_progress':
-    case 'rejected':
+    case 'NOT_STARTED':
+      return {
+        title: 'ยังไม่ถึงขั้นตอนนี้',
+        description: 'กรุณารอการดำเนินการจากขั้นตอนก่อนหน้า',
+        icon: Clock,
+        color: 'text-muted-foreground bg-muted',
+      };
+    case 'IN_PROGRESS':
       return {
         title: 'อยู่ระหว่างดำเนินการ',
         description: 'เจ้าหน้าที่พัสดุกำลังจัดทำหรือแก้ไขเอกสาร',
         icon: UserCog,
-        color: 'text-error bg-error-light',
+        color: 'text-info bg-info-light',
       };
-    case 'submitted':
+    case 'REJECTED':
+      return {
+        title: 'รอการแก้ไขเอกสาร',
+        description: 'รอเจ้าหน้าที่พัสดุปรับปรุงเอกสารและส่งใหม่',
+        icon: UserCheck,
+        color: 'text-info bg-info-light',
+      };
+    case 'WAITING_APPROVAL':
+    case 'WAITING_PROPOSAL':
       return {
         title: 'รอการตรวจสอบ',
         description: 'หัวหน้ากลุ่มงานกำลังตรวจสอบความถูกต้อง',
         icon: UserCheck,
         color: 'text-info bg-info-light',
       };
-    case 'approved':
+    case 'WAITING_SIGNATURE':
       return {
         title: 'รอเสนอลงนาม',
         description: 'เจ้าหน้าที่งานระเบียบกำลังเตรียมเสนอผู้อำนวยการ',
         icon: FileCheck,
         color: 'text-info bg-info-light',
       };
-    case 'completed':
+    case 'COMPLETED':
       return {
         title: 'ดำเนินการเสร็จสิ้น',
         description: 'ขั้นตอนนี้เสร็จสมบูรณ์แล้ว',

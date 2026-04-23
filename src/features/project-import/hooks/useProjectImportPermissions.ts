@@ -1,5 +1,5 @@
 import { useAuth } from '@/context/AuthContext';
-import { SUPPLY_OPERATION_DEPARTMENT_ID } from '@/features/settings/constants';
+import { OPS_DEPT_ID } from '@/lib/constants';
 import { hasRoleInScopes } from '@/lib/permissions';
 
 export const useProjectImportPermissions = () => {
@@ -11,7 +11,7 @@ export const useProjectImportPermissions = () => {
     canImportOptions: !!(
       user &&
       hasRoleInScopes(user, ['DOCUMENT_STAFF'], {
-        departmentId: SUPPLY_OPERATION_DEPARTMENT_ID,
+        departmentId: OPS_DEPT_ID,
       })
     ),
   };

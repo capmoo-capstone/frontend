@@ -6,6 +6,8 @@ import {
   useQueryClient,
 } from '@tanstack/react-query';
 
+import { OPS_DEPT_ID } from '@/lib/constants';
+
 import {
   addDelegation,
   cancelDelegation,
@@ -80,13 +82,15 @@ export const useUpdateUsersInUnit = () => {
 export const useUpdateSupplyRole = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (data: { role: UserRole; newUserIds: string[]; removeUserIds: string[]; }) =>
+    mutationFn: (data: { role: UserRole; newUserIds: string[]; removeUserIds: string[] }) =>
       updateSupplyRole(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['users', 'selection', { deptId: 'DEPT-SUP-OPS' }] });
+      queryClient.invalidateQueries({
+        queryKey: ['users', 'selection', { deptId: OPS_DEPT_ID }],
+      });
     },
   });
-}
+};
 
 export const useUpdateUserRole = () => {
   const queryClient = useQueryClient();
@@ -99,8 +103,12 @@ export const useUpdateUserRole = () => {
       unitId?: string;
     }) => updateUserRole(data),
     onSuccess: (_data, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['users', 'selection', { deptId: variables.deptId }] });
-      queryClient.invalidateQueries({ queryKey: ['users', 'selection', { unitId: variables.unitId }] });
+      queryClient.invalidateQueries({
+        queryKey: ['users', 'selection', { deptId: variables.deptId }],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ['users', 'selection', { unitId: variables.unitId }],
+      });
     },
     onError: (error) => {
       throw new Error('Failed to update user role:' + error.message);

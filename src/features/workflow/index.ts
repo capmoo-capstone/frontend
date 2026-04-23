@@ -2,7 +2,10 @@
 export * from './api';
 
 // Hooks
+export { workflowKeys } from './hooks/queryKeys';
 export { useWorkflow } from './hooks/useWorkflow';
+export { useWorkflowMutations } from './hooks/useWorkflowMutations';
+export { useWorkflowSubmissions } from './hooks/useWorkflowSubmissions';
 
 // Components
 export { DynamicStepForm } from './components/DynamicStepForm';
@@ -21,6 +24,7 @@ export { ProcurementWorkflows } from './config/procurement-workflows';
 export {
   FieldTypeSchema,
   StepStatusSchema,
+  UiOnlyStepStatusSchema,
   SubmissionDocumentSchema,
   SubmissionSchema,
   WorkflowDocumentConfigSchema,
@@ -28,11 +32,14 @@ export {
 } from './types';
 
 export type {
+  BackendSubmissionStatus,
   FieldConfig,
   FieldType,
   StepStatus,
   Submission,
   SubmissionDocument,
+  SubmissionStatus,
+  UiOnlyStepStatus,
   WorkflowDocumentConfig,
   WorkflowStepConfig,
 } from './types';

@@ -13,8 +13,8 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useUnitsList } from '@/features/organization';
-import { SUPPLY_OPERATION_DEPARTMENT_ID } from '@/features/settings/constants';
 import { useUsersForSelection } from '@/features/users';
+import { OPS_DEPT_ID } from '@/lib/constants';
 import { getResponsibleTypeFormat } from '@/lib/formatters';
 
 import { type ProjectFilterParams } from '../api';
@@ -46,7 +46,7 @@ export function ProjectFilterCard({ filters, setFilters }: ProjectFilterCardProp
   const urgentStatuses = ProjectUrgentStatusEnum.options;
 
   const { data: units } = useUnitsList();
-  const { data: users } = useUsersForSelection({ deptId: SUPPLY_OPERATION_DEPARTMENT_ID });
+  const { data: users } = useUsersForSelection({ deptId: OPS_DEPT_ID });
   const generalStaff = useMemo(() => {
     if (!users?.data) return [];
 

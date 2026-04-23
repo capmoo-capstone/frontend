@@ -8,8 +8,11 @@ import type { Role } from '@/features/auth';
 import type { StepStatus, Submission } from '@/features/workflow';
 import { cn } from '@/lib/utils';
 
+import type { DocumentStaffAction } from '../lib/workflow-actions';
+
 interface StepActionFormProps {
   isActive?: boolean;
+  isBusy?: boolean;
   stepStatus: StepStatus;
   viewAsRole: Role;
   onSubmit?: () => void;
@@ -17,6 +20,7 @@ interface StepActionFormProps {
   onApprove?: () => void;
   onDownloadAll?: () => void;
   onSupApprove?: () => void;
+  documentStaffAction?: DocumentStaffAction;
   viewSubmission?: Submission | null;
   onBackToEdit?: () => void;
   children: React.ReactNode;
@@ -24,6 +28,7 @@ interface StepActionFormProps {
 
 export function StepActionForm({
   isActive = true,
+  isBusy = false,
   stepStatus,
   viewAsRole,
   onSubmit,
@@ -31,6 +36,7 @@ export function StepActionForm({
   onApprove,
   onDownloadAll,
   onSupApprove,
+  documentStaffAction = null,
   viewSubmission,
   onBackToEdit,
   children,
@@ -92,14 +98,14 @@ export function StepActionForm({
       {/* Footer Actions */}
       <div className="mt-8 space-y-2 border-t pt-6 empty:hidden">
         {['GENERAL_STAFF'].includes(viewAsRole) &&
-          ['in_progress', 'rejected'].includes(stepStatus) && (
-            <Button className="w-full" variant="brand" onClick={onSubmit}>
+          ['IN_PROGRESS', 'REJECTED'].includes(stepStatus) && (
+            <Button className="w-full" variant="brand" onClick={onSubmit} disabled={isBusy}>
               <Send className="mr-2 h-4 w-4" />
               ส่งงาน
             </Button>
           )}
 
-        {['HEAD_OF_UNIT'].includes(viewAsRole) && ['submitted'].includes(stepStatus) && (
+        {['HEAD_OF_UNIT'].includes(viewAsRole) && ['WAITING_APPROVAL'].includes(stepStatus) && (
           <>
             {showRejectInput ? (
               <div className="space-y-3">
@@ -114,7 +120,12 @@ export function StepActionForm({
                   />
                 </div>
                 <div className="flex gap-2">
-                  <Button className="flex-1" variant="outline" onClick={handleCancelReject}>
+                  <Button
+                    className="flex-1"
+                    variant="outline"
+                    onClick={handleCancelReject}
+                    disabled={isBusy}
+                  >
                     <X className="mr-2 h-4 w-4" />
                     ยกเลิก
                   </Button>
@@ -122,7 +133,7 @@ export function StepActionForm({
                     className="flex-1"
                     variant="destructive"
                     onClick={handleSubmitReject}
-                    disabled={!rejectReason.trim()}
+                    disabled={!rejectReason.trim() || isBusy}
                   >
                     <SquareArrowLeft className="mr-2 h-4 w-4" />
                     ส่งกลับเพื่อแก้ไข
@@ -131,11 +142,16 @@ export function StepActionForm({
               </div>
             ) : (
               <>
-                <Button className="w-full" variant="outline" onClick={handleRejectClick}>
+                <Button
+                  className="w-full"
+                  variant="outline"
+                  onClick={handleRejectClick}
+                  disabled={isBusy}
+                >
                   <SquareArrowLeft className="mr-2 h-4 w-4" />
                   ส่งกลับเพื่อแก้ไข
                 </Button>
-                <Button className="w-full" variant="brand" onClick={onApprove}>
+                <Button className="w-full" variant="brand" onClick={onApprove} disabled={isBusy}>
                   <CircleCheckBig className="mr-2 h-4 w-4" />
                   อนุมัติขั้นตอน
                 </Button>
@@ -144,18 +160,29 @@ export function StepActionForm({
           </>
         )}
 
-        {['DOCUMENT_STAFF'].includes(viewAsRole) && ['approved'].includes(stepStatus) && (
-          <>
-            <Button className="w-full" variant="outline" onClick={onDownloadAll}>
-              <Download className="mr-2 h-4 w-4" />
-              ดาวน์โหลดเอกสารทั้งหมด
-            </Button>
-            <Button className="w-full" variant="brand" onClick={onSupApprove}>
-              <CircleCheckBig className="mr-2 h-4 w-4" />
-              เสนอผู้อำนวยการเรียบร้อยแล้ว
-            </Button>
-          </>
-        )}
+        {['DOCUMENT_STAFF'].includes(viewAsRole) &&
+          ['WAITING_PROPOSAL', 'WAITING_SIGNATURE'].includes(stepStatus) && (
+            <>
+              <Button
+                className="w-full"
+                variant="outline"
+                onClick={onDownloadAll}
+                disabled={isBusy || !onDownloadAll}
+              >
+                <Download className="mr-2 h-4 w-4" />
+                ดาวน์โหลดเอกสารทั้งหมด
+              </Button>
+              <Button
+                className="w-full"
+                variant="brand"
+                onClick={onSupApprove}
+                disabled={isBusy || !onSupApprove || documentStaffAction === null}
+              >
+                <CircleCheckBig className="mr-2 h-4 w-4" />
+                {documentStaffAction === 'sign' ? 'ลงนามเอกสาร' : 'เสนอผู้อำนวยการเรียบร้อยแล้ว'}
+              </Button>
+            </>
+          )}
       </div>
     </div>
   );

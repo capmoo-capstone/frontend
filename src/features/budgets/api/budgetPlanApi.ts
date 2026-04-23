@@ -45,8 +45,8 @@ const fetchRemainingPages = async <T>(
 const normalizeBudgetPlan = (item: BudgetPlanBackend): BudgetPlan => {
   return BudgetPlanSchema.parse({
     id: item.id,
-    fiscal_year: item.budget_year,
-    cost_center: item.unit_no,
+    fiscal_year: String(item.budget_year),
+    cost_center: item.unit_no || item.unit_id,
     unit_id: item.unit_id,
     activity_type: item.activity_type,
     activity_name: item.activity_type_name,
@@ -89,7 +89,7 @@ export async function getBudgetPlans(unitId: string, fiscalYear: string): Promis
   }
 
   return allRows
-    .filter((item) => item.unit_id === unitId && item.budget_year === fiscalYear)
+    .filter((item) => item.unit_id === unitId && item.budget_year === Number(fiscalYear))
     .map((item) => normalizeBudgetPlan(item));
 }
 
@@ -108,7 +108,7 @@ export async function linkBudgetPlanToProject(
 ): Promise<BudgetPlanProjectLinkResponse> {
   const encodedId = encodeURIComponent(id);
   const encodedProjectId = encodeURIComponent(projectId);
-  const { data } = await api.patch(`/budget-plans/${encodedId}/project/${encodedProjectId}`);
+  const { data } = await api.patch(`/budget-plans/${encodedId}/projects/${encodedProjectId}`);
 
   return BudgetPlanProjectLinkResponseSchema.parse(data);
 }

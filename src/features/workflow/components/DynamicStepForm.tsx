@@ -15,9 +15,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import type { BudgetPlan } from '@/features/budgets';
 import type { FieldConfig } from '@/features/workflow';
 import { cn } from '@/lib/utils';
 
+import { BudgetPlanSelectField } from './fields/BudgetPlanSelectField';
 import { ContractNumberGenerator } from './fields/ContractNumberGenerator';
 import { DueDateMultiSelect } from './fields/DueDateMultiSelect';
 import { MultiEmailInput } from './fields/MultiEmailInput';
@@ -27,9 +29,20 @@ interface DynamicStepFormProps {
   formData: Record<string, unknown>;
   onChange: (field_key: string, value: unknown) => void;
   disabled?: boolean;
+  budgetPlans?: BudgetPlan[];
+  isLoadingBudgetPlans?: boolean;
+  isErrorBudgetPlans?: boolean;
 }
 
-export function DynamicStepForm({ fields, formData, onChange, disabled }: DynamicStepFormProps) {
+export function DynamicStepForm({
+  fields,
+  formData,
+  onChange,
+  disabled,
+  budgetPlans,
+  isLoadingBudgetPlans,
+  isErrorBudgetPlans,
+}: DynamicStepFormProps) {
   const [skippedFields, setSkippedFields] = useState<Set<string>>(new Set());
 
   // --- Helpers ---
@@ -222,6 +235,18 @@ export function DynamicStepForm({ fields, formData, onChange, disabled }: Dynami
                   </SelectContent>
                 </Select>
               )}
+
+              {/* --- 11. BUDGET PLAN SELECT --- */}
+              {field.type === 'SELECT_BUDGET_PLAN' && (
+                <BudgetPlanSelectField
+                  value={getStringArrayValue(formData[field.field_key])}
+                  onChange={(value) => onChange(field.field_key, value)}
+                  budgetPlans={budgetPlans}
+                  isLoading={isLoadingBudgetPlans}
+                  isError={isErrorBudgetPlans}
+                  disabled={disabled}
+                />
+              )}
             </div>
 
             {/* --- Mark as Done Button --- */}
@@ -236,6 +261,7 @@ export function DynamicStepForm({ fields, formData, onChange, disabled }: Dynami
                 'GEN_CONT_NO',
                 'SELECT_CONTRACT_STATUS',
                 'SELECT_DELIVERY_STATUS',
+                'SELECT_BUDGET_PLAN',
               ].includes(field.type) && (
                 <Button
                   type="button"

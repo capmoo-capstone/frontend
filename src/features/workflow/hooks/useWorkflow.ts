@@ -2,64 +2,89 @@ import { useCallback, useState } from 'react';
 
 import type { ProjectDetail } from '@/features/projects';
 
-import type { StepStatus, Submission, WorkflowStepConfig } from '../types';
+import { buildSubmissionFormData } from '../lib/submission-values';
+import { isSameWorkflowType } from '../lib/workflow-identity';
+import type { BackendSubmissionStatus, StepStatus, Submission, WorkflowStepConfig } from '../types';
+
+const mapBackendStatusToStepStatus = (status: BackendSubmissionStatus): StepStatus => {
+  switch (status) {
+    case 'WAITING_APPROVAL':
+    case 'SUBMITTED':
+      return 'WAITING_APPROVAL';
+    case 'WAITING_PROPOSAL':
+      return 'WAITING_PROPOSAL';
+    case 'WAITING_SIGNATURE':
+    case 'APPROVED':
+      return 'WAITING_SIGNATURE';
+    case 'ACCEPTED':
+    case 'COMPLETED':
+      return 'COMPLETED';
+    case 'REJECTED':
+      return 'REJECTED';
+    default: {
+      const _unreachable: never = status;
+      return _unreachable;
+    }
+  }
+};
 
 // Now accepts 'activeSteps' to know which workflow we are dealing with
-export function useWorkflow(project: ProjectDetail | undefined, activeSteps: WorkflowStepConfig[]) {
+export function useWorkflow(
+  project: ProjectDetail | undefined,
+  activeSteps: WorkflowStepConfig[],
+  activeWorkflowType?: string
+) {
   const [stepFormData, setStepFormData] = useState<Record<string, Record<string, unknown>>>({});
   const [viewingSubmissions, setViewingSubmissions] = useState<Record<number, Submission | null>>(
     {}
   );
 
-  // Helper to find the name of the step at a given order
-  const getStepName = useCallback(
-    (order: number) => {
-      return activeSteps.find((s) => s.order === order)?.name;
-    },
-    [activeSteps]
-  );
-
   const getStepSubmissions = useCallback(
     (stepOrder: number) => {
       if (!project) return [];
-      const targetName = getStepName(stepOrder);
 
       return project.submissions
-        .filter((sub) => sub.step_order === stepOrder && sub.step_name === targetName) // Strict check by name
+        .filter(
+          (sub) =>
+            sub.step_order === stepOrder &&
+            isSameWorkflowType(sub.workflow_type, activeWorkflowType)
+        )
         .sort((a, b) => a.submission_round - b.submission_round);
     },
-    [project, getStepName]
+    [project, activeWorkflowType]
   );
 
   const getStepStatus = useCallback(
     (stepOrder: number): StepStatus => {
-      if (!project) return 'not_started';
-      // --- TESTING MODE START ---
-      // Uncomment this line to force all steps to be open and editable
-      return 'in_progress';
-      // --- TESTING MODE END ---
+      if (!project) return 'NOT_STARTED';
 
-      // Note: project.current_step might belong to Procurement or Contract.
-      // Ideally, the backend should provide separate current steps or we infer it.
-      // For now, we assume standard logic:
       const submissions = getStepSubmissions(stepOrder);
 
-      if (submissions.length === 0) {
-        // Logic: If previous step is done, this one is in_progress.
-        // For simplicity, if it has no submissions, check if it's the very first step or previous is done.
-        if (stepOrder === 1) return 'in_progress'; // Simplified
-        return 'not_started';
+      // If submission exists, use its backend_status (which reflects the real workflow state)
+      if (submissions.length > 0) {
+        const latest = submissions[submissions.length - 1];
+        if (latest.backend_status) {
+          return mapBackendStatusToStepStatus(latest.backend_status);
+        }
       }
 
-      const latest = submissions[submissions.length - 1];
-      if (latest.status === 'SUBMITTED') return 'submitted';
-      if (latest.status === 'REJECTED') return 'rejected';
-      if (latest.status === 'ACCEPTED') return 'approved';
-      if (latest.status === 'APPROVED') return 'completed';
+      // No submission yet: check if prerequisites are met
+      const step = activeSteps.find((item) => item.order === stepOrder);
+      if (!step) return 'NOT_STARTED';
 
-      return 'not_started';
+      const previousSteps = step.required_step ?? [];
+      if (previousSteps.length === 0) {
+        return 'IN_PROGRESS';
+      }
+
+      const previousStepsCompleted = previousSteps.every((previousOrder) => {
+        const previousSubmissions = getStepSubmissions(previousOrder);
+        return previousSubmissions.length > 0;
+      });
+
+      return previousStepsCompleted ? 'IN_PROGRESS' : 'NOT_STARTED';
     },
-    [project, getStepSubmissions]
+    [project, getStepSubmissions, activeSteps]
   );
 
   const getStepFormData = useCallback(
@@ -70,14 +95,11 @@ export function useWorkflow(project: ProjectDetail | undefined, activeSteps: Wor
       if (submissions.length === 0) return {};
 
       const targetSubmission = submissions[submissions.length - 1];
+      const currentStep = activeSteps.find((item) => item.order === stepOrder);
 
-      const formData: Record<string, unknown> = {};
-      targetSubmission?.documents.forEach((doc) => {
-        formData[doc.field_key] = doc.file_path || doc.value;
-      });
-      return formData;
+      return buildSubmissionFormData(targetSubmission, currentStep?.required_documents);
     },
-    [stepFormData, getStepSubmissions]
+    [stepFormData, getStepSubmissions, activeSteps]
   );
 
   const handleStepFormChange = useCallback(
@@ -107,15 +129,10 @@ export function useWorkflow(project: ProjectDetail | undefined, activeSteps: Wor
 
   const getSubmissionFormData = useCallback(
     (submission: Submission | null): Record<string, unknown> => {
-      if (!submission) return {};
-
-      const formData: Record<string, unknown> = {};
-      submission.documents.forEach((doc) => {
-        formData[doc.field_key] = doc.file_path || doc.value;
-      });
-      return formData;
+      const currentStep = activeSteps.find((item) => item.order === submission?.step_order);
+      return buildSubmissionFormData(submission, currentStep?.required_documents);
     },
-    []
+    [activeSteps]
   );
 
   return {

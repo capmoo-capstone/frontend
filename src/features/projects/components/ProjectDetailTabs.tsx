@@ -7,6 +7,8 @@ import {
   ProjectSummaryView,
   ProjectWorkflowSteps,
   type WorkflowStepConfig,
+  normalizeWorkflowSubmissions,
+  useWorkflowSubmissions,
 } from '@/features/workflow';
 import { cn } from '@/lib/utils';
 
@@ -24,6 +26,9 @@ interface ProjectDetailTabsProps {
 
 export function ProjectDetailTabs({ project, workflowConfigs }: ProjectDetailTabsProps) {
   const [workflowTab, setWorkflowTab] = useState<'PROCUREMENT' | 'CONTRACT'>('PROCUREMENT');
+  const { data: workflowSubmissions } = useWorkflowSubmissions(project.id);
+
+  const isContractWorkflowAvailable = project.current_template_type === 'CONTRACT';
 
   const activeSteps = useMemo(() => {
     if (workflowTab === 'PROCUREMENT') {
@@ -33,16 +38,27 @@ export function ProjectDetailTabs({ project, workflowConfigs }: ProjectDetailTab
     }
   }, [project.procurement_type, workflowConfigs, workflowTab]);
 
+  const activeWorkflowType = workflowTab === 'PROCUREMENT' ? project.procurement_type : 'CONTRACT';
+
+  const projectWithSubmissions = useMemo(() => {
+    const procurementSteps =
+      workflowConfigs.find((w) => w.type === project.procurement_type)?.steps || [];
+    const contractSteps = workflowConfigs.find((w) => w.type === 'CONTRACT')?.steps || [];
+
+    return {
+      ...project,
+      submissions: [
+        ...normalizeWorkflowSubmissions(workflowSubmissions?.procurement ?? [], procurementSteps),
+        ...normalizeWorkflowSubmissions(workflowSubmissions?.contract ?? [], contractSteps),
+      ],
+    };
+  }, [project, workflowConfigs, workflowSubmissions]);
+
   const getResponsiblePerson = () => {
     if (workflowTab === 'PROCUREMENT') {
-      const names = [
-        project.assignee_procurement?.full_name,
-        'นางสาวพิมพ์ชนก ใจดีนามสกุลยาว',
-      ].filter(Boolean);
-      return names.join(', ');
+      return project.assignee_procurement?.full_name ?? 'ยังไม่มีผู้รับผิดชอบ';
     } else {
-      const names = [project.assignee_contract?.full_name, 'นายสมชาย รักงาน'].filter(Boolean);
-      return names.join(', ');
+      return project.assignee_contract?.full_name ?? 'ยังไม่มีผู้รับผิดชอบ';
     }
   };
 
@@ -66,9 +82,11 @@ export function ProjectDetailTabs({ project, workflowConfigs }: ProjectDetailTab
             </div>
           </button>
           <button
-            onClick={() => setWorkflowTab('CONTRACT')}
+            onClick={() => isContractWorkflowAvailable && setWorkflowTab('CONTRACT')}
+            disabled={!isContractWorkflowAvailable}
             className={cn(
               'caption flex flex-col items-start gap-1 border-b-2 px-1 pb-3 transition-colors',
+              !isContractWorkflowAvailable && 'cursor-not-allowed opacity-50',
               workflowTab === 'CONTRACT'
                 ? 'border-brand-9 text-brand-11'
                 : 'text-muted-foreground hover:text-foreground border-transparent'
@@ -101,11 +119,19 @@ export function ProjectDetailTabs({ project, workflowConfigs }: ProjectDetailTab
 
       {/* --- Content Area --- */}
       <TabsContent value="timeline">
-        <ProjectWorkflowSteps project={project} steps={activeSteps} />
+        <ProjectWorkflowSteps
+          project={projectWithSubmissions}
+          steps={activeSteps}
+          activeWorkflowType={activeWorkflowType}
+        />
       </TabsContent>
 
       <TabsContent value="summary">
-        <ProjectSummaryView project={project} steps={activeSteps} />
+        <ProjectSummaryView
+          project={projectWithSubmissions}
+          steps={activeSteps}
+          activeWorkflowType={activeWorkflowType}
+        />
       </TabsContent>
     </Tabs>
   );

@@ -13,9 +13,7 @@ interface UseUnitRepresentativeEditorParams {
   unit: UnitItem;
 }
 
-export function useUnitRepresentativeEditor({
-  unit,
-}: UseUnitRepresentativeEditorParams) {
+export function useUnitRepresentativeEditor({ unit }: UseUnitRepresentativeEditorParams) {
   const updateRepresentative = useUpdateRepresentative();
 
   const [isEditing, setIsEditing] = useState(false);

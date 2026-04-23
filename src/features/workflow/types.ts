@@ -1,5 +1,16 @@
 import { z } from 'zod';
 
+export const WorkflowSubmissionBackendStatusSchema = z.enum([
+  'WAITING_APPROVAL',
+  'WAITING_PROPOSAL',
+  'WAITING_SIGNATURE',
+  'REJECTED',
+  'COMPLETED',
+  'SUBMITTED',
+  'APPROVED',
+  'ACCEPTED',
+]);
+
 // ============================================================================
 // Workflow Field Types
 // ============================================================================
@@ -16,6 +27,7 @@ export const FieldTypeSchema = z.enum([
   'COMMITTEE_EMAIL',
   'SELECT_CONTRACT_STATUS',
   'SELECT_DELIVERY_STATUS',
+  'SELECT_BUDGET_PLAN',
 ]);
 
 export type FieldType = z.infer<typeof FieldTypeSchema>;
@@ -31,16 +43,16 @@ export interface FieldConfig {
 // Workflow Step Types
 // ============================================================================
 
-export const StepStatusSchema = z.enum([
-  'not_started',
-  'in_progress',
-  'submitted',
-  'approved',
-  'rejected',
-  'completed',
+export const UiOnlyStepStatusSchema = z.enum(['NOT_STARTED', 'IN_PROGRESS']);
+
+export const StepStatusSchema = z.union([
+  UiOnlyStepStatusSchema,
+  WorkflowSubmissionBackendStatusSchema,
 ]);
 
 export type StepStatus = z.infer<typeof StepStatusSchema>;
+export type UiOnlyStepStatus = z.infer<typeof UiOnlyStepStatusSchema>;
+export type BackendSubmissionStatus = z.infer<typeof WorkflowSubmissionBackendStatusSchema>;
 
 export const WorkflowDocumentConfigSchema = z.object({
   type: FieldTypeSchema,
@@ -56,6 +68,8 @@ export const WorkflowStepConfigSchema = z.object({
   order: z.number(),
   required_step: z.array(z.number()),
   required_documents: z.array(WorkflowDocumentConfigSchema),
+  require_approval: z.boolean().optional(),
+  requiredSignature: z.boolean().optional(),
 });
 
 export type WorkflowStepConfig = z.infer<typeof WorkflowStepConfigSchema>;
@@ -79,17 +93,29 @@ export const SubmissionDocumentSchema = z.object({
 export type SubmissionDocument = z.infer<typeof SubmissionDocumentSchema>;
 
 export const SubmissionSchema = z.object({
-  step_name: z.string(),
+  id: z.string().optional(),
+  project_id: z.string().optional(),
+  workflow_type: z.string().optional(),
+  submission_type: z.string().nullable().optional(),
+  backend_status: WorkflowSubmissionBackendStatusSchema.optional(),
+  step_name: z.string().optional(),
   step_order: z.number(),
   submission_round: z.number(),
-  status: z.enum(['SUBMITTED', 'APPROVED', 'ACCEPTED', 'REJECTED']),
-  submitted_by: z.string(),
-  submitted_at: z.string(),
-  action_by: z.string().nullable().optional(),
-  action_at: z.string().nullable().optional(),
+  po_no: z.string().nullable().optional(),
+  status: z.enum(['SUBMITTED', 'APPROVED', 'ACCEPTED', 'COMPLETED', 'REJECTED']),
+  submitted_by: z.string().nullable().optional(),
+  submitted_at: z.string().nullable().optional(),
+  approved_by: z.string().nullable().optional(),
+  approved_at: z.string().nullable().optional(),
+  proposing_by: z.string().nullable().optional(),
+  proposing_at: z.string().nullable().optional(),
+  completed_by: z.string().nullable().optional(),
+  completed_at: z.string().nullable().optional(),
   documents: z.array(SubmissionDocumentSchema),
-  meta_data: z.record(z.string(), z.any()),
+  meta_data: z.union([z.record(z.string(), z.any()), z.array(z.unknown())]).default([]),
+  comment: z.string().nullable().optional(),
   comments: z.string().optional(),
 });
 
 export type Submission = z.infer<typeof SubmissionSchema>;
+export type SubmissionStatus = Submission['status'];

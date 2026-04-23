@@ -8,15 +8,14 @@ import { type ProcurementRoleSetting, type SettingsUserOption } from '@/features
 import {
   type UserRole,
   UserSelect,
-  useUpdateSupplyRole,
   useAddDelegation,
   useCancelDelegation,
-  useUpdateUserRole,
+  useUpdateSupplyRole,
   useUsersForSelection,
 } from '@/features/users';
+import { OPS_DEPT_ID } from '@/lib/constants';
 import { formatDateThaiShort } from '@/lib/formatters';
 
-import { SUPPLY_OPERATION_DEPARTMENT_ID } from '../../constants';
 import { PROCUREMENT_ROLES_CONFIG } from '../../constants';
 import { useProcurementRoleEditor } from '../../hooks/useProcurementRoleEditor';
 import { DelegationFormSection } from '../DelegationFormSection';
@@ -24,7 +23,7 @@ import { InlineActionRow } from '../InlineActionRow';
 
 export function ProcurementStaffManager() {
   const { data: procurementUsersResponse, isPending } = useUsersForSelection({
-    deptId: SUPPLY_OPERATION_DEPARTMENT_ID,
+    deptId: OPS_DEPT_ID,
   });
   const addDelegationMutation = useAddDelegation();
   const cancelDelegationMutation = useCancelDelegation();
@@ -74,12 +73,10 @@ export function ProcurementStaffManager() {
         }
       }
 
-      const newUserIds = _updatedRole.member_ids.filter(
-        (id) => !current.member_ids.includes(id)
-      ) ?? [];
-      const removeUserIds = current.member_ids.filter(
-        (id) => !_updatedRole.member_ids.includes(id)
-      ) ?? [];
+      const newUserIds =
+        _updatedRole.member_ids.filter((id) => !current.member_ids.includes(id)) ?? [];
+      const removeUserIds =
+        current.member_ids.filter((id) => !_updatedRole.member_ids.includes(id)) ?? [];
 
       if (newUserIds.length > 0 || removeUserIds.length > 0) {
         await updateSupplyRole.mutateAsync({

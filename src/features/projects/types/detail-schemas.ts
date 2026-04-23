@@ -152,6 +152,7 @@ export const ProjectDetailApiSchema = z.object({
   migo_no: z.string().nullable(),
   budget_plans: z.array(z.union([z.string(), ProjectDetailBudgetPlanApiSchema])).default([]),
   expected_approval_date: z.string().datetime().nullable(),
+  expected_completion_procurement_date: z.string().datetime().nullable(),
   created_at: z.string().datetime(),
   updated_at: z.string().datetime().nullable(),
   vendor: z.object({

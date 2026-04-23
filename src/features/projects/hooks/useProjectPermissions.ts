@@ -67,7 +67,7 @@ export const useProjectPermissions = (input?: UseProjectPermissionsInput) => {
       })
     ),
     canEditProjectDetails: !!(
-      user && hasRoleInScopes(user, ['HEAD_OF_UNIT'], { unitId: resolvedUnitId })
+      user && hasRoleInScopes(user, ['HEAD_OF_UNIT', 'GENERAL_STAFF'], { unitId: resolvedUnitId })
     ),
   };
 };

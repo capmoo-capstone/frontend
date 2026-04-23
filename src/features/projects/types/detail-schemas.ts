@@ -38,6 +38,7 @@ export const ProjectDetailSchema = z.object({
   migo_no: z.string().nullable(),
   budget_plans: z.array(z.string()).default([]),
   expected_approval_date: z.string().nullable(),
+  expected_completion_procurement_date: z.string().nullable(),
   created_at: z.string(),
   updated_at: z.string(),
   vendor: z.object({

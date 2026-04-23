@@ -129,9 +129,9 @@ export default function ProjectDetail() {
         toast.warning('ขณะนี้ระบบยังไม่รองรับการยกเลิกผูกแผนงบประมาณจากโครงการ');
       }
 
-      toast.success('อัปเดตข้อมูลแผนงบประมาณสำเร็จ');
+      toast.success('อัปเดตข้อมูลโครงการสำเร็จ');
     } catch (error) {
-      toast.error('ไม่สามารถอัปเดตข้อมูลแผนงบประมาณได้ กรุณาลองใหม่อีกครั้ง');
+      toast.error('ไม่สามารถอัปเดตข้อมูลโครงการได้ กรุณาลองใหม่อีกครั้ง');
       throw error;
     } finally {
       setIsSavingProjectInfo(false);

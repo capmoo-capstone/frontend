@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 
 import { Check, ChevronDown, Copy, Pencil, X } from 'lucide-react';
+import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -68,6 +69,7 @@ export const ProjectInfoGrid = ({
   onSaveVendorInfo,
   isSavingVendorInfo = false,
 }: ProjectInfoGridProps) => {
+  const hadLinkedBudgetPlansInitially = (project.budget_plans?.length ?? 0) > 0;
   const [isEditingProjectInfo, setIsEditingProjectInfo] = useState(false);
   const [isEditingVendor, setIsEditingVendor] = useState(false);
 
@@ -100,6 +102,7 @@ export const ProjectInfoGrid = ({
     () => budgetPlans?.filter((plan) => selectedBudgetPlanIds.includes(plan.id)) ?? [],
     [budgetPlans, selectedBudgetPlanIds]
   );
+  const initialBudgetPlanIdSet = useMemo(() => new Set(project.budget_plans ?? []), [project]);
 
   const budgetPlanDisplay =
     selectedBudgetPlans.length > 0
@@ -134,6 +137,13 @@ export const ProjectInfoGrid = ({
   const handleSaveProjectInfo = async () => {
     try {
       const nextBudgetPlanIds = hasAssetCode ? selectedBudgetPlanIds : [];
+
+      if (hadLinkedBudgetPlansInitially && nextBudgetPlanIds.length === 0) {
+        toast.error(
+          'ยังไม่รองรับการยกเลิกรหัสสินทรัพย์ที่ผูกไว้แล้ว กรุณาเลือกแผนงบประมาณอย่างน้อย 1 รายการ'
+        );
+        return;
+      }
 
       await onSaveProjectInfo?.({
         budget_plan_id: nextBudgetPlanIds,
@@ -176,7 +186,12 @@ export const ProjectInfoGrid = ({
   const toggleBudgetPlan = (planId: string) => {
     setSelectedBudgetPlanIds((previous) => {
       if (previous.includes(planId)) {
-        return previous;
+        if (initialBudgetPlanIdSet.has(planId)) {
+          toast.error('ยังไม่รองรับการยกเลิกแผนงบประมาณที่ผูกกับโครงการเดิม');
+          return previous;
+        }
+
+        return previous.filter((id) => id !== planId);
       }
 
       return [...previous, planId];
@@ -258,7 +273,10 @@ export const ProjectInfoGrid = ({
             label="วันที่รับเอกสาร"
             value={formatDateThai(project.created_at, 'd MMM yyyy')}
           />
-          <ReadonlyFieldCell label="วันที่ส่งให้ทีมตรวจรับ" value="-" />
+          <ReadonlyFieldCell
+            label="วันที่ส่งให้ทีมตรวจรับ"
+            value={formatDateThai(project.expected_completion_procurement_date, 'd MMM yyyy')}
+          />
           <div className="flex min-h-14 flex-col gap-1">
             <span className="text-muted-foreground h4-sub">มีรหัสสินทรัพย์หรือไม่</span>
             <label className="flex h-9 items-center gap-2">
@@ -267,7 +285,15 @@ export const ProjectInfoGrid = ({
                 onCheckedChange={(checked) => {
                   const nextValue = Boolean(checked);
                   if (!nextValue && hasAssetCode) {
-                    return;
+                    const canUncheck =
+                      selectedBudgetPlanIds.length === 0 || !hadLinkedBudgetPlansInitially;
+
+                    if (!canUncheck) {
+                      toast.error(
+                        'หากต้องการยกเลิกรหัสสินทรัพย์ ระบบยังไม่รองรับการบันทึกการยกเลิกนี้ในขณะนี้'
+                      );
+                      return;
+                    }
                   }
 
                   setHasAssetCode(nextValue);
@@ -315,20 +341,20 @@ export const ProjectInfoGrid = ({
                       {!isLoadingBudgetPlans &&
                         budgetPlans?.map((plan) => {
                           const isSelected = selectedBudgetPlanIds.includes(plan.id);
+                          const isInitiallyLinked = initialBudgetPlanIdSet.has(plan.id);
+                          const canToggleOff = isSelected ? !isInitiallyLinked : true;
                           return (
                             <div
                               key={plan.id}
                               className={cn(
                                 'border-border flex items-center gap-3 border-b px-3 py-3 last:border-b-0',
-                                isSelected
-                                  ? 'cursor-not-allowed opacity-80'
-                                  : 'cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50'
+                                canToggleOff
+                                  ? 'cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50'
+                                  : 'cursor-not-allowed opacity-80'
                               )}
                               onClick={(event) => {
                                 event.preventDefault();
-                                if (!isSelected) {
-                                  toggleBudgetPlan(plan.id);
-                                }
+                                toggleBudgetPlan(plan.id);
                               }}
                             >
                               <Checkbox checked={isSelected} className="pointer-events-none" />

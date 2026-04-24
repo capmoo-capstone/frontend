@@ -291,6 +291,15 @@ export const normalizeYearToBE = (value: unknown, fallbackYearBE: number): numbe
   return parsed < 2400 ? parsed + 543 : parsed;
 };
 
+export const normalizeMappedValue = (
+  value: string | undefined,
+  nameToIdMap: Map<string, string>
+): string => {
+  const raw = value?.trim();
+  if (!raw) return '';
+  return nameToIdMap.get(raw) ?? raw;
+};
+
 // ==================== RESPONSIBLE TYPE FORMATTERS ====================
 
 export const RESPONSIBLE_SELECT_OPTIONS: { value: UnitResponsibleType; label: string }[] = [

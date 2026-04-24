@@ -125,7 +125,7 @@ export function useExcelImport(mode: ImportMode) {
           procurement_type:
             rowObj['วิธีการจัดหา']?.toString() || (mode === 'fiori' ? 'LT100K' : ''),
           delivery_date_str: deliveryDateStr,
-          budget: Number(rowObj['วงเงินงบประมาณ'] || rowObj['มูลค่ารวม'] || 0),
+          budget: parseExcelNumber(rowObj['วงเงินงบประมาณ'] ?? rowObj['มูลค่ารวม']),
           department_id: rowObj['หน่วยงาน']?.toString() || rowObj['จากหน่วยงาน']?.toString() || '',
           unit_id: rowObj['ฝ่าย']?.toString() || '',
           fiscal_year: rowObj['ปีงบประมาณ']?.toString() || defaultFiscalYear.toString(),

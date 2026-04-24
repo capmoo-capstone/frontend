@@ -8,7 +8,7 @@ import { useDepartments, useUnitsList } from '@/features/organization';
 import { EditableImportTable, useExcelImport } from '@/features/project-import';
 import { ExcelUploadZone } from '@/features/project-import/components/ExcelUploadZone';
 import { OPS_DEPT_ID } from '@/lib/constants';
-import { getFiscalYear, normalizeYearToBE } from '@/lib/formatters';
+import { getFiscalYear, normalizeMappedValue, normalizeYearToBE } from '@/lib/formatters';
 
 export default function BudgetPlanImport() {
   const navigate = useNavigate();
@@ -41,18 +41,11 @@ export default function BudgetPlanImport() {
         (filteredDepartments ?? []).map((dept) => [dept.name, dept.id])
       );
       const unitNameToId = new Map((units ?? []).map((unit) => [unit.name, unit.id]));
-      const currentFiscalYearBE = getFiscalYear(new Date());
-
-      const normalizeValue = (value: string | undefined, nameToIdMap: Map<string, string>) => {
-        const raw = value?.trim();
-        if (!raw) return '';
-        return nameToIdMap.get(raw) ?? raw;
-      };
 
       const payload: ImportBudgetPlanPayload = data.map((row) => ({
-        budget_year: normalizeYearToBE(row.budget_year, currentFiscalYearBE),
-        unit_id: normalizeValue(row.unit_id, unitNameToId),
-        department_id: normalizeValue(row.department_id, departmentNameToId),
+        budget_year: normalizeYearToBE(row.budget_year, currentYear),
+        unit_id: normalizeMappedValue(row.unit_id, unitNameToId),
+        department_id: normalizeMappedValue(row.department_id, departmentNameToId),
         activity_type: row.activity_type ?? '',
         activity_type_name: row.activity_type_name ?? '',
         description: row.description ?? '',

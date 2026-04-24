@@ -1,9 +1,11 @@
 import { useEffect, useMemo } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
+import { toast } from 'sonner';
+
 import { useDepartments, useUnitsList } from '@/features/organization';
 import { OPS_DEPT_ID } from '@/lib/constants';
-import { getFiscalYear } from '@/lib/formatters';
+import { getFiscalYear, normalizeMappedValue, parseThaiDateString } from '@/lib/formatters';
 
 import { useImportProjects } from '../hooks/useCreateProject';
 import { useExcelImport } from '../hooks/useExcelImport';
@@ -51,24 +53,38 @@ export function ProjectImportContainer() {
   }, [mode, setData]);
 
   const handleSuccess = async (importData?: typeof data) => {
-    if (importData && (mode === 'lesspaper' || mode === 'fiori')) {
-      // For batch import, convert data to ProjectImportPayload and call API
-      const payloads = importData.map((row) => ({
-        pr_no: row.pr_no || undefined,
-        lesspaper_no: row.lesspaper_no || undefined,
-        title: row.title || '',
-        description: row.description || '',
-        procurement_type: row.procurement_type || '',
-        budget: Number(row.budget || 0),
-        department_id: row.department_id || '',
-        unit_id: row.unit_id || '',
-        fiscal_year: row.fiscal_year || currentYear.toString(),
-        delivery_date: row.delivery_date_str ? new Date(row.delivery_date_str) : undefined,
-        budget_plan_ids: [],
-      }));
-      await importProjectsMutation(payloads);
+    try {
+      if (importData && (mode === 'lesspaper' || mode === 'fiori')) {
+        const departmentNameToId = new Map(
+          (filteredDepartments ?? []).map((dept) => [dept.name, dept.id])
+        );
+        const unitNameToId = new Map((units ?? []).map((unit) => [unit.name, unit.id]));
+
+        // For batch import, convert data to ProjectImportPayload and call API
+        const payloads = importData.map((row) => ({
+          pr_no: row.pr_no || undefined,
+          lesspaper_no: row.lesspaper_no || undefined,
+          title: row.title || '',
+          description: row.description || '',
+          procurement_type: row.procurement_type || '',
+          budget: Number(row.budget || 0),
+          department_id: normalizeMappedValue(row.department_id, departmentNameToId),
+          unit_id: normalizeMappedValue(row.unit_id, unitNameToId),
+          fiscal_year: row.fiscal_year || currentYear.toString(),
+          delivery_date: row.delivery_date_str
+            ? parseThaiDateString(row.delivery_date_str, 'ymd', '-')
+            : undefined,
+          budget_plan_ids: [],
+        }));
+
+        await importProjectsMutation(payloads);
+      }
+
+      navigate('/app/project-import/success?mode=' + mode);
+    } catch (error) {
+      console.error('Project import failed:', error);
+      toast.error('นำเข้าโครงการไม่สำเร็จ กรุณาตรวจสอบข้อมูลและลองใหม่อีกครั้ง');
     }
-    navigate('/app/project-import/success?mode=' + mode);
   };
 
   const handleSelectMode = (selectedMode: ImportMode) => {

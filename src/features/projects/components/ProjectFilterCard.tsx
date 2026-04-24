@@ -12,14 +12,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { useUnitsList } from '@/features/organization';
+import { useDepartments } from '@/features/organization';
 import { useUsersForSelection } from '@/features/users';
 import { OPS_DEPT_ID } from '@/lib/constants';
 import { getResponsibleTypeFormat } from '@/lib/formatters';
 
 import { type ProjectFilterParams } from '../api';
 import { useProjectPermissions } from '../hooks/useProjectPermissions';
-import { ProcurementTypeEnum, ProjectStatusEnum, ProjectUrgentStatusEnum } from '../types/index';
+import type { ProjectStatus } from '../types/index';
+import { ProcurementTypeEnum, ProjectUrgentStatusEnum } from '../types/index';
 import { FilterCheckbox } from './FilterCheckbox';
 import { SearchCheckbox } from './SearchCheckbox';
 
@@ -42,10 +43,40 @@ export function ProjectFilterCard({ filters, setFilters }: ProjectFilterCardProp
   };
 
   const procurementTypes = ProcurementTypeEnum.options;
-  const projectStatuses = ProjectStatusEnum.options;
   const urgentStatuses = ProjectUrgentStatusEnum.options;
+  const projectStatusFilters: Array<{
+    id: string;
+    label: string;
+    values: ProjectStatus[];
+  }> = [
+    {
+      id: 'UNASSIGNED',
+      label: 'ยังไม่ได้มอบหมาย',
+      values: ['UNASSIGNED'],
+    },
+    {
+      id: 'WAITING_ACCEPT',
+      label: 'รอการตอบรับ',
+      values: ['WAITING_ACCEPT'],
+    },
+    {
+      id: 'IN_PROGRESS_GROUP',
+      label: 'กำลังดำเนินการ',
+      values: ['IN_PROGRESS', 'WAITING_CANCEL', 'REQUEST_EDIT'],
+    },
+    {
+      id: 'CLOSED',
+      label: 'ปิดโครงการ',
+      values: ['CLOSED'],
+    },
+    {
+      id: 'CANCELLED',
+      label: 'ยกเลิก',
+      values: ['CANCELLED'],
+    },
+  ] as const;
 
-  const { data: units } = useUnitsList();
+  const { data: departments } = useDepartments();
   const { data: users } = useUsersForSelection({ deptId: OPS_DEPT_ID });
   const generalStaff = useMemo(() => {
     if (!users?.data) return [];
@@ -138,23 +169,30 @@ export function ProjectFilterCard({ filters, setFilters }: ProjectFilterCardProp
 
         <div className="flex flex-col gap-0.5">
           <span className="normal-b">สถานะ</span>
-          {projectStatuses.map((status) => (
+          {projectStatusFilters.map((statusGroup) => (
             <FilterCheckbox
-              key={status}
-              id={status}
-              label={
-                {
-                  UNASSIGNED: 'ยังไม่ได้มอบหมาย',
-                  WAITING_ACCEPT: 'รอการตอบรับ',
-                  IN_PROGRESS: 'กำลังดำเนินการ',
-                  WAITING_CANCEL: 'รอยกเลิก',
-                  REQUEST_EDIT: 'ขอแก้ไข',
-                  CLOSED: 'เสร็จสิ้น',
-                  CANCELLED: 'ยกเลิก',
-                }[status]
-              }
-              checked={filters.status?.includes(status)}
-              onCheckedChange={() => handleToggleFilter('status', status)}
+              key={statusGroup.id}
+              id={statusGroup.id}
+              label={statusGroup.label}
+              checked={statusGroup.values.every((value) => filters.status?.includes(value))}
+              onCheckedChange={(checked) => {
+                setFilters((prev) => {
+                  const current = prev.status ?? [];
+
+                  if (checked) {
+                    const next = new Set(current);
+                    statusGroup.values.forEach((value) => next.add(value));
+                    return { ...prev, status: [...next] };
+                  }
+
+                  const nextValues = new Set(current);
+
+                  return {
+                    ...prev,
+                    status: current.filter((value) => !nextValues.has(value)),
+                  };
+                });
+              }}
             />
           ))}
         </div>
@@ -183,10 +221,10 @@ export function ProjectFilterCard({ filters, setFilters }: ProjectFilterCardProp
           <div className="flex flex-col gap-0.5">
             <span className="normal-b">หน่วยงาน</span>
             <SearchCheckbox
-              items={units?.data ?? []}
+              items={departments ?? []}
               placeholder="ค้นหาหน่วยงาน"
-              value={filters.units}
-              onChange={(val) => setFilters((p) => ({ ...p, units: val }))}
+              value={filters.departments}
+              onChange={(val) => setFilters((p) => ({ ...p, departments: val }))}
             />
           </div>
         )}

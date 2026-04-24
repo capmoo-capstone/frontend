@@ -9,6 +9,7 @@ export interface ProjectFilterParams {
   status?: string[];
   urgentStatus?: string[];
   assignees?: string[];
+  departments?: string[];
   units?: string[];
   myTasks?: boolean;
 }

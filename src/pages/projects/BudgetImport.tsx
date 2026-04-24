@@ -7,15 +7,15 @@ import { type ImportBudgetPlanPayload, useImportBudgetPlans } from '@/features/b
 import { useDepartments, useUnitsList } from '@/features/organization';
 import { EditableImportTable, useExcelImport } from '@/features/project-import';
 import { ExcelUploadZone } from '@/features/project-import/components/ExcelUploadZone';
-import { SUPPLY_OPERATION_DEPARTMENT_ID } from '@/features/settings/constants';
-import { getFiscalYear } from '@/lib/formatters';
+import { OPS_DEPT_ID } from '@/lib/constants';
+import { getFiscalYear, normalizeYearToBE } from '@/lib/formatters';
 
 export default function BudgetPlanImport() {
   const navigate = useNavigate();
 
   const { data: departments } = useDepartments();
   const filteredDepartments = useMemo(
-    () => departments?.filter((dept) => dept.id !== SUPPLY_OPERATION_DEPARTMENT_ID),
+    () => departments?.filter((dept) => dept.id !== OPS_DEPT_ID),
     [departments]
   );
 
@@ -37,15 +37,27 @@ export default function BudgetPlanImport() {
 
   const handleSuccess = async () => {
     try {
+      const departmentNameToId = new Map(
+        (filteredDepartments ?? []).map((dept) => [dept.name, dept.id])
+      );
+      const unitNameToId = new Map((units ?? []).map((unit) => [unit.name, unit.id]));
+      const currentFiscalYearBE = getFiscalYear(new Date());
+
+      const normalizeValue = (value: string | undefined, nameToIdMap: Map<string, string>) => {
+        const raw = value?.trim();
+        if (!raw) return '';
+        return nameToIdMap.get(raw) ?? raw;
+      };
+
       const payload: ImportBudgetPlanPayload = data.map((row) => ({
-        budget_year: row.budget_year ?? '',
-        unit_id: row.unit_id ?? '',
-        department_id: row.department_id ?? '',
+        budget_year: normalizeYearToBE(row.budget_year, currentFiscalYearBE),
+        unit_id: normalizeValue(row.unit_id, unitNameToId),
+        department_id: normalizeValue(row.department_id, departmentNameToId),
         activity_type: row.activity_type ?? '',
         activity_type_name: row.activity_type_name ?? '',
         description: row.description ?? '',
         budget_name: row.budget_name ?? '',
-        amount: Number(row.amount ?? 0),
+        budget_amount: Number(row.budget_amount ?? 0),
       }));
 
       await importBudgetPlans(payload);

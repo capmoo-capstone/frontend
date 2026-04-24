@@ -2,7 +2,7 @@ import { useEffect, useMemo } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
 import { useDepartments, useUnitsList } from '@/features/organization';
-import { SUPPLY_OPERATION_DEPARTMENT_ID } from '@/features/settings/constants';
+import { OPS_DEPT_ID } from '@/lib/constants';
 import { getFiscalYear } from '@/lib/formatters';
 
 import { useImportProjects } from '../hooks/useCreateProject';
@@ -28,7 +28,7 @@ export function ProjectImportContainer() {
 
   const { data: departments } = useDepartments();
   const filteredDepartments = useMemo(
-    () => departments?.filter((dept) => dept.id !== SUPPLY_OPERATION_DEPARTMENT_ID),
+    () => departments?.filter((dept) => dept.id !== OPS_DEPT_ID),
     [departments]
   );
 

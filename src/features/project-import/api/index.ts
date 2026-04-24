@@ -44,12 +44,12 @@ const toCreateProjectPayload = (payload: ProjectImportPayload): CreateProjectReq
 
 export const createProject = async (payload: ProjectImportPayload) => {
   const requestPayload = toCreateProjectPayload(payload);
-  const data = await api.post('/projects/create', requestPayload);
+  const { data } = await api.post('/projects/create', requestPayload);
   return data;
 };
 
 export const importProjects = async (payload: ProjectImportPayload[]) => {
   const requestPayload = payload.map(toCreateProjectPayload);
-  const data = await api.post('/projects/import', requestPayload);
+  const { data } = await api.post('/projects/import', requestPayload);
   return data;
 };

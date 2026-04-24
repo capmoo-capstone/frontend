@@ -33,7 +33,7 @@ export const getMe = async (): Promise<User> => {
 
 export const login = async (username: string, full_name: string): Promise<User> => {
   const payload = LoginRequestSchema.parse({ username, full_name });
-  const data = await api.post('/auth/login', payload);
+  const { data } = await api.post('/auth/login', payload);
   const parsed = BackendLoginResponseSchema.parse(data);
   const normalized = toAuthUser(parsed, { username, full_name });
 

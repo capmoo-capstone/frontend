@@ -1,5 +1,5 @@
 import { useAuth } from '@/context/AuthContext';
-import { SUPPLY_OPERATION_DEPARTMENT_ID } from '@/features/settings/constants';
+import { OPS_DEPT_ID } from '@/lib/constants';
 import { hasRoleInScopes } from '@/lib/permissions';
 
 export const useBudgetImportPermissions = () => {
@@ -10,7 +10,7 @@ export const useBudgetImportPermissions = () => {
     canImportBudget: !!(
       user &&
       hasRoleInScopes(user, ['ADMIN'], {
-        departmentId: SUPPLY_OPERATION_DEPARTMENT_ID,
+        departmentId: OPS_DEPT_ID,
       })
     ),
   };

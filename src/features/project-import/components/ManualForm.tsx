@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 
 import { Button } from '@/components/ui/button';
-import { SUPPLY_OPERATION_DEPARTMENT_ID } from '@/features/settings/constants';
+import { OPS_DEPT_ID } from '@/lib/constants';
 
 import { useProjectImportForm } from '../hooks/useProjectImportForm';
 import { BudgetPlanField } from './BudgetPlanField';
@@ -43,7 +43,7 @@ export function ManualForm({ onBack, onSuccess }: ManualFormProps) {
   const fiscalYears = Array.from({ length: 7 }, (_, i) => (currentYear - 3 + i).toString());
 
   const filteredDepartments = useMemo(
-    () => departments?.filter((dept) => dept.id !== SUPPLY_OPERATION_DEPARTMENT_ID),
+    () => departments?.filter((dept) => dept.id !== OPS_DEPT_ID),
     [departments]
   );
 

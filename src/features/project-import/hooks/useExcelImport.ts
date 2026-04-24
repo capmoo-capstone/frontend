@@ -2,7 +2,12 @@ import { useState } from 'react';
 
 import readXlsxFile from 'read-excel-file';
 
-import { formatDateThai, getFiscalYear, parseThaiDateString } from '@/lib/formatters';
+import {
+  formatDateThai,
+  getFiscalYear,
+  normalizeYearToBE,
+  parseThaiDateString,
+} from '@/lib/formatters';
 
 import { type EditableImportRow, type ImportMode } from '../types';
 
@@ -55,7 +60,7 @@ export function useExcelImport(mode: ImportMode) {
 
       const headers = rows[0] as string[];
       const dataRows = rows.slice(1);
-      const defaultFiscalYear = getFiscalYear(new Date()).toString();
+      const defaultFiscalYear = getFiscalYear(new Date());
 
       const formattedData: EditableImportRow[] = dataRows.map((row) => {
         const rowObj: Record<string, unknown> = {};
@@ -76,7 +81,7 @@ export function useExcelImport(mode: ImportMode) {
         if (mode === 'budget') {
           return {
             _rowId: Math.random().toString(36).substring(7),
-            budget_year: rowObj['ปีงบประมาณ']?.toString() || defaultFiscalYear,
+            budget_year: normalizeYearToBE(rowObj['ปีงบประมาณ'], defaultFiscalYear),
             unit_no: rowObj['ศูนย์ต้นทุน']?.toString() || '',
             unit_id: rowObj['ชื่อศูนย์ต้นทุน']?.toString() || '',
             department_id:
@@ -89,7 +94,7 @@ export function useExcelImport(mode: ImportMode) {
               rowObj['รายละเอียด']?.toString() ||
               rowObj['คำอธิบายเพิ่มเติมประเภทกิจกรรม']?.toString() ||
               '',
-            amount: parseExcelNumber(
+            budget_amount: parseExcelNumber(
               rowObj['ราคารวม'] ?? rowObj['วงเงินงบประมาณ'] ?? rowObj['วงเงินงบประมาณ (บาท)']
             ),
           };
@@ -123,7 +128,7 @@ export function useExcelImport(mode: ImportMode) {
           budget: Number(rowObj['วงเงินงบประมาณ'] || rowObj['มูลค่ารวม'] || 0),
           department_id: rowObj['หน่วยงาน']?.toString() || rowObj['จากหน่วยงาน']?.toString() || '',
           unit_id: rowObj['ฝ่าย']?.toString() || '',
-          fiscal_year: rowObj['ปีงบประมาณ']?.toString() || defaultFiscalYear,
+          fiscal_year: rowObj['ปีงบประมาณ']?.toString() || defaultFiscalYear.toString(),
         };
       });
 

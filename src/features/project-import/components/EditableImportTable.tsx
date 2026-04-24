@@ -84,7 +84,7 @@ const EditableCell = ({
   const { index, original } = row;
   const initialValue = getValue();
   const initialTextValue = initialValue == null ? '' : String(initialValue);
-  const isCurrencyField = id === 'amount' || id === 'budget';
+  const isCurrencyField = id === 'budget_amount' || id === 'budget';
   const formatWithComma = (val: unknown) => {
     if (val === null || val === undefined || val === '') return '';
     const num = Number(String(val).replace(/,/g, ''));
@@ -118,7 +118,7 @@ const EditableCell = ({
     if (!updateData) return;
 
     let finalValue: unknown = value;
-    if (id === 'budget' || id === 'amount') {
+    if (id === 'budget' || id === 'budget_amount') {
       finalValue = value === '' ? '' : Number(value);
     }
     updateData(index, id, finalValue);
@@ -207,7 +207,14 @@ const EditableCell = ({
       <div className="flex w-full flex-col gap-1">
         <Select
           value={displayValue}
-          onValueChange={(val) => updateData && updateData(index, id, val)}
+          onValueChange={(val) => {
+            if (!updateData) return;
+            if (id === 'budget_year') {
+              updateData(index, id, Number(val));
+              return;
+            }
+            updateData(index, id, val);
+          }}
         >
           <SelectTrigger
             className={cn('bg-background h-9 w-full', hasError && 'border-destructive')}
@@ -328,7 +335,7 @@ const EditableCell = ({
     );
   }
 
-  if (id === 'amount' || id === 'budget') {
+  if (id === 'budget_amount' || id === 'budget') {
     return (
       <div className="flex w-full flex-col gap-1">
         <Input
@@ -440,7 +447,7 @@ export function EditableImportTable({
         mode === 'budget'
           ? {
               id: row._rowId,
-              budget_year: row.budget_year ?? '',
+              budget_year: Number(row.budget_year ?? 0),
               unit_id: normalizeOptionId(row.unit_id, unitIdSet, unitNameToId),
               department_id: normalizeOptionId(
                 row.department_id,
@@ -451,7 +458,7 @@ export function EditableImportTable({
               activity_type_name: row.activity_type_name ?? '',
               description: row.description ?? '',
               budget_name: row.budget_name ?? '',
-              amount: Number(row.amount ?? 0),
+              budget_amount: Number(row.budget_amount ?? 0),
               project_id: null,
             }
           : {
@@ -581,7 +588,7 @@ export function EditableImportTable({
               size: 350,
             },
             {
-              accessorKey: 'amount',
+              accessorKey: 'budget_amount',
               header: () => (
                 <>
                   วงเงินงบประมาณ (บาท) <span className="text-destructive">*</span>

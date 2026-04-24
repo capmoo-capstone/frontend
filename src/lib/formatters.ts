@@ -285,6 +285,12 @@ export const getFiscalYear = (date: Date | string) => {
   return month >= 10 ? year + 544 : year + 543; // Convert to BE and adjust for fiscal year
 };
 
+export const normalizeYearToBE = (value: unknown, fallbackYearBE: number): number => {
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed) || parsed <= 0) return fallbackYearBE;
+  return parsed < 2400 ? parsed + 543 : parsed;
+};
+
 // ==================== RESPONSIBLE TYPE FORMATTERS ====================
 
 export const RESPONSIBLE_SELECT_OPTIONS: { value: UnitResponsibleType; label: string }[] = [

@@ -7,6 +7,8 @@ export interface ProjectFilterParams {
   fiscalYear?: string;
   procurementType?: string[];
   status?: string[];
+  procurementStatus?: string[];
+  contractStatus?: string[];
   urgentStatus?: string[];
   assignees?: string[];
   departments?: string[];

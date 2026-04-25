@@ -14,34 +14,17 @@ import { getResponsibleTypeFormat } from '@/features/projects';
 import { cn } from '@/lib/utils';
 
 import type { FinanceExportItem } from '../types';
+import { getFinanceStatusFormat, isReadyToCloseProject } from '../utils/financeFormatters';
 
 interface FinanceColumnsConfig {
+  isActionPending?: boolean;
+  onCloseProject?: (item: FinanceExportItem) => void;
   onRequestEdit?: (item: FinanceExportItem) => void;
-  onMarkComplete?: (item: FinanceExportItem) => void;
 }
 
 // Status Badge using Badge component
 const renderFinanceStatusBadge = (status: FinanceExportItem['export_status']) => {
-  const config = {
-    NOT_EXPORTED: {
-      label: 'รอส่งเบิกการเงิน',
-      variant: 'secondary' as const,
-    },
-    EXPORTED: {
-      label: 'ส่งการเงินแล้ว',
-      variant: 'info' as const,
-    },
-    CLOSED: {
-      label: 'ปิดโครงการ',
-      variant: 'success' as const,
-    },
-    WAITING_EDIT: {
-      label: 'การเงินส่งคืน',
-      variant: 'destructive' as const,
-    },
-  };
-
-  const current = config[status];
+  const current = getFinanceStatusFormat(status);
 
   return <Badge variant={current.variant}>{current.label}</Badge>;
 };
@@ -219,9 +202,10 @@ export const getFinanceColumns = (
     enableHiding: false,
     cell: ({ row }) => {
       const status = row.original.export_status;
+      const canRequestEdit = status === 'CLOSED';
+      const canCloseProject = isReadyToCloseProject(row.original);
 
-      // Only show actions for CLOSED and WAITING_EDIT statuses
-      if (status !== 'CLOSED' && status !== 'WAITING_EDIT') {
+      if (!canRequestEdit && !canCloseProject) {
         return null;
       }
 
@@ -233,16 +217,22 @@ export const getFinanceColumns = (
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            {status === 'CLOSED' && (
-              <DropdownMenuItem onClick={() => config?.onRequestEdit?.(row.original)}>
+            {canRequestEdit && (
+              <DropdownMenuItem
+                disabled={config?.isActionPending}
+                onClick={() => config?.onRequestEdit?.(row.original)}
+              >
                 <Edit className="h-4 w-4" />
                 ขอแก้ไข
               </DropdownMenuItem>
             )}
-            {status === 'WAITING_EDIT' && (
-              <DropdownMenuItem onClick={() => config?.onMarkComplete?.(row.original)}>
+            {canCloseProject && (
+              <DropdownMenuItem
+                disabled={config?.isActionPending}
+                onClick={() => config?.onCloseProject?.(row.original)}
+              >
                 <CheckCircle className="h-4 w-4" />
-                แก้ไขเสร็จสิ้น
+                ปิดโครงการ
               </DropdownMenuItem>
             )}
           </DropdownMenuContent>

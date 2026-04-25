@@ -1,6 +1,8 @@
 import { z } from 'zod';
 
-export type ImportMode = 'none' | 'lesspaper' | 'fiori' | 'manual';
+import type { ImportBudgetPlanItem } from '@/features/budgets';
+
+export type ImportMode = 'none' | 'lesspaper' | 'fiori' | 'manual' | 'budget';
 
 export const PROCUREMENT_MIN_DAYS: Record<string, number> = {
   LT100K: 15,
@@ -11,8 +13,11 @@ export const PROCUREMENT_MIN_DAYS: Record<string, number> = {
 };
 
 export const ProjectImportSchema = z.object({
-  pr_no: z.string().optional(),
-  lesspaper_no: z.string().optional(),
+  pr_no: z.string().regex(/^\d*$/, 'เลขที่ใบขอซื้อขอจ้างต้องเป็นตัวเลขเท่านั้น').optional(),
+  lesspaper_no: z
+    .string()
+    .regex(/^\d*$/, 'เลขที่หนังสือ Lesspaper ต้องเป็นตัวเลขเท่านั้น')
+    .optional(),
   title: z.string().min(1, 'กรุณาระบุชื่อโครงการ'),
   description: z.string().min(1, 'กรุณาระบุรายละเอียดโครงการ'),
   procurement_type: z.string().min(1, 'กรุณาเลือกวิธีการจัดหา'),
@@ -31,7 +36,6 @@ export type ProjectImportFormValues = z.input<typeof ProjectImportSchema>;
 export type ProjectImportPayload = z.infer<typeof ProjectImportSchema>;
 
 export const FioriImportSchema = ProjectImportSchema.omit({
-  unit_id: true,
   budget_plan_ids: true,
   lesspaper_no: true,
 });
@@ -39,16 +43,19 @@ export const FioriImportSchema = ProjectImportSchema.omit({
 export type FioriImportPayload = z.infer<typeof FioriImportSchema>;
 
 export const LesspaperImportSchema = ProjectImportSchema.omit({
-  unit_id: true,
   budget_plan_ids: true,
   lesspaper_no: true,
 }).extend({
-  lesspaper_no: z.string().min(1, 'กรุณาระบุเลขที่หนังสือ Lesspaper'),
+  lesspaper_no: z
+    .string()
+    .min(1, 'กรุณาระบุเลขที่หนังสือ Lesspaper')
+    .regex(/^\d+$/, 'เลขที่หนังสือ Lesspaper ต้องเป็นตัวเลขเท่านั้น'),
 });
 
 export type LesspaperImportPayload = z.infer<typeof LesspaperImportSchema>;
 
-export interface EditableImportRow extends Partial<ProjectImportPayload> {
+export interface EditableImportRow
+  extends Partial<ProjectImportPayload>, Partial<ImportBudgetPlanItem> {
   _rowId: string;
   delivery_date_str?: string;
   isValid?: boolean;

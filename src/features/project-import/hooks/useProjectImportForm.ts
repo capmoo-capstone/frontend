@@ -35,6 +35,8 @@ export function useProjectImportForm({ onSuccess }: UseProjectImportFormOptions)
 
   const form = useForm<ProjectImportFormValues, unknown, ProjectImportPayload>({
     resolver: zodResolver(ProjectImportSchema),
+    mode: 'onChange',
+    reValidateMode: 'onChange',
     defaultValues: {
       pr_no: '',
       title: '',
@@ -44,7 +46,7 @@ export function useProjectImportForm({ onSuccess }: UseProjectImportFormOptions)
       department_id: canSelectEveryUnits ? '' : user?.department?.id || '',
       unit_id: canSelectEveryUnits ? '' : user?.unit?.id || '',
       budget_plan_ids: [],
-      budget: 0,
+      budget: '',
     },
   });
 
@@ -75,7 +77,9 @@ export function useProjectImportForm({ onSuccess }: UseProjectImportFormOptions)
     differenceInDays(watchDeliveryDate, new Date()) < minDays;
 
   const calculatedSum = budgetPlans
-    ? budgetPlans.filter((p) => selectedPlans.includes(p.id)).reduce((a, b) => a + b.amount, 0)
+    ? budgetPlans
+        .filter((p) => selectedPlans.includes(p.id))
+        .reduce((a, b) => a + b.budget_amount, 0)
     : 0;
   const showBudgetWarning = selectedPlans.length > 0 && typedBudget < calculatedSum;
 
@@ -95,10 +99,8 @@ export function useProjectImportForm({ onSuccess }: UseProjectImportFormOptions)
     if (selectedPlans.length > 0 && budgetPlans) {
       const sum = budgetPlans
         .filter((p) => selectedPlans.includes(p.id))
-        .reduce((acc, curr) => acc + curr.amount, 0);
+        .reduce((acc, curr) => acc + curr.budget_amount, 0);
       form.setValue('budget', sum, { shouldValidate: true });
-    } else {
-      form.setValue('budget', 0, { shouldValidate: true });
     }
   }, [selectedPlans, budgetPlans, form]);
 

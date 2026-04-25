@@ -119,10 +119,19 @@ export function ProjectDetailsFields({
           <Field data-invalid={fieldState.invalid}>
             <FieldLabel htmlFor={field.name}>เลขที่ใบขอซื้อขอจ้าง (ถ้ามี)</FieldLabel>
             <Input
-              {...field}
+              name={field.name}
+              value={field.value ?? ''}
+              onBlur={field.onBlur}
+              ref={field.ref}
               id={field.name}
               placeholder="กรุณากรอกเลขที่ใบขอซื้อขอจ้าง"
               aria-invalid={fieldState.invalid}
+              inputMode="numeric"
+              pattern="[0-9]*"
+              onChange={(e) => {
+                const digitsOnly = e.target.value.replace(/\D/g, '');
+                field.onChange(digitsOnly);
+              }}
             />
             {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
           </Field>
@@ -160,10 +169,8 @@ export function ProjectDetailsFields({
         name="budget"
         control={control}
         render={({ field, fieldState }) => {
-          const numericValue =
-            typeof field.value === 'number' && Number.isFinite(field.value)
-              ? field.value
-              : Number(field.value || 0);
+          const displayValue =
+            field.value === null || field.value === undefined ? '' : String(field.value);
 
           return (
             <Field data-invalid={fieldState.invalid}>
@@ -175,8 +182,9 @@ export function ProjectDetailsFields({
                 name={field.name}
                 ref={field.ref}
                 onBlur={field.onBlur}
-                value={Number.isFinite(numericValue) ? numericValue : 0}
-                type="number"
+                value={displayValue}
+                type="text"
+                inputMode="decimal"
                 placeholder="กรุณากรอกวงเงินงบประมาณ"
                 aria-invalid={fieldState.invalid}
                 className={cn(
@@ -185,9 +193,18 @@ export function ProjectDetailsFields({
                     'border-warning focus-visible:ring-warning-light'
                 )}
                 onChange={(e) => {
-                  const value = e.target.valueAsNumber || 0;
+                  const value = e.target.value;
                   field.onChange(value);
-                  onBudgetChange(value);
+
+                  if (value === '') {
+                    onBudgetChange(0);
+                  } else {
+                    const sanitized = value.replace(/,/g, '').trim();
+                    const parsedValue = Number(sanitized);
+                    if (Number.isFinite(parsedValue)) {
+                      onBudgetChange(parsedValue);
+                    }
+                  }
                 }}
               />
               {showBudgetWarning && !fieldState.invalid && (

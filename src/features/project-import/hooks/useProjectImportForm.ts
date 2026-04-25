@@ -1,11 +1,11 @@
-import { useEffect, useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useEffect, useMemo, useState } from 'react';
+import { useForm, useWatch } from 'react-hook-form';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { differenceInDays } from 'date-fns';
 import { toast } from 'sonner';
 
-import { useAuth } from '@/context/AuthContext';
+import { useAuth } from '@/context/useAuth';
 import { useBudgetPlans } from '@/features/budgets';
 import { useDepartments, useUnits } from '@/features/organization';
 import { getFiscalYear } from '@/lib/date-formatters';
@@ -51,13 +51,14 @@ export function useProjectImportForm({ onSuccess }: UseProjectImportFormOptions)
   });
 
   // Watch form fields
-  const watchDeptId = form.watch('department_id');
-  const watchUnitId = form.watch('unit_id');
-  const watchFiscalYear = form.watch('fiscal_year');
-  const watchDeliveryDate = form.watch('delivery_date');
-  const watchProcurementType = form.watch('procurement_type');
-  const selectedPlans = form.watch('budget_plan_ids') || [];
-  const watchBudget = form.watch('budget');
+  const watchDeptId = useWatch({ control: form.control, name: 'department_id' });
+  const watchUnitId = useWatch({ control: form.control, name: 'unit_id' });
+  const watchFiscalYear = useWatch({ control: form.control, name: 'fiscal_year' });
+  const watchDeliveryDate = useWatch({ control: form.control, name: 'delivery_date' });
+  const watchProcurementType = useWatch({ control: form.control, name: 'procurement_type' });
+  const watchedBudgetPlanIds = useWatch({ control: form.control, name: 'budget_plan_ids' });
+  const selectedPlans = useMemo(() => watchedBudgetPlanIds ?? [], [watchedBudgetPlanIds]);
+  const watchBudget = useWatch({ control: form.control, name: 'budget' });
   const typedBudget = typeof watchBudget === 'number' ? watchBudget : Number(watchBudget || 0);
 
   // Fetch data

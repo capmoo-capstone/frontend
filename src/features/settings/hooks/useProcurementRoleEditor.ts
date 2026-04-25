@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import { DIRECTOR_ROLE_ID } from '../constants';
 import {
@@ -32,16 +32,6 @@ export function useProcurementRoleEditor({
 
   const isDirectorRole = role.id === DIRECTOR_ROLE_ID;
   const directorMemberId = draftMemberIds[0] ?? '';
-
-  useEffect(() => {
-    if (!isEditing) {
-      setDraftMemberIds(role.member_ids);
-      setDraftDelegations(role.delegation);
-      setDelegationToAdd(null);
-      setMemberToAdd('');
-      setError('');
-    }
-  }, [isEditing, role.member_ids, role.delegation]);
 
   const resetEditorState = () => {
     setDraftMemberIds(role.member_ids);
@@ -100,6 +90,7 @@ export function useProcurementRoleEditor({
   };
 
   const handleEdit = () => {
+    resetEditorState();
     setIsEditing(true);
   };
 

@@ -15,12 +15,12 @@ import {
 import { useDepartments } from '@/features/organization';
 import { useUsersForSelection } from '@/features/users';
 import { OPS_DEPT_ID } from '@/lib/constants';
-import { getResponsibleTypeFormat } from '../utils/projectFormatters';
 
 import { type ProjectFilterParams } from '../api';
 import { useProjectPermissions } from '../hooks/useProjectPermissions';
 import type { ProjectStatus } from '../types/index';
 import { ProcurementTypeEnum, ProjectUrgentStatusEnum } from '../types/index';
+import { getResponsibleTypeFormat } from '../utils/projectFormatters';
 import { FilterCheckbox } from './FilterCheckbox';
 import { SearchCheckbox } from './SearchCheckbox';
 

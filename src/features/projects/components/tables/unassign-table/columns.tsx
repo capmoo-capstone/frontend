@@ -11,10 +11,9 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { formatDateThaiShort } from '@/lib/date-formatters';
 
-import { getResponsibleTypeFormat } from '../../../utils/projectFormatters';
-
 import type { UnassignedProjectItem } from '../../../types/index';
 import { getCancelProjectActionLabel } from '../../../utils/project-selectors';
+import { getResponsibleTypeFormat } from '../../../utils/projectFormatters';
 import {
   renderAssignedStatusBadge,
   renderSortableHeader,

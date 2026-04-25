@@ -12,7 +12,7 @@ import {
 import type { ColumnDef } from '@tanstack/react-table';
 import { AlertTriangle, Loader2 } from 'lucide-react';
 
-import { useAuth } from '@/context/AuthContext';
+import { useAuth } from '@/context/useAuth';
 
 import { useProjectPermissions } from '../hooks/useProjectPermissions';
 import { type ProjectFilterParams, useProjects } from '../hooks/useProjectQueries';

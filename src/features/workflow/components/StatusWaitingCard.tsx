@@ -2,8 +2,8 @@ import type { Role } from '@/features/auth';
 import type { ProjectStatus } from '@/features/projects';
 import { cn } from '@/lib/utils';
 
-import { getWaitingStatusInfo } from '../lib/workflowFormatters';
 import { getStepColor } from '../lib/workflow-utils';
+import { getWaitingStatusInfo } from '../lib/workflowFormatters';
 import type { StepStatus } from '../types';
 
 interface StatusWaitingCardProps {

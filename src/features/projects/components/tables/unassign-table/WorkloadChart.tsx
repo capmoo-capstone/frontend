@@ -14,9 +14,9 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from '@/components/ui/chart';
-import { useWorkloadStats } from '../../../hooks/useProjectQueries';
 
 import { useProjectPermissions } from '../../../hooks/useProjectPermissions';
+import { useWorkloadStats } from '../../../hooks/useProjectQueries';
 
 const chartConfig = {
   current: {

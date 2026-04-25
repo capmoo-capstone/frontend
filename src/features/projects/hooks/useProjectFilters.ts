@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from 'react';
-
 import type { DateRange } from 'react-day-picker';
 
 import type { ProjectFilterParams } from '../api';

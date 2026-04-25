@@ -41,6 +41,7 @@ export default tseslint.config(
         'warn',
         { allowConstantExport: true },
       ],
+      'react-hooks/incompatible-library': 'off',
       'react-hooks/set-state-in-effect': 'warn',
       'react-hooks/refs': 'warn',
       'import/newline-after-import': ['error', { count: 1 }],

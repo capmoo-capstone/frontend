@@ -65,6 +65,7 @@ export function UnassignTable({ unitId, pendingChanges, setPendingChanges }: Una
       }),
     [
       pendingChanges,
+      setPendingChanges,
       unitId,
       canClaimProjects,
       canAssignProjects,

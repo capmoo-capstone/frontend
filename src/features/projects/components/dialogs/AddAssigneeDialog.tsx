@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
-import { Controller, useForm } from 'react-hook-form';
+import { Controller, useForm, useWatch } from 'react-hook-form';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'sonner';
@@ -37,7 +37,7 @@ export function AddAssigneeDialog({ isOpen, onClose, project }: AddAssigneeDialo
     },
   });
 
-  const selectedUserId = form.watch('userId');
+  const selectedUserId = useWatch({ control: form.control, name: 'userId' });
 
   useEffect(() => {
     if (isOpen) {

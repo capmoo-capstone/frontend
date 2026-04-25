@@ -37,9 +37,9 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  useSidebar,
 } from '@/components/ui/sidebar';
-import { useAuth } from '@/context/AuthContext';
+import { useSidebar } from '@/components/ui/sidebar-context';
+import { useAuth } from '@/context/useAuth';
 import { useLogout } from '@/features/auth';
 import { type Role } from '@/features/auth';
 import { cn } from '@/lib/utils';

@@ -1,20 +1,37 @@
 import { useMemo, useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 
+import { RESPONSIBLE_SELECT_OPTIONS } from '@/features/projects';
+
 import {
+  type DelegationPayload,
   type WorkGroupFormInput,
   type WorkGroupSetting,
   createWorkGroupValidationSchema,
 } from '../types';
-import { RESPONSIBLE_SELECT_OPTIONS } from '@/features/projects';
 
 interface UseCreateGroupFormParams {
   groups: WorkGroupSetting[];
   directorUserId?: string;
   onCreate: (group: WorkGroupSetting) => void;
 }
+
+const normalizeDelegation = (
+  delegation: Partial<DelegationPayload> | null | undefined
+): DelegationPayload | null => {
+  if (!delegation?.user_id || !delegation.start_date || !delegation.end_date) {
+    return null;
+  }
+
+  return {
+    id: delegation.id,
+    user_id: delegation.user_id,
+    start_date: delegation.start_date,
+    end_date: delegation.end_date,
+  };
+};
 
 export function useCreateGroupForm({ groups, directorUserId, onCreate }: UseCreateGroupFormParams) {
   // TODO (BACKEND MIGRATION): Group creation validation and uniqueness constraints should be validated server-side to prevent race conditions across clients.
@@ -41,7 +58,14 @@ export function useCreateGroupForm({ groups, directorUserId, onCreate }: UseCrea
     reValidateMode: 'onBlur',
   });
 
-  const draft = form.watch();
+  const watchedDraft = useWatch({ control: form.control });
+  const draft: WorkGroupFormInput = {
+    name: watchedDraft.name ?? '',
+    workflow_types: watchedDraft.workflow_types ?? [],
+    head_id: watchedDraft.head_id ?? '',
+    member_ids: watchedDraft.member_ids ?? [],
+    delegation: normalizeDelegation(watchedDraft.delegation),
+  };
   const [newGroupId] = useState(() => `wg-${Date.now()}`);
 
   const usedWorkflowTypes = useMemo(

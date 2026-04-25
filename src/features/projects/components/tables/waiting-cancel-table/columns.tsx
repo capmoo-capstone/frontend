@@ -10,9 +10,8 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { formatDateThaiShort } from '@/lib/date-formatters';
 
-import { getResponsibleTypeFormat } from '../../../utils/projectFormatters';
-
 import type { WaitingCancelProjectItem } from '../../../types/index';
+import { getResponsibleTypeFormat } from '../../../utils/projectFormatters';
 import { renderSortableHeader, renderUrgentText } from '../column-helpers';
 
 interface GetColumnsProps {

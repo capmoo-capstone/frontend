@@ -1,4 +1,4 @@
-import { useAuth } from '@/context/AuthContext';
+import { useAuth } from '@/context/useAuth';
 import { usePermissions } from '@/features/auth';
 import { useProjectImportPermissions } from '@/features/project-import';
 import { OPS_DEPT_ID } from '@/lib/constants';

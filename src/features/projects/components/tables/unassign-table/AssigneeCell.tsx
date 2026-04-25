@@ -1,5 +1,3 @@
-import { useEffect, useRef, useState } from 'react';
-
 import { UserSelect } from '@/features/users';
 
 interface AssigneeCellProps {
@@ -19,14 +17,7 @@ export function AssigneeCell({
 }: AssigneeCellProps) {
   const isDirty = Object.prototype.hasOwnProperty.call(pendingChanges, rowId);
 
-  const currentValue = isDirty ? pendingChanges[rowId] : originalValue;
-  const [localValue, setLocalValue] = useState<string | null>(currentValue ?? null);
-  const latestValueRef = useRef<string | null>(currentValue ?? null);
-
-  useEffect(() => {
-    setLocalValue(currentValue ?? null);
-    latestValueRef.current = currentValue ?? null;
-  }, [currentValue]);
+  const currentValue = isDirty ? pendingChanges[rowId] : (originalValue ?? null);
 
   const removePendingChange = (prev: Record<string, string>) => {
     const next = { ...prev };
@@ -34,9 +25,9 @@ export function AssigneeCell({
     return next;
   };
 
-  const handleCommit = () => {
+  const handleChange = (newId: string) => {
     setPendingChanges((prev) => {
-      const nextValue = latestValueRef.current ?? '';
+      const nextValue = newId || '';
       const baselineValue = originalValue ?? '';
 
       if (nextValue === baselineValue) {
@@ -51,21 +42,14 @@ export function AssigneeCell({
   };
 
   const handleReset = () => {
-    setLocalValue(originalValue ?? null);
-    latestValueRef.current = originalValue ?? null;
     setPendingChanges((prev) => removePendingChange(prev));
   };
 
   return (
     <UserSelect
-      value={localValue}
+      value={currentValue}
       unitId={unitId}
-      onChange={(newId) => {
-        const nextValue = newId || null;
-        latestValueRef.current = nextValue;
-        setLocalValue(nextValue);
-      }}
-      onBlur={handleCommit}
+      onChange={handleChange}
       onReset={handleReset}
       className="h-8 w-48 flex-1 text-sm"
       hasClearButton={true}

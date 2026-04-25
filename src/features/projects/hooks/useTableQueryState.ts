@@ -1,10 +1,7 @@
 import { useCallback, useMemo } from 'react';
-
-import {
-  type PaginationState,
-  type SortingState,
-} from '@tanstack/react-table';
 import { useSearchParams } from 'react-router-dom';
+
+import { type PaginationState, type SortingState } from '@tanstack/react-table';
 
 export type TableSortType = 'ASC' | 'DESC';
 
@@ -24,7 +21,10 @@ export interface UseTableQueryStateResult {
   pagination: PaginationState;
   sorting: SortingState;
   stringFilters: Record<string, string>;
-  updateQueryParams: (updates: Record<string, QueryParamValue>, options?: UpdateQueryParamsOptions) => void;
+  updateQueryParams: (
+    updates: Record<string, QueryParamValue>,
+    options?: UpdateQueryParamsOptions
+  ) => void;
 }
 
 const PAGE_PARAM = 'page';
@@ -53,7 +53,11 @@ export function useTableQueryState(): UseTableQueryStateResult {
 
   const sortField = searchParams.get(SORT_FIELD_PARAM) || undefined;
   const sortType =
-    sortField && searchParams.get(SORT_TYPE_PARAM) === 'DESC' ? 'DESC' : sortField ? 'ASC' : undefined;
+    sortField && searchParams.get(SORT_TYPE_PARAM) === 'DESC'
+      ? 'DESC'
+      : sortField
+        ? 'ASC'
+        : undefined;
 
   const sorting = useMemo<SortingState>(() => {
     if (!sortField) return [];

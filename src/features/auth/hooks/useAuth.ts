@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom';
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
-import { useAuth } from '@/context/AuthContext';
+import { useAuth } from '@/context/useAuth';
 import { userKeys } from '@/features/users';
 
 import { login as loginApi } from '../api';

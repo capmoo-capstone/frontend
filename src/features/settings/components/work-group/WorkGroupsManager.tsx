@@ -41,7 +41,10 @@ export function WorkGroupsManager() {
     deptId: OPS_DEPT_ID,
   });
 
-  const procurementUsers = procurementUsersResponse?.data ?? [];
+  const procurementUsers = useMemo(
+    () => procurementUsersResponse?.data ?? [],
+    [procurementUsersResponse?.data]
+  );
   const directorUserId = useMemo(
     () => procurementUsers.find((user) => user.role === DIRECTOR_ROLE_ID)?.id,
     [procurementUsers]

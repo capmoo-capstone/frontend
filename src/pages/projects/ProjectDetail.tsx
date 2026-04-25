@@ -5,7 +5,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 
-import { useAuth } from '@/context/AuthContext';
+import { useAuth } from '@/context/useAuth';
 import { useLinkBudgetPlanToProject } from '@/features/budgets';
 import {
   ApproveCancelDialog,

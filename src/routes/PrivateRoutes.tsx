@@ -2,7 +2,7 @@ import { lazy } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 
 import PermissionGuard from '@/components/guards/PermissionGuard';
-import { useAuth } from '@/context/AuthContext';
+import { useAuth } from '@/context/useAuth';
 import { useBudgetImportPermissions, useProjectImportPermissions } from '@/features/project-import';
 import AppLayout from '@/layouts/AppLayout';
 import { hasSettingsPermission } from '@/lib/permissions';

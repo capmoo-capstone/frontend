@@ -21,7 +21,7 @@ interface FinanceColumnsConfig {
 }
 
 // Status Badge using Badge component
-const FinanceStatusBadge = ({ status }: { status: FinanceExportItem['export_status'] }) => {
+const renderFinanceStatusBadge = (status: FinanceExportItem['export_status']) => {
   const config = {
     NOT_EXPORTED: {
       label: 'รอส่งเบิกการเงิน',
@@ -212,7 +212,7 @@ export const getFinanceColumns = (
         />
       </div>
     ),
-    cell: ({ row }) => <FinanceStatusBadge status={row.original.export_status} />,
+    cell: ({ row }) => renderFinanceStatusBadge(row.original.export_status),
   },
   {
     id: 'actions',

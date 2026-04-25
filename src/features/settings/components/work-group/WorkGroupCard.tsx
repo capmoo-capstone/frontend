@@ -83,12 +83,7 @@ export function WorkGroupCard(props: WorkGroupCardProps) {
               </Button>
             </>
           ) : (
-            <Button
-              type="button"
-              size="sm"
-              variant="outline"
-              onClick={() => editor.setIsEditing(true)}
-            >
+            <Button type="button" size="sm" variant="outline" onClick={editor.handleStartEditing}>
               <Pencil className="mr-1 h-4 w-4" /> แก้ไขกลุ่มงาน
             </Button>
           )}

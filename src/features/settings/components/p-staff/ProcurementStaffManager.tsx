@@ -1,6 +1,5 @@
 import { useCallback, useMemo } from 'react';
 
-import { useQueryClient } from '@tanstack/react-query';
 import { Trash2, UserPlus, Users, X } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -29,9 +28,10 @@ export function ProcurementStaffManager() {
   const cancelDelegationMutation = useCancelDelegation();
   const updateSupplyRole = useUpdateSupplyRole();
 
-  const queryClient = useQueryClient();
-
-  const procurementUsers = procurementUsersResponse?.data ?? [];
+  const procurementUsers = useMemo(
+    () => procurementUsersResponse?.data ?? [],
+    [procurementUsersResponse?.data]
+  );
 
   const procurementRoles = useMemo<ProcurementRoleSetting[]>(() => {
     return PROCUREMENT_ROLES_CONFIG.map((config) => {
@@ -86,13 +86,7 @@ export function ProcurementStaffManager() {
         });
       }
     },
-    [
-      procurementRoles,
-      addDelegationMutation,
-      cancelDelegationMutation,
-      updateSupplyRole,
-      queryClient,
-    ]
+    [procurementRoles, addDelegationMutation, cancelDelegationMutation, updateSupplyRole]
   );
 
   if (isPending) {

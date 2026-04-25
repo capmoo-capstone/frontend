@@ -1,8 +1,11 @@
-import { useEffect, useMemo, useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useMemo, useState } from 'react';
+import { useForm, useWatch } from 'react-hook-form';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 
+import { RESPONSIBLE_SELECT_OPTIONS } from '@/features/projects';
+
+import { getFormErrorMessages } from '../components/work-group/workGroupFormUtils';
 import {
   type DelegationPayload,
   type SettingsUserOption,
@@ -10,9 +13,6 @@ import {
   type WorkGroupSetting,
   createWorkGroupValidationSchema,
 } from '../types';
-import { RESPONSIBLE_SELECT_OPTIONS } from '@/features/projects';
-
-import { getFormErrorMessages } from '../components/work-group/workGroupFormUtils';
 import { useDelegationFormReset } from './useDelegationFormReset';
 
 interface UseWorkGroupCardEditorParams {
@@ -22,6 +22,21 @@ interface UseWorkGroupCardEditorParams {
   directorUserId?: string;
   onSave: (group: WorkGroupSetting) => void | Promise<void>;
 }
+
+const normalizeDelegation = (
+  delegation: Partial<DelegationPayload> | null | undefined
+): DelegationPayload | null => {
+  if (!delegation?.user_id || !delegation.start_date || !delegation.end_date) {
+    return null;
+  }
+
+  return {
+    id: delegation.id,
+    user_id: delegation.user_id,
+    start_date: delegation.start_date,
+    end_date: delegation.end_date,
+  };
+};
 
 export function useWorkGroupCardEditor({
   group,
@@ -54,7 +69,22 @@ export function useWorkGroupCardEditor({
     },
   });
 
-  const draft = form.watch();
+  const watchedDraft = useWatch({ control: form.control });
+  const draft: WorkGroupFormInput = isEditing
+    ? {
+        name: watchedDraft.name ?? '',
+        workflow_types: watchedDraft.workflow_types ?? [],
+        head_id: watchedDraft.head_id ?? '',
+        member_ids: watchedDraft.member_ids ?? [],
+        delegation: normalizeDelegation(watchedDraft.delegation),
+      }
+    : {
+        name: group.name,
+        workflow_types: group.workflow_types,
+        head_id: group.head_id,
+        member_ids: group.member_ids,
+        delegation: group.delegation,
+      };
   const validationErrors = useMemo(
     () => getFormErrorMessages(form.formState.errors),
     [form.formState.errors]
@@ -65,10 +95,6 @@ export function useWorkGroupCardEditor({
     setDelegationToAdd(null);
     bumpDelegationFormResetKey();
   };
-
-  useEffect(() => {
-    resetFormToGroupData();
-  }, [group]);
 
   // Enforce staff uniqueness: Cannot be director, cannot be in ANY other group
   const availableMembers = useMemo(() => {
@@ -81,7 +107,7 @@ export function useWorkGroupCardEditor({
       if (assignedElsewhereIds.has(person.id)) return false;
       return true;
     });
-  }, [directorUserId, group.id, groups, procurementUsers]);
+  }, [directorUserId, groups, procurementUsers]);
 
   const usedWorkflowByOtherGroups = useMemo(
     () => new Set(groups.filter((g) => g.id !== group.id).flatMap((g) => g.workflow_types)),
@@ -174,6 +200,11 @@ export function useWorkGroupCardEditor({
     setIsEditing(false);
   };
 
+  const handleStartEditing = () => {
+    resetFormToGroupData();
+    setIsEditing(true);
+  };
+
   return {
     draft,
     form,
@@ -185,7 +216,7 @@ export function useWorkGroupCardEditor({
     availableMembers,
     availableWorkflowOptions,
     validationErrors,
-    setIsEditing,
+    handleStartEditing,
     setIsExpanded,
     setMemberToAdd,
     setDelegationToAdd,

@@ -6,13 +6,18 @@ import {
 } from '@/features/projects/types/enums';
 import { getThaiHolidays, toDateKey } from '@/lib/thai-holidays';
 
-const isNonWorkingDay = async (date: Date) => {
+const isNonWorkingDaySync = (date: Date, holidaysByYear: Map<number, Set<string>>): boolean => {
   if (isWeekend(date)) return true;
-  const holidays = await getThaiHolidays(date.getFullYear());
+  const holidays = holidaysByYear.get(date.getFullYear());
+  if (!holidays) return false;
   return holidays.has(toDateKey(date));
 };
 
-const addWorkingDays = async (fromDate: Date, workingDays: number): Promise<Date> => {
+const addWorkingDaysSync = (
+  fromDate: Date,
+  workingDays: number,
+  holidaysByYear: Map<number, Set<string>>
+): Date => {
   if (workingDays <= 0) return fromDate;
 
   let cursor = startOfDay(fromDate);
@@ -20,7 +25,7 @@ const addWorkingDays = async (fromDate: Date, workingDays: number): Promise<Date
 
   while (countedDays < workingDays) {
     cursor = addDays(cursor, 1);
-    if (!(await isNonWorkingDay(cursor))) {
+    if (!isNonWorkingDaySync(cursor, holidaysByYear)) {
       countedDays += 1;
     }
   }
@@ -28,7 +33,10 @@ const addWorkingDays = async (fromDate: Date, workingDays: number): Promise<Date
   return cursor;
 };
 
-const getWorkingDaysDiff = async (deliveryDate: Date): Promise<number> => {
+const getWorkingDaysDiffSync = (
+  deliveryDate: Date,
+  holidaysByYear: Map<number, Set<string>>
+): number => {
   const today = startOfDay(new Date());
   const target = startOfDay(deliveryDate);
   const calendarDiff = differenceInCalendarDays(target, today);
@@ -39,7 +47,7 @@ const getWorkingDaysDiff = async (deliveryDate: Date): Promise<number> => {
 
   for (let offset = 1; offset <= calendarDiff; offset += 1) {
     const candidate = addDays(today, offset);
-    if (!(await isNonWorkingDay(candidate))) {
+    if (!isNonWorkingDaySync(candidate, holidaysByYear)) {
       workingDays += 1;
     }
   }
@@ -48,36 +56,43 @@ const getWorkingDaysDiff = async (deliveryDate: Date): Promise<number> => {
 };
 
 export const getDefaultDeliveryDate = async (
-  unitResponsibilityType: UnitResponsibleType
+  unitResponsibilityType: UnitResponsibleType,
+  holidaysByYear?: Map<number, Set<string>>
 ): Promise<Date> => {
   const baseDate = startOfDay(new Date());
 
-  if (unitResponsibilityType === 'LT100K' || unitResponsibilityType === 'INTERNAL') {
-    return addWorkingDays(baseDate, 30);
-  }
+  // Prefetch holidays if not provided
+  const holidays = holidaysByYear ?? (await prefetchHolidaysByYear([baseDate]));
 
-  if (
+  let workingDaysNeeded = 60; // Default
+
+  if (unitResponsibilityType === 'LT100K' || unitResponsibilityType === 'INTERNAL') {
+    workingDaysNeeded = 30;
+  } else if (
     unitResponsibilityType === 'LT500K' ||
     unitResponsibilityType === 'MT500K' ||
     unitResponsibilityType === 'SELECTION'
   ) {
-    return addWorkingDays(baseDate, 60);
+    workingDaysNeeded = 60;
+  } else if (unitResponsibilityType === 'EBIDDING') {
+    workingDaysNeeded = 120;
   }
 
-  if (unitResponsibilityType === 'EBIDDING') {
-    return addWorkingDays(baseDate, 120);
-  }
-
-  return addWorkingDays(baseDate, 60);
+  return addWorkingDaysSync(baseDate, workingDaysNeeded, holidays);
 };
 
 export const calculateUrgentLevel = (
   deliveryDate: Date | undefined,
-  unitResponsibilityType: UnitResponsibleType
+  unitResponsibilityType: UnitResponsibleType,
+  holidaysByYear?: Map<number, Set<string>>
 ): Promise<ProjectUrgentStatus> => {
   if (!deliveryDate || Number.isNaN(deliveryDate.getTime())) return Promise.resolve('NORMAL');
 
-  return getWorkingDaysDiff(deliveryDate).then((diffDays) => {
+  // Prefetch holidays if not provided (for backward compatibility)
+  return (
+    holidaysByYear ? Promise.resolve(holidaysByYear) : prefetchHolidaysByYear([deliveryDate])
+  ).then((holidays) => {
+    const diffDays = getWorkingDaysDiffSync(deliveryDate, holidays);
     if (
       diffDays <= 3 &&
       (unitResponsibilityType === 'LT100K' || unitResponsibilityType === 'LT500K')
@@ -110,4 +125,16 @@ export const calculateUrgentLevel = (
     }
     return 'NORMAL';
   });
+};
+
+export const prefetchHolidaysByYear = async (dates: Date[]): Promise<Map<number, Set<string>>> => {
+  const yearsNeeded = new Set(dates.map((d) => d.getFullYear()));
+  const results = await Promise.all(Array.from(yearsNeeded).map((year) => getThaiHolidays(year)));
+
+  const holidaysByYear = new Map<number, Set<string>>();
+  Array.from(yearsNeeded).forEach((year, idx) => {
+    holidaysByYear.set(year, results[idx]);
+  });
+
+  return holidaysByYear;
 };

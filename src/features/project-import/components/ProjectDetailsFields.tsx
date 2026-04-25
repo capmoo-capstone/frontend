@@ -195,8 +195,16 @@ export function ProjectDetailsFields({
                 onChange={(e) => {
                   const value = e.target.value;
                   field.onChange(value);
-                  const parsedValue = value === '' ? 0 : Number(value);
-                  onBudgetChange(Number.isFinite(parsedValue) ? parsedValue : 0);
+
+                  if (value === '') {
+                    onBudgetChange(0);
+                  } else {
+                    const sanitized = value.replace(/,/g, '').trim();
+                    const parsedValue = Number(sanitized);
+                    if (Number.isFinite(parsedValue)) {
+                      onBudgetChange(parsedValue);
+                    }
+                  }
                 }}
               />
               {showBudgetWarning && !fieldState.invalid && (

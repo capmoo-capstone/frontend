@@ -5,7 +5,12 @@ import { toast } from 'sonner';
 
 import { useDepartments, useUnitsList } from '@/features/organization';
 import { OPS_DEPT_ID } from '@/lib/constants';
-import { getFiscalYear, normalizeMappedValue, parseThaiDateString } from '@/lib/formatters';
+import {
+  getFiscalYear,
+  normalizeMappedValue,
+  normalizeYearToBE,
+  parseThaiDateString,
+} from '@/lib/formatters';
 
 import { useImportProjects } from '../hooks/useCreateProject';
 import { useExcelImport } from '../hooks/useExcelImport';
@@ -70,7 +75,7 @@ export function ProjectImportContainer() {
           budget: Number(row.budget || 0),
           department_id: normalizeMappedValue(row.department_id, departmentNameToId),
           unit_id: normalizeMappedValue(row.unit_id, unitNameToId),
-          fiscal_year: row.fiscal_year || currentYear.toString(),
+          fiscal_year: normalizeYearToBE(row.fiscal_year, currentYear).toString(),
           delivery_date: row.delivery_date_str
             ? parseThaiDateString(row.delivery_date_str, 'ymd', '-')
             : undefined,

@@ -1,18 +1,18 @@
 import { addDays, differenceInCalendarDays, isWeekend, startOfDay } from 'date-fns';
-import Holidays from 'date-holidays';
 
 import {
   type ProjectUrgentStatus,
   type UnitResponsibleType,
 } from '@/features/projects/types/enums';
+import { getThaiHolidays, toDateKey } from '@/lib/thai-holidays';
 
-const holidayChecker = new Holidays('TH');
-
-const isNonWorkingDay = (date: Date) => {
-  return isWeekend(date) || Boolean(holidayChecker.isHoliday(date));
+const isNonWorkingDay = async (date: Date) => {
+  if (isWeekend(date)) return true;
+  const holidays = await getThaiHolidays(date.getFullYear());
+  return holidays.has(toDateKey(date));
 };
 
-const addWorkingDays = (fromDate: Date, workingDays: number): Date => {
+const addWorkingDays = async (fromDate: Date, workingDays: number): Promise<Date> => {
   if (workingDays <= 0) return fromDate;
 
   let cursor = startOfDay(fromDate);
@@ -20,7 +20,7 @@ const addWorkingDays = (fromDate: Date, workingDays: number): Date => {
 
   while (countedDays < workingDays) {
     cursor = addDays(cursor, 1);
-    if (!isNonWorkingDay(cursor)) {
+    if (!(await isNonWorkingDay(cursor))) {
       countedDays += 1;
     }
   }
@@ -28,7 +28,7 @@ const addWorkingDays = (fromDate: Date, workingDays: number): Date => {
   return cursor;
 };
 
-const getWorkingDaysDiff = (deliveryDate: Date): number => {
+const getWorkingDaysDiff = async (deliveryDate: Date): Promise<number> => {
   const today = startOfDay(new Date());
   const target = startOfDay(deliveryDate);
   const calendarDiff = differenceInCalendarDays(target, today);
@@ -39,7 +39,7 @@ const getWorkingDaysDiff = (deliveryDate: Date): number => {
 
   for (let offset = 1; offset <= calendarDiff; offset += 1) {
     const candidate = addDays(today, offset);
-    if (!isNonWorkingDay(candidate)) {
+    if (!(await isNonWorkingDay(candidate))) {
       workingDays += 1;
     }
   }
@@ -47,7 +47,9 @@ const getWorkingDaysDiff = (deliveryDate: Date): number => {
   return workingDays;
 };
 
-export const getDefaultDeliveryDate = (unitResponsibilityType: UnitResponsibleType): Date => {
+export const getDefaultDeliveryDate = async (
+  unitResponsibilityType: UnitResponsibleType
+): Promise<Date> => {
   const baseDate = startOfDay(new Date());
 
   if (unitResponsibilityType === 'LT100K' || unitResponsibilityType === 'INTERNAL') {
@@ -72,40 +74,40 @@ export const getDefaultDeliveryDate = (unitResponsibilityType: UnitResponsibleTy
 export const calculateUrgentLevel = (
   deliveryDate: Date | undefined,
   unitResponsibilityType: UnitResponsibleType
-): ProjectUrgentStatus => {
-  if (!deliveryDate || Number.isNaN(deliveryDate.getTime())) return 'NORMAL';
+): Promise<ProjectUrgentStatus> => {
+  if (!deliveryDate || Number.isNaN(deliveryDate.getTime())) return Promise.resolve('NORMAL');
 
-  const diffDays = getWorkingDaysDiff(deliveryDate);
+  return getWorkingDaysDiff(deliveryDate).then((diffDays) => {
+    if (
+      diffDays <= 3 &&
+      (unitResponsibilityType === 'LT100K' || unitResponsibilityType === 'LT500K')
+    ) {
+      return 'SUPER_URGENT';
+    }
 
-  if (
-    diffDays <= 3 &&
-    (unitResponsibilityType === 'LT100K' || unitResponsibilityType === 'LT500K')
-  ) {
-    return 'SUPER_URGENT';
-  }
+    if (unitResponsibilityType === 'SELECTION') {
+      if (diffDays <= 30) return 'URGENT';
+      if (diffDays <= 60) return 'NORMAL';
+      return 'NORMAL';
+    }
 
-  if (unitResponsibilityType === 'SELECTION') {
-    if (diffDays <= 30) return 'URGENT';
-    if (diffDays <= 60) return 'NORMAL';
+    if (unitResponsibilityType === 'EBIDDING') {
+      if (diffDays <= 60) return 'VERY_URGENT';
+      if (diffDays <= 90) return 'URGENT';
+      return 'NORMAL';
+    }
+
+    if (unitResponsibilityType === 'LT100K' || unitResponsibilityType === 'INTERNAL') {
+      if (diffDays <= 7) return 'VERY_URGENT';
+      if (diffDays <= 15) return 'URGENT';
+      return 'NORMAL';
+    }
+
+    if (unitResponsibilityType === 'LT500K' || unitResponsibilityType === 'MT500K') {
+      if (diffDays <= 15) return 'VERY_URGENT';
+      if (diffDays <= 30) return 'URGENT';
+      return 'NORMAL';
+    }
     return 'NORMAL';
-  }
-
-  if (unitResponsibilityType === 'EBIDDING') {
-    if (diffDays <= 60) return 'VERY_URGENT';
-    if (diffDays <= 90) return 'URGENT';
-    return 'NORMAL';
-  }
-
-  if (unitResponsibilityType === 'LT100K' || unitResponsibilityType === 'INTERNAL') {
-    if (diffDays <= 7) return 'VERY_URGENT';
-    if (diffDays <= 15) return 'URGENT';
-    return 'NORMAL';
-  }
-
-  if (unitResponsibilityType === 'LT500K' || unitResponsibilityType === 'MT500K') {
-    if (diffDays <= 15) return 'VERY_URGENT';
-    if (diffDays <= 30) return 'URGENT';
-    return 'NORMAL';
-  }
-  return 'NORMAL';
+  });
 };

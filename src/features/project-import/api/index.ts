@@ -18,13 +18,15 @@ interface CreateProjectRequestPayload {
   expected_approval_date?: Date;
 }
 
-const toCreateProjectPayload = (payload: ProjectImportPayload): CreateProjectRequestPayload => {
+const toCreateProjectPayload = async (
+  payload: ProjectImportPayload
+): Promise<CreateProjectRequestPayload> => {
   const parsedPayload = ProjectImportSchema.parse(payload);
   const procurementType = parsedPayload.procurement_type as UnitResponsibleType;
   const resolvedDeliveryDate =
-    parsedPayload.delivery_date ?? getDefaultDeliveryDate(procurementType);
+    parsedPayload.delivery_date ?? (await getDefaultDeliveryDate(procurementType));
   const urgentLevel = parsedPayload.delivery_date
-    ? calculateUrgentLevel(parsedPayload.delivery_date, procurementType)
+    ? await calculateUrgentLevel(parsedPayload.delivery_date, procurementType)
     : 'NORMAL';
 
   return {
@@ -43,13 +45,13 @@ const toCreateProjectPayload = (payload: ProjectImportPayload): CreateProjectReq
 };
 
 export const createProject = async (payload: ProjectImportPayload) => {
-  const requestPayload = toCreateProjectPayload(payload);
+  const requestPayload = await toCreateProjectPayload(payload);
   const { data } = await api.post('/projects/create', requestPayload);
   return data;
 };
 
 export const importProjects = async (payload: ProjectImportPayload[]) => {
-  const requestPayload = payload.map(toCreateProjectPayload);
+  const requestPayload = await Promise.all(payload.map((item) => toCreateProjectPayload(item)));
   const { data } = await api.post('/projects/import', requestPayload);
   return data;
 };

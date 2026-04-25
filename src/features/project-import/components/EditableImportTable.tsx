@@ -59,6 +59,8 @@ interface EditableTableMeta {
   mode: ImportMode;
   departments: Array<{ id: string; name: string }> | undefined;
   units: Array<{ id: string; name: string; dept_id?: string }> | undefined;
+  unitsByDeptId: Map<string, Array<{ id: string; name: string; dept_id?: string }>>;
+  unitIdSetByDeptId: Map<string, Set<string>>;
   fiscalYears: string[];
   errorMap: Map<string, string>;
   departmentIdSet: Set<string>;
@@ -99,7 +101,8 @@ const EditableCell = ({
   const mode = meta?.mode;
   const departments = meta?.departments;
   const fiscalYears = meta?.fiscalYears;
-  const units = meta?.units;
+  const unitsByDeptId = meta?.unitsByDeptId;
+  const unitIdSetByDeptId = meta?.unitIdSetByDeptId;
   const errorMap = meta?.errorMap;
   const departmentIdSet = meta?.departmentIdSet;
   const departmentNameToId = meta?.departmentNameToId;
@@ -298,9 +301,11 @@ const EditableCell = ({
       ? rawDepartmentValue
       : (departmentNameToId?.get(rawDepartmentValue) ?? '');
     const filteredUnits = selectedDepartmentId
-      ? (units ?? []).filter((unit) => unit.dept_id === selectedDepartmentId)
+      ? (unitsByDeptId?.get(selectedDepartmentId) ?? [])
       : [];
-    const filteredUnitIdSet = new Set(filteredUnits.map((unit) => unit.id));
+    const filteredUnitIdSet = selectedDepartmentId
+      ? (unitIdSetByDeptId?.get(selectedDepartmentId) ?? new Set<string>())
+      : new Set<string>();
 
     const normalizedUnitValue = resolveSelectValue(initialTextValue, unitIdSet, unitNameToId);
     const displayValue =
@@ -405,6 +410,26 @@ export function EditableImportTable({
     () => new Map((units ?? []).map((unit) => [unit.name, unit.id])),
     [units]
   );
+  const unitsByDeptId = useMemo(() => {
+    const grouped = new Map<string, Array<{ id: string; name: string; dept_id?: string }>>();
+    for (const unit of units ?? []) {
+      if (!unit.dept_id) continue;
+      const existing = grouped.get(unit.dept_id);
+      if (existing) {
+        existing.push(unit);
+      } else {
+        grouped.set(unit.dept_id, [unit]);
+      }
+    }
+    return grouped;
+  }, [units]);
+  const unitIdSetByDeptId = useMemo(() => {
+    const sets = new Map<string, Set<string>>();
+    for (const [deptId, deptUnits] of unitsByDeptId) {
+      sets.set(deptId, new Set(deptUnits.map((unit) => unit.id)));
+    }
+    return sets;
+  }, [unitsByDeptId]);
 
   const errorMap = useMemo(() => {
     const map = new Map<string, string>();
@@ -729,6 +754,8 @@ export function EditableImportTable({
       mode,
       departments,
       units,
+      unitsByDeptId,
+      unitIdSetByDeptId,
       fiscalYears,
       errorMap,
       departmentIdSet,

@@ -169,7 +169,8 @@ export function ProjectDetailsFields({
         name="budget"
         control={control}
         render={({ field, fieldState }) => {
-          const displayValue = field.value ? String(field.value) : '';
+          const displayValue =
+            field.value === null || field.value === undefined ? '' : String(field.value);
 
           return (
             <Field data-invalid={fieldState.invalid}>
@@ -182,7 +183,8 @@ export function ProjectDetailsFields({
                 ref={field.ref}
                 onBlur={field.onBlur}
                 value={displayValue}
-                type="number"
+                type="text"
+                inputMode="decimal"
                 placeholder="กรุณากรอกวงเงินงบประมาณ"
                 aria-invalid={fieldState.invalid}
                 className={cn(
@@ -192,9 +194,9 @@ export function ProjectDetailsFields({
                 )}
                 onChange={(e) => {
                   const value = e.target.value;
-                  const numValue = value === '' ? 0 : parseFloat(value);
-                  field.onChange(numValue);
-                  onBudgetChange(numValue);
+                  field.onChange(value);
+                  const parsedValue = value === '' ? 0 : Number(value);
+                  onBudgetChange(Number.isFinite(parsedValue) ? parsedValue : 0);
                 }}
               />
               {showBudgetWarning && !fieldState.invalid && (

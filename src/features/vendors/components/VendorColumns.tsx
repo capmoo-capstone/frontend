@@ -2,7 +2,7 @@ import type { ColumnDef } from '@tanstack/react-table';
 import { ArrowUpDown } from 'lucide-react';
 
 import { FileCard } from '@/components/ui/file-card';
-import { formatDateThaiShort } from '@/lib/formatters';
+import { formatDateThaiShort } from '@/lib/date-formatters';
 
 import type { VendorSubmission } from '../types';
 

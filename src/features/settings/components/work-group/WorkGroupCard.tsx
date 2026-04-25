@@ -5,10 +5,8 @@ import { ChevronDown, Pencil, Save, Trash2, UserPlus, Users, X } from 'lucide-re
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { type WorkGroupSetting } from '@/features/settings/types';
-import { type SettingsUserOption } from '@/features/settings/types';
-import { UserSelect } from '@/features/users/components/UserSelect';
-import { formatDateThaiShort } from '@/lib/formatters';
+import { UserSelect } from '@/features/users';
+import { formatDateThaiShort } from '@/lib/date-formatters';
 import { cn } from '@/lib/utils';
 
 import { DIRECTOR_ROLE_ID } from '../../constants';

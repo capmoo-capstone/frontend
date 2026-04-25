@@ -7,7 +7,7 @@ import { CalendarIcon, X } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
-import { formatDateThai, parseThaiDateString } from '@/lib/formatters';
+import { formatDateThai, parseThaiDateString } from '@/lib/date-formatters';
 
 interface DatePickerWithRangeProps {
   value?: DateRange;

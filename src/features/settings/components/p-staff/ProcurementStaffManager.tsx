@@ -14,7 +14,7 @@ import {
   useUsersForSelection,
 } from '@/features/users';
 import { OPS_DEPT_ID } from '@/lib/constants';
-import { formatDateThaiShort } from '@/lib/formatters';
+import { formatDateThaiShort } from '@/lib/date-formatters';
 
 import { PROCUREMENT_ROLES_CONFIG } from '../../constants';
 import { useProcurementRoleEditor } from '../../hooks/useProcurementRoleEditor';

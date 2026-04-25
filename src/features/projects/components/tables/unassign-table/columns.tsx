@@ -9,7 +9,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { formatDateThaiShort, getResponsibleTypeFormat } from '@/lib/formatters';
+import { formatDateThaiShort } from '@/lib/date-formatters';
+
+import { getResponsibleTypeFormat } from '../../../utils/projectFormatters';
 
 import type { UnassignedProjectItem } from '../../../types/index';
 import { getCancelProjectActionLabel } from '../../../utils/project-selectors';

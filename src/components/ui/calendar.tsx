@@ -6,7 +6,7 @@ import { type DayButton, DayPicker, getDefaultClassNames } from 'react-day-picke
 import { th } from 'date-fns/locale';
 
 import { Button, buttonVariants } from '@/components/ui/button';
-import { formatDateThai } from '@/lib/formatters';
+import { formatDateThai } from '@/lib/date-formatters';
 import { cn } from '@/lib/utils';
 
 function Calendar({

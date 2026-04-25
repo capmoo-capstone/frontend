@@ -4,8 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { FileCard } from '@/components/ui/file-card';
 import type { ProjectDetail } from '@/features/projects';
-import type { SubmissionDocument, SubmissionStatus, WorkflowStepConfig } from '@/features/workflow';
-import { formatDateThai } from '@/lib/formatters';
+import { formatDateThai } from '@/lib/date-formatters';
 import { cn } from '@/lib/utils';
 
 import { isCompletedLikeSubmissionStatus } from '../lib/submission-presentation';

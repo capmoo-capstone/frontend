@@ -9,7 +9,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { useBudgetPlans } from '@/features/budgets';
-import { formatDateThai, getFiscalYear } from '@/lib/formatters';
+import { formatDateThai, getFiscalYear } from '@/lib/date-formatters';
 import { cn } from '@/lib/utils';
 
 import type { ProjectDetail } from '../types/index';

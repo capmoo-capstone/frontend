@@ -8,7 +8,7 @@ import { toast } from 'sonner';
 import { useAuth } from '@/context/AuthContext';
 import { useBudgetPlans } from '@/features/budgets';
 import { useDepartments, useUnits } from '@/features/organization';
-import { getFiscalYear } from '@/lib/formatters';
+import { getFiscalYear } from '@/lib/date-formatters';
 import { hasProcurementPermission } from '@/lib/permissions';
 
 import {

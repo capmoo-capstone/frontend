@@ -25,7 +25,6 @@ interface ProjectDataTableProps<TData extends { id?: string }> {
 
 export function ProjectDataTable<TData extends { id?: string }>({
   table,
-  columnsLength: _columnsLength,
   toolbar,
   hasPagination = true,
   emptyStateText = 'No results.',

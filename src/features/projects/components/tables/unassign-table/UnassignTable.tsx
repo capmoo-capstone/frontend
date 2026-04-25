@@ -146,7 +146,7 @@ export function UnassignTable({ unitId, pendingChanges, setPendingChanges }: Una
         <CancelProjectDialog
           isOpen={!!projectToCancel}
           onClose={() => setProjectToCancel(null)}
-          project={projectToCancel as any}
+          project={projectToCancel}
         />
       )}
     </>

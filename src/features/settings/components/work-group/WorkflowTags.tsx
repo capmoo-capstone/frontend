@@ -5,7 +5,7 @@ import { X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { RESPONSIBLE_SELECT_OPTIONS, getResponsibleTypeFormat } from '@/lib/formatters';
+import { RESPONSIBLE_SELECT_OPTIONS, getResponsibleTypeFormat } from '@/features/projects';
 import { cn } from '@/lib/utils';
 
 interface WorkflowTagsProps {

@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 
 import { type Project, useProjects } from '@/features/projects';
-import { getResponsiblePerson } from '@/lib/formatters';
+import { getResponsiblePerson } from '@/features/projects';
 
 import type { FinanceExportItem, FinanceExportStatus } from '../types';
 

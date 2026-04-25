@@ -10,7 +10,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { type User, isProcurementStaffRole } from '@/features/auth';
-import { getProjectStatusesFormat, getResponsibleTypeFormat } from '@/lib/formatters';
+import { getProjectStatusesFormat, getResponsibleTypeFormat } from '../../utils/projectFormatters';
 import { hasUnitPermission } from '@/lib/permissions';
 
 import type { Project } from '../../types/index';

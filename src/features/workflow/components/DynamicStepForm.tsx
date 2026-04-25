@@ -16,9 +16,9 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import type { BudgetPlan } from '@/features/budgets';
-import type { FieldConfig } from '@/features/workflow';
 import { cn } from '@/lib/utils';
 
+import type { FieldConfig } from '../types';
 import { BudgetPlanSelectField } from './fields/BudgetPlanSelectField';
 import { ContractNumberGenerator } from './fields/ContractNumberGenerator';
 import { DueDateMultiSelect } from './fields/DueDateMultiSelect';

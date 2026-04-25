@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils';
 
 import { getActorDisplayName } from '../lib/submission-presentation';
 import { getSubmissionStableKey } from '../lib/workflow-identity';
+import type { Submission } from '../types';
 
 interface StepHistoryProps {
   submissions?: Submission[];

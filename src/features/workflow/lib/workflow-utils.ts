@@ -1,6 +1,7 @@
 import type { Role } from '@/features/auth';
 import type { ProjectStatus } from '@/features/projects';
-import type { StepStatus } from '@/features/workflow';
+
+import type { StepStatus } from '../types';
 
 const LOCKED_PROJECT_STATUSES = new Set(['CANCELLED', 'CLOSED', 'UNASSIGNED', 'WAITING_ACCEPT']);
 

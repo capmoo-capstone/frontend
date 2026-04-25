@@ -27,6 +27,8 @@ export {
   ProjectToolbar,
   SearchCheckbox,
   UnassignTable,
+  WaitingCancelTable,
+  WorkloadChart,
 } from './components';
 
 // Hooks
@@ -51,6 +53,7 @@ export {
   useCancelProject,
   useChangeProjectAssignee,
   useClaimProject,
+  useCompleteProjectContract,
   useCloseProject,
   useCompleteProjectProcurement,
   useDeleteProject,

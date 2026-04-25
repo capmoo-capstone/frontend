@@ -1,9 +1,11 @@
 import { useEffect, useMemo, useState } from 'react';
 
-import type { ProcurementRoleSetting } from '@/features/settings/types';
-import { type DelegationPayload, createProcurementRoleSchema } from '@/features/settings/types';
-
 import { DIRECTOR_ROLE_ID } from '../constants';
+import {
+  type DelegationPayload,
+  type ProcurementRoleSetting,
+  createProcurementRoleSchema,
+} from '../types';
 import { hasDelegatedRoleMemberConflict } from './delegationConflictUtils';
 import { useDelegationFormReset } from './useDelegationFormReset';
 

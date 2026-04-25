@@ -4,7 +4,6 @@ import { useQueryClient } from '@tanstack/react-query';
 import { Trash2, UserPlus, Users, X } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
-import { type ProcurementRoleSetting, type SettingsUserOption } from '@/features/settings/types';
 import {
   type UserRole,
   UserSelect,
@@ -18,6 +17,7 @@ import { formatDateThaiShort } from '@/lib/date-formatters';
 
 import { PROCUREMENT_ROLES_CONFIG } from '../../constants';
 import { useProcurementRoleEditor } from '../../hooks/useProcurementRoleEditor';
+import { type ProcurementRoleSetting, type SettingsUserOption } from '../../types';
 import { DelegationFormSection } from '../DelegationFormSection';
 import { InlineActionRow } from '../InlineActionRow';
 

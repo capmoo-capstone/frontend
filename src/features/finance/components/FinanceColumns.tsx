@@ -10,7 +10,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { getResponsibleTypeFormat } from '@/lib/formatters';
+import { getResponsibleTypeFormat } from '@/features/projects';
 import { cn } from '@/lib/utils';
 
 import type { FinanceExportItem } from '../types';

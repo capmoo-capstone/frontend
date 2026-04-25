@@ -18,10 +18,10 @@ import {
   projectKeys,
   useApproveProjectCancellation,
   useProjectDetail,
+  useProjectPermissions,
   useRejectProjectCancellation,
   useUpdateProject,
 } from '@/features/projects';
-import { useProjectPermissions } from '@/features/projects/hooks/useProjectPermissions';
 import { ProcurementWorkflows } from '@/features/workflow';
 
 export default function ProjectDetail() {

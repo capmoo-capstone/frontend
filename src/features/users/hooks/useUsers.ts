@@ -22,10 +22,11 @@ import {
   updateUsersInUnit,
 } from '../api';
 import type { GetUsersParams, GetUsersSelectionParams, UserRole } from '../types';
+import { userKeys } from './queryKeys';
 
 export const useUsers = ({ page = 1, limit = 10 }: GetUsersParams) => {
   return useQuery({
-    queryKey: ['users', { page, limit }],
+    queryKey: userKeys.list({ page, limit }),
     queryFn: () => getUsers({ page, limit }),
 
     placeholderData: keepPreviousData,
@@ -37,7 +38,7 @@ export const useUsersForSelection = (
   options?: { enabled?: boolean }
 ) => {
   return useQuery({
-    queryKey: ['users', 'selection', { unitId, deptId }],
+    queryKey: userKeys.selection({ unitId, deptId }),
     queryFn: () => {
       if (unitId) return getUsersForSelection({ unitId });
       if (deptId) return getUsersForSelection({ deptId });
@@ -50,7 +51,7 @@ export const useUsersForSelection = (
 export const useUsersForUnitsSelection = (unitIds: string[]) => {
   return useQueries({
     queries: unitIds.map((unitId) => ({
-      queryKey: ['users', 'selection', { unitId }],
+      queryKey: userKeys.unitSelection(unitId),
       queryFn: () => getUsersForSelection({ unitId }),
       enabled: !!unitId,
     })),
@@ -59,7 +60,7 @@ export const useUsersForUnitsSelection = (unitIds: string[]) => {
 
 export const useUserById = (userId: string) => {
   return useQuery({
-    queryKey: ['users', userId],
+    queryKey: userKeys.detail(userId),
     queryFn: () => {
       if (userId) return getUserById(userId);
       throw new Error('userId is required');
@@ -74,7 +75,7 @@ export const useUpdateUsersInUnit = () => {
     mutationFn: (data: { unitId: string; newUserIds: string[]; removeUserIds: string[] }) =>
       updateUsersInUnit(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['users', 'selection'] });
+      queryClient.invalidateQueries({ queryKey: userKeys.selections() });
     },
   });
 };
@@ -86,7 +87,7 @@ export const useUpdateSupplyRole = () => {
       updateSupplyRole(data),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ['users', 'selection', { deptId: OPS_DEPT_ID }],
+        queryKey: userKeys.deptSelection(OPS_DEPT_ID),
       });
     },
   });
@@ -104,10 +105,10 @@ export const useUpdateUserRole = () => {
     }) => updateUserRole(data),
     onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({
-        queryKey: ['users', 'selection', { deptId: variables.deptId }],
+        queryKey: userKeys.selection({ deptId: variables.deptId }),
       });
       queryClient.invalidateQueries({
-        queryKey: ['users', 'selection', { unitId: variables.unitId }],
+        queryKey: userKeys.selection({ unitId: variables.unitId }),
       });
     },
     onError: (error) => {
@@ -138,14 +139,14 @@ export const useAddDelegation = () => {
         end_date: data.endDate,
       }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['delegations'] });
+      queryClient.invalidateQueries({ queryKey: userKeys.delegations() });
     },
   });
 };
 
 export const useUserDelegationDetail = (delegationId: string) => {
   return useQuery({
-    queryKey: ['delegation', delegationId],
+    queryKey: userKeys.delegation(delegationId),
     queryFn: () => {
       if (delegationId) {
         return getDelegationById(delegationId);
@@ -162,7 +163,7 @@ export const useCancelDelegation = () => {
   return useMutation({
     mutationFn: (data: { delegationId: string }) => cancelDelegation(data.delegationId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['delegations'] });
+      queryClient.invalidateQueries({ queryKey: userKeys.delegations() });
     },
   });
 };
@@ -170,7 +171,7 @@ export const useCancelDelegation = () => {
 export const useActiveDelegationByUnit = (unitIds: string[]) => {
   return useQueries({
     queries: unitIds.map((unitId) => ({
-      queryKey: ['delegations', { unitId }],
+      queryKey: userKeys.activeDelegationByUnit(unitId),
       queryFn: () => {
         if (unitId) {
           return getActiveDelegationByUnit(unitId);

@@ -3,14 +3,14 @@ import { useForm } from 'react-hook-form';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 
-import { type WorkGroupSetting } from '@/features/settings/types';
 import {
   type DelegationPayload,
   type SettingsUserOption,
   type WorkGroupFormInput,
+  type WorkGroupSetting,
   createWorkGroupValidationSchema,
-} from '@/features/settings/types';
-import { RESPONSIBLE_SELECT_OPTIONS } from '@/lib/formatters';
+} from '../types';
+import { RESPONSIBLE_SELECT_OPTIONS } from '@/features/projects';
 
 import { getFormErrorMessages } from '../components/work-group/workGroupFormUtils';
 import { useDelegationFormReset } from './useDelegationFormReset';

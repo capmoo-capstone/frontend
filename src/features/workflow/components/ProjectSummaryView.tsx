@@ -10,6 +10,7 @@ import { cn } from '@/lib/utils';
 import { isCompletedLikeSubmissionStatus } from '../lib/submission-presentation';
 import { normalizeStoredSubmissionValue } from '../lib/submission-values';
 import { isSameWorkflowType } from '../lib/workflow-identity';
+import type { SubmissionDocument, SubmissionStatus, WorkflowStepConfig } from '../types';
 
 interface ProjectSummaryViewProps {
   project: ProjectDetail;

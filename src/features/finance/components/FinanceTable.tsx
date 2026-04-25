@@ -12,7 +12,7 @@ import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { ExportTableToolbar } from '@/components/ExportTableToolbar';
-import { ProjectDataTable } from '@/features/projects/components/tables/DataTable';
+import { ProjectDataTable } from '@/features/projects';
 
 import { useFinanceExport } from '../hooks/useFinanceExport';
 import type { FinanceExportItem } from '../types';

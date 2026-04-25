@@ -11,6 +11,7 @@ import { cn } from '@/lib/utils';
 
 import { DIRECTOR_ROLE_ID } from '../../constants';
 import { useWorkGroupCardEditor } from '../../hooks/useWorkGroupCardEditor';
+import { type SettingsUserOption, type WorkGroupSetting } from '../../types';
 import { DelegationFormSection } from '../DelegationFormSection';
 import { WorkflowTags } from './WorkflowTags';
 

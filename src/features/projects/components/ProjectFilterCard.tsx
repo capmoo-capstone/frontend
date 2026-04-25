@@ -15,7 +15,7 @@ import {
 import { useDepartments } from '@/features/organization';
 import { useUsersForSelection } from '@/features/users';
 import { OPS_DEPT_ID } from '@/lib/constants';
-import { getResponsibleTypeFormat } from '@/lib/formatters';
+import { getResponsibleTypeFormat } from '../utils/projectFormatters';
 
 import { type ProjectFilterParams } from '../api';
 import { useProjectPermissions } from '../hooks/useProjectPermissions';

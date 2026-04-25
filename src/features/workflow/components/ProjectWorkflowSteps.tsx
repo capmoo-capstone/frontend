@@ -1,24 +1,16 @@
-import { useState } from 'react';
-
 import { CheckCircle2, Loader2 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { useAuth } from '@/context/AuthContext';
-import {
-  type ProjectDetail,
-  useAssignProjects,
-  useCompleteProjectProcurement,
-} from '@/features/projects';
-import {
-  useCloseProject,
-  useCompleteProjectContract,
-  useRequestProjectEdit,
-} from '@/features/projects/hooks/useProjectMutations';
+import { type ProjectDetail } from '@/features/projects';
 import { UserSelect } from '@/features/users';
-import { type WorkflowStepConfig, useWorkflow, useWorkflowMutations } from '@/features/workflow';
 import { CONTRACT_UNIT_ID } from '@/lib/constants';
 
+import { useWorkflowHandoffs } from '../hooks/useWorkflowHandoffs';
+import { useWorkflow } from '../hooks/useWorkflow';
+import { useWorkflowMutations } from '../hooks/useWorkflowMutations';
+import type { WorkflowStepConfig } from '../types';
 import { WorkflowList } from './WorkflowList';
 import { WorkflowStepRow } from './WorkflowStepRow';
 
@@ -35,23 +27,8 @@ export function ProjectWorkflowSteps({
 }: ProjectWorkflowStepsProps) {
   const { user } = useAuth();
   const workflowMutations = useWorkflowMutations(project.id);
-  const [procurementAssigneeId, setProcurementAssigneeId] = useState('');
-  const [procurementHandoffCompleted, setProcurementHandoffCompleted] = useState(
-    project.current_template_type === 'CONTRACT'
-  );
-  const [contractHandoffCompleted, setContractHandoffCompleted] = useState(
-    project.contract_status === 'COMPLETED' || project.status === 'CLOSED'
-  );
-  const [showContractEditInput, setShowContractEditInput] = useState(false);
-  const [contractEditReason, setContractEditReason] = useState('');
 
   const workflowState = useWorkflow(project, steps, activeWorkflowType);
-
-  const completeProcurementMutation = useCompleteProjectProcurement();
-  const assignProjectsMutation = useAssignProjects();
-  const completeContractMutation = useCompleteProjectContract();
-  const closeProjectMutation = useCloseProject();
-  const requestEditMutation = useRequestProjectEdit();
 
   const isMutating =
     workflowMutations.createSubmission.isPending ||
@@ -60,76 +37,17 @@ export function ProjectWorkflowSteps({
     workflowMutations.proposeSubmission.isPending ||
     workflowMutations.signSubmission.isPending;
 
-  if (!user) return null;
-
-  const hasFinanceRole = user.roles.some((role) => role.role === 'FINANCE_STAFF');
-
   const sortedSteps = [...steps].sort((a, b) => a.order - b.order);
   const lastStepOrder = sortedSteps.at(-1)?.order;
-
-  // Check if all steps are COMPLETED
-  const allStepsCompleted = sortedSteps.every((step) => {
-    const stepStatus = workflowState.getStepStatus(step.order);
-    return stepStatus === 'COMPLETED';
+  const handoffs = useWorkflowHandoffs({
+    project,
+    sortedSteps,
+    activeWorkflowType,
+    workflowState,
+    user,
   });
 
-  const isProcurementWorkflow = activeWorkflowType !== 'CONTRACT';
-  const isContractWorkflow = activeWorkflowType === 'CONTRACT';
-
-  const isProcurementHandoffBusy =
-    completeProcurementMutation.isPending || assignProjectsMutation.isPending;
-
-  const isContractHandoffBusy =
-    completeContractMutation.isPending ||
-    closeProjectMutation.isPending ||
-    requestEditMutation.isPending;
-
-  const canCompleteContract =
-    project.status === 'IN_PROGRESS' && project.contract_status === 'NOT_EXPORTED';
-  const canCloseProject =
-    (project.status === 'IN_PROGRESS' || project.status === 'REQUEST_EDIT') &&
-    contractHandoffCompleted;
-  const canRequestEdit = project.status === 'CLOSED' && contractHandoffCompleted;
-
-  const handleCompleteProcurementTransfer = async () => {
-    if (!user || user.role !== 'HEAD_OF_UNIT' || !allStepsCompleted) return;
-
-    await completeProcurementMutation.mutateAsync(project.id);
-
-    if (procurementAssigneeId) {
-      await assignProjectsMutation.mutateAsync([
-        {
-          projectId: project.id,
-          userId: procurementAssigneeId,
-        },
-      ]);
-    }
-
-    setProcurementAssigneeId('');
-    setProcurementHandoffCompleted(true);
-  };
-
-  const handleCompleteContractTransfer = async () => {
-    if (!canCompleteContract) return;
-
-    await completeContractMutation.mutateAsync(project.id);
-    setContractHandoffCompleted(true);
-  };
-
-  const handleCloseProject = async () => {
-    if (!canCloseProject) return;
-
-    await closeProjectMutation.mutateAsync(project.id);
-  };
-
-  const handleRequestEdit = async () => {
-    const reason = contractEditReason.trim();
-    if (!canRequestEdit || !reason) return;
-
-    await requestEditMutation.mutateAsync({ projectId: project.id, reason });
-    setShowContractEditInput(false);
-    setContractEditReason('');
-  };
+  if (!user) return null;
 
   return (
     <>
@@ -148,9 +66,9 @@ export function ProjectWorkflowSteps({
         ))}
       </WorkflowList>
 
-      {isProcurementWorkflow && allStepsCompleted && (
+      {handoffs.isProcurementWorkflow && handoffs.allStepsCompleted && (
         <div className="mt-6 rounded-lg border p-4">
-          {procurementHandoffCompleted ? (
+          {handoffs.procurementHandoffCompleted ? (
             <div className="space-y-1">
               <h3 className="h4-topic text-primary">ส่งต่องานจัดซื้อไปยังงานบริหารสัญญา</h3>
               <p className="text-muted-foreground normal">
@@ -174,22 +92,22 @@ export function ProjectWorkflowSteps({
 
               <div className="mt-4 space-y-4">
                 <UserSelect
-                  value={procurementAssigneeId}
-                  onChange={setProcurementAssigneeId}
+                  value={handoffs.procurementAssigneeId}
+                  onChange={handoffs.setProcurementAssigneeId}
                   unitId={CONTRACT_UNIT_ID}
                   placeholder="เลือกผู้รับผิดชอบงานบริหารสัญญา"
-                  disabled={isProcurementHandoffBusy || user.role !== 'HEAD_OF_UNIT'}
+                  disabled={handoffs.isProcurementHandoffBusy || user.role !== 'HEAD_OF_UNIT'}
                   className="w-full"
                   excludeHeadOfUnit
                 />
 
                 <Button
-                  onClick={() => void handleCompleteProcurementTransfer()}
-                  disabled={isProcurementHandoffBusy || user.role !== 'HEAD_OF_UNIT'}
+                  onClick={() => void handoffs.handleCompleteProcurementTransfer()}
+                  disabled={handoffs.isProcurementHandoffBusy || user.role !== 'HEAD_OF_UNIT'}
                   className="w-full gap-2"
                   variant="brand"
                 >
-                  {isProcurementHandoffBusy ? (
+                  {handoffs.isProcurementHandoffBusy ? (
                     <>
                       <Loader2 className="h-4 w-4 animate-spin" />
                       กำลังเปลี่ยน...
@@ -207,9 +125,9 @@ export function ProjectWorkflowSteps({
         </div>
       )}
 
-      {isContractWorkflow && allStepsCompleted && hasFinanceRole && (
+      {handoffs.isContractWorkflow && handoffs.allStepsCompleted && handoffs.hasFinanceRole && (
         <div className="mt-6 rounded-lg border p-4">
-          {contractHandoffCompleted ? (
+          {handoffs.contractHandoffCompleted ? (
             <>
               <div className="space-y-1 border-b pb-4">
                 <h3 className="h4-topic text-primary">ส่งเอกสารเบิกไปยังการเงินเรียบร้อยแล้ว</h3>
@@ -219,11 +137,11 @@ export function ProjectWorkflowSteps({
               </div>
 
               <div className="mt-4 space-y-3">
-                {showContractEditInput ? (
+                {handoffs.showContractEditInput ? (
                   <div className="space-y-2">
                     <Textarea
-                      value={contractEditReason}
-                      onChange={(e) => setContractEditReason(e.target.value)}
+                      value={handoffs.contractEditReason}
+                      onChange={(e) => handoffs.setContractEditReason(e.target.value)}
                       placeholder="กรุณาระบุเหตุผลการแก้ไข"
                       rows={3}
                       className="resize-none"
@@ -233,40 +151,42 @@ export function ProjectWorkflowSteps({
                         className="flex-1"
                         variant="outline"
                         onClick={() => {
-                          setShowContractEditInput(false);
-                          setContractEditReason('');
+                          handoffs.setShowContractEditInput(false);
+                          handoffs.setContractEditReason('');
                         }}
-                        disabled={isContractHandoffBusy}
+                        disabled={handoffs.isContractHandoffBusy}
                       >
                         ยกเลิก
                       </Button>
                       <Button
                         className="flex-1"
                         variant="destructive"
-                        onClick={() => void handleRequestEdit()}
+                        onClick={() => void handoffs.handleRequestEdit()}
                         disabled={
-                          isContractHandoffBusy || !canRequestEdit || !contractEditReason.trim()
+                          handoffs.isContractHandoffBusy ||
+                          !handoffs.canRequestEdit ||
+                          !handoffs.contractEditReason.trim()
                         }
                       >
                         ยืนยันส่งแก้ไข
                       </Button>
                     </div>
                   </div>
-                ) : canRequestEdit ? (
+                ) : handoffs.canRequestEdit ? (
                   <Button
                     className="w-full"
                     variant="outline"
-                    onClick={() => setShowContractEditInput(true)}
-                    disabled={isContractHandoffBusy}
+                    onClick={() => handoffs.setShowContractEditInput(true)}
+                    disabled={handoffs.isContractHandoffBusy}
                   >
                     การเงินส่งคืนแก้ไข
                   </Button>
-                ) : canCloseProject ? (
+                ) : handoffs.canCloseProject ? (
                   <Button
                     className="w-full"
                     variant="brand"
-                    onClick={() => void handleCloseProject()}
-                    disabled={isContractHandoffBusy}
+                    onClick={() => void handoffs.handleCloseProject()}
+                    disabled={handoffs.isContractHandoffBusy}
                   >
                     ปิดโครงการ
                   </Button>
@@ -284,12 +204,12 @@ export function ProjectWorkflowSteps({
 
               <div className="mt-4 space-y-4">
                 <Button
-                  onClick={() => void handleCompleteContractTransfer()}
-                  disabled={isContractHandoffBusy || !canCompleteContract}
+                  onClick={() => void handoffs.handleCompleteContractTransfer()}
+                  disabled={handoffs.isContractHandoffBusy || !handoffs.canCompleteContract}
                   className="w-full gap-2"
                   variant="brand"
                 >
-                  {isContractHandoffBusy ? (
+                  {handoffs.isContractHandoffBusy ? (
                     <>
                       <Loader2 className="h-4 w-4 animate-spin" />
                       กำลังบันทึก...

@@ -1,4 +1,4 @@
-import { UserSelect } from '@/features/users/components/UserSelect';
+import { UserSelect } from '@/features/users';
 
 import {
   type UnitItem,

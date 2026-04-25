@@ -7,8 +7,8 @@ import {
   type WorkGroupFormInput,
   type WorkGroupSetting,
   createWorkGroupValidationSchema,
-} from '@/features/settings/types';
-import { RESPONSIBLE_SELECT_OPTIONS } from '@/lib/formatters';
+} from '../types';
+import { RESPONSIBLE_SELECT_OPTIONS } from '@/features/projects';
 
 interface UseCreateGroupFormParams {
   groups: WorkGroupSetting[];

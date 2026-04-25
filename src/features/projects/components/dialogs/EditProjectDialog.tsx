@@ -166,7 +166,7 @@ export function EditProjectDialog({ isOpen, onClose, onConfirm, project }: EditP
                     id="is_urgent"
                     checked={isUrgentProject(field.value)}
                     onCheckedChange={(checked) =>
-                      field.onChange(Boolean(checked) ? 'URGENT' : 'NORMAL')
+                      field.onChange(checked ? 'URGENT' : 'NORMAL')
                     }
                     disabled={isSubmitting}
                   />

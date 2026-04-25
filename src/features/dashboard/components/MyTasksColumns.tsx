@@ -4,7 +4,7 @@ import { ArrowUpDown } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { type User, isProcurementStaffRole } from '@/features/auth';
 import { type Project } from '@/features/projects';
-import { getProjectStatusesFormat, getResponsibleTypeFormat } from '@/lib/formatters';
+import { getProjectStatusesFormat, getResponsibleTypeFormat } from '@/features/projects';
 
 interface MyTasksColumnsProps {
   user?: User;

@@ -3,8 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { FileCheck, Table2, Upload } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
-import type { ImportMode } from '@/features/project-import';
-import { useProjectImportPermissions } from '@/features/project-import/hooks/useProjectImportPermissions';
+import { type ImportMode, useProjectImportPermissions } from '@/features/project-import';
 
 export default function ProjectImportSuccess() {
   const navigate = useNavigate();

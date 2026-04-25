@@ -6,8 +6,8 @@ import {
   ProjectStats,
   ProjectToolbar,
   useProjectFilters,
+  useProjectPermissions,
 } from '@/features/projects';
-import { useProjectPermissions } from '@/features/projects/hooks/useProjectPermissions';
 
 export default function ProjectListPage() {
   const {

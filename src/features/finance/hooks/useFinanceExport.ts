@@ -1,24 +1,32 @@
 import { useMemo } from 'react';
 
-import {
-  type Project,
-  type ProjectFilterParams,
-  getResponsiblePerson,
-  useProjects,
-} from '@/features/projects';
+import { useQuery } from '@tanstack/react-query';
+
+import { type Project, getResponsiblePerson, projectKeys } from '@/features/projects';
+import { PaginatedProjectListApiResponseSchema } from '@/features/projects/types/index';
+import api from '@/lib/axios';
 
 import type { FinanceExportItem, FinanceExportStatus } from '../types';
 
-type ProjectWithRequester = Project & {
-  requester?: {
-    dept_name?: string;
-  };
-};
-
-const FINANCE_PROJECT_FILTERS: ProjectFilterParams = {
+const FINANCE_PROJECT_FILTERS = {
   status: ['IN_PROGRESS', 'CLOSED', 'REQUEST_EDIT'],
   procurementStatus: ['COMPLETED'],
   contractStatus: ['NOT_EXPORTED', 'COMPLETED'],
+};
+
+const getFinanceProjects = async (): Promise<Project[]> => {
+  const { data } = await api.post(
+    '/projects',
+    { filter: FINANCE_PROJECT_FILTERS },
+    {
+      params: {
+        page: 1,
+        limit: 50,
+      },
+    }
+  );
+
+  return PaginatedProjectListApiResponseSchema.parse(data).data;
 };
 
 const isFinanceProject = (project: Project) => {
@@ -44,19 +52,14 @@ const mapToFinanceStatus = (project: Project): FinanceExportStatus => {
 };
 
 export function useFinanceExport() {
-  const { data: projects, isLoading } = useProjects(FINANCE_PROJECT_FILTERS);
+  const { data: projects, isLoading } = useQuery({
+    queryKey: projectKeys.list(FINANCE_PROJECT_FILTERS),
+    queryFn: getFinanceProjects,
+  });
 
   // Map and filter projects to finance export items
   const data = useMemo<FinanceExportItem[]>(() => {
     if (!projects) return [];
-
-    const getDepartmentName = (project: Project): string => {
-      const maybeProject = project as ProjectWithRequester;
-      if (typeof maybeProject.requester?.dept_name === 'string') {
-        return maybeProject.requester.dept_name;
-      }
-      return '-';
-    };
 
     return projects
       .filter(isFinanceProject)
@@ -69,7 +72,11 @@ export function useFinanceExport() {
         procurement_type: project.procurement_type,
         budget:
           typeof project.budget === 'number' ? project.budget : parseFloat(project.budget || '0'),
-        department_name: getDepartmentName(project),
+        department_name: project.requesting_dept.name ?? '-',
+        vendor_name: project.vendor_name,
+        po_no: project.po_no,
+        contract_no: project.contract_no,
+        contract_step: project.contract_step,
         export_status: mapToFinanceStatus(project),
         project_status: project.status,
         procurement_status: project.procurement_status,

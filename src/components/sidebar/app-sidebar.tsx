@@ -99,6 +99,7 @@ const menuGroups: MenuGroup[] = [
         title: 'นำเข้าโครงการ',
         url: '/app/project-import',
         icon: Import,
+        allowedRoles: ['DOCUMENT_STAFF', 'SUPER_ADMIN'],
       },
       {
         title: 'นำเข้าแผนงบประมาณ',

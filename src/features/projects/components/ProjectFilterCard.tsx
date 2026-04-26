@@ -185,11 +185,11 @@ export function ProjectFilterCard({ filters, setFilters }: ProjectFilterCardProp
                     return { ...prev, status: [...next] };
                   }
 
-                  const nextValues = new Set(current);
+                  const valuesToRemove = new Set<string>(statusGroup.values);
 
                   return {
                     ...prev,
-                    status: current.filter((value) => !nextValues.has(value)),
+                    status: current.filter((value) => !valuesToRemove.has(value)),
                   };
                 });
               }}

@@ -35,6 +35,7 @@ type ProjectsQueryParams = {
   urgentStatus?: ProjectFilterParams['urgentStatus'];
   assignees?: ProjectFilterParams['assignees'];
   units?: ProjectFilterParams['units'];
+  departments?: ProjectFilterParams['departments'];
 };
 
 const toProjectsQueryParams = (params?: ProjectFilterParams): ProjectsQueryParams => {
@@ -62,7 +63,7 @@ const toProjectsQueryParams = (params?: ProjectFilterParams): ProjectsQueryParam
   if (params.urgentStatus?.length) query.urgentStatus = params.urgentStatus;
   if (params.assignees?.length) query.assignees = params.assignees;
   if (params.units?.length) query.units = params.units;
-
+  if (params.departments?.length) query.departments = params.departments;
   return query;
 };
 

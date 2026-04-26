@@ -177,9 +177,9 @@ export const submitWorkflowStep = async (payload: CreateWorkflowSubmissionPayloa
   return WorkflowSubmissionApiSchema.parse(data);
 };
 
-export const approveWorkflowStep = async (submissionId: string, requiredSignature = false) => {
+export const approveWorkflowStep = async (submissionId: string, required_signature = false) => {
   const { data } = await api.patch(`/submissions/${submissionId}/approve`, {
-    required_signature: requiredSignature,
+    required_signature,
   });
 
   return WorkflowSubmissionApiSchema.parse(data);

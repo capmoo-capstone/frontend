@@ -17,7 +17,7 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
         order: 1,
         required_step: [],
         require_approval: true,
-        requiredSignature: true,
+        required_signature: true,
         required_documents: [
           {
             type: 'FILE',
@@ -38,7 +38,7 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
         order: 2,
         required_step: [1],
         require_approval: true,
-        requiredSignature: true,
+        required_signature: true,
         required_documents: [
           {
             type: 'FILE',
@@ -65,7 +65,7 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
         order: 3,
         required_step: [2],
         require_approval: true,
-        requiredSignature: true,
+        required_signature: true,
         required_documents: [
           {
             type: 'FILE',
@@ -98,7 +98,7 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
         order: 4,
         required_step: [3],
         require_approval: true,
-        requiredSignature: true,
+        required_signature: true,
         required_documents: [
           {
             type: 'GEN_CONT_NO',
@@ -125,7 +125,7 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
         order: 5,
         required_step: [4],
         require_approval: false,
-        requiredSignature: false,
+        required_signature: false,
         required_documents: [
           {
             type: 'VENDOR_EMAIL',
@@ -140,7 +140,7 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
         order: 6,
         required_step: [1, 2, 3, 4, 5],
         require_approval: true,
-        requiredSignature: false,
+        required_signature: false,
         required_documents: [
           {
             type: 'NUMBER',
@@ -180,7 +180,7 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
         order: 1,
         required_step: [],
         require_approval: true,
-        requiredSignature: true,
+        required_signature: true,
         required_documents: [
           {
             type: 'FILE',
@@ -195,7 +195,7 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
         order: 2,
         required_step: [1],
         require_approval: true,
-        requiredSignature: true,
+        required_signature: true,
         required_documents: [
           {
             type: 'FILE',
@@ -216,7 +216,7 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
         order: 3,
         required_step: [2],
         require_approval: true,
-        requiredSignature: true,
+        required_signature: true,
         required_documents: [
           {
             type: 'DATE',
@@ -243,7 +243,7 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
         order: 4,
         required_step: [3],
         require_approval: true,
-        requiredSignature: true,
+        required_signature: true,
         required_documents: [
           {
             type: 'FILE',
@@ -282,7 +282,7 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
         order: 5,
         required_step: [4],
         require_approval: true,
-        requiredSignature: true,
+        required_signature: true,
         required_documents: [
           {
             type: 'FILE',
@@ -310,7 +310,7 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
         order: 6,
         required_step: [5],
         require_approval: false,
-        requiredSignature: false,
+        required_signature: false,
         required_documents: [
           {
             type: 'DATE',
@@ -337,7 +337,7 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
         order: 7,
         required_step: [6],
         require_approval: true,
-        requiredSignature: true,
+        required_signature: true,
         required_documents: [
           {
             type: 'FILE',
@@ -376,7 +376,7 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
         order: 8,
         required_step: [7],
         require_approval: true,
-        requiredSignature: true,
+        required_signature: true,
         required_documents: [
           {
             type: 'FILE',
@@ -397,7 +397,7 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
         order: 9,
         required_step: [8],
         require_approval: false,
-        requiredSignature: false,
+        required_signature: false,
         required_documents: [
           {
             type: 'VENDOR_EMAIL',
@@ -412,7 +412,7 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
         order: 10,
         required_step: [1, 2, 3, 4, 5, 6, 7, 8, 9],
         require_approval: true,
-        requiredSignature: false,
+        required_signature: false,
         required_documents: [
           {
             type: 'NUMBER',
@@ -447,7 +447,7 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
         order: 1,
         required_step: [],
         require_approval: true,
-        requiredSignature: true,
+        required_signature: true,
         required_documents: [
           {
             type: 'FILE',
@@ -468,7 +468,7 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
         order: 2,
         required_step: [1],
         require_approval: true,
-        requiredSignature: true,
+        required_signature: true,
         required_documents: [
           {
             type: 'FILE',
@@ -495,7 +495,7 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
         order: 3,
         required_step: [2],
         require_approval: false,
-        requiredSignature: false,
+        required_signature: false,
         required_documents: [
           {
             type: 'DATE',
@@ -522,7 +522,7 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
         order: 4,
         required_step: [3],
         require_approval: true,
-        requiredSignature: true,
+        required_signature: true,
         required_documents: [
           {
             type: 'FILE',
@@ -561,7 +561,7 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
         order: 5,
         required_step: [4],
         require_approval: true,
-        requiredSignature: true,
+        required_signature: true,
         required_documents: [
           {
             type: 'FILE',
@@ -582,7 +582,7 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
         order: 6,
         required_step: [5],
         require_approval: false,
-        requiredSignature: false,
+        required_signature: false,
         required_documents: [
           {
             type: 'VENDOR_EMAIL',
@@ -597,7 +597,7 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
         order: 7,
         required_step: [1, 2, 3, 4, 5, 6],
         require_approval: true,
-        requiredSignature: false,
+        required_signature: false,
         required_documents: [
           {
             type: 'NUMBER',
@@ -637,7 +637,7 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
         order: 1,
         required_step: [],
         require_approval: true,
-        requiredSignature: true,
+        required_signature: true,
         required_documents: [
           {
             type: 'FILE',
@@ -670,7 +670,7 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
         order: 2,
         required_step: [1],
         require_approval: true,
-        requiredSignature: true,
+        required_signature: true,
         required_documents: [
           {
             type: 'GEN_CONT_NO',
@@ -697,7 +697,7 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
         order: 3,
         required_step: [2],
         require_approval: false,
-        requiredSignature: false,
+        required_signature: false,
         required_documents: [
           {
             type: 'VENDOR_EMAIL',
@@ -712,7 +712,7 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
         order: 4,
         required_step: [1, 2, 3],
         require_approval: true,
-        requiredSignature: false,
+        required_signature: false,
         required_documents: [
           {
             type: 'NUMBER',
@@ -752,7 +752,7 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
         order: 1,
         required_step: [],
         require_approval: true,
-        requiredSignature: true,
+        required_signature: true,
         required_documents: [
           {
             type: 'TEXT',
@@ -773,7 +773,7 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
         order: 2,
         required_step: [1],
         require_approval: true,
-        requiredSignature: true,
+        required_signature: true,
         required_documents: [
           {
             type: 'TEXT',
@@ -794,7 +794,7 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
         order: 3,
         required_step: [2],
         require_approval: false,
-        requiredSignature: false,
+        required_signature: false,
         required_documents: [
           {
             type: 'VENDOR_EMAIL',
@@ -809,7 +809,7 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
         order: 4,
         required_step: [1, 2, 3],
         require_approval: true,
-        requiredSignature: false,
+        required_signature: false,
         required_documents: [
           {
             type: 'NUMBER',
@@ -849,7 +849,7 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
         order: 1,
         required_step: [],
         require_approval: true,
-        requiredSignature: true,
+        required_signature: true,
         required_documents: [
           {
             type: 'TEXT',
@@ -876,7 +876,7 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
         order: 2,
         required_step: [1],
         require_approval: true,
-        requiredSignature: true,
+        required_signature: true,
         required_documents: [
           {
             type: 'TEXT',
@@ -903,7 +903,7 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
         order: 3,
         required_step: [2],
         require_approval: false,
-        requiredSignature: false,
+        required_signature: false,
         required_documents: [
           {
             type: 'TEXT',
@@ -924,7 +924,7 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
         order: 4,
         required_step: [1, 2, 3],
         require_approval: true,
-        requiredSignature: false,
+        required_signature: false,
         required_documents: [
           {
             type: 'NUMBER',
@@ -982,7 +982,7 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
         order: 1,
         required_step: [],
         require_approval: false,
-        requiredSignature: false,
+        required_signature: false,
         required_documents: [
           {
             type: 'DATE',
@@ -1015,7 +1015,7 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
         order: 2,
         required_step: [1],
         require_approval: true,
-        requiredSignature: false,
+        required_signature: false,
         required_documents: [
           {
             type: 'SELECT_CONTRACT_STATUS',
@@ -1031,7 +1031,7 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
         order: 3,
         required_step: [2],
         require_approval: true,
-        requiredSignature: false,
+        required_signature: false,
         required_documents: [
           {
             type: 'TEXT',
@@ -1046,7 +1046,7 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
         order: 4,
         required_step: [3],
         require_approval: true,
-        requiredSignature: false,
+        required_signature: false,
         required_documents: [
           {
             type: 'SELECT_DELIVERY_STATUS',

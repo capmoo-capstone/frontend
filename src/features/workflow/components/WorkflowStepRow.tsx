@@ -79,7 +79,7 @@ export function WorkflowStepRow({
 
     await workflowMutations.approveSubmission.mutateAsync({
       submissionId: latestSubmission.id,
-      requiredSignature: step.requiredSignature ?? true,
+      required_signature: step.required_signature ?? true,
     });
   };
 

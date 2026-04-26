@@ -69,7 +69,7 @@ export const WorkflowStepConfigSchema = z.object({
   required_step: z.array(z.number()),
   required_documents: z.array(WorkflowDocumentConfigSchema),
   require_approval: z.boolean().optional(),
-  requiredSignature: z.boolean().optional(),
+  required_signature: z.boolean().optional(),
 });
 
 export type WorkflowStepConfig = z.infer<typeof WorkflowStepConfigSchema>;

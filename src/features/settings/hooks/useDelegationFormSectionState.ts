@@ -5,7 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { startOfToday } from 'date-fns';
 import { z } from 'zod';
 
-import { type DelegationPayload, DelegationWithFutureDateSchema } from '@/features/settings/types';
+import { type DelegationPayload, DelegationWithFutureDateSchema } from '../types';
 
 interface UseDelegationFormSectionStateParams {
   value: DelegationPayload | null;

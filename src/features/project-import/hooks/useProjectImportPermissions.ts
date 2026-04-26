@@ -1,4 +1,4 @@
-import { useAuth } from '@/context/AuthContext';
+import { useAuth } from '@/context/useAuth';
 import { OPS_DEPT_ID } from '@/lib/constants';
 import { hasRoleInScopes } from '@/lib/permissions';
 

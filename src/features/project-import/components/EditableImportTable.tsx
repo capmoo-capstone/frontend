@@ -30,7 +30,8 @@ import {
 } from '@/components/ui/table';
 import { Textarea } from '@/components/ui/textarea';
 import { ImportBudgetPlanItemSchema } from '@/features/budgets';
-import { RESPONSIBLE_SELECT_OPTIONS, formatDateThai, parseThaiDateString } from '@/lib/formatters';
+import { RESPONSIBLE_SELECT_OPTIONS } from '@/features/projects';
+import { formatDateThai, parseThaiDateString } from '@/lib/date-formatters';
 import { cn } from '@/lib/utils';
 
 import type { EditableImportRow, ImportMode } from '../types';

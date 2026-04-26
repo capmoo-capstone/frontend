@@ -1,11 +1,11 @@
 import { CornerDownRight, FileText } from 'lucide-react';
 
-import type { Submission } from '@/features/workflow';
-import { formatDateThai } from '@/lib/formatters';
+import { formatDateThai } from '@/lib/date-formatters';
 import { cn } from '@/lib/utils';
 
 import { getActorDisplayName } from '../lib/submission-presentation';
 import { getSubmissionStableKey } from '../lib/workflow-identity';
+import type { Submission } from '../types';
 
 interface StepHistoryProps {
   submissions?: Submission[];

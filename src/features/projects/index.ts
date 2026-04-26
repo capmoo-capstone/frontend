@@ -27,6 +27,8 @@ export {
   ProjectToolbar,
   SearchCheckbox,
   UnassignTable,
+  WaitingCancelTable,
+  WorkloadChart,
 } from './components';
 
 // Hooks
@@ -51,6 +53,7 @@ export {
   useCancelProject,
   useChangeProjectAssignee,
   useClaimProject,
+  useCompleteProjectContract,
   useCloseProject,
   useCompleteProjectProcurement,
   useDeleteProject,
@@ -59,6 +62,17 @@ export {
   useReturnProject,
   useUpdateProject,
 } from './hooks/useProjectMutations';
+export { useProjectPermissions } from './hooks/useProjectPermissions';
+export {
+  RESPONSIBLE_SELECT_OPTIONS,
+  getProjectStatusFormat,
+  getProjectStatusesFormat,
+  getResponsiblePerson,
+  getResponsibleTypeFormat,
+  type ProjectStatusesResult,
+  type StatusFormat,
+  type StatusVariant,
+} from './utils/projectFormatters';
 
 // Types
 export type {

@@ -3,6 +3,8 @@ import { useMutation, useQueries, useQueryClient } from '@tanstack/react-query';
 import { useUnits } from '@/features/organization';
 import { getRepresentative, updateRepresentative } from '@/features/users';
 
+import { settingsKeys } from './queryKeys';
+
 export function useDepartmentUnits(departmentId: string) {
   const { data: units } = useUnits(departmentId);
   const unitIds = units?.map((unit) => unit.id) ?? [];
@@ -29,7 +31,7 @@ export function useDepartmentUnits(departmentId: string) {
 export const useRepresentative = (unitIds: string[]) => {
   return useQueries({
     queries: unitIds.map((id) => ({
-      queryKey: ['representative', { id }],
+      queryKey: settingsKeys.representative(id),
       queryFn: () => {
         if (id) return getRepresentative(id);
         throw new Error('unitId is required');
@@ -46,7 +48,7 @@ export const useUpdateRepresentative = () => {
       updateRepresentative(data),
     onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({
-        queryKey: ['representative', { id: variables.unitId }],
+        queryKey: settingsKeys.representative(variables.unitId),
       });
     },
     onError: (error) => {

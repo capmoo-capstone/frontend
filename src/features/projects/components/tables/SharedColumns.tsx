@@ -10,7 +10,6 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { type User, isProcurementStaffRole } from '@/features/auth';
-import { getProjectStatusesFormat, getResponsibleTypeFormat } from '@/lib/formatters';
 import { hasUnitPermission } from '@/lib/permissions';
 
 import type { Project } from '../../types/index';
@@ -21,6 +20,7 @@ import {
   getActiveResponsibleUsers,
   getCancelProjectActionLabel,
 } from '../../utils/project-selectors';
+import { getProjectStatusesFormat, getResponsibleTypeFormat } from '../../utils/projectFormatters';
 import { renderSortableHeader, renderUrgentText } from './column-helpers';
 
 interface SharedColumnsProps {

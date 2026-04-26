@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
-import { projectKeys } from '@/features/projects/hooks/queryKeys';
+import { projectKeys } from '@/features/projects';
 
 import {
   type CreateWorkflowSubmissionPayload,

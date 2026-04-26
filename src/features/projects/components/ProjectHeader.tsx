@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import { MoreVertical, Pencil, Trash2, Users } from 'lucide-react';
 
@@ -59,10 +59,11 @@ export const ProjectHeader = ({
   const [draftTitle, setDraftTitle] = useState(project.title);
   const [draftDescription, setDraftDescription] = useState(project.description ?? '');
 
-  useEffect(() => {
+  const handleStartEditing = () => {
     setDraftTitle(project.title);
     setDraftDescription(project.description ?? '');
-  }, [project.title, project.description]);
+    setIsEditing(true);
+  };
 
   const handleCancel = () => {
     setDraftTitle(project.title);
@@ -102,7 +103,7 @@ export const ProjectHeader = ({
                   {project.title}
                 </h1>
                 {canEditProjectDetails && (
-                  <Button variant="outline" size="icon" onClick={() => setIsEditing(true)}>
+                  <Button variant="outline" size="icon" onClick={handleStartEditing}>
                     <Pencil className="h-4 w-4" />
                   </Button>
                 )}

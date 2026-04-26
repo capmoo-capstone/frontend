@@ -6,5 +6,6 @@ export * from './hooks/useDelegationFormSectionState';
 export * from './hooks/useProcurementRoleEditor';
 export * from './hooks/useUnitRepresentativeEditor';
 export * from './hooks/useWorkGroupCardEditor';
+export * from './hooks/queryKeys';
 
 export * from './types';

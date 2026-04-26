@@ -10,11 +10,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { useAuth } from '@/context/AuthContext';
-import { useUnits } from '@/features/organization/hooks/useOrganization';
-import type { UnitItem } from '@/features/organization/types';
-import { AssignedTable, UnassignTable, WaitingCancelTable } from '@/features/projects/components';
-import { WorkloadChart } from '@/features/projects/components/tables/unassign-table/WorkloadChart';
+import { useAuth } from '@/context/useAuth';
+import { type UnitItem, useUnits } from '@/features/organization';
+import {
+  AssignedTable,
+  UnassignTable,
+  WaitingCancelTable,
+  WorkloadChart,
+} from '@/features/projects';
 import { OPS_DEPT_ID } from '@/lib/constants';
 import {
   hasDepartmentPermission,

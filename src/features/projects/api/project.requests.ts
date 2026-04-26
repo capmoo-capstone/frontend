@@ -20,6 +20,8 @@ import type { OwnProjectQueryParams, ProjectFilterParams } from './types';
 type ProjectsQueryParams = {
   page: number;
   limit: number;
+  sortBy: string;
+  sortOrder: 'asc' | 'desc';
   search?: string;
   title?: string;
   fiscalYear?: string | number;
@@ -28,15 +30,20 @@ type ProjectsQueryParams = {
   dateTo?: string;
   procurementType?: ProjectFilterParams['procurementType'];
   status?: ProjectFilterParams['status'];
+  procurementStatus?: ProjectFilterParams['procurementStatus'];
+  contractStatus?: ProjectFilterParams['contractStatus'];
   urgentStatus?: ProjectFilterParams['urgentStatus'];
   assignees?: ProjectFilterParams['assignees'];
   units?: ProjectFilterParams['units'];
+  departments?: ProjectFilterParams['departments'];
 };
 
 const toProjectsQueryParams = (params?: ProjectFilterParams): ProjectsQueryParams => {
   const query: ProjectsQueryParams = {
     page: 1,
     limit: 50,
+    sortBy: 'receive_no',
+    sortOrder: 'desc',
   };
 
   if (!params) return query;
@@ -51,10 +58,12 @@ const toProjectsQueryParams = (params?: ProjectFilterParams): ProjectsQueryParam
 
   if (params.procurementType?.length) query.procurementType = params.procurementType;
   if (params.status?.length) query.status = params.status;
+  if (params.procurementStatus?.length) query.procurementStatus = params.procurementStatus;
+  if (params.contractStatus?.length) query.contractStatus = params.contractStatus;
   if (params.urgentStatus?.length) query.urgentStatus = params.urgentStatus;
   if (params.assignees?.length) query.assignees = params.assignees;
   if (params.units?.length) query.units = params.units;
-
+  if (params.departments?.length) query.departments = params.departments;
   return query;
 };
 

@@ -12,33 +12,99 @@ import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { ExportTableToolbar } from '@/components/ExportTableToolbar';
-import { ProjectDataTable } from '@/features/projects/components/tables/DataTable';
+import {
+  ProjectDataTable,
+  useCloseProject,
+  useCompleteProjectContract,
+  useRequestProjectEdit,
+} from '@/features/projects';
 
 import { useFinanceExport } from '../hooks/useFinanceExport';
 import type { FinanceExportItem } from '../types';
+import { isReadyToCloseProject, needsFinanceExportCompletion } from '../utils/financeFormatters';
+import { downloadFinanceProjectsPdf } from '../utils/financePdf';
 import { getFinanceColumns } from './FinanceColumns';
 import { RequestEditDialog } from './RequestEditDialog';
 
+const getSelectedProjectsDescription = (items: FinanceExportItem[]) => {
+  const projectNos = items
+    .map((item) => item.receive_no)
+    .slice(0, 3)
+    .join(', ');
+  const moreCount = items.length > 3 ? ` และอีก ${items.length - 3} รายการ` : '';
+
+  return `เลขที่ลงรับ: ${projectNos}${moreCount}`;
+};
+
 export function FinanceTable() {
   const { data, isLoading } = useFinanceExport();
+  const completeContractMutation = useCompleteProjectContract();
+  const closeProjectMutation = useCloseProject();
+  const requestEditMutation = useRequestProjectEdit();
 
   // State Management for Table
   const [sorting, setSorting] = useState<SortingState>([]);
   const [rowSelection, setRowSelection] = useState({}); // Stores selected rows
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 15 });
+  const [isBulkActionPending, setIsBulkActionPending] = useState(false);
 
   // Dialog state
   const [itemToEdit, setItemToEdit] = useState<FinanceExportItem | null>(null);
+  const isActionPending =
+    isBulkActionPending ||
+    completeContractMutation.isPending ||
+    closeProjectMutation.isPending ||
+    requestEditMutation.isPending;
+
+  function getSelectedItems() {
+    return table.getSelectedRowModel().rows.map((row) => row.original);
+  }
+
+  async function handleRequestEdit(reason: string) {
+    if (!itemToEdit) return;
+
+    const requestEditPromise = requestEditMutation.mutateAsync({
+      projectId: itemToEdit.id,
+      reason,
+    });
+
+    toast.promise(requestEditPromise, {
+      loading: 'กำลังส่งคำขอแก้ไข...',
+      success: 'ส่งคำขอแก้ไขเรียบร้อยแล้ว',
+      error: 'ไม่สามารถส่งคำขอแก้ไขได้',
+    });
+
+    await requestEditPromise;
+    setItemToEdit(null);
+  }
+
+  async function handleCloseSingleProject(item: FinanceExportItem) {
+    if (!isReadyToCloseProject(item)) {
+      toast.error('กรุณาเลือกรายการที่ส่งออกแล้วเท่านั้น');
+      return;
+    }
+
+    const closePromise = closeProjectMutation.mutateAsync(item.id);
+
+    toast.promise(closePromise, {
+      loading: 'กำลังปิดโครงการ...',
+      success: 'ปิดโครงการสำเร็จ',
+      error: 'ไม่สามารถปิดโครงการได้',
+    });
+
+    try {
+      await closePromise;
+      table.resetRowSelection();
+    } catch (error) {
+      console.error(error);
+    }
+  }
 
   // Generate columns with callbacks
   const columns = getFinanceColumns({
+    isActionPending,
+    onCloseProject: handleCloseSingleProject,
     onRequestEdit: (item) => setItemToEdit(item),
-    onMarkComplete: (item) => {
-      toast.success(`แก้ไขโครงการเสร็จสิ้น`, {
-        description: `เลขที่ลงรับ: ${item.receive_no}`,
-      });
-      // Here you would call your API to mark as complete
-    },
   });
 
   const table = useReactTable({
@@ -59,56 +125,77 @@ export function FinanceTable() {
     enableRowSelection: true,
   });
 
-  const handleRequestEdit = (reason: string) => {
-    if (!itemToEdit) return;
-
-    toast.success('ส่งคำขอแก้ไขเรียบร้อยแล้ว', {
-      description: `เลขที่ลงรับ: ${itemToEdit.receive_no} - เหตุผล: ${reason}`,
-    });
-    // Here you would call your API to request edit with the reason
-    setItemToEdit(null);
-  };
-
-  const handleExport = () => {
-    const selectedRows = table.getSelectedRowModel().rows;
-    if (selectedRows.length === 0) {
+  const handleExport = async () => {
+    const selectedItems = getSelectedItems();
+    if (selectedItems.length === 0) {
       toast.error('กรุณาเลือกรายการที่ต้องการส่งออก');
       return;
     }
 
-    // Show project details in toast
-    const projectNos = selectedRows
-      .map((row) => row.original.receive_no)
-      .slice(0, 3)
-      .join(', ');
-    const moreCount = selectedRows.length > 3 ? ` และอีก ${selectedRows.length - 3} รายการ` : '';
+    const exportPromise = (async () => {
+      await downloadFinanceProjectsPdf(selectedItems);
+      await Promise.all(
+        selectedItems
+          .filter(needsFinanceExportCompletion)
+          .map((item) => completeContractMutation.mutateAsync(item.id))
+      );
+    })();
 
-    toast.success(`ส่งออกรายงาน ${selectedRows.length} รายการสำเร็จ`, {
-      description: `เลขที่ลงรับ: ${projectNos}${moreCount}`,
-      duration: 4000,
+    setIsBulkActionPending(true);
+    toast.promise(exportPromise, {
+      loading: `กำลังส่งออกรายงาน ${selectedItems.length} รายการ...`,
+      success: () => ({
+        message: `ส่งออกรายงาน ${selectedItems.length} รายการสำเร็จ`,
+        description: getSelectedProjectsDescription(selectedItems),
+        duration: 4000,
+      }),
+      error: 'ไม่สามารถส่งออกรายงานได้',
     });
-    table.resetRowSelection();
+
+    try {
+      await exportPromise;
+      table.resetRowSelection();
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsBulkActionPending(false);
+    }
   };
 
-  const handleCloseProject = () => {
-    const selectedRows = table.getSelectedRowModel().rows;
-    if (selectedRows.length === 0) {
+  const handleCloseProject = async () => {
+    const selectedItems = getSelectedItems();
+    if (selectedItems.length === 0) {
       toast.error('กรุณาเลือกรายการที่ต้องการปิดโครงการ');
       return;
     }
+    if (!selectedItems.every(isReadyToCloseProject)) {
+      toast.error('กรุณาเลือกรายการที่ส่งออกแล้วเท่านั้น');
+      return;
+    }
 
-    // Show project details in toast
-    const projectNos = selectedRows
-      .map((row) => row.original.receive_no)
-      .slice(0, 3)
-      .join(', ');
-    const moreCount = selectedRows.length > 3 ? ` และอีก ${selectedRows.length - 3} รายการ` : '';
+    const closePromise = Promise.all(
+      selectedItems.map((item) => closeProjectMutation.mutateAsync(item.id))
+    );
 
-    toast.success(`ปิดโครงการ ${selectedRows.length} รายการสำเร็จ`, {
-      description: `เลขที่ลงรับ: ${projectNos}${moreCount}`,
-      duration: 4000,
+    setIsBulkActionPending(true);
+    toast.promise(closePromise, {
+      loading: `กำลังปิดโครงการ ${selectedItems.length} รายการ...`,
+      success: () => ({
+        message: `ปิดโครงการ ${selectedItems.length} รายการสำเร็จ`,
+        description: getSelectedProjectsDescription(selectedItems),
+        duration: 4000,
+      }),
+      error: 'ไม่สามารถปิดโครงการได้',
     });
-    table.resetRowSelection();
+
+    try {
+      await closePromise;
+      table.resetRowSelection();
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsBulkActionPending(false);
+    }
   };
 
   if (isLoading) {
@@ -159,14 +246,14 @@ export function FinanceTable() {
                   {
                     label: 'ส่งออกรายงาน',
                     onClick: handleExport,
-                    disabled: !hasSelection,
+                    disabled: !hasSelection || isActionPending,
                     title: !hasSelection ? 'กรุณาเลือกรายการก่อนส่งออก' : 'ส่งออกรายงานที่เลือก',
                   },
                   {
                     label: 'ปิดโครงการ',
                     onClick: handleCloseProject,
                     variant: 'default',
-                    disabled: !hasSelection,
+                    disabled: !hasSelection || isActionPending,
                     title: !hasSelection ? 'กรุณาเลือกรายการก่อนปิดโครงการ' : 'ปิดโครงการที่เลือก',
                   },
                 ]}

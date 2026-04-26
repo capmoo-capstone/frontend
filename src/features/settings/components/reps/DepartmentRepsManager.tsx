@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useMemo } from 'react';
 
 import { Search, Users } from 'lucide-react';
 
@@ -17,11 +17,10 @@ export function DepartmentRepsManager() {
   const { isLoading, searchTerm, setSearchTerm, filteredDepartments } = useDepartmentRepsManager();
   const hasDepartments = filteredDepartments.length > 0;
 
-  const [expandedItems, setExpandedItems] = useState<string[]>([]);
-
-  useEffect(() => {
-    setExpandedItems(filteredDepartments.map((department) => department.id));
-  }, [filteredDepartments]);
+  const defaultExpandedItems = useMemo(
+    () => filteredDepartments.map((department) => department.id),
+    [filteredDepartments]
+  );
 
   if (isLoading) {
     return (
@@ -53,10 +52,10 @@ export function DepartmentRepsManager() {
         </div>
       ) : (
         <Accordion
+          key={defaultExpandedItems.join('|')}
           type="multiple"
           className="space-y-4 pb-4"
-          value={expandedItems}
-          onValueChange={setExpandedItems}
+          defaultValue={defaultExpandedItems}
         >
           {filteredDepartments.map((department) => (
             <AccordionItem

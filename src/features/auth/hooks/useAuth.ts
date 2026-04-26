@@ -2,7 +2,8 @@ import { useNavigate } from 'react-router-dom';
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
-import { useAuth } from '@/context/AuthContext';
+import { useAuth } from '@/context/useAuth';
+import { userKeys } from '@/features/users';
 
 import { login as loginApi } from '../api';
 
@@ -21,8 +22,8 @@ export const useLogin = () => {
 
     onSuccess: async (user) => {
       setSession(user);
-      await queryClient.invalidateQueries({ queryKey: ['users'] });
-      await queryClient.invalidateQueries({ queryKey: ['users', 'selection'] });
+      await queryClient.invalidateQueries({ queryKey: userKeys.all });
+      await queryClient.invalidateQueries({ queryKey: userKeys.selections() });
 
       if (user.department?.name === 'procurement') {
         navigate('/app/me/dashboard');

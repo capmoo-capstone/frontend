@@ -1,10 +1,8 @@
 import { useCallback, useMemo } from 'react';
 
-import { useQueryClient } from '@tanstack/react-query';
 import { Trash2, UserPlus, Users, X } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
-import { type ProcurementRoleSetting, type SettingsUserOption } from '@/features/settings/types';
 import {
   type UserRole,
   UserSelect,
@@ -14,10 +12,11 @@ import {
   useUsersForSelection,
 } from '@/features/users';
 import { OPS_DEPT_ID } from '@/lib/constants';
-import { formatDateThaiShort } from '@/lib/formatters';
+import { formatDateThaiShort } from '@/lib/date-formatters';
 
 import { PROCUREMENT_ROLES_CONFIG } from '../../constants';
 import { useProcurementRoleEditor } from '../../hooks/useProcurementRoleEditor';
+import { type ProcurementRoleSetting, type SettingsUserOption } from '../../types';
 import { DelegationFormSection } from '../DelegationFormSection';
 import { InlineActionRow } from '../InlineActionRow';
 
@@ -29,9 +28,10 @@ export function ProcurementStaffManager() {
   const cancelDelegationMutation = useCancelDelegation();
   const updateSupplyRole = useUpdateSupplyRole();
 
-  const queryClient = useQueryClient();
-
-  const procurementUsers = procurementUsersResponse?.data ?? [];
+  const procurementUsers = useMemo(
+    () => procurementUsersResponse?.data ?? [],
+    [procurementUsersResponse?.data]
+  );
 
   const procurementRoles = useMemo<ProcurementRoleSetting[]>(() => {
     return PROCUREMENT_ROLES_CONFIG.map((config) => {
@@ -86,13 +86,7 @@ export function ProcurementStaffManager() {
         });
       }
     },
-    [
-      procurementRoles,
-      addDelegationMutation,
-      cancelDelegationMutation,
-      updateSupplyRole,
-      queryClient,
-    ]
+    [procurementRoles, addDelegationMutation, cancelDelegationMutation, updateSupplyRole]
   );
 
   if (isPending) {

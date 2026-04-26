@@ -1,4 +1,4 @@
-import { useAuth } from '@/context/AuthContext';
+import { useAuth } from '@/context/useAuth';
 import { hasRoleInScopes } from '@/lib/permissions';
 
 export const useBudgetImportPermissions = () => {

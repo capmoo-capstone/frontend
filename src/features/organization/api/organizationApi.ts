@@ -20,10 +20,12 @@ export const getDepartments = async (): Promise<DepartmentItem[]> => {
   const { data } = await api.get('/departments');
   const parsed = DepartmentsApiResponseSchema.parse(data);
 
-  return parsed.data.map((department) => ({
-    id: department.id,
-    name: department.name,
-  }));
+  return parsed.data
+    .filter((department) => department.id !== OPS_DEPT_ID)
+    .map((department) => ({
+      id: department.id,
+      name: department.name,
+    }));
 };
 
 export const getUnitsByDepartment = async (departmentId: string): Promise<UnitItem[]> => {

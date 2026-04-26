@@ -16,7 +16,7 @@ import { AlertTriangle, ExternalLink, Loader2, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { DatePickerWithRange } from '@/components/ui/date-picker-with-range';
 import { Input } from '@/components/ui/input';
-import { ProjectDataTable } from '@/features/projects/components/tables/DataTable';
+import { ProjectDataTable } from '@/features/projects';
 
 import { useVendorSubmissions } from '../hooks/useVendorSubmissions';
 import type { VendorFilterParams } from '../types';

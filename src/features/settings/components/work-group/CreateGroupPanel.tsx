@@ -4,12 +4,11 @@ import { Check, X } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { type WorkGroupSetting } from '@/features/settings/types';
-import { type SettingsUserOption } from '@/features/settings/types';
-import { UserSelect } from '@/features/users/components/UserSelect';
+import { UserSelect } from '@/features/users';
 import { cn } from '@/lib/utils';
 
 import { useCreateGroupForm } from '../../hooks/useCreateGroupForm';
+import { type SettingsUserOption, type WorkGroupSetting } from '../../types';
 
 interface CreateGroupPanelProps {
   groups: WorkGroupSetting[];

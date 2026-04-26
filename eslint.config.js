@@ -8,7 +8,7 @@ import importPlugin from 'eslint-plugin-import';
 import prettier from 'eslint-plugin-prettier';
 import prettierConfig from 'eslint-config-prettier';
 
-export default tseslint(
+export default tseslint.config(
   { ignores: ['dist', '.eslintrc.cjs'] },
   {
     files: ['**/*.{ts,tsx}'],
@@ -23,7 +23,7 @@ export default tseslint(
     },
     settings: {
       react: {
-        version: '18.2',
+        version: 'detect',
       },
     },
     plugins: {
@@ -41,6 +41,9 @@ export default tseslint(
         'warn',
         { allowConstantExport: true },
       ],
+      'react-hooks/incompatible-library': 'off',
+      'react-hooks/set-state-in-effect': 'warn',
+      'react-hooks/refs': 'warn',
       'import/newline-after-import': ['error', { count: 1 }],
     },
   }

@@ -11,7 +11,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { RESPONSIBLE_SELECT_OPTIONS } from '@/lib/formatters';
+import { RESPONSIBLE_SELECT_OPTIONS } from '@/features/projects';
 import { cn } from '@/lib/utils';
 
 import type { ProjectImportFormValues } from '../types';

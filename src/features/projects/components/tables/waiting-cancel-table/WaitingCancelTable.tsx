@@ -50,7 +50,7 @@ export function WaitingCancelTable({ unitId }: { unitId?: string }) {
         },
         canCancelProjects,
       }),
-    [approveMutation, rejectMutation, canCancelProjects]
+    [canCancelProjects]
   );
 
   const handleConfirmAction = async () => {

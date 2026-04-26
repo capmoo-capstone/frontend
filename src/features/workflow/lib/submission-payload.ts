@@ -1,4 +1,4 @@
-import type { WorkflowStepConfig } from '@/features/workflow';
+import type { WorkflowStepConfig } from '../types';
 
 export interface SubmissionPayload {
   files?: Array<{

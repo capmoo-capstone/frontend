@@ -1,6 +1,6 @@
 import type { FieldErrors } from 'react-hook-form';
 
-import type { WorkGroupFormInput } from '@/features/settings/types';
+import type { WorkGroupFormInput } from '../../types';
 
 export const getFormErrorMessages = (errors: FieldErrors<WorkGroupFormInput>) => {
   const messages = new Set<string>();

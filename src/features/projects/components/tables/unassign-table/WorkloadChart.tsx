@@ -14,9 +14,9 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from '@/components/ui/chart';
-import { useWorkloadStats } from '@/features/projects/hooks/useProjectQueries';
 
 import { useProjectPermissions } from '../../../hooks/useProjectPermissions';
+import { useWorkloadStats } from '../../../hooks/useProjectQueries';
 
 const chartConfig = {
   current: {
@@ -37,10 +37,6 @@ interface WorkloadChartProps {
 export function WorkloadChart({ pendingChanges, unitId }: WorkloadChartProps) {
   const { canViewWorkloadChart } = useProjectPermissions(unitId);
   const { data, isLoading, isError } = useWorkloadStats(unitId);
-
-  if (!canViewWorkloadChart) {
-    return null;
-  }
 
   const chartData = useMemo(() => {
     if (!data) {
@@ -88,6 +84,10 @@ export function WorkloadChart({ pendingChanges, unitId }: WorkloadChartProps) {
       }))
       .sort((a, b) => b.current - a.current);
   }, [data, pendingChanges]);
+
+  if (!canViewWorkloadChart) {
+    return null;
+  }
 
   if (isLoading) {
     return (

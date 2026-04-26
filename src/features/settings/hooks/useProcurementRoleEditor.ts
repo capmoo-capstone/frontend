@@ -1,9 +1,11 @@
-import { useEffect, useMemo, useState } from 'react';
-
-import type { ProcurementRoleSetting } from '@/features/settings/types';
-import { type DelegationPayload, createProcurementRoleSchema } from '@/features/settings/types';
+import { useMemo, useState } from 'react';
 
 import { DIRECTOR_ROLE_ID } from '../constants';
+import {
+  type DelegationPayload,
+  type ProcurementRoleSetting,
+  createProcurementRoleSchema,
+} from '../types';
 import { hasDelegatedRoleMemberConflict } from './delegationConflictUtils';
 import { useDelegationFormReset } from './useDelegationFormReset';
 
@@ -30,16 +32,6 @@ export function useProcurementRoleEditor({
 
   const isDirectorRole = role.id === DIRECTOR_ROLE_ID;
   const directorMemberId = draftMemberIds[0] ?? '';
-
-  useEffect(() => {
-    if (!isEditing) {
-      setDraftMemberIds(role.member_ids);
-      setDraftDelegations(role.delegation);
-      setDelegationToAdd(null);
-      setMemberToAdd('');
-      setError('');
-    }
-  }, [isEditing, role.member_ids, role.delegation]);
 
   const resetEditorState = () => {
     setDraftMemberIds(role.member_ids);
@@ -98,6 +90,7 @@ export function useProcurementRoleEditor({
   };
 
   const handleEdit = () => {
+    resetEditorState();
     setIsEditing(true);
   };
 

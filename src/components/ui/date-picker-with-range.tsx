@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useRef, useState } from 'react';
+import { type RefObject, useEffect, useRef, useState } from 'react';
 import { type DateRange } from 'react-day-picker';
 
 import { isAfter, isBefore, startOfDay } from 'date-fns';
@@ -7,7 +7,7 @@ import { CalendarIcon, X } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
-import { formatDateThai, parseThaiDateString } from '@/lib/formatters';
+import { formatDateThai, parseThaiDateString } from '@/lib/date-formatters';
 
 interface DatePickerWithRangeProps {
   value?: DateRange;
@@ -55,21 +55,36 @@ function snapCursor(pos: number): number {
 function useMaskedDateInput(
   initial: string,
   onValidDate: (date: Date) => string | null,
-  onFocusOpen: () => void
+  onFocusOpen: () => void,
+  inputRef: RefObject<HTMLInputElement | null>
 ) {
-  const [masked, setMasked] = useState(initial || MASK);
+  const getInitialMasked = () => initial || MASK;
+  const [state, setState] = useState(() => ({
+    source: initial,
+    masked: getInitialMasked(),
+    error: null as string | null,
+  }));
   const [focused, setFocused] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
-    if (initial) {
-      setMasked(initial);
-      setError(null);
-    } else {
-      setMasked(MASK);
-    }
-  }, [initial]);
+  const isSynced = state.source === initial;
+  const masked = isSynced ? state.masked : getInitialMasked();
+  const error = isSynced ? state.error : null;
+
+  const setMasked = (nextMasked: string) => {
+    setState((previous) => ({
+      source: initial,
+      masked: nextMasked,
+      error: previous.source === initial ? previous.error : null,
+    }));
+  };
+
+  const setError = (nextError: string | null) => {
+    setState((previous) => ({
+      source: initial,
+      masked: previous.source === initial ? previous.masked : getInitialMasked(),
+      error: nextError,
+    }));
+  };
 
   const setCursor = (pos: number) => {
     requestAnimationFrame(() => {
@@ -193,7 +208,6 @@ function useMaskedDateInput(
   const isEmpty = masked === MASK && !focused;
 
   return {
-    inputRef,
     masked,
     setMasked,
     focused,
@@ -210,14 +224,27 @@ function useMaskedDateInput(
 
 export function DatePickerWithRange({ value, onChange }: DatePickerWithRangeProps) {
   const [open, setOpen] = useState(false);
-  const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
+  const [currentMonth, setCurrentMonth] = useState<Date>(() => value?.from ?? new Date());
   const [step, setStep] = useState<1 | 2>(1);
   const [internalRange, setInternalRange] = useState<DateRange | undefined>(value);
   const containerRef = useRef<HTMLDivElement>(null);
+  const fromInputRef = useRef<HTMLInputElement>(null);
+  const toInputRef = useRef<HTMLInputElement>(null);
 
   const fromStr = value?.from ? formatThaiDate(value.from) : '';
   const toStr = value?.to ? formatThaiDate(value.to) : '';
   const hasSelection = Boolean(value?.from ?? internalRange?.from);
+
+  const handleOpenCalendar = () => {
+    if (!open) {
+      setStep(1);
+      setInternalRange(value);
+      if (value?.from) {
+        setCurrentMonth(value.from);
+      }
+    }
+    setOpen(true);
+  };
 
   const fromInput = useMaskedDateInput(
     fromStr,
@@ -232,7 +259,8 @@ export function DatePickerWithRange({ value, onChange }: DatePickerWithRangeProp
       setCurrentMonth(date);
       return null;
     },
-    () => setOpen(true)
+    handleOpenCalendar,
+    fromInputRef
   );
 
   const toInput = useMaskedDateInput(
@@ -248,27 +276,15 @@ export function DatePickerWithRange({ value, onChange }: DatePickerWithRangeProp
       onChange?.({ from: range?.from, to: date });
       return null;
     },
-    () => setOpen(true)
+    handleOpenCalendar,
+    toInputRef
   );
-
-  useEffect(() => {
-    if (!open) return;
-    setStep(1);
-  }, [open]);
-
-  useEffect(() => {
-    if (!open) return;
-    setInternalRange(value);
-  }, [open, value]);
-
-  useEffect(() => {
-    if (value?.from && !open) setCurrentMonth(value.from);
-  }, [value, open]);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
         setOpen(false);
+        setStep(1);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -290,7 +306,7 @@ export function DatePickerWithRange({ value, onChange }: DatePickerWithRangeProp
       toInput.setError(null);
 
       setStep(2);
-      setTimeout(() => toInput.inputRef.current?.focus(), 0);
+      setTimeout(() => toInputRef.current?.focus(), 0);
     } else {
       const startDate = internalRange?.from;
 
@@ -346,7 +362,7 @@ export function DatePickerWithRange({ value, onChange }: DatePickerWithRangeProp
   return (
     <div
       ref={containerRef}
-      className="bg-background relative w-[17rem] rounded-lg"
+      className="bg-background relative w-68 rounded-lg"
       onBlurCapture={handleContainerBlurCapture}
       onKeyDownCapture={handleContainerKeyDownCapture}
     >
@@ -363,7 +379,7 @@ export function DatePickerWithRange({ value, onChange }: DatePickerWithRangeProp
             </span>
           )}
           <input
-            ref={fromInput.inputRef}
+            ref={fromInputRef}
             value={fromInput.isEmpty ? '' : fromInput.masked}
             aria-label="วันที่เริ่มต้น"
             onKeyDown={fromInput.handleKeyDown}
@@ -387,7 +403,7 @@ export function DatePickerWithRange({ value, onChange }: DatePickerWithRangeProp
             </span>
           )}
           <input
-            ref={toInput.inputRef}
+            ref={toInputRef}
             value={toInput.isEmpty ? '' : toInput.masked}
             aria-label="วันที่สิ้นสุด"
             onKeyDown={toInput.handleKeyDown}

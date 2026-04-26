@@ -1,6 +1,26 @@
 import type { UnitResponsibleType } from '@/features/projects';
 
+
+
 import type { WorkflowStepConfig } from '../types';
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 type WorkflowConfig = {
   type: UnitResponsibleType;
@@ -1014,8 +1034,29 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
         ],
       },
       {
-        name: 'ตรวจสอบและบันทึกข้อมูลการส่งมอบงาน',
+        name: 'vendor วางบิล',
         order: 2,
+        required_step: [],
+        require_approval: false,
+        required_signature: false,
+        required_documents: [
+          {
+            type: 'TEXT',
+            label: 'เลขที่ใบสั่งซื้อ (PO)',
+            field_key: 'contract_billing_po_number',
+            mark_as_done: false,
+          },
+          {
+            type: 'FILE',
+            label: 'อัปโหลดไฟล์ใบแจ้งหนี้/ใบส่งของ/ใบวางบิล',
+            field_key: 'contract_billing_doc',
+            mark_as_done: true,
+          },
+        ],
+      },
+      {
+        name: 'ตรวจสอบและบันทึกข้อมูลการส่งมอบงาน',
+        order: 3,
         required_step: [1],
         require_approval: true,
         required_signature: false,
@@ -1031,8 +1072,8 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
       },
       {
         name: 'บันทึกข้อมูลการตรวจรับ',
-        order: 3,
-        required_step: [2],
+        order: 4,
+        required_step: [3],
         require_approval: true,
         required_signature: false,
         required_documents: [
@@ -1046,8 +1087,8 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
       },
       {
         name: 'บันทึกรายงานผลการตรวจรับพัสดุเสนอผู้บริหาร',
-        order: 4,
-        required_step: [3],
+        order: 5,
+        required_step: [4],
         require_approval: true,
         required_signature: false,
         required_documents: [

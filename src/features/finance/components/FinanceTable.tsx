@@ -12,6 +12,7 @@ import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { ExportTableToolbar } from '@/components/ExportTableToolbar';
+import { useAuth } from '@/context/useAuth';
 import {
   ProjectDataTable,
   useCloseProject,
@@ -38,6 +39,7 @@ const getSelectedProjectsDescription = (items: FinanceExportItem[]) => {
 
 export function FinanceTable() {
   const { data, isLoading } = useFinanceExport();
+  const { user } = useAuth();
   const completeContractMutation = useCompleteProjectContract();
   const closeProjectMutation = useCloseProject();
   const requestEditMutation = useRequestProjectEdit();
@@ -133,7 +135,9 @@ export function FinanceTable() {
     }
 
     const exportPromise = (async () => {
-      await downloadFinanceProjectsPdf(selectedItems);
+      await downloadFinanceProjectsPdf(selectedItems, {
+        generatedBy: user?.full_name,
+      });
       await Promise.all(
         selectedItems
           .filter(needsFinanceExportCompletion)

@@ -16,6 +16,10 @@ export interface FinanceExportItem {
   procurement_type: ProcurementType;
   budget: number;
   department_name: string;
+  vendor_name: string | null;
+  po_no: string | null;
+  contract_no: string | null;
+  contract_step: number | null;
   export_status: FinanceExportStatus;
   project_status: ProjectStatus;
   procurement_status: ProjectStatusByType;

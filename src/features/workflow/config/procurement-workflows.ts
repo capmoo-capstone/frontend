@@ -15,11 +15,14 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
       {
         name: 'จัดทำแผนจัดการจัดซื้อจัดจ้าง และจัดทำคำสั่งแต่งตั้งคณะกรรมการฯ TOR',
         order: 1,
-        required_step: [],
-        require_approval: true,
-        required_signature: true,
+        required_step: [], // ต้องส่งขั้นตอนใน required_step ก่อน ถึงจะทำขั้นตอนนี้ได้
+        require_approval: true, // หัวหน้า ต้องอนุมัติขั้นตอนนี้
+        required_signature: true, // ผอ ต้องเซ็นอนุมัติในขั้นตอนนี้
         required_documents: [
           {
+            // ถ้าขั้นตอนนี้มีเลขที่ต้อง save / action ที่ต้องทำหลัง step ให้ใส่ comment ไว้
+            // todo: saved PR no to project id after complete this step
+            // todo: set noti after complete this step
             type: 'FILE',
             label: 'แผนการจัดซื้อจัดจ้าง',
             field_key: 'mt500k_procurement_plan_file',

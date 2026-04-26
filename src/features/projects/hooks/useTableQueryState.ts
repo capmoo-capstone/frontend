@@ -36,6 +36,8 @@ const RESERVED_KEYS = new Set([PAGE_PARAM, PAGE_SIZE_PARAM, SORT_FIELD_PARAM, SO
 
 const DEFAULT_PAGE = 1;
 const DEFAULT_PAGE_SIZE = 25;
+const DEFAULT_SORT_FIELD = 'receive_no';
+const DEFAULT_SORT_TYPE: TableSortType = 'DESC';
 
 const parsePositiveInt = (value: string | null, fallback: number) => {
   const parsed = Number(value);
@@ -51,13 +53,13 @@ export function useTableQueryState(): UseTableQueryStateResult {
   const page = parsePositiveInt(searchParams.get(PAGE_PARAM), DEFAULT_PAGE);
   const pageSize = parsePositiveInt(searchParams.get(PAGE_SIZE_PARAM), DEFAULT_PAGE_SIZE);
 
-  const sortField = searchParams.get(SORT_FIELD_PARAM) || undefined;
+  const sortField = searchParams.get(SORT_FIELD_PARAM) || DEFAULT_SORT_FIELD;
   const sortType =
-    sortField && searchParams.get(SORT_TYPE_PARAM) === 'DESC'
-      ? 'DESC'
-      : sortField
-        ? 'ASC'
-        : undefined;
+    searchParams.get(SORT_TYPE_PARAM) === 'ASC'
+      ? 'ASC'
+      : searchParams.get(SORT_TYPE_PARAM) === 'DESC'
+        ? 'DESC'
+        : DEFAULT_SORT_TYPE;
 
   const sorting = useMemo<SortingState>(() => {
     if (!sortField) return [];

@@ -20,6 +20,8 @@ import type { OwnProjectQueryParams, ProjectFilterParams } from './types';
 type ProjectsQueryParams = {
   page: number;
   limit: number;
+  sortBy: string;
+  sortOrder: 'asc' | 'desc';
   search?: string;
   title?: string;
   fiscalYear?: string | number;
@@ -39,6 +41,8 @@ const toProjectsQueryParams = (params?: ProjectFilterParams): ProjectsQueryParam
   const query: ProjectsQueryParams = {
     page: 1,
     limit: 50,
+    sortBy: 'receive_no',
+    sortOrder: 'desc',
   };
 
   if (!params) return query;

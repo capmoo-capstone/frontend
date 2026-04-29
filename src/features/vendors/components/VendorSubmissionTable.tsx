@@ -2,12 +2,7 @@ import { useState } from 'react';
 import type { DateRange } from 'react-day-picker';
 import { useNavigate } from 'react-router-dom';
 
-import {
-  type SortingState,
-  getCoreRowModel,
-  getSortedRowModel,
-  useReactTable,
-} from '@tanstack/react-table';
+import { getCoreRowModel, useReactTable } from '@tanstack/react-table';
 import { AlertTriangle, ExternalLink, Loader2, Search } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -31,9 +26,12 @@ export function VendorSubmissionTable({
   onDateRangeChange,
 }: VendorSubmissionTableProps) {
   const navigate = useNavigate();
-  const [sorting, setSorting] = useState<SortingState>([]);
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 });
-  const { data: vendorPage, isLoading, isError } = useVendorSubmissions(filters, {
+  const {
+    data: vendorPage,
+    isLoading,
+    isError,
+  } = useVendorSubmissions(filters, {
     page: pagination.pageIndex + 1,
     limit: pagination.pageSize,
   });
@@ -44,12 +42,10 @@ export function VendorSubmissionTable({
     pageCount: vendorPage?.totalPages ?? 0,
     rowCount: vendorPage?.total ?? 0,
     manualPagination: true,
+    enableSorting: false,
     getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    onSortingChange: setSorting,
     onPaginationChange: setPagination,
     state: {
-      sorting,
       pagination,
     },
   });
@@ -87,7 +83,7 @@ export function VendorSubmissionTable({
       columnsLength={vendorSubmissionColumns.length}
       getRowHref={(row) => `/app/projects/${row.project_id}`}
       toolbar={
-        <div className="flex w-full items-center justify-end gap-3 flex-wrap">
+        <div className="flex w-full flex-wrap items-center justify-end gap-3">
           <div className="relative min-w-[342px]">
             <Input
               className="normal pr-10"

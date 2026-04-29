@@ -7,6 +7,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { useUnitDetailsByIds, useUnits, useUpdateUnit } from '@/features/organization';
 import {
   type UserRole,
+  hasUserSelectionRole,
   useActiveDelegationByUnit,
   useAddDelegation,
   useCancelDelegation,
@@ -46,7 +47,7 @@ export function WorkGroupsManager() {
     [procurementUsersResponse?.data]
   );
   const directorUserId = useMemo(
-    () => procurementUsers.find((user) => user.role === DIRECTOR_ROLE_ID)?.id,
+    () => procurementUsers.find((user) => hasUserSelectionRole(user, DIRECTOR_ROLE_ID))?.id,
     [procurementUsers]
   );
 
@@ -56,7 +57,8 @@ export function WorkGroupsManager() {
     return units.map((unit, index) => {
       const detail = unitDetailQueries[index]?.data;
       const users = unitUsersQueries[index]?.data?.data ?? [];
-      const headId = users.find((user) => user.role === HEAD_OF_UNIT_ROLE_ID)?.id ?? '';
+      const headId =
+        users.find((user) => hasUserSelectionRole(user, HEAD_OF_UNIT_ROLE_ID))?.id ?? '';
       const delegation = delegationQueries[index]?.data ?? null;
 
       return {

@@ -5,7 +5,7 @@ import { ChevronDown, Pencil, Save, Trash2, UserPlus, Users, X } from 'lucide-re
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { UserSelect } from '@/features/users';
+import { UserSelect, hasUserSelectionRole } from '@/features/users';
 import { formatDateThaiShort } from '@/lib/date-formatters';
 import { cn } from '@/lib/utils';
 
@@ -122,7 +122,9 @@ export function WorkGroupCard(props: WorkGroupCardProps) {
                     <UserSelect
                       value={field.value}
                       deptId="procurement"
-                      options={procurementUsers.filter((p) => p.role !== DIRECTOR_ROLE_ID)}
+                      options={procurementUsers.filter(
+                        (person) => !hasUserSelectionRole(person, DIRECTOR_ROLE_ID)
+                      )}
                       onChange={field.onChange}
                       className="min-w-[320px]"
                       hasClearButton={false}

@@ -18,12 +18,13 @@ import type { Role } from '@/features/auth';
 import { cn } from '@/lib/utils';
 
 import { useUsersForSelection } from '../hooks/useUsers';
+import { getUserSelectionRoles, hasAnyUserSelectionRole } from '../utils/roles';
 
 interface UserSelectProps {
   value?: string | null;
   onChange: (value: string) => void;
   onSelectUser?: (user: { id: string; full_name: string }) => void;
-  options?: Array<{ id: string; full_name: string; role?: string }>;
+  options?: Array<{ id: string; full_name: string; roles?: string[] }>;
   onBlur?: () => void;
   onReset?: () => void;
   unitId?: string;
@@ -68,13 +69,15 @@ export function UserSelect({
     const allUsers = options ?? data?.data ?? [];
 
     return allUsers.filter((user) => {
-      const role = user.role;
+      const roles = getUserSelectionRoles(user);
 
       if (excludeUserIds.includes(user.id)) return false;
-      if (!role) return false;
-      if (excludeHeadOfUnit && role === 'HEAD_OF_UNIT') return false;
-      if (excludeHeadOfDept && role === 'HEAD_OF_DEPARTMENT') return false;
-      if (onlyIncludeRoles.length > 0 && !onlyIncludeRoles.includes(role as Role)) return false;
+      if (roles.length === 0) return false;
+      if (excludeHeadOfUnit && roles.includes('HEAD_OF_UNIT')) return false;
+      if (excludeHeadOfDept && roles.includes('HEAD_OF_DEPARTMENT')) return false;
+      if (onlyIncludeRoles.length > 0 && !hasAnyUserSelectionRole(user, onlyIncludeRoles)) {
+        return false;
+      }
 
       return true;
     });
@@ -143,7 +146,7 @@ export function UserSelect({
               {users.map((user) => (
                 <CommandItem
                   key={user.id}
-                  value={`${user.full_name} ${user.role ?? ''}`}
+                  value={`${user.full_name} ${getUserSelectionRoles(user).join(' ')}`}
                   onSelect={() => {
                     onChange(user.id);
                     onSelectUser?.({ id: user.id, full_name: user.full_name });

@@ -6,7 +6,7 @@ import type { AuthUser } from '../hooks/useStepActor';
 import { useStepActor } from '../hooks/useStepActor';
 import { useWorkflow } from '../hooks/useWorkflow';
 import { useWorkflowMutations } from '../hooks/useWorkflowMutations';
-import { buildSubmissionPayload } from '../lib/submission-payload';
+import { buildSubmissionPayload, hasProjectUpdateMetaData } from '../lib/submission-payload';
 import { resolveDocumentStaffAction } from '../lib/workflow-actions';
 import { getSubmissionStableKey } from '../lib/workflow-identity';
 import type { WorkflowStepConfig } from '../types';
@@ -69,7 +69,7 @@ export function WorkflowStepRow({
       project_id: project.id,
       workflow_type: project.current_template_type,
       step_order: step.order,
-      require_approval: step.require_approval ?? true,
+      required_approval: step.required_approval ?? true,
       ...buildSubmissionPayload(step, getStepFormData(step.order)),
     });
   };
@@ -101,7 +101,10 @@ export function WorkflowStepRow({
     }
 
     if (documentStaffAction === 'sign') {
-      await workflowMutations.signSubmission.mutateAsync(latestSubmission.id);
+      await workflowMutations.signSubmission.mutateAsync({
+        submissionId: latestSubmission.id,
+        required_updating: hasProjectUpdateMetaData(latestSubmission.meta_data),
+      });
       return;
     }
 

@@ -37,6 +37,7 @@ export interface FieldConfig {
   label: string;
   type: FieldType;
   mark_as_done?: boolean;
+  project_update_key?: ProjectUpdateFieldKey;
 }
 
 // ============================================================================
@@ -54,11 +55,25 @@ export type StepStatus = z.infer<typeof StepStatusSchema>;
 export type UiOnlyStepStatus = z.infer<typeof UiOnlyStepStatusSchema>;
 export type BackendSubmissionStatus = z.infer<typeof WorkflowSubmissionBackendStatusSchema>;
 
+export const ProjectUpdateFieldKeySchema = z.enum([
+  'pr_no',
+  'po_no',
+  'less_no',
+  'contract_no',
+  'migo_no',
+  'asset_code',
+  'vendor_name',
+  'vendor_email',
+]);
+
+export type ProjectUpdateFieldKey = z.infer<typeof ProjectUpdateFieldKeySchema>;
+
 export const WorkflowDocumentConfigSchema = z.object({
   type: FieldTypeSchema,
   label: z.string(),
   field_key: z.string(),
   mark_as_done: z.boolean(),
+  project_update_key: ProjectUpdateFieldKeySchema.optional(),
 });
 
 export type WorkflowDocumentConfig = z.infer<typeof WorkflowDocumentConfigSchema>;
@@ -68,7 +83,7 @@ export const WorkflowStepConfigSchema = z.object({
   order: z.number(),
   required_step: z.array(z.number()),
   required_documents: z.array(WorkflowDocumentConfigSchema),
-  require_approval: z.boolean().optional(),
+  required_approval: z.boolean().optional(),
   required_signature: z.boolean().optional(),
 });
 

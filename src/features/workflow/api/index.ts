@@ -63,14 +63,15 @@ export type WorkflowSubmissionFileInput = {
 
 export type WorkflowSubmissionMetaInput = {
   field_key?: string;
-  value?: string;
+  value?: string | number | boolean;
 };
 
 export type CreateWorkflowSubmissionPayload = {
   project_id: string;
   workflow_type: string;
   step_order: number;
-  require_approval: boolean;
+  required_approval: boolean;
+  required_updating: boolean;
   meta_data?: WorkflowSubmissionMetaInput[];
   files?: WorkflowSubmissionFileInput[];
 };
@@ -199,8 +200,13 @@ export const proposeWorkflowStep = async (submissionId: string) => {
   return WorkflowSubmissionApiSchema.parse(data);
 };
 
-export const signAndCompleteWorkflowStep = async (submissionId: string) => {
-  const { data } = await api.patch(`/submissions/${submissionId}/sign`);
+export const signAndCompleteWorkflowStep = async (
+  submissionId: string,
+  required_updating = false
+) => {
+  const { data } = await api.patch(`/submissions/${submissionId}/sign`, {
+    required_updating,
+  });
 
   return WorkflowSubmissionApiSchema.parse(data);
 };

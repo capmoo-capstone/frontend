@@ -17,7 +17,11 @@ import type { ProjectDetail } from '../types/index';
 interface ProjectInfoGridProps {
   project: ProjectDetail;
   canEditProjectDetails?: boolean;
-  onSaveProjectInfo?: (data: { budget_plan_id: string[]; budget: number }) => Promise<void>;
+  onSaveProjectInfo?: (data: {
+    asset_code: boolean;
+    budget_plan_id: string[];
+    budget: number;
+  }) => Promise<void>;
   isSavingProjectInfo?: boolean;
   onSaveVendorInfo?: (data: { vendor_name: string; vendor_email: string }) => Promise<void>;
   isSavingVendorInfo?: boolean;
@@ -70,10 +74,11 @@ export const ProjectInfoGrid = ({
   isSavingVendorInfo = false,
 }: ProjectInfoGridProps) => {
   const hadLinkedBudgetPlansInitially = (project.budget_plans?.length ?? 0) > 0;
+  const initialHasAssetCode = project.asset_code ?? hadLinkedBudgetPlansInitially;
   const [isEditingProjectInfo, setIsEditingProjectInfo] = useState(false);
   const [isEditingVendor, setIsEditingVendor] = useState(false);
 
-  const [hasAssetCode, setHasAssetCode] = useState((project.budget_plans?.length ?? 0) > 0);
+  const [hasAssetCode, setHasAssetCode] = useState(initialHasAssetCode);
   const [selectedBudgetPlanIds, setSelectedBudgetPlanIds] = useState<string[]>(
     project.budget_plans ?? []
   );
@@ -89,7 +94,7 @@ export const ProjectInfoGrid = ({
   );
 
   const resetProjectInfoDraft = () => {
-    setHasAssetCode((project.budget_plans?.length ?? 0) > 0);
+    setHasAssetCode(initialHasAssetCode);
     setSelectedBudgetPlanIds(project.budget_plans ?? []);
     setProjectBudget(project.budget ?? 0);
   };
@@ -113,7 +118,7 @@ export const ProjectInfoGrid = ({
     () => (isEditingProjectInfo ? selectedBudgetPlanIds : (project.budget_plans ?? [])),
     [isEditingProjectInfo, project.budget_plans, selectedBudgetPlanIds]
   );
-  const displayHasAssetCode = isEditingProjectInfo ? hasAssetCode : hadLinkedBudgetPlansInitially;
+  const displayHasAssetCode = isEditingProjectInfo ? hasAssetCode : initialHasAssetCode;
   const displayVendorName = isEditingVendor ? vendorName : (project.vendor.name ?? '');
   const displayVendorEmail = isEditingVendor ? vendorEmail : (project.vendor.email ?? '');
 
@@ -168,12 +173,12 @@ export const ProjectInfoGrid = ({
       }
 
       await onSaveProjectInfo?.({
+        asset_code: hasAssetCode,
         budget_plan_id: nextBudgetPlanIds,
         budget: projectBudget,
       });
 
-      // Keep local UI state consistent when user enabled asset code but selected no plans.
-      setHasAssetCode(nextBudgetPlanIds.length > 0);
+      setHasAssetCode(hasAssetCode);
       setIsEditingProjectInfo(false);
     } catch {
       // Error toast is handled by parent.
@@ -181,7 +186,7 @@ export const ProjectInfoGrid = ({
   };
 
   const handleCancelProjectInfo = () => {
-    setHasAssetCode((project.budget_plans?.length ?? 0) > 0);
+    setHasAssetCode(initialHasAssetCode);
     setSelectedBudgetPlanIds(project.budget_plans ?? []);
     setProjectBudget(project.budget ?? 0);
     setIsEditingProjectInfo(false);

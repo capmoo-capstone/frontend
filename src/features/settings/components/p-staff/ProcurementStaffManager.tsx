@@ -10,6 +10,7 @@ import {
   useCancelDelegation,
   useUpdateSupplyRole,
   useUsersForSelection,
+  hasUserSelectionRole,
 } from '@/features/users';
 import { OPS_DEPT_ID } from '@/lib/constants';
 import { formatDateThaiShort } from '@/lib/date-formatters';
@@ -35,9 +36,9 @@ export function ProcurementStaffManager() {
 
   const procurementRoles = useMemo<ProcurementRoleSetting[]>(() => {
     return PROCUREMENT_ROLES_CONFIG.map((config) => {
-      // NOTE: Make sure this matches your JSON! In the previous data you shared,
-      // "roles" was an array. If so, this should be: user.roles?.includes(config.role)
-      const membersWithRole = procurementUsers.filter((user) => user.role === config.role);
+      const membersWithRole = procurementUsers.filter((user) =>
+        hasUserSelectionRole(user, config.role)
+      );
 
       return {
         id: config.role,

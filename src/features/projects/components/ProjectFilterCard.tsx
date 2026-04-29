@@ -13,7 +13,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useDepartments } from '@/features/organization';
-import { useUsersForSelection } from '@/features/users';
+import { hasUserSelectionRole, useUsersForSelection } from '@/features/users';
 import { OPS_DEPT_ID } from '@/lib/constants';
 
 import { type ProjectFilterParams } from '../api';
@@ -123,7 +123,7 @@ export function ProjectFilterCard({ filters, setFilters }: ProjectFilterCardProp
     if (!users?.data) return [];
 
     return users.data
-      .filter((user) => user.role === 'GENERAL_STAFF')
+      .filter((user) => hasUserSelectionRole(user, 'GENERAL_STAFF'))
       .map((user) => ({
         id: user.id,
         full_name: user.full_name,

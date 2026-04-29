@@ -4,6 +4,7 @@ import { HomeIcon, TriangleAlert } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/useAuth';
+import { isProcurementStaffRole } from '@/features/auth';
 
 export default function PageNotFound() {
   const { user } = useAuth();
@@ -20,7 +21,7 @@ export default function PageNotFound() {
         className="mt-9"
         onClick={() => {
           if (user) {
-            if (user?.department?.name === 'procurement') {
+            if (isProcurementStaffRole(user)) {
               navigate(`/app/me/dashboard`);
             } else {
               navigate(`/app/dashboards/department`);

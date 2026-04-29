@@ -4,6 +4,7 @@ import { toast } from 'sonner';
 
 import { TextInputDialog } from '@/components/shared-dialog';
 import { useAuth } from '@/context/useAuth';
+import { hasRoleInScopes } from '@/lib/permissions';
 
 import { useCancelProject } from '../../hooks/useProjectMutations';
 import { useProjectPermissions } from '../../hooks/useProjectPermissions';
@@ -22,7 +23,7 @@ export function CancelProjectDialog({ isOpen, onClose, project }: CancelProjectD
   const { user } = useAuth();
   const { mutateAsync: cancelProjectMutation } = useCancelProject();
   const { canCancelProjects } = useProjectPermissions();
-  const isAuthorized = user?.role === 'SUPER_ADMIN' || user?.role === 'HEAD_OF_DEPARTMENT';
+  const isAuthorized = !!user && hasRoleInScopes(user, ['SUPER_ADMIN', 'HEAD_OF_DEPARTMENT']);
   const actionLabel = getCancelProjectActionLabel(canCancelProjects);
 
   const handleConfirm = async (reason: string) => {

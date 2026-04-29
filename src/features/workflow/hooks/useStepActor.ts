@@ -8,7 +8,6 @@ import type { StepStatus, Submission } from '../types';
 
 export interface AuthUser {
   id: string;
-  role?: Role;
   roles: Array<{ role: Role }>;
 }
 
@@ -22,16 +21,35 @@ export interface StepActorResult {
   showForm: boolean;
 }
 
-function resolveActionRole(viewAsRole: Role, availableRoles: Role[], status: StepStatus): Role {
-  if (viewAsRole === 'FINANCE_STAFF') return 'FINANCE_STAFF';
-  if (viewAsRole === 'HEAD_OF_DEPARTMENT') return 'HEAD_OF_DEPARTMENT';
+const ACTION_ROLES_BY_STATUS: Partial<Record<StepStatus, Role[]>> = {
+  IN_PROGRESS: ['GENERAL_STAFF'],
+  REJECTED: ['GENERAL_STAFF'],
+  WAITING_APPROVAL: ['HEAD_OF_UNIT'],
+  WAITING_PROPOSAL: ['DOCUMENT_STAFF'],
+  WAITING_SIGNATURE: ['DOCUMENT_STAFF'],
+};
 
-  const stepIsStaffActionable = status === 'IN_PROGRESS' || status === 'REJECTED';
-  if (stepIsStaffActionable && availableRoles.includes('GENERAL_STAFF')) {
-    return 'GENERAL_STAFF';
+const ROLE_DISPLAY_PRIORITY: Role[] = [
+  'SUPER_ADMIN',
+  'ADMIN',
+  'HEAD_OF_DEPARTMENT',
+  'HEAD_OF_UNIT',
+  'DOCUMENT_STAFF',
+  'FINANCE_STAFF',
+  'GENERAL_STAFF',
+  'REPRESENTATIVE',
+  'GUEST',
+];
+
+function resolveActionRole(availableRoles: Role[], status: StepStatus): Role {
+  const actionableRoles = ACTION_ROLES_BY_STATUS[status] ?? [];
+  const actionableRole = actionableRoles.find((role) => availableRoles.includes(role));
+
+  if (actionableRole) {
+    return actionableRole;
   }
 
-  return viewAsRole;
+  return ROLE_DISPLAY_PRIORITY.find((role) => availableRoles.includes(role)) ?? 'GUEST';
 }
 
 export function useStepActor(
@@ -41,10 +59,9 @@ export function useStepActor(
   viewingSubmission: Submission | null | undefined
 ): StepActorResult {
   return useMemo(() => {
-    const viewAsRole = user.role ?? 'GUEST';
-    const availableRoles = user.roles.map((r) => r.role);
+    const availableRoles = Array.from(new Set(user.roles.map((r) => r.role)));
 
-    const actionRole = resolveActionRole(viewAsRole, availableRoles, status);
+    const actionRole = resolveActionRole(availableRoles, status);
 
     const userCanAct = isActionRequired(actionRole, status, projectStatus);
 

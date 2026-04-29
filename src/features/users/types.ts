@@ -1,27 +1,21 @@
 import { z } from 'zod';
 
-import { type Role, RoleEnum } from '@/features/auth';
+import { type Role, RoleDetailSchema, RoleEnum } from '@/features/auth';
 
 export const UserRoleEnum = RoleEnum;
 export type UserRole = Role;
 
 export const UserRecordSchema = z.object({
   id: z.string(),
-  unit_id: z.string().nullable(),
-  username: z.string(),
-  email: z.email().nullable(),
   full_name: z.string(),
-  role: UserRoleEnum.nullable(),
-  is_delegate: z.boolean(),
-  delegate_user_id: z.string().nullable(),
-  created_at: z.iso.datetime(),
+  roles: z.array(z.string()),
 });
 
 export const UserListResponseSchema = z.object({
-  total: z.number(),
-  page: z.number(),
-  pageSize: z.number(),
-  totalPages: z.number(),
+  id: z.string(),
+  name: z.string(),
+  entity_type: z.enum(['all', 'unit', 'department']),
+  total: z.number().optional(),
   data: z.array(UserRecordSchema),
 });
 
@@ -34,13 +28,14 @@ export type User = UserRecord;
 export const UserSelectionItemSchema = z.object({
   id: z.string(),
   full_name: z.string(),
-  role: z.string(),
+  roles: z.array(z.string()),
 });
 
 export const UserSelectionResponseSchema = z.object({
   id: z.string(),
   name: z.string(),
   entity_type: z.enum(['unit', 'department']),
+  total: z.number().optional(),
   data: z.array(UserSelectionItemSchema),
 });
 
@@ -82,6 +77,7 @@ export const UserRoleSchema = z.object({
       id: z.string(),
       name: z.string(),
     })
+    .nullable()
     .optional(),
 });
 
@@ -96,6 +92,14 @@ export const BackendUserDetailResponseSchema = z.object({
 });
 
 export type BackendUserDetailResponse = z.infer<typeof BackendUserDetailResponseSchema>;
+
+export const UserDetailResponseSchema = BackendUserDetailResponseSchema.omit({
+  roles: true,
+}).extend({
+  roles: z.array(RoleDetailSchema),
+});
+
+export type UserDetailResponse = z.infer<typeof UserDetailResponseSchema>;
 
 export const UpdateUsersToUnitSchema = z.object({
   unitId: z.string(),

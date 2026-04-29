@@ -55,6 +55,18 @@ export const ManageSelfRoles: Role[] = ['GENERAL_STAFF'];
  */
 const getAllScopes = (user: User) => user.roles;
 
+export const getUserRoleNames = (user: User | null | undefined): Role[] => {
+  if (!user) return [];
+
+  return Array.from(new Set(user.roles.map((scope) => scope.role)));
+};
+
+export const hasAnyRole = (user: User | null | undefined, allowedRoles: Role[]): boolean => {
+  const roles = getUserRoleNames(user);
+
+  return allowedRoles.some((role) => roles.includes(role));
+};
+
 /**
  * Core engine to check if a user possesses any of the allowed roles,
  * optionally restricted to a specific unit or department context.
@@ -88,7 +100,7 @@ export const hasRoleInScopes = (
  * @param bypassRoles Array of roles that grant bypass access
  */
 export const hasBypassRole = (user: User, bypassRoles: Role[]) => {
-  return hasRoleInScopes(user, bypassRoles) || (!!user.role && bypassRoles.includes(user.role));
+  return hasRoleInScopes(user, bypassRoles);
 };
 
 // ============================================================================
@@ -104,10 +116,7 @@ export const hasProcurementPermission = (user: User, targetDepartmentId?: string
     return hasRoleInScopes(user, ProcurementAllowedRoles, { departmentId: targetDepartmentId });
   }
 
-  return (
-    hasRoleInScopes(user, ProcurementAllowedRoles) ||
-    (!!user.role && ProcurementAllowedRoles.includes(user.role))
-  );
+  return hasRoleInScopes(user, ProcurementAllowedRoles);
 };
 
 /**
@@ -116,10 +125,7 @@ export const hasProcurementPermission = (user: User, targetDepartmentId?: string
  */
 export const hasUnitPermission = (user: User, targetUnitId?: string) => {
   if (!targetUnitId) {
-    return (
-      hasRoleInScopes(user, UnitAllowedRoles) ||
-      (!!user.role && UnitAllowedRoles.includes(user.role))
-    );
+    return hasRoleInScopes(user, UnitAllowedRoles);
   }
 
   if (hasBypassRole(user, UnitBypassRoles)) {
@@ -135,10 +141,7 @@ export const hasUnitPermission = (user: User, targetUnitId?: string) => {
  */
 export const hasDepartmentPermission = (user: User, targetDepartmentId?: string) => {
   if (!targetDepartmentId) {
-    return (
-      hasRoleInScopes(user, DepartmentAllowedRoles) ||
-      (!!user.role && DepartmentAllowedRoles.includes(user.role))
-    );
+    return hasRoleInScopes(user, DepartmentAllowedRoles);
   }
 
   if (hasBypassRole(user, DepartmentBypassRoles)) {
@@ -152,10 +155,7 @@ export const hasDepartmentPermission = (user: User, targetDepartmentId?: string)
  * Checks if a user has access to global system settings.
  */
 export const hasSettingsPermission = (user: User) => {
-  return (
-    hasRoleInScopes(user, SettingsAllowedRoles) ||
-    (!!user.role && SettingsAllowedRoles.includes(user.role))
-  );
+  return hasRoleInScopes(user, SettingsAllowedRoles);
 };
 
 /**

@@ -57,61 +57,13 @@ export const AuthUserSchema = z.object({
 export type AuthUser = z.infer<typeof AuthUserSchema> & {
   name?: string;
   email?: string;
-  role?: Role;
-  isStaff?: boolean;
-  department?: {
-    id?: string;
-    name?: string;
-  };
-  unit?: {
-    id?: string;
-    name?: string;
-  };
-};
-
-const ROLE_PRIORITY: Record<Role, number> = {
-  SUPER_ADMIN: 8,
-  ADMIN: 7,
-  HEAD_OF_DEPARTMENT: 6,
-  HEAD_OF_UNIT: 5,
-  REPRESENTATIVE: 4,
-  DOCUMENT_STAFF: 3,
-  FINANCE_STAFF: 2,
-  GENERAL_STAFF: 1,
-  GUEST: 0,
-};
-
-export const getPrimaryRole = (user: AuthUser): RoleDetail | null => {
-  const allRoles = user.roles;
-
-  if (allRoles.length === 0) return null;
-
-  return allRoles.reduce((highestRole, currentRole) =>
-    ROLE_PRIORITY[currentRole.role] > ROLE_PRIORITY[highestRole.role] ? currentRole : highestRole
-  );
 };
 
 export const enrichUser = (userData: z.infer<typeof AuthUserSchema>): AuthUser => {
-  const primaryRole = getPrimaryRole(userData);
-
   return {
     ...userData,
     name: userData.full_name,
     email: `${userData.username}@example.com`,
-    role: primaryRole?.role,
-    isStaff: primaryRole?.role ? !['GUEST'].includes(primaryRole.role) : false,
-    department: primaryRole?.dept_id
-      ? {
-          id: primaryRole.dept_id,
-          name: primaryRole.dept_name || undefined,
-        }
-      : undefined,
-    unit: primaryRole?.unit_id
-      ? {
-          id: primaryRole.unit_id,
-          name: primaryRole.unit_name || undefined,
-        }
-      : undefined,
   };
 };
 

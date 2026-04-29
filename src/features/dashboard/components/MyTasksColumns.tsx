@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { type User, isProcurementStaffRole } from '@/features/auth';
 import { type Project } from '@/features/projects';
 import { getProjectStatusesFormat, getResponsibleTypeFormat } from '@/features/projects';
+import { getUserRoleNames } from '@/lib/permissions';
 
 interface MyTasksColumnsProps {
   user?: User;
@@ -19,7 +20,7 @@ const getProjectStatuses = (project: Project, user?: User) =>
     contractStatus: project.contract_status ?? 'NOT_STARTED',
     contractStep: project.contract_step ?? null,
     isProcurementStaff: isProcurementStaffRole(user),
-    role: user?.role,
+    roles: getUserRoleNames(user),
   });
 
 export const myTasksColumns = ({ user }: MyTasksColumnsProps): ColumnDef<Project>[] => [

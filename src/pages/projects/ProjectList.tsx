@@ -1,12 +1,10 @@
 import { useNavigate } from 'react-router-dom';
 
-import {
-  AllProjectTable,
-  ProjectFilterPanel,
-  ProjectStats,
-  ProjectToolbar,
-  useProjectFilters,
-} from '@/features/projects';
+import { AllProjectTable } from '@/features/projects/components/AllProjectTable';
+import { ProjectFilterPanel } from '@/features/projects/components/ProjectFilterPanel';
+import { ProjectStats } from '@/features/projects/components/ProjectStats';
+import { ProjectToolbar } from '@/features/projects/components/ProjectToolbar';
+import { useProjectFilters } from '@/features/projects/hooks/useProjectFilters';
 import { useProjectPermissions } from '@/features/projects/hooks/useProjectPermissions';
 
 export default function ProjectListPage() {

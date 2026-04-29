@@ -2,8 +2,9 @@ import { useMemo } from 'react';
 
 import type { Role } from '@/features/auth';
 import type { ProjectStatus } from '@/features/projects';
-import type { StepStatus, Submission } from '@/features/workflow';
-import { isActionRequired, isWorkflowProjectLocked } from '@/lib/workflow-utils';
+
+import { isActionRequired, isWorkflowProjectLocked } from '../lib/workflow-utils';
+import type { StepStatus, Submission } from '../types';
 
 export interface AuthUser {
   id: string;

@@ -7,10 +7,20 @@ export interface ProjectFilterParams {
   fiscalYear?: string;
   procurementType?: string[];
   status?: string[];
+  procurementStatus?: string[];
+  contractStatus?: string[];
   urgentStatus?: string[];
   assignees?: string[];
+  departments?: string[];
   units?: string[];
   myTasks?: boolean;
+}
+
+export interface ProjectsQueryOptions {
+  page?: number;
+  limit?: number;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
 }
 
 export interface OwnProjectQueryParams {

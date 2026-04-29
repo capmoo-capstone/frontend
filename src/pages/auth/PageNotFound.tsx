@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { HomeIcon, TriangleAlert } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
-import { useAuth } from '@/context/AuthContext';
+import { useAuth } from '@/context/useAuth';
 
 export default function PageNotFound() {
   const { user } = useAuth();

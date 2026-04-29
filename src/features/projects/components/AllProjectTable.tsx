@@ -3,19 +3,21 @@
 import { useMemo, useState } from 'react';
 
 import {
-  type SortingState,
   getCoreRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table';
 import type { ColumnDef } from '@tanstack/react-table';
 import { AlertTriangle, Loader2 } from 'lucide-react';
 
-import { useAuth } from '@/context/AuthContext';
+import { useAuth } from '@/context/useAuth';
 
 import { useProjectPermissions } from '../hooks/useProjectPermissions';
-import { type ProjectFilterParams, useProjects } from '../hooks/useProjectQueries';
+import {
+  type ProjectFilterParams,
+  type ProjectsQueryOptions,
+  useProjects,
+} from '../hooks/useProjectQueries';
+import { useTableQueryState } from '../hooks/useTableQueryState';
 import type { Project } from '../types/index';
 import { AddAssigneeDialog } from './dialogs/AddAssigneeDialog';
 import { CancelProjectDialog } from './dialogs/CancelProjectDialog';
@@ -31,9 +33,23 @@ interface AllProjectTableProps {
 export function AllProjectTable({ filters, columns: customColumns }: AllProjectTableProps) {
   const { user } = useAuth();
   const { canCancelProjects } = useProjectPermissions();
+  const { pagination, sorting, updateQueryParams } = useTableQueryState();
 
-  const { data: projects, isLoading, isError } = useProjects(filters);
-  const [sorting, setSorting] = useState<SortingState>([]);
+  const projectQueryOptions = useMemo<ProjectsQueryOptions>(
+    () => {
+      const primarySort = sorting[0];
+
+      return {
+        page: pagination.pageIndex + 1,
+        limit: pagination.pageSize,
+        sortBy: primarySort?.id,
+        sortOrder: primarySort ? (primarySort.desc ? 'desc' : 'asc') : undefined,
+      };
+    },
+    [pagination.pageIndex, pagination.pageSize, sorting]
+  );
+
+  const { data: projectPage, isLoading, isError } = useProjects(filters, projectQueryOptions);
   const [projectToAddAssignee, setProjectToAddAssignee] = useState<Project | null>(null);
   const [projectToReturn, setProjectToReturn] = useState<Project | null>(null);
   const [projectToCancel, setProjectToCancel] = useState<Project | null>(null);
@@ -52,13 +68,41 @@ export function AllProjectTable({ filters, columns: customColumns }: AllProjectT
   );
 
   const table = useReactTable({
-    data: projects || [],
+    data: projectPage?.data || [],
     columns,
-    onSortingChange: setSorting,
+    pageCount: projectPage?.totalPages ?? 0,
+    rowCount: projectPage?.total ?? 0,
+    manualPagination: true,
+    manualSorting: true,
+    state: {
+      sorting,
+      pagination,
+    },
+    onSortingChange: (updater) => {
+      const nextSorting = typeof updater === 'function' ? updater(sorting) : updater;
+      const primarySort = nextSorting[0];
+
+      updateQueryParams(
+        {
+          sortField: primarySort?.id ?? null,
+          sortType: primarySort ? (primarySort.desc ? 'DESC' : 'ASC') : null,
+        },
+        { resetPage: true }
+      );
+    },
+    onPaginationChange: (updater) => {
+      const nextPagination = typeof updater === 'function' ? updater(pagination) : updater;
+      const pageSizeChanged = nextPagination.pageSize !== pagination.pageSize;
+
+      updateQueryParams(
+        {
+          page: pageSizeChanged ? 1 : nextPagination.pageIndex + 1,
+          pageSize: nextPagination.pageSize,
+        },
+        { resetPage: false }
+      );
+    },
     getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    state: { sorting },
     initialState: {
       pagination: {
         pageSize: 25,

@@ -7,16 +7,11 @@ import {
   removeBudgetPlan,
 } from '../api';
 import type { ImportBudgetPlanPayload } from '../types';
-
-export const BUDGET_QUERY_KEYS = {
-  all: ['budget-plans'] as const,
-  byUnitAndYear: (unitId: string, fiscalYear: string) =>
-    ['budget-plans', unitId, fiscalYear] as const,
-};
+import { budgetKeys } from './queryKeys';
 
 export function useBudgetPlans(unitId: string, fiscalYear: string) {
   return useQuery({
-    queryKey: BUDGET_QUERY_KEYS.byUnitAndYear(unitId, fiscalYear),
+    queryKey: budgetKeys.byUnitAndYear(unitId, fiscalYear),
     queryFn: () => getBudgetPlans(unitId, fiscalYear),
     enabled: Boolean(unitId) && Boolean(fiscalYear),
   });
@@ -28,7 +23,7 @@ export function useImportBudgetPlans() {
   return useMutation({
     mutationFn: (payload: ImportBudgetPlanPayload) => importBudgetPlans(payload),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: BUDGET_QUERY_KEYS.all });
+      queryClient.invalidateQueries({ queryKey: budgetKeys.all });
     },
   });
 }
@@ -40,7 +35,7 @@ export function useLinkBudgetPlanToProject() {
     mutationFn: ({ id, projectId }: { id: string; projectId: string }) =>
       linkBudgetPlanToProject(id, projectId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: BUDGET_QUERY_KEYS.all });
+      queryClient.invalidateQueries({ queryKey: budgetKeys.all });
     },
   });
 }
@@ -51,7 +46,7 @@ export function useDeleteBudgetPlan() {
   return useMutation({
     mutationFn: (id: string) => removeBudgetPlan(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: BUDGET_QUERY_KEYS.all });
+      queryClient.invalidateQueries({ queryKey: budgetKeys.all });
     },
   });
 }

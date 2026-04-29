@@ -3,7 +3,7 @@
 import { toast } from 'sonner';
 
 import { TextInputDialog } from '@/components/shared-dialog';
-import { useAuth } from '@/context/AuthContext';
+import { useAuth } from '@/context/useAuth';
 
 import { useCancelProject } from '../../hooks/useProjectMutations';
 import { useProjectPermissions } from '../../hooks/useProjectPermissions';

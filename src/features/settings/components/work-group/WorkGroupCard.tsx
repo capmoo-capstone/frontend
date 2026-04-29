@@ -5,14 +5,13 @@ import { ChevronDown, Pencil, Save, Trash2, UserPlus, Users, X } from 'lucide-re
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { type WorkGroupSetting } from '@/features/settings/types';
-import { type SettingsUserOption } from '@/features/settings/types';
-import { UserSelect } from '@/features/users/components/UserSelect';
-import { formatDateThaiShort } from '@/lib/formatters';
+import { UserSelect } from '@/features/users';
+import { formatDateThaiShort } from '@/lib/date-formatters';
 import { cn } from '@/lib/utils';
 
 import { DIRECTOR_ROLE_ID } from '../../constants';
 import { useWorkGroupCardEditor } from '../../hooks/useWorkGroupCardEditor';
+import { type SettingsUserOption, type WorkGroupSetting } from '../../types';
 import { DelegationFormSection } from '../DelegationFormSection';
 import { WorkflowTags } from './WorkflowTags';
 
@@ -84,12 +83,7 @@ export function WorkGroupCard(props: WorkGroupCardProps) {
               </Button>
             </>
           ) : (
-            <Button
-              type="button"
-              size="sm"
-              variant="outline"
-              onClick={() => editor.setIsEditing(true)}
-            >
+            <Button type="button" size="sm" variant="outline" onClick={editor.handleStartEditing}>
               <Pencil className="mr-1 h-4 w-4" /> แก้ไขกลุ่มงาน
             </Button>
           )}

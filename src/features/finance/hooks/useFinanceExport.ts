@@ -1,54 +1,68 @@
 import { useMemo } from 'react';
 
-import { type Project, useProjects } from '@/features/projects';
-import { getResponsiblePerson } from '@/lib/formatters';
+import { useQuery } from '@tanstack/react-query';
+
+import { type Project, getResponsiblePerson, projectKeys } from '@/features/projects';
+import { PaginatedProjectListApiResponseSchema } from '@/features/projects/types/index';
+import api from '@/lib/axios';
 
 import type { FinanceExportItem, FinanceExportStatus } from '../types';
 
-type ProjectWithRequester = Project & {
-  requester?: {
-    dept_name?: string;
-  };
+const FINANCE_PROJECT_FILTERS = {
+  status: ['IN_PROGRESS', 'CLOSED', 'REQUEST_EDIT'],
+  procurementStatus: ['COMPLETED'],
+  contractStatus: ['NOT_EXPORTED', 'COMPLETED'],
 };
 
-// Map project status to finance export status
-const mapToFinanceStatus = (projectStatus: Project['status']): FinanceExportStatus => {
-  switch (projectStatus) {
-    case 'CLOSED':
-      return 'CLOSED';
-    case 'REQUEST_EDIT':
-      return 'WAITING_EDIT';
-    case 'IN_PROGRESS':
-      // In a real scenario, you'd check if it's been exported
-      // For now, we'll use IN_PROGRESS as NOT_EXPORTED
-      return 'NOT_EXPORTED';
-    case 'WAITING_ACCEPT':
-    case 'WAITING_CANCEL':
-      return 'NOT_EXPORTED';
-    default:
-      return 'NOT_EXPORTED';
+const getFinanceProjects = async (): Promise<Project[]> => {
+  const { data } = await api.post(
+    '/projects',
+    { filter: FINANCE_PROJECT_FILTERS },
+    {
+      params: {
+        page: 1,
+        limit: 50,
+      },
+    }
+  );
+
+  return PaginatedProjectListApiResponseSchema.parse(data).data;
+};
+
+const isFinanceProject = (project: Project) => {
+  if (project.procurement_status !== 'COMPLETED') return false;
+
+  if (project.status === 'IN_PROGRESS') {
+    return project.contract_status === 'NOT_EXPORTED' || project.contract_status === 'COMPLETED';
   }
+
+  return (
+    (project.status === 'CLOSED' || project.status === 'REQUEST_EDIT') &&
+    project.contract_status === 'COMPLETED'
+  );
+};
+
+const mapToFinanceStatus = (project: Project): FinanceExportStatus => {
+  if (project.status === 'IN_PROGRESS' && project.contract_status === 'COMPLETED') {
+    return 'EXPORTED';
+  }
+  if (project.status === 'CLOSED') return 'CLOSED';
+  if (project.status === 'REQUEST_EDIT') return 'WAITING_EDIT';
+  return 'NOT_EXPORTED';
 };
 
 export function useFinanceExport() {
-  // Fetch projects with filter for finance-relevant statuses
-  const { data: projects, isLoading } = useProjects({
-    status: ['IN_PROGRESS', 'CLOSED', 'REQUEST_EDIT', 'WAITING_ACCEPT'],
+  const { data: projects, isLoading } = useQuery({
+    queryKey: projectKeys.list(FINANCE_PROJECT_FILTERS),
+    queryFn: getFinanceProjects,
   });
 
   // Map and filter projects to finance export items
   const data = useMemo<FinanceExportItem[]>(() => {
     if (!projects) return [];
 
-    const getDepartmentName = (project: Project): string => {
-      const maybeProject = project as ProjectWithRequester;
-      if (typeof maybeProject.requester?.dept_name === 'string') {
-        return maybeProject.requester.dept_name;
-      }
-      return '-';
-    };
-
     return projects
+      .filter(isFinanceProject)
       .map((project) => ({
         id: project.id,
         receive_no: project.receive_no,
@@ -58,9 +72,15 @@ export function useFinanceExport() {
         procurement_type: project.procurement_type,
         budget:
           typeof project.budget === 'number' ? project.budget : parseFloat(project.budget || '0'),
-        department_name: getDepartmentName(project),
-        export_status: mapToFinanceStatus(project.status),
+        department_name: project.requesting_dept.name ?? '-',
+        vendor_name: project.vendor_name,
+        po_no: project.po_no,
+        contract_no: project.contract_no,
+        contract_step: project.contract_step,
+        export_status: mapToFinanceStatus(project),
         project_status: project.status,
+        procurement_status: project.procurement_status,
+        contract_status: project.contract_status,
         urgent_status: project.is_urgent,
       }))
       .sort((a, b) => {

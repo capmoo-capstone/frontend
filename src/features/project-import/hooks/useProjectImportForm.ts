@@ -1,14 +1,14 @@
-import { useEffect, useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useEffect, useMemo, useState } from 'react';
+import { useForm, useWatch } from 'react-hook-form';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { differenceInDays } from 'date-fns';
 import { toast } from 'sonner';
 
-import { useAuth } from '@/context/AuthContext';
+import { useAuth } from '@/context/useAuth';
 import { useBudgetPlans } from '@/features/budgets';
 import { useDepartments, useUnits } from '@/features/organization';
-import { getFiscalYear } from '@/lib/formatters';
+import { getFiscalYear } from '@/lib/date-formatters';
 import { hasProcurementPermission } from '@/lib/permissions';
 
 import {
@@ -35,6 +35,8 @@ export function useProjectImportForm({ onSuccess }: UseProjectImportFormOptions)
 
   const form = useForm<ProjectImportFormValues, unknown, ProjectImportPayload>({
     resolver: zodResolver(ProjectImportSchema),
+    mode: 'onChange',
+    reValidateMode: 'onChange',
     defaultValues: {
       pr_no: '',
       title: '',
@@ -44,18 +46,19 @@ export function useProjectImportForm({ onSuccess }: UseProjectImportFormOptions)
       department_id: canSelectEveryUnits ? '' : user?.department?.id || '',
       unit_id: canSelectEveryUnits ? '' : user?.unit?.id || '',
       budget_plan_ids: [],
-      budget: 0,
+      budget: '',
     },
   });
 
   // Watch form fields
-  const watchDeptId = form.watch('department_id');
-  const watchUnitId = form.watch('unit_id');
-  const watchFiscalYear = form.watch('fiscal_year');
-  const watchDeliveryDate = form.watch('delivery_date');
-  const watchProcurementType = form.watch('procurement_type');
-  const selectedPlans = form.watch('budget_plan_ids') || [];
-  const watchBudget = form.watch('budget');
+  const watchDeptId = useWatch({ control: form.control, name: 'department_id' });
+  const watchUnitId = useWatch({ control: form.control, name: 'unit_id' });
+  const watchFiscalYear = useWatch({ control: form.control, name: 'fiscal_year' });
+  const watchDeliveryDate = useWatch({ control: form.control, name: 'delivery_date' });
+  const watchProcurementType = useWatch({ control: form.control, name: 'procurement_type' });
+  const watchedBudgetPlanIds = useWatch({ control: form.control, name: 'budget_plan_ids' });
+  const selectedPlans = useMemo(() => watchedBudgetPlanIds ?? [], [watchedBudgetPlanIds]);
+  const watchBudget = useWatch({ control: form.control, name: 'budget' });
   const typedBudget = typeof watchBudget === 'number' ? watchBudget : Number(watchBudget || 0);
 
   // Fetch data
@@ -75,7 +78,9 @@ export function useProjectImportForm({ onSuccess }: UseProjectImportFormOptions)
     differenceInDays(watchDeliveryDate, new Date()) < minDays;
 
   const calculatedSum = budgetPlans
-    ? budgetPlans.filter((p) => selectedPlans.includes(p.id)).reduce((a, b) => a + b.amount, 0)
+    ? budgetPlans
+        .filter((p) => selectedPlans.includes(p.id))
+        .reduce((a, b) => a + b.budget_amount, 0)
     : 0;
   const showBudgetWarning = selectedPlans.length > 0 && typedBudget < calculatedSum;
 
@@ -95,10 +100,8 @@ export function useProjectImportForm({ onSuccess }: UseProjectImportFormOptions)
     if (selectedPlans.length > 0 && budgetPlans) {
       const sum = budgetPlans
         .filter((p) => selectedPlans.includes(p.id))
-        .reduce((acc, curr) => acc + curr.amount, 0);
+        .reduce((acc, curr) => acc + curr.budget_amount, 0);
       form.setValue('budget', sum, { shouldValidate: true });
-    } else {
-      form.setValue('budget', 0, { shouldValidate: true });
     }
   }, [selectedPlans, budgetPlans, form]);
 

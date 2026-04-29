@@ -45,13 +45,12 @@ const fetchRemainingPages = async <T>(
 const normalizeBudgetPlan = (item: BudgetPlanBackend): BudgetPlan => {
   return BudgetPlanSchema.parse({
     id: item.id,
-    fiscal_year: String(item.budget_year),
-    cost_center: item.unit_no || item.unit_id,
+    budget_year: item.budget_year,
     unit_id: item.unit_id,
     activity_type: item.activity_type,
-    activity_name: item.activity_type_name,
+    activity_type_name: item.activity_type_name,
     description: item.description ?? item.activity_type_name,
-    amount: item.budget_amount,
+    budget_amount: item.budget_amount,
     project_id: item.project_id ?? null,
   });
 };

@@ -10,11 +10,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { useAuth } from '@/context/AuthContext';
-import { useUnits } from '@/features/organization/hooks/useOrganization';
-import type { UnitItem } from '@/features/organization/types';
-import { AssignedTable, UnassignTable, WaitingCancelTable } from '@/features/projects/components';
-import { WorkloadChart } from '@/features/projects/components/tables/unassign-table/WorkloadChart';
+import { useAuth } from '@/context/useAuth';
+import { type UnitItem, useUnits } from '@/features/organization';
+import {
+  AssignedTable,
+  UnassignTable,
+  WaitingCancelTable,
+  WorkloadChart,
+} from '@/features/projects';
 import { OPS_DEPT_ID } from '@/lib/constants';
 import {
   hasDepartmentPermission,
@@ -42,6 +45,7 @@ export default function AssignJobs() {
         hasSelfManagePermission(user, unit.id)
     );
   }, [units, user]);
+  const selectedUnit = unitOptions.find((unit) => unit.id === id);
 
   useEffect(() => {
     if (id || isLoading) return;
@@ -90,7 +94,7 @@ export default function AssignJobs() {
         pendingChanges={pendingChanges}
         setPendingChanges={setPendingChanges}
       />
-      <AssignedTable unitId={id} />
+      <AssignedTable unitId={id} unitTypes={selectedUnit?.type} />
     </div>
   );
 }

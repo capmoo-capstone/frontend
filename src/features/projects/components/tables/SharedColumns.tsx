@@ -10,7 +10,6 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { type User, isProcurementStaffRole } from '@/features/auth';
-import { getProjectStatusesFormat, getResponsibleTypeFormat } from '@/lib/formatters';
 import { hasUnitPermission } from '@/lib/permissions';
 
 import type { Project } from '../../types/index';
@@ -18,9 +17,11 @@ import {
   canCancelProject,
   canEditProjectAssignee,
   canReturnProject,
+  canUserAddProjectAssignees,
   getActiveResponsibleUsers,
   getCancelProjectActionLabel,
 } from '../../utils/project-selectors';
+import { getProjectStatusesFormat, getResponsibleTypeFormat } from '../../utils/projectFormatters';
 import { renderSortableHeader, renderUrgentText } from './column-helpers';
 
 interface SharedColumnsProps {
@@ -147,7 +148,8 @@ export const baseColumns = ({
         (user && hasUnitPermission(user, project.responsible_unit_id)) ||
         assigneeIds.includes(user?.id ?? '');
 
-      const canAddAssignee = canEditProjectAssignee(project.status) && canManage;
+      const canAddAssignee =
+        canEditProjectAssignee(project.status) && canUserAddProjectAssignees(user, project);
       const canReturnProjectAction =
         canReturnProject(
           project.status,

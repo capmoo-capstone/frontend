@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
-import { projectKeys } from '@/features/projects/hooks/queryKeys';
+import { projectKeys } from '@/features/projects';
 
 import {
   type CreateWorkflowSubmissionPayload,
@@ -33,11 +33,11 @@ export const useWorkflowMutations = (projectId?: string) => {
   const approveSubmission = useMutation({
     mutationFn: ({
       submissionId,
-      requiredSignature = true,
+      required_signature = true,
     }: {
       submissionId: string;
-      requiredSignature?: boolean;
-    }) => approveWorkflowStep(submissionId, requiredSignature),
+      required_signature?: boolean;
+    }) => approveWorkflowStep(submissionId, required_signature),
     onSuccess: () => {
       if (projectId) invalidateWorkflowQueries(queryClient, projectId);
     },

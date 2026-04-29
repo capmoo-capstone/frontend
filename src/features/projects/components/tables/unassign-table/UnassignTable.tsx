@@ -29,7 +29,9 @@ interface UnassignTableProps {
 }
 
 export function UnassignTable({ unitId, pendingChanges, setPendingChanges }: UnassignTableProps) {
-  const { canAssignProjects, canClaimProjects, canCancelProjects } = useProjectPermissions(unitId);
+  const { canAssignProjects, canClaimProjects, canCancelProjects } = useProjectPermissions({
+    unitId,
+  });
 
   const { data: projects, isLoading, isError } = useUnassignedProjects(unitId);
   const { mutateAsync: assignProjectsMutation } = useAssignProjects();
@@ -65,6 +67,7 @@ export function UnassignTable({ unitId, pendingChanges, setPendingChanges }: Una
       }),
     [
       pendingChanges,
+      setPendingChanges,
       unitId,
       canClaimProjects,
       canAssignProjects,
@@ -146,7 +149,7 @@ export function UnassignTable({ unitId, pendingChanges, setPendingChanges }: Una
         <CancelProjectDialog
           isOpen={!!projectToCancel}
           onClose={() => setProjectToCancel(null)}
-          project={projectToCancel as any}
+          project={projectToCancel}
         />
       )}
     </>

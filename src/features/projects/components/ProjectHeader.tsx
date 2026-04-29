@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import { MoreVertical, Pencil, Trash2, Users } from 'lucide-react';
 
@@ -37,6 +37,7 @@ const getUrgentLabel = (value: ProjectUrgentStatus) => {
 interface ProjectHeaderProps {
   project: ProjectDetail;
   canCancelProjects: boolean;
+  canAddAssignees?: boolean;
   canEditProjectDetails?: boolean;
   onSaveProjectHeader?: (data: { title: string; description: string | null }) => Promise<void>;
   onCancelProject?: () => void;
@@ -48,6 +49,7 @@ interface ProjectHeaderProps {
 export const ProjectHeader = ({
   project,
   canCancelProjects,
+  canAddAssignees = false,
   canEditProjectDetails = false,
   onSaveProjectHeader,
   onCancelProject,
@@ -59,10 +61,11 @@ export const ProjectHeader = ({
   const [draftTitle, setDraftTitle] = useState(project.title);
   const [draftDescription, setDraftDescription] = useState(project.description ?? '');
 
-  useEffect(() => {
+  const handleStartEditing = () => {
     setDraftTitle(project.title);
     setDraftDescription(project.description ?? '');
-  }, [project.title, project.description]);
+    setIsEditing(true);
+  };
 
   const handleCancel = () => {
     setDraftTitle(project.title);
@@ -102,7 +105,7 @@ export const ProjectHeader = ({
                   {project.title}
                 </h1>
                 {canEditProjectDetails && (
-                  <Button variant="outline" size="icon" onClick={() => setIsEditing(true)}>
+                  <Button variant="outline" size="icon" onClick={handleStartEditing}>
                     <Pencil className="h-4 w-4" />
                   </Button>
                 )}
@@ -149,9 +152,11 @@ export const ProjectHeader = ({
       </div>
 
       <div className="flex items-center gap-2">
-        <Button variant="brand" onClick={onExportReport}>
-          ส่งออกรายงาน
-        </Button>
+        {onExportReport && (
+          <Button variant="brand" onClick={onExportReport}>
+            ส่งออกรายงาน
+          </Button>
+        )}
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -160,10 +165,12 @@ export const ProjectHeader = ({
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={onAddAssignee}>
-              <Users className="h-4 w-4" />
-              เพิ่มผู้รับผิดชอบ
-            </DropdownMenuItem>
+            {canAddAssignees && onAddAssignee && (
+              <DropdownMenuItem onClick={onAddAssignee}>
+                <Users className="h-4 w-4" />
+                เพิ่มผู้รับผิดชอบ
+              </DropdownMenuItem>
+            )}
             <DropdownMenuItem onClick={onCancelProject} variant="destructive">
               <Trash2 className="h-4 w-4" />
               {getCancelProjectActionLabel(canCancelProjects)}

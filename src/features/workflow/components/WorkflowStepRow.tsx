@@ -1,7 +1,6 @@
 import { useBudgetPlans } from '@/features/budgets';
 import type { ProjectDetail } from '@/features/projects';
-import type { WorkflowStepConfig } from '@/features/workflow';
-import { getFiscalYear } from '@/lib/formatters';
+import { getFiscalYear } from '@/lib/date-formatters';
 
 import type { AuthUser } from '../hooks/useStepActor';
 import { useStepActor } from '../hooks/useStepActor';
@@ -10,6 +9,7 @@ import { useWorkflowMutations } from '../hooks/useWorkflowMutations';
 import { buildSubmissionPayload } from '../lib/submission-payload';
 import { resolveDocumentStaffAction } from '../lib/workflow-actions';
 import { getSubmissionStableKey } from '../lib/workflow-identity';
+import type { WorkflowStepConfig } from '../types';
 import { DynamicStepForm } from './DynamicStepForm';
 import { StatusWaitingCard } from './StatusWaitingCard';
 import { StepActionForm } from './StepActionForm';
@@ -79,7 +79,7 @@ export function WorkflowStepRow({
 
     await workflowMutations.approveSubmission.mutateAsync({
       submissionId: latestSubmission.id,
-      requiredSignature: step.requiredSignature ?? true,
+      required_signature: step.required_signature ?? true,
     });
   };
 

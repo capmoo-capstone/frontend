@@ -5,7 +5,6 @@ import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { useUnitDetailsByIds, useUnits, useUpdateUnit } from '@/features/organization';
-import { type WorkGroupSetting } from '@/features/settings/types';
 import {
   type UserRole,
   useActiveDelegationByUnit,
@@ -19,6 +18,7 @@ import {
 import { OPS_DEPT_ID } from '@/lib/constants';
 
 import { DIRECTOR_ROLE_ID, HEAD_OF_UNIT_ROLE_ID } from '../../constants';
+import { type WorkGroupSetting } from '../../types';
 import { CreateGroupPanel } from './CreateGroupPanel';
 import { WorkGroupCard } from './WorkGroupCard';
 
@@ -41,7 +41,10 @@ export function WorkGroupsManager() {
     deptId: OPS_DEPT_ID,
   });
 
-  const procurementUsers = procurementUsersResponse?.data ?? [];
+  const procurementUsers = useMemo(
+    () => procurementUsersResponse?.data ?? [],
+    [procurementUsersResponse?.data]
+  );
   const directorUserId = useMemo(
     () => procurementUsers.find((user) => user.role === DIRECTOR_ROLE_ID)?.id,
     [procurementUsers]
@@ -165,7 +168,7 @@ export function WorkGroupsManager() {
     ]
   );
 
-  const handleCreateGroup = useCallback((_newGroup: WorkGroupSetting) => {
+  const handleCreateGroup = useCallback(() => {
     // TODO: Connect to actual create unit endpoint
     setIsCreateVisible(false);
   }, []);

@@ -51,7 +51,7 @@ export function BudgetPlanSelectField({
                   className="bg-secondary/60 text-foreground hover:bg-secondary flex items-center gap-1.5 rounded-md px-3 py-1.5 text-base font-normal transition-colors"
                 >
                   <span>
-                    {plan.description || '-'} {plan.amount.toLocaleString()} บาท
+                    {plan.description || '-'} {plan.budget_amount.toLocaleString()} บาท
                   </span>
                   <X
                     className="text-muted-foreground hover:text-foreground h-4 w-4 cursor-pointer"
@@ -108,7 +108,7 @@ export function BudgetPlanSelectField({
                 >
                   <Checkbox checked={isSelected} className="pointer-events-none" />
                   <span className="text-primary normal-normal">
-                    {plan.description || '-'} {plan.amount.toLocaleString()} บาท
+                    {plan.description || '-'} {plan.budget_amount.toLocaleString()} บาท
                   </span>
                 </div>
               );

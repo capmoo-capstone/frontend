@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { type Role, RoleEnum } from '@/features/auth/types';
+import { type Role, RoleEnum } from '@/features/auth';
 
 export const UserRoleEnum = RoleEnum;
 export type UserRole = Role;

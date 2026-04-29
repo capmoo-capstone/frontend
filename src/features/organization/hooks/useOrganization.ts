@@ -19,24 +19,18 @@ import {
   type UpdateDepartmentPayload,
   type UpdateUnitPayload,
 } from '../types';
-
-const ORGANIZATION_QUERY_KEYS = {
-  departments: ['departments'] as const,
-  units: ['units'] as const,
-  unitsByDepartment: (departmentId: string) => ['units', departmentId] as const,
-  unitsList: (page: number, limit: number) => ['units', 'list', page, limit] as const,
-};
+import { organizationKeys } from './queryKeys';
 
 export function useDepartments() {
   return useQuery({
-    queryKey: ORGANIZATION_QUERY_KEYS.departments,
+    queryKey: organizationKeys.departments,
     queryFn: getDepartments,
   });
 }
 
 export function useUnits(departmentId: string) {
   return useQuery({
-    queryKey: ORGANIZATION_QUERY_KEYS.unitsByDepartment(departmentId),
+    queryKey: organizationKeys.unitsByDepartment(departmentId),
     queryFn: () => getUnitsByDepartment(departmentId),
     enabled: !!departmentId,
   });
@@ -44,7 +38,7 @@ export function useUnits(departmentId: string) {
 
 export function useUnitsList({ page = 1, limit = 20 }: Partial<UnitListParams> = {}) {
   return useQuery({
-    queryKey: ORGANIZATION_QUERY_KEYS.unitsList(page, limit),
+    queryKey: organizationKeys.unitsList(page, limit),
     queryFn: () => getUnits({ page, limit }),
   });
 }
@@ -52,7 +46,7 @@ export function useUnitsList({ page = 1, limit = 20 }: Partial<UnitListParams> =
 export function useUnitDetailsByIds(unitIds: string[]) {
   return useQueries({
     queries: unitIds.map((unitId) => ({
-      queryKey: ['units', 'detail', unitId],
+      queryKey: organizationKeys.unitDetail(unitId),
       queryFn: () => getUnitById(unitId),
       enabled: !!unitId,
     })),
@@ -65,7 +59,7 @@ export function useCreateDepartment() {
   return useMutation({
     mutationFn: (payload: CreateDepartmentPayload) => createDepartment(payload),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ORGANIZATION_QUERY_KEYS.departments });
+      queryClient.invalidateQueries({ queryKey: organizationKeys.departments });
     },
   });
 }
@@ -76,8 +70,8 @@ export function useUpdateDepartment() {
   return useMutation({
     mutationFn: (payload: UpdateDepartmentPayload) => updateDepartment(payload),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ORGANIZATION_QUERY_KEYS.departments });
-      queryClient.invalidateQueries({ queryKey: ORGANIZATION_QUERY_KEYS.units });
+      queryClient.invalidateQueries({ queryKey: organizationKeys.departments });
+      queryClient.invalidateQueries({ queryKey: organizationKeys.units });
     },
   });
 }
@@ -88,8 +82,8 @@ export function useDeleteDepartment() {
   return useMutation({
     mutationFn: (departmentId: string) => deleteDepartment(departmentId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ORGANIZATION_QUERY_KEYS.departments });
-      queryClient.invalidateQueries({ queryKey: ORGANIZATION_QUERY_KEYS.units });
+      queryClient.invalidateQueries({ queryKey: organizationKeys.departments });
+      queryClient.invalidateQueries({ queryKey: organizationKeys.units });
     },
   });
 }
@@ -100,7 +94,7 @@ export function useCreateUnit() {
   return useMutation({
     mutationFn: (payload: CreateUnitPayload) => createUnit(payload),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ORGANIZATION_QUERY_KEYS.units });
+      queryClient.invalidateQueries({ queryKey: organizationKeys.units });
     },
   });
 }
@@ -111,7 +105,7 @@ export function useUpdateUnit() {
   return useMutation({
     mutationFn: (payload: UpdateUnitPayload) => updateUnit(payload),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ORGANIZATION_QUERY_KEYS.units });
+      queryClient.invalidateQueries({ queryKey: organizationKeys.units });
     },
   });
 }
@@ -122,7 +116,7 @@ export function useDeleteUnit() {
   return useMutation({
     mutationFn: (unitId: string) => deleteUnit(unitId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ORGANIZATION_QUERY_KEYS.units });
+      queryClient.invalidateQueries({ queryKey: organizationKeys.units });
     },
   });
 }

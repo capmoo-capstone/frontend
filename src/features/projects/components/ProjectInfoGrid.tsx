@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import { Check, ChevronDown, Copy, Pencil, X } from 'lucide-react';
 import { toast } from 'sonner';
@@ -9,7 +9,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { useBudgetPlans } from '@/features/budgets';
-import { formatDateThai, getFiscalYear } from '@/lib/formatters';
+import { formatDateThai, getFiscalYear } from '@/lib/date-formatters';
 import { cn } from '@/lib/utils';
 
 import type { ProjectDetail } from '../types/index';
@@ -88,21 +88,43 @@ export const ProjectInfoGrid = ({
     fiscalYear
   );
 
-  useEffect(() => {
+  const resetProjectInfoDraft = () => {
     setHasAssetCode((project.budget_plans?.length ?? 0) > 0);
     setSelectedBudgetPlanIds(project.budget_plans ?? []);
     setProjectBudget(project.budget ?? 0);
+  };
+
+  const resetVendorDraft = () => {
     setVendorName(project.vendor.name ?? '');
     setVendorEmail(project.vendor.email ?? '');
-    setIsEditingProjectInfo(false);
-    setIsEditingVendor(false);
-  }, [project.id, project.budget, project.budget_plans, project.vendor.email, project.vendor.name]);
+  };
+
+  const handleStartProjectInfoEditing = () => {
+    resetProjectInfoDraft();
+    setIsEditingProjectInfo(true);
+  };
+
+  const handleStartVendorEditing = () => {
+    resetVendorDraft();
+    setIsEditingVendor(true);
+  };
+
+  const activeBudgetPlanIds = useMemo(
+    () => (isEditingProjectInfo ? selectedBudgetPlanIds : (project.budget_plans ?? [])),
+    [isEditingProjectInfo, project.budget_plans, selectedBudgetPlanIds]
+  );
+  const displayHasAssetCode = isEditingProjectInfo ? hasAssetCode : hadLinkedBudgetPlansInitially;
+  const displayVendorName = isEditingVendor ? vendorName : (project.vendor.name ?? '');
+  const displayVendorEmail = isEditingVendor ? vendorEmail : (project.vendor.email ?? '');
 
   const selectedBudgetPlans = useMemo(
-    () => budgetPlans?.filter((plan) => selectedBudgetPlanIds.includes(plan.id)) ?? [],
-    [budgetPlans, selectedBudgetPlanIds]
+    () => budgetPlans?.filter((plan) => activeBudgetPlanIds.includes(plan.id)) ?? [],
+    [activeBudgetPlanIds, budgetPlans]
   );
-  const initialBudgetPlanIdSet = useMemo(() => new Set(project.budget_plans ?? []), [project]);
+  const initialBudgetPlanIdSet = useMemo(
+    () => new Set(project.budget_plans ?? []),
+    [project.budget_plans]
+  );
 
   const budgetPlanDisplay =
     selectedBudgetPlans.length > 0
@@ -204,7 +226,7 @@ export const ProjectInfoGrid = ({
         <div className="flex items-center justify-between gap-2">
           <h6 className="text-primary h3-topic">รายละเอียดโครงการ</h6>
           {!isEditingProjectInfo && canEditProjectDetails ? (
-            <Button variant="outline" size="sm" onClick={() => setIsEditingProjectInfo(true)}>
+            <Button variant="outline" size="sm" onClick={handleStartProjectInfoEditing}>
               <Pencil className="h-4 w-4" />
               แก้ไขข้อมูลโครงการ
             </Button>
@@ -281,7 +303,7 @@ export const ProjectInfoGrid = ({
             <span className="text-muted-foreground h4-sub">มีรหัสสินทรัพย์หรือไม่</span>
             <label className="flex h-9 items-center gap-2">
               <Checkbox
-                checked={hasAssetCode}
+                checked={displayHasAssetCode}
                 onCheckedChange={(checked) => {
                   const nextValue = Boolean(checked);
                   if (!nextValue && hasAssetCode) {
@@ -306,7 +328,7 @@ export const ProjectInfoGrid = ({
               <span className="normal">มีรหัสสินทรัพย์</span>
             </label>
           </div>
-          {hasAssetCode && (
+          {displayHasAssetCode && (
             <div className="flex min-h-14 flex-col gap-1 lg:col-span-2">
               <span className="text-muted-foreground h4-sub">แผนงบประมาณ</span>
               {isEditingProjectInfo ? (
@@ -377,7 +399,7 @@ export const ProjectInfoGrid = ({
         <div className="flex items-center justify-between gap-2">
           <h6 className="text-primary h3-topic">ข้อมูลของผู้ค้า</h6>
           {!isEditingVendor && canEditProjectDetails ? (
-            <Button variant="outline" size="sm" onClick={() => setIsEditingVendor(true)}>
+            <Button variant="outline" size="sm" onClick={handleStartVendorEditing}>
               <Pencil className="h-4 w-4" />
               แก้ไขข้อมูลผู้ค้า
             </Button>
@@ -417,14 +439,14 @@ export const ProjectInfoGrid = ({
               />
             ) : (
               <div className="flex items-center gap-2">
-                <span className="normal">{vendorName || '-'}</span>
-                {vendorName && (
+                <span className="normal">{displayVendorName || '-'}</span>
+                {displayVendorName && (
                   <Button
                     variant="ghost"
                     size="icon"
                     className="text-muted-foreground hover:text-primary h-6 w-6 p-0 hover:bg-transparent"
                     onClick={() => {
-                      navigator.clipboard.writeText(vendorName);
+                      navigator.clipboard.writeText(displayVendorName);
                     }}
                   >
                     <Copy className="h-5 w-5" />
@@ -444,14 +466,14 @@ export const ProjectInfoGrid = ({
               />
             ) : (
               <div className="flex items-center gap-2">
-                <span className="normal">{vendorEmail || '-'}</span>
-                {vendorEmail && (
+                <span className="normal">{displayVendorEmail || '-'}</span>
+                {displayVendorEmail && (
                   <Button
                     variant="ghost"
                     size="icon"
                     className="text-muted-foreground hover:text-primary h-6 w-6 p-0 hover:bg-transparent"
                     onClick={() => {
-                      navigator.clipboard.writeText(vendorEmail);
+                      navigator.clipboard.writeText(displayVendorEmail);
                     }}
                   >
                     <Copy className="h-5 w-5" />

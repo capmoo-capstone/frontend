@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
-import { Controller, useForm } from 'react-hook-form';
+import { Controller, useForm, useWatch } from 'react-hook-form';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'sonner';
@@ -11,7 +11,6 @@ import { CustomContentDialog } from '@/components/shared-dialog';
 import { UserSelect } from '@/features/users';
 
 import { useAddProjectAssignee } from '../../hooks/useProjectMutations';
-import type { Project } from '../../types/index';
 
 const AddAssigneeFormSchema = z.object({
   userId: z.string().min(1, 'กรุณาเลือกเจ้าหน้าที่'),
@@ -22,7 +21,10 @@ type AddAssigneeFormValues = z.infer<typeof AddAssigneeFormSchema>;
 interface AddAssigneeDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  project: Project;
+  project: {
+    id: string;
+    responsible_unit_id: string;
+  };
 }
 
 export function AddAssigneeDialog({ isOpen, onClose, project }: AddAssigneeDialogProps) {
@@ -37,7 +39,7 @@ export function AddAssigneeDialog({ isOpen, onClose, project }: AddAssigneeDialo
     },
   });
 
-  const selectedUserId = form.watch('userId');
+  const selectedUserId = useWatch({ control: form.control, name: 'userId' });
 
   useEffect(() => {
     if (isOpen) {

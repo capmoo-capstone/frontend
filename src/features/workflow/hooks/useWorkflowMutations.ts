@@ -59,7 +59,13 @@ export const useWorkflowMutations = (projectId?: string) => {
   });
 
   const signSubmission = useMutation({
-    mutationFn: (submissionId: string) => signAndCompleteWorkflowStep(submissionId),
+    mutationFn: ({
+      submissionId,
+      required_updating = false,
+    }: {
+      submissionId: string;
+      required_updating?: boolean;
+    }) => signAndCompleteWorkflowStep(submissionId, required_updating),
     onSuccess: () => {
       if (projectId) invalidateWorkflowQueries(queryClient, projectId);
     },

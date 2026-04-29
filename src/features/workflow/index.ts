@@ -23,6 +23,8 @@ export { ProcurementWorkflows } from './config/procurement-workflows';
 // Types and Schemas
 export {
   FieldTypeSchema,
+  PROJECT_UPDATE_FIELD_KEYS,
+  ProjectUpdateFieldKeySchema,
   StepStatusSchema,
   UiOnlyStepStatusSchema,
   SubmissionDocumentSchema,
@@ -35,6 +37,7 @@ export type {
   BackendSubmissionStatus,
   FieldConfig,
   FieldType,
+  ProjectUpdateFieldKey,
   StepStatus,
   Submission,
   SubmissionDocument,

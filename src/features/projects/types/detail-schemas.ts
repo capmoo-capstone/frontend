@@ -37,6 +37,7 @@ export const ProjectDetailSchema = z.object({
   po_no: z.string().nullable(),
   contract_no: z.string().nullable(),
   migo_no: z.string().nullable(),
+  asset_code: z.boolean().nullable(),
   budget_plans: z.array(z.string()).default([]),
   expected_approval_date: z.string().nullable(),
   expected_completion_procurement_date: z.string().nullable(),
@@ -44,7 +45,6 @@ export const ProjectDetailSchema = z.object({
   updated_at: z.string(),
   vendor: z.object({
     name: z.string().nullable(),
-    tax_id: z.string().nullable(),
     email: z.string().nullable(),
   }),
   requester: z.object({
@@ -154,6 +154,7 @@ export const ProjectDetailApiSchema = z.object({
   po_no: z.string().nullable(),
   contract_no: z.string().nullable(),
   migo_no: z.string().nullable(),
+  asset_code: z.boolean().nullable(),
   budget_plans: z.array(z.union([z.string(), ProjectDetailBudgetPlanApiSchema])).default([]),
   expected_approval_date: z.string().datetime().nullable(),
   expected_completion_procurement_date: z.string().datetime().nullable(),
@@ -161,7 +162,6 @@ export const ProjectDetailApiSchema = z.object({
   updated_at: z.string().datetime().nullable(),
   vendor: z.object({
     name: z.string().nullable(),
-    tax_id: z.string().nullable(),
     email: z.string().nullable(),
   }),
   requester: z.object({

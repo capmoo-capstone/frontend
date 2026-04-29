@@ -33,6 +33,11 @@ export function ProjectSummaryView({
   steps,
   activeWorkflowType,
 }: ProjectSummaryViewProps) {
+  const findDocumentConfig = (step: WorkflowStepConfig, fieldKey: string) =>
+    step.required_documents?.find(
+      (document) => document.field_key === fieldKey || document.project_update_key === fieldKey
+    );
+
   const stepsWithDocs = steps
     .map((step) => {
       // Filter submissions by step order so name changes do not hide history.
@@ -48,7 +53,7 @@ export function ProjectSummaryView({
       const targetSubmission = approved || latest;
 
       const enrichedDocuments = (targetSubmission?.documents || []).map((doc) => {
-        const docConfig = step.required_documents?.find((d) => d.field_key === doc.field_key);
+        const docConfig = findDocumentConfig(step, doc.field_key);
         return {
           ...doc,
           label: docConfig?.label || doc.field_key,
@@ -67,7 +72,7 @@ export function ProjectSummaryView({
 
             if (typeof fieldKey !== 'string') return [];
 
-            const docConfig = step.required_documents?.find((d) => d.field_key === fieldKey);
+            const docConfig = findDocumentConfig(step, fieldKey);
 
             return [
               {
@@ -79,7 +84,7 @@ export function ProjectSummaryView({
             ];
           })
         : Object.entries(metaDataSource).map(([fieldKey, value]) => {
-            const docConfig = step.required_documents?.find((d) => d.field_key === fieldKey);
+            const docConfig = findDocumentConfig(step, fieldKey);
 
             return {
               field_key: fieldKey,
@@ -135,7 +140,20 @@ export function ProjectSummaryView({
           </span>
         );
 
-      case 'VENDOR_EMAIL':
+      case 'VENDOR_EMAIL': {
+        const email = Array.isArray(doc.value)
+          ? doc.value.find((item): item is string => typeof item === 'string')
+          : typeof doc.value === 'string'
+            ? doc.value
+            : '';
+
+        return (
+          <span className="flex items-center gap-1.5">
+            <Mail className="text-muted-foreground h-3 w-3" /> {email || '-'}
+          </span>
+        );
+      }
+
       case 'COMMITTEE_EMAIL': {
         const emails = Array.isArray(doc.value)
           ? doc.value.filter((email): email is string => typeof email === 'string')

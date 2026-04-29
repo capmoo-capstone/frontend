@@ -91,12 +91,18 @@ export default function ProjectDetail() {
     }
   };
 
-  const handleSaveProjectInfo = async (data: { budget_plan_id: string[]; budget: number }) => {
+  const handleSaveProjectInfo = async (data: {
+    asset_code: boolean;
+    budget_plan_id: string[];
+    budget: number;
+  }) => {
     setIsSavingProjectInfo(true);
     try {
       const existingBudgetPlanIds = new Set(project.budget_plans ?? []);
       const nextBudgetPlanIds = new Set(data.budget_plan_id);
       const hasBudgetChanged = data.budget !== project.budget;
+      const currentAssetCode = project.asset_code ?? (project.budget_plans?.length ?? 0) > 0;
+      const hasAssetCodeChanged = data.asset_code !== currentAssetCode;
 
       const addedBudgetPlanIds = [...nextBudgetPlanIds].filter(
         (budgetPlanId) => !existingBudgetPlanIds.has(budgetPlanId)
@@ -113,11 +119,12 @@ export default function ProjectDetail() {
         );
       }
 
-      if (hasBudgetChanged) {
+      if (hasBudgetChanged || hasAssetCodeChanged) {
         await updateProjectMutation({
           projectId: id,
           payload: {
-            budget: data.budget,
+            ...(hasBudgetChanged ? { budget: data.budget } : {}),
+            asset_code: data.asset_code,
           },
         });
       }

@@ -1,4 +1,12 @@
-import type { WorkflowStepConfig } from '../types';
+import {
+  PROJECT_UPDATE_FIELD_KEYS,
+  type ProjectUpdateFieldKey,
+  type WorkflowStepConfig,
+} from '../types';
+
+const PROJECT_UPDATE_FIELD_KEY_SET = new Set<ProjectUpdateFieldKey>(PROJECT_UPDATE_FIELD_KEYS);
+
+type SubmissionMetaValue = string | number | boolean;
 
 export interface SubmissionPayload {
   files?: Array<{
@@ -8,14 +16,40 @@ export interface SubmissionPayload {
   }>;
   meta_data: Array<{
     field_key?: string;
-    value?: string;
+    value?: SubmissionMetaValue;
   }>;
+  required_updating: boolean;
 }
 
-function serialiseMetaValue(value: unknown): string {
+function serialiseMetaValue(
+  value: unknown,
+  projectUpdateKey?: ProjectUpdateFieldKey
+): SubmissionMetaValue {
+  if (projectUpdateKey === 'asset_code' && typeof value === 'boolean') return value;
   if (value instanceof Date) return value.toISOString();
   if (Array.isArray(value)) return JSON.stringify(value);
   return String(value);
+}
+
+export function hasProjectUpdateMetaData(metaData: unknown): boolean {
+  if (Array.isArray(metaData)) {
+    return metaData.some((item) => {
+      if (!item || typeof item !== 'object') return false;
+      const fieldKey = (item as { field_key?: unknown }).field_key;
+      return (
+        typeof fieldKey === 'string' &&
+        PROJECT_UPDATE_FIELD_KEY_SET.has(fieldKey as ProjectUpdateFieldKey)
+      );
+    });
+  }
+
+  if (metaData && typeof metaData === 'object') {
+    return Object.keys(metaData).some((fieldKey) =>
+      PROJECT_UPDATE_FIELD_KEY_SET.has(fieldKey as ProjectUpdateFieldKey)
+    );
+  }
+
+  return false;
 }
 
 export function buildSubmissionPayload(
@@ -58,13 +92,14 @@ export function buildSubmissionPayload(
     }
 
     metaData.push({
-      field_key: document.field_key,
-      value: serialiseMetaValue(value),
+      field_key: document.project_update_key ?? document.field_key,
+      value: serialiseMetaValue(value, document.project_update_key),
     });
   }
 
   return {
     files: files.length > 0 ? files : undefined,
     meta_data: metaData,
+    required_updating: hasProjectUpdateMetaData(metaData),
   };
 }

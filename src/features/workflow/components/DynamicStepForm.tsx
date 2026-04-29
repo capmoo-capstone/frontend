@@ -64,6 +64,14 @@ export function DynamicStepForm({
     return '';
   };
 
+  const getSingleEmailValue = (value: unknown): string => {
+    if (typeof value === 'string') return value;
+    if (Array.isArray(value)) {
+      return value.find((item): item is string => typeof item === 'string') ?? '';
+    }
+    return '';
+  };
+
   const getStringArrayValue = (value: unknown): string[] => {
     if (!Array.isArray(value)) return [];
     return value.filter((item): item is string => typeof item === 'string');
@@ -179,19 +187,28 @@ export function DynamicStepForm({
                 />
               )}
 
-              {/* --- 7. MULTI-EMAIL --- */}
-              {(field.type === 'VENDOR_EMAIL' || field.type === 'COMMITTEE_EMAIL') && (
+              {/* --- 7. VENDOR EMAIL --- */}
+              {field.type === 'VENDOR_EMAIL' && (
+                <Input
+                  type="email"
+                  value={getSingleEmailValue(formData[field.field_key])}
+                  onChange={(e) => onChange(field.field_key, e.target.value)}
+                  disabled={disabled}
+                  placeholder="ระบุอีเมลผู้ค้า..."
+                />
+              )}
+
+              {/* --- 8. MULTI-EMAIL --- */}
+              {field.type === 'COMMITTEE_EMAIL' && (
                 <MultiEmailInput
                   value={getStringArrayValue(formData[field.field_key])}
                   onChange={(emails) => onChange(field.field_key, emails)}
                   disabled={disabled}
-                  placeholder={
-                    field.type === 'VENDOR_EMAIL' ? 'ระบุอีเมลผู้ค้า...' : 'ระบุอีเมลกรรมการ...'
-                  }
+                  placeholder="ระบุอีเมลกรรมการ..."
                 />
               )}
 
-              {/* --- 8. DUE DATE SELECT --- */}
+              {/* --- 9. DUE DATE SELECT --- */}
               {field.type === 'DUE_DATE_SELECT' && (
                 <DueDateMultiSelect
                   value={getNumberArrayValue(formData[field.field_key])}
@@ -200,7 +217,7 @@ export function DynamicStepForm({
                 />
               )}
 
-              {/* --- 9. CONTRACT STATUS SELECT --- */}
+              {/* --- 10. CONTRACT STATUS SELECT --- */}
               {field.type === 'SELECT_CONTRACT_STATUS' && (
                 <Select
                   value={getStringValue(formData[field.field_key])}
@@ -218,7 +235,7 @@ export function DynamicStepForm({
                 </Select>
               )}
 
-              {/* --- 10. DELIVERY STATUS SELECT --- */}
+              {/* --- 11. DELIVERY STATUS SELECT --- */}
               {field.type === 'SELECT_DELIVERY_STATUS' && (
                 <Select
                   value={getStringValue(formData[field.field_key])}
@@ -236,7 +253,7 @@ export function DynamicStepForm({
                 </Select>
               )}
 
-              {/* --- 11. BUDGET PLAN SELECT --- */}
+              {/* --- 12. BUDGET PLAN SELECT --- */}
               {field.type === 'SELECT_BUDGET_PLAN' && (
                 <BudgetPlanSelectField
                   value={getStringArrayValue(formData[field.field_key])}

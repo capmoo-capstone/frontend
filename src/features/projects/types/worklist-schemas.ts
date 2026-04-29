@@ -124,9 +124,9 @@ export const UpdateProjectPayloadSchema = z.object({
   description: z.string().nullable().optional(),
   budget: z.number().nullable().optional(),
   is_urgent: ProjectUrgentStatusEnum.optional(),
+  asset_code: z.boolean().optional(),
   vendor_name: z.string().optional(),
   vendor_email: z.string().optional(),
-  vendor_tax_id: z.string().optional(),
 });
 
 export type AssignedProjectItem = z.infer<typeof AssignedProjectItemSchema>;

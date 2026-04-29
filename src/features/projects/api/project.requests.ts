@@ -53,9 +53,9 @@ const toProjectsQueryParams = (
   if (params.title) query.title = params.title;
   if (params.fiscalYear) query.fiscalYear = params.fiscalYear;
   if (params.myTasks) query.myTasks = true;
-  if (params.sortBy && params.sortOrder) {
-    query.sortBy = params.sortBy;
-    query.sortOrder = params.sortOrder;
+  if (options?.sortBy && options.sortOrder) {
+    query.sortBy = options.sortBy;
+    query.sortOrder = options.sortOrder;
   }
 
   if (params.dateRange?.from) query.dateFrom = params.dateRange.from.toISOString();
@@ -77,7 +77,7 @@ export const fetchProjectsPage = async (
   options?: ProjectsQueryOptions
 ) => {
   const queryParams = toProjectsQueryParams(params, options);
-  const { page = 1, limit = 50, ...filter } = queryParams;
+  const { page, limit, ...filter } = queryParams;
 
   const { data } = await api.post(
     '/projects',

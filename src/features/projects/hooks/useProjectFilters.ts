@@ -38,9 +38,6 @@ const FILTER_PARAM_KEYS = [
   ...ARRAY_FILTER_KEYS,
 ] as const;
 
-const SORT_FIELD_PARAM = 'sortField';
-const SORT_TYPE_PARAM = 'sortType';
-
 const parseDateRange = (searchParams: URLSearchParams): DateRange | undefined => {
   const dateFrom = searchParams.get('dateFrom');
   const dateTo = searchParams.get('dateTo');
@@ -57,21 +54,11 @@ const parseProjectFilters = (
   searchParams: URLSearchParams,
   isProcurementStaff: boolean
 ): ProjectFilterParams => {
-  const sortField = searchParams.get(SORT_FIELD_PARAM);
-  const sortType = searchParams.get(SORT_TYPE_PARAM);
-
   const nextFilters: ProjectFilterParams = {
     search: searchParams.get('search') ?? '',
     title: searchParams.get('title') ?? '',
     dateRange: parseDateRange(searchParams),
     fiscalYear: searchParams.get('fiscalYear') ?? '',
-    sortBy: sortField || undefined,
-    sortOrder:
-      sortField && sortType === 'ASC'
-        ? 'asc'
-        : sortField && sortType === 'DESC'
-          ? 'desc'
-          : undefined,
     procurementType: searchParams.getAll('procurementType'),
     status: searchParams.getAll('status'),
     urgentStatus: searchParams.getAll('urgentStatus'),

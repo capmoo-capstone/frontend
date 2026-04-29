@@ -5,8 +5,6 @@ export interface ProjectFilterParams {
   title?: string;
   dateRange?: DateRange;
   fiscalYear?: string;
-  sortBy?: string;
-  sortOrder?: 'asc' | 'desc';
   procurementType?: string[];
   status?: string[];
   procurementStatus?: string[];
@@ -21,6 +19,8 @@ export interface ProjectFilterParams {
 export interface ProjectsQueryOptions {
   page?: number;
   limit?: number;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
 }
 
 export interface OwnProjectQueryParams {

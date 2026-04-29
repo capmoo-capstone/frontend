@@ -96,14 +96,18 @@ export function ProjectWorkflowSteps({
                   onChange={handoffs.setProcurementAssigneeId}
                   unitId={CONTRACT_UNIT_ID}
                   placeholder="เลือกผู้รับผิดชอบงานบริหารสัญญา"
-                  disabled={handoffs.isProcurementHandoffBusy || user.role !== 'HEAD_OF_UNIT'}
+                  disabled={
+                    handoffs.isProcurementHandoffBusy || !handoffs.canCompleteProcurementTransfer
+                  }
                   className="w-full"
                   excludeHeadOfUnit
                 />
 
                 <Button
                   onClick={() => void handoffs.handleCompleteProcurementTransfer()}
-                  disabled={handoffs.isProcurementHandoffBusy || user.role !== 'HEAD_OF_UNIT'}
+                  disabled={
+                    handoffs.isProcurementHandoffBusy || !handoffs.canCompleteProcurementTransfer
+                  }
                   className="w-full gap-2"
                   variant="brand"
                 >

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Navigate, Outlet, useParams } from 'react-router-dom';
 
 import { useAuth } from '@/context/useAuth';
+import { hasRoleInScopes } from '@/lib/permissions';
 
 import { getProjectDetail } from '../../api';
 
@@ -14,8 +15,7 @@ const ProjectAccessGuard = () => {
     const checkAccess = async () => {
       if (!user || !id) return;
 
-      // Super User Bypass
-      if (user.role === 'SUPER_ADMIN') {
+      if (hasRoleInScopes(user, ['SUPER_ADMIN'])) {
         setIsAllowed(true);
         return;
       }

@@ -3,12 +3,14 @@ export type {
   VendorSubmission,
   VendorFilterParams,
   VendorFormData,
-  SubmissionStatus,
-  Attachment,
+  VendorDocument,
+  VendorSubmissionListResponse,
+  CreateVendorSubmissionPayload,
+  CreateVendorSubmissionResponse,
 } from './types';
 
 // Hooks
-export { useVendorSubmissions } from './hooks/useVendorSubmissions';
+export { useCreateVendorSubmission, useVendorSubmissions } from './hooks/useVendorSubmissions';
 
 // Components
 export { VendorSubmissionTable } from './components/VendorSubmissionTable';

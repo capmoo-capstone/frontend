@@ -21,6 +21,7 @@ interface ProjectDataTableProps<TData extends { id?: string }> {
   toolbar?: React.ReactNode;
   hasPagination?: boolean;
   emptyStateText?: string;
+  getRowHref?: (row: TData) => string | undefined;
 }
 
 export function ProjectDataTable<TData extends { id?: string }>({
@@ -28,13 +29,16 @@ export function ProjectDataTable<TData extends { id?: string }>({
   toolbar,
   hasPagination = true,
   emptyStateText = 'No results.',
+  getRowHref,
 }: ProjectDataTableProps<TData>) {
   const navigate = useNavigate();
 
   const handleNavigate = (row: Row<TData>) => {
-    const projectId = row.original.id;
-    if (projectId) {
-      navigate(`/app/projects/${projectId}`);
+    const href =
+      getRowHref?.(row.original) ??
+      (row.original.id ? `/app/projects/${row.original.id}` : undefined);
+    if (href) {
+      navigate(href);
     }
   };
 

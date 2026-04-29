@@ -20,13 +20,12 @@ export const vendorSubmissionColumns: ColumnDef<VendorSubmission>[] = [
         />
       </div>
     ),
-    enableGlobalFilter: false,
     cell: ({ row }) => (
       <span className="normal">{formatDateThaiShort(row.original.submitted_at)}</span>
     ),
   },
   {
-    accessorKey: 'po_number',
+    accessorKey: 'po_no',
     header: ({ column }) => (
       <div
         className="flex cursor-pointer items-center"
@@ -38,7 +37,7 @@ export const vendorSubmissionColumns: ColumnDef<VendorSubmission>[] = [
         />
       </div>
     ),
-    cell: ({ row }) => <span className="normal font-mono">{row.original.po_number}</span>,
+    cell: ({ row }) => <span className="normal font-mono">{row.original.po_no ?? '-'}</span>,
   },
   {
     accessorKey: 'vendor_name',
@@ -54,12 +53,12 @@ export const vendorSubmissionColumns: ColumnDef<VendorSubmission>[] = [
       </div>
     ),
     sortingFn: (rowA, rowB) => {
-      return rowA.original.vendor_name.localeCompare(rowB.original.vendor_name, 'th');
+      return (rowA.original.vendor_name ?? '').localeCompare(rowB.original.vendor_name ?? '', 'th');
     },
-    cell: ({ row }) => <span className="normal">{row.original.vendor_name}</span>,
+    cell: ({ row }) => <span className="normal">{row.original.vendor_name ?? '-'}</span>,
   },
   {
-    accessorKey: 'receipt_number',
+    accessorKey: 'receive_no',
     header: ({ column }) => (
       <div
         className="flex cursor-pointer items-center"
@@ -71,10 +70,10 @@ export const vendorSubmissionColumns: ColumnDef<VendorSubmission>[] = [
         />
       </div>
     ),
-    cell: ({ row }) => <span className="normal font-mono">{row.original.receipt_number}</span>,
+    cell: ({ row }) => <span className="normal font-mono">{row.original.receive_no}</span>,
   },
   {
-    accessorKey: 'project_title',
+    accessorKey: 'title',
     header: ({ column }) => (
       <div
         className="flex cursor-pointer items-center"
@@ -88,14 +87,15 @@ export const vendorSubmissionColumns: ColumnDef<VendorSubmission>[] = [
     ),
     cell: ({ row }) => (
       <div className="max-w-80">
-        <span className="normal line-clamp-2" title={row.original.project_title}>
-          {row.original.project_title}
+        <span className="normal line-clamp-2" title={row.original.title}>
+          {row.original.title}
         </span>
       </div>
     ),
   },
   {
-    accessorKey: 'department',
+    id: 'requesting_dept',
+    accessorFn: (row) => row.requester.dept_name,
     header: ({ column }) => (
       <div
         className="flex cursor-pointer items-center"
@@ -107,18 +107,22 @@ export const vendorSubmissionColumns: ColumnDef<VendorSubmission>[] = [
         />
       </div>
     ),
-    cell: ({ row }) => <span className="normal">{row.original.department}</span>,
+    cell: ({ row }) => <span className="normal">{row.original.requester.dept_name}</span>,
   },
   {
-    accessorKey: 'attachments',
+    accessorKey: 'documents',
     header: 'ไฟล์แนบ',
     cell: ({ row }) => (
       <div className="flex flex-col gap-1">
-        {row.original.attachments.map((attachment) => (
-          <div key={attachment.id} className="flex items-center gap-2">
-            <FileCard file={attachment.filename} />
-          </div>
-        ))}
+        {row.original.documents.map((document, index) => {
+          const file = document.file_path || document.file_name || 'Unknown File';
+
+          return (
+            <div key={`${file}-${index}`} className="flex items-center gap-2">
+              <FileCard file={file} />
+            </div>
+          );
+        })}
       </div>
     ),
   },

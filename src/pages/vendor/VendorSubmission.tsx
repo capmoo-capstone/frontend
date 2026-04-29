@@ -6,7 +6,6 @@ import { type VendorFilterParams, VendorSubmissionTable } from '@/features/vendo
 export default function VendorSubmission() {
   const [filters, setFilters] = useState<VendorFilterParams>({
     search: '',
-    status: [],
     dateRange: undefined,
   });
 

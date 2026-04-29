@@ -4,10 +4,7 @@ import { useNavigate } from 'react-router-dom';
 
 import {
   type SortingState,
-  type Updater,
   getCoreRowModel,
-  getFilteredRowModel,
-  getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table';
@@ -34,35 +31,37 @@ export function VendorSubmissionTable({
   onDateRangeChange,
 }: VendorSubmissionTableProps) {
   const navigate = useNavigate();
-  const { data, isLoading, isError } = useVendorSubmissions(filters);
   const [sorting, setSorting] = useState<SortingState>([]);
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 });
-
-  const handleGlobalFilterChange = (updater: Updater<string>) => {
-    const nextValue =
-      typeof updater === 'function' ? updater(filters.search ?? '') : (updater ?? filters.search);
-    onSearchChange(String(nextValue ?? ''));
-  };
+  const { data: vendorPage, isLoading, isError } = useVendorSubmissions(filters, {
+    page: pagination.pageIndex + 1,
+    limit: pagination.pageSize,
+  });
 
   const table = useReactTable({
-    data: data || [],
+    data: vendorPage?.data || [],
     columns: vendorSubmissionColumns,
+    pageCount: vendorPage?.totalPages ?? 0,
+    rowCount: vendorPage?.total ?? 0,
+    manualPagination: true,
     getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     onSortingChange: setSorting,
     onPaginationChange: setPagination,
-    onGlobalFilterChange: handleGlobalFilterChange,
     state: {
       sorting,
       pagination,
-      globalFilter: filters.search,
     },
   });
 
   const handleDateRangeFilterChange = (range: DateRange | undefined) => {
+    setPagination((prev) => ({ ...prev, pageIndex: 0 }));
     onDateRangeChange(range);
+  };
+
+  const handleSearchInputChange = (search: string) => {
+    setPagination((prev) => ({ ...prev, pageIndex: 0 }));
+    onSearchChange(search);
   };
 
   if (isLoading) {
@@ -86,14 +85,15 @@ export function VendorSubmissionTable({
     <ProjectDataTable
       table={table}
       columnsLength={vendorSubmissionColumns.length}
+      getRowHref={(row) => `/app/projects/${row.project_id}`}
       toolbar={
-        <div className="flex w-full items-center justify-end gap-3">
+        <div className="flex w-full items-center justify-end gap-3 flex-wrap">
           <div className="relative min-w-[342px]">
             <Input
               className="normal pr-10"
               placeholder={'ค้นหาจากเลขที่ PO, ชื่อผู้ค้า, เลขที่ลงรับ, ...'}
               value={filters.search}
-              onChange={(e) => onSearchChange(e.target.value)}
+              onChange={(e) => handleSearchInputChange(e.target.value)}
             />
             <Search className="text-muted-foreground absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2" />
           </div>

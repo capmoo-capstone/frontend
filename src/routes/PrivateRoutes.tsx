@@ -5,6 +5,7 @@ import PermissionGuard from '@/components/guards/PermissionGuard';
 import { useAuth } from '@/context/useAuth';
 import { useBudgetImportPermissions, useProjectImportPermissions } from '@/features/project-import';
 import AppLayout from '@/layouts/AppLayout';
+import { isProductionApp } from '@/lib/environment';
 import { hasSettingsPermission } from '@/lib/permissions';
 
 // --- Lazy Load Pages ---
@@ -46,6 +47,7 @@ export const PrivateRoutes = () => {
   const { canImportProject } = useProjectImportPermissions();
   const { canImportBudget } = useBudgetImportPermissions();
   const canManageSettings = user ? hasSettingsPermission(user) : false;
+  const landingPath = isProductionApp ? '/app/projects' : '/app/home';
 
   return (
     <Routes>
@@ -54,11 +56,19 @@ export const PrivateRoutes = () => {
         element={
           <AppLayout>
             <Routes>
-              {/* --- Redirect Root to Home --- */}
-              <Route path="/" element={<Navigate to="/app/home" replace />} />
+              {/* --- Redirect Root to Environment Landing Page --- */}
+              <Route path="/" element={<Navigate to={landingPath} replace />} />
               {/* --- Main Entry Points --- */}
-              <Route path="/app/home" element={<Home />} />
-              <Route path="/app/dashboards/overview" element={<OverallDashboard />} />
+              <Route
+                path="/app/home"
+                element={isProductionApp ? <Navigate to={landingPath} replace /> : <Home />}
+              />
+              <Route
+                path="/app/dashboards/overview"
+                element={
+                  isProductionApp ? <Navigate to={landingPath} replace /> : <OverallDashboard />
+                }
+              />
               <Route path="/app/me/dashboard" element={<MyToDoDashboard />} />
               {/* --- Projects (The Unified View) --- */}
               <Route path="/app/projects" element={<ProjectList />} />
@@ -78,7 +88,7 @@ export const PrivateRoutes = () => {
               <Route path="/app/assign/:id" element={<ProcurementJobs />} />
               {/* --- Budget Plan --- */}
               <Route
-                element={<PermissionGuard isAllowed={canImportBudget} redirectPath="/app/home" />}
+                element={<PermissionGuard isAllowed={canImportBudget} redirectPath={landingPath} />}
               >
                 <Route path="/app/budget-import" element={<BudgetPlanImport />} />
                 <Route path="/app/budget-import/success" element={<BudgetImportSuccess />} />
@@ -88,11 +98,16 @@ export const PrivateRoutes = () => {
               <Route path="/app/vendor-form" element={<VendorForm />} />
               <Route path="/vendor-form" element={<Navigate to="/app/vendor-form" replace />} />
               {/* --- Management / Admin --- */}
-              <Route path="/app/management/employees/kpi" element={<StaffKpi />} />
+              <Route
+                path="/app/management/employees/kpi"
+                element={isProductionApp ? <Navigate to={landingPath} replace /> : <StaffKpi />}
+              />
               <Route path="/app/management/organization" element={<OrganizationManagement />} />
               <Route path="/app/dev/api-probe" element={<ApiProbe />} />
               <Route
-                element={<PermissionGuard isAllowed={canManageSettings} redirectPath="/app/home" />}
+                element={
+                  <PermissionGuard isAllowed={canManageSettings} redirectPath={landingPath} />
+                }
               >
                 <Route
                   path="/app/settings"

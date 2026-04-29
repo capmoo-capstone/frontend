@@ -91,12 +91,10 @@ Current variables used by this frontend:
 
 ```env
 VITE_API_BASE_URL=http://localhost:3000/api/v1
-VITE_USE_PROJECTS_MOCK=true
 ```
 
 Notes:
 
-- Set `VITE_USE_PROJECTS_MOCK=false` when you want real backend calls.
 - Keep `VITE_API_BASE_URL` aligned with your backend server.
 
 ## Documentation Directory

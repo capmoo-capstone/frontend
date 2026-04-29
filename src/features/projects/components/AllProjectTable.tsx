@@ -2,10 +2,7 @@
 
 import { useMemo, useState } from 'react';
 
-import {
-  getCoreRowModel,
-  useReactTable,
-} from '@tanstack/react-table';
+import { getCoreRowModel, useReactTable } from '@tanstack/react-table';
 import type { ColumnDef } from '@tanstack/react-table';
 import { AlertTriangle, Loader2 } from 'lucide-react';
 
@@ -35,19 +32,16 @@ export function AllProjectTable({ filters, columns: customColumns }: AllProjectT
   const { canCancelProjects } = useProjectPermissions();
   const { pagination, sorting, updateQueryParams } = useTableQueryState();
 
-  const projectQueryOptions = useMemo<ProjectsQueryOptions>(
-    () => {
-      const primarySort = sorting[0];
+  const projectQueryOptions = useMemo<ProjectsQueryOptions>(() => {
+    const primarySort = sorting[0];
 
-      return {
-        page: pagination.pageIndex + 1,
-        limit: pagination.pageSize,
-        sortBy: primarySort?.id,
-        sortOrder: primarySort ? (primarySort.desc ? 'desc' : 'asc') : undefined,
-      };
-    },
-    [pagination.pageIndex, pagination.pageSize, sorting]
-  );
+    return {
+      page: pagination.pageIndex + 1,
+      limit: pagination.pageSize,
+      sortBy: primarySort?.id,
+      sortOrder: primarySort ? (primarySort.desc ? 'desc' : 'asc') : undefined,
+    };
+  }, [pagination.pageIndex, pagination.pageSize, sorting]);
 
   const { data: projectPage, isLoading, isError } = useProjects(filters, projectQueryOptions);
   const [projectToAddAssignee, setProjectToAddAssignee] = useState<Project | null>(null);

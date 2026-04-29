@@ -108,9 +108,7 @@ const getPhaseFormat = (
     return {
       label: 'การเงินส่งคืนแก้ไข',
       variant:
-        hasRole(roles, 'GENERAL_STAFF') || hasRole(roles, 'FINANCE_STAFF')
-          ? 'destructive'
-          : 'info',
+        hasRole(roles, 'GENERAL_STAFF') || hasRole(roles, 'FINANCE_STAFF') ? 'destructive' : 'info',
     };
   }
 

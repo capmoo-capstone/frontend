@@ -186,13 +186,9 @@ export function VendorForm({ onSubmit }: VendorFormProps) {
                   setErrors((prev) => ({ ...prev, installment: undefined, submit: undefined }));
                 }}
                 placeholder="กรุณากรอกงวดที่ (ถ้ามี)"
-                className={
-                  errors.installment ? 'h-11 border-red-500 bg-white' : 'h-11 bg-white'
-                }
+                className={errors.installment ? 'h-11 border-red-500 bg-white' : 'h-11 bg-white'}
               />
-              {errors.installment && (
-                <p className="text-sm text-red-500">{errors.installment}</p>
-              )}
+              {errors.installment && <p className="text-sm text-red-500">{errors.installment}</p>}
             </div>
           </div>
 

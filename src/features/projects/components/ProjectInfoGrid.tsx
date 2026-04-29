@@ -1,11 +1,7 @@
 import { useMemo, useState } from 'react';
 
-
-
 import { Check, ChevronDown, Copy, Pencil, X } from 'lucide-react';
 import { toast } from 'sonner';
-
-
 
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -16,29 +12,7 @@ import { useBudgetPlans } from '@/features/budgets';
 import { formatDateThai, getFiscalYear } from '@/lib/date-formatters';
 import { cn } from '@/lib/utils';
 
-
-
 import type { ProjectDetail } from '../types/index';
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 interface ProjectInfoGridProps {
   project: ProjectDetail;

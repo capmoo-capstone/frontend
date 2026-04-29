@@ -7,8 +7,8 @@ import { Input } from '@/components/ui/input';
 import { UserSelect, hasUserSelectionRole } from '@/features/users';
 import { cn } from '@/lib/utils';
 
-import { useCreateGroupForm } from '../../hooks/useCreateGroupForm';
 import { DIRECTOR_ROLE_ID } from '../../constants';
+import { useCreateGroupForm } from '../../hooks/useCreateGroupForm';
 import { type SettingsUserOption, type WorkGroupSetting } from '../../types';
 
 interface CreateGroupPanelProps {

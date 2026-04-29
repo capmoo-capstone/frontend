@@ -43,7 +43,7 @@ export default function VendorFormPage() {
       <div className="fixed bottom-6 left-6 z-30">
         <Button
           variant="secondary"
-          className="normal-b h-auto max-w-[calc(100vw-3rem)] justify-start whitespace-normal text-left sm:whitespace-nowrap"
+          className="normal-b h-auto max-w-[calc(100vw-3rem)] justify-start text-left whitespace-normal sm:whitespace-nowrap"
           onClick={handleButtonClick}
         >
           <LockKeyhole className="h-4 w-4 shrink-0" />

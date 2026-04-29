@@ -1,11 +1,9 @@
 'use client';
 
-import { useMemo } from 'react';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import {
   getCoreRowModel,
-  getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table';
@@ -34,7 +32,15 @@ export function AllProjectTable({ filters, columns: customColumns }: AllProjectT
   const { canCancelProjects } = useProjectPermissions();
   const { pagination, sorting, updateQueryParams } = useTableQueryState();
 
-  const { data: projects, isLoading, isError } = useProjects(filters);
+  const projectQueryOptions = useMemo(
+    () => ({
+      page: pagination.pageIndex + 1,
+      limit: pagination.pageSize,
+    }),
+    [pagination.pageIndex, pagination.pageSize]
+  );
+
+  const { data: projectPage, isLoading, isError } = useProjects(filters, projectQueryOptions);
   const [projectToAddAssignee, setProjectToAddAssignee] = useState<Project | null>(null);
   const [projectToReturn, setProjectToReturn] = useState<Project | null>(null);
   const [projectToCancel, setProjectToCancel] = useState<Project | null>(null);
@@ -53,8 +59,11 @@ export function AllProjectTable({ filters, columns: customColumns }: AllProjectT
   );
 
   const table = useReactTable({
-    data: projects || [],
+    data: projectPage?.data || [],
     columns,
+    pageCount: projectPage?.totalPages ?? 0,
+    rowCount: projectPage?.total ?? 0,
+    manualPagination: true,
     state: {
       sorting,
       pagination,
@@ -85,7 +94,6 @@ export function AllProjectTable({ filters, columns: customColumns }: AllProjectT
     },
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
     initialState: {
       pagination: {
         pageSize: 25,

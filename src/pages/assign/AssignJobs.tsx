@@ -45,6 +45,7 @@ export default function AssignJobs() {
         hasSelfManagePermission(user, unit.id)
     );
   }, [units, user]);
+  const selectedUnit = unitOptions.find((unit) => unit.id === id);
 
   useEffect(() => {
     if (id || isLoading) return;
@@ -93,7 +94,7 @@ export default function AssignJobs() {
         pendingChanges={pendingChanges}
         setPendingChanges={setPendingChanges}
       />
-      <AssignedTable unitId={id} />
+      <AssignedTable unitId={id} unitTypes={selectedUnit?.type} />
     </div>
   );
 }

@@ -15,7 +15,7 @@ import {
   UpdateProjectPayloadSchema,
   WorkloadStatsResponseSchema,
 } from '../types/index';
-import type { OwnProjectQueryParams, ProjectFilterParams } from './types';
+import type { OwnProjectQueryParams, ProjectFilterParams, ProjectsQueryOptions } from './types';
 
 type ProjectsQueryParams = {
   page: number;
@@ -38,10 +38,13 @@ type ProjectsQueryParams = {
   departments?: ProjectFilterParams['departments'];
 };
 
-const toProjectsQueryParams = (params?: ProjectFilterParams): ProjectsQueryParams => {
+const toProjectsQueryParams = (
+  params?: ProjectFilterParams,
+  options?: ProjectsQueryOptions
+): ProjectsQueryParams => {
   const query: ProjectsQueryParams = {
-    page: 1,
-    limit: 50,
+    page: options?.page ?? 1,
+    limit: options?.limit ?? 25,
   };
 
   if (!params) return query;
@@ -69,8 +72,11 @@ const toProjectsQueryParams = (params?: ProjectFilterParams): ProjectsQueryParam
   return query;
 };
 
-export const fetchProjectsPage = async (params?: ProjectFilterParams) => {
-  const queryParams = toProjectsQueryParams(params);
+export const fetchProjectsPage = async (
+  params?: ProjectFilterParams,
+  options?: ProjectsQueryOptions
+) => {
+  const queryParams = toProjectsQueryParams(params, options);
   const { page = 1, limit = 50, ...filter } = queryParams;
 
   const { data } = await api.post(
@@ -92,10 +98,11 @@ export const fetchProjectDetail = async (id: string) => {
   return ProjectDetailApiSchema.parse(data);
 };
 
-export const fetchAssignedProjects = async (date: Date) => {
+export const fetchAssignedProjects = async (date: Date, unitId?: string) => {
   const { data } = await api.get('/projects/assigned', {
     params: {
       date: date.toISOString(),
+      ...(unitId ? { unitId } : {}),
     },
   });
 

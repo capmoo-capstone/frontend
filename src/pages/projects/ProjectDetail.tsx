@@ -7,22 +7,24 @@ import { toast } from 'sonner';
 
 import { useAuth } from '@/context/useAuth';
 import { useLinkBudgetPlanToProject } from '@/features/budgets';
+import { ProjectDetailTabs } from '@/features/projects/components/ProjectDetailTabs';
+import { ProjectHeader } from '@/features/projects/components/ProjectHeader';
+import { ProjectInfoGrid } from '@/features/projects/components/ProjectInfoGrid';
 import {
-  AddAssigneeDialog,
-  ApproveCancelDialog,
-  CancelProjectDialog,
   CancellationRequestBanner,
   CancelledProjectBanner,
-  ProjectDetailTabs,
-  ProjectHeader,
-  ProjectInfoGrid,
-  projectKeys,
+} from '@/features/projects/components/ProjectStatusBanners';
+import { AddAssigneeDialog } from '@/features/projects/components/dialogs/AddAssigneeDialog';
+import { ApproveCancelDialog } from '@/features/projects/components/dialogs/ApproveCancelDialog';
+import { CancelProjectDialog } from '@/features/projects/components/dialogs/CancelProjectDialog';
+import { projectKeys } from '@/features/projects/hooks/queryKeys';
+import {
   useApproveProjectCancellation,
-  useProjectDetail,
-  useProjectPermissions,
   useRejectProjectCancellation,
   useUpdateProject,
-} from '@/features/projects';
+} from '@/features/projects/hooks/useProjectMutations';
+import { useProjectPermissions } from '@/features/projects/hooks/useProjectPermissions';
+import { useProjectDetail } from '@/features/projects/hooks/useProjectQueries';
 import { ProcurementWorkflows } from '@/features/workflow';
 
 export default function ProjectDetail() {

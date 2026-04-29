@@ -18,6 +18,11 @@ export interface ProjectFilterParams {
   myTasks?: boolean;
 }
 
+export interface ProjectsQueryOptions {
+  page?: number;
+  limit?: number;
+}
+
 export interface OwnProjectQueryParams {
   page?: number;
   limit?: number;

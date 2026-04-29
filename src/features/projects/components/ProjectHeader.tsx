@@ -152,9 +152,11 @@ export const ProjectHeader = ({
       </div>
 
       <div className="flex items-center gap-2">
-        <Button variant="brand" onClick={onExportReport}>
-          ส่งออกรายงาน
-        </Button>
+        {onExportReport && (
+          <Button variant="brand" onClick={onExportReport}>
+            ส่งออกรายงาน
+          </Button>
+        )}
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

@@ -24,15 +24,20 @@ import { ChangeAssigneeDialog } from '../../dialogs/ChangeAssigneeDialog';
 import { ProjectDataTable } from '../DataTable';
 import { getColumns } from './columns';
 
-export function AssignedTable({ unitId }: { unitId?: string }) {
+export function AssignedTable({ unitId, unitTypes }: { unitId?: string; unitTypes?: string[] }) {
   const { canClaimProjects, canChangeProjectAssignee, canCancelProjects } = useProjectPermissions({
     unitId,
   });
 
   const [date, setDate] = useState<Date | undefined>(new Date());
 
-  const { data: projects, isLoading, isError } = useAssignedProjects(date);
+  const { data: projects, isLoading, isError } = useAssignedProjects(date, unitId);
   const { mutateAsync: acceptProjectsMutation, isPending: isAccepting } = useAcceptProjects();
+  const filteredProjects = useMemo(() => {
+    if (!unitTypes?.length) return projects ?? [];
+
+    return (projects ?? []).filter((project) => unitTypes.includes(project.template_type));
+  }, [projects, unitTypes]);
 
   const [sorting, setSorting] = useState<SortingState>([{ id: 'status', desc: true }]);
   const [projectToCancel, setProjectToCancel] = useState<AssignedProjectItem | null>(null);
@@ -74,14 +79,14 @@ export function AssignedTable({ unitId }: { unitId?: string }) {
 
   const waitingProjectIds = useMemo(
     () =>
-      (projects ?? [])
+      filteredProjects
         .filter((project) => project.status === 'WAITING_ACCEPT')
         .map((project) => project.id),
-    [projects]
+    [filteredProjects]
   );
 
   const table = useReactTable({
-    data: projects || [],
+    data: filteredProjects,
     columns,
     onSortingChange: setSorting,
     getCoreRowModel: getCoreRowModel(),

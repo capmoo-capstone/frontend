@@ -11,7 +11,8 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { RESPONSIBLE_SELECT_OPTIONS } from '@/features/projects';
+import { ProcurementTypeEnum } from '@/features/projects/types/enums';
+import { getResponsibleTypeFormat } from '@/features/projects/utils/projectFormatters';
 import { cn } from '@/lib/utils';
 
 import type { ProjectImportFormValues } from '../types';
@@ -35,6 +36,11 @@ export function ProjectDetailsFields({
   showBudgetWarning,
   onBudgetChange,
 }: ProjectDetailsFieldsProps) {
+  const procurementTypeOptions = ProcurementTypeEnum.options.map((value) => ({
+    value,
+    label: getResponsibleTypeFormat(value).label,
+  }));
+
   return (
     <>
       {/* Project Title */}
@@ -99,7 +105,7 @@ export function ProjectDetailsFields({
                 <SelectValue placeholder="กรุณาเลือกวิธีการจัดหา" />
               </SelectTrigger>
               <SelectContent>
-                {RESPONSIBLE_SELECT_OPTIONS.map((option) => (
+                {procurementTypeOptions.map((option) => (
                   <SelectItem key={option.value} value={option.value}>
                     {option.label}
                   </SelectItem>

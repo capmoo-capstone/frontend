@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import type { User } from '@/features/auth';
-import { AllProjectTable } from '@/features/projects';
+import { AllProjectTable } from '@/features/projects/components/AllProjectTable';
 
 import { myTasksColumns } from './MyTasksColumns';
 

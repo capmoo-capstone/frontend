@@ -24,6 +24,12 @@ interface ProjectDetailTabsProps {
   workflowConfigs: WorkflowConfig[];
 }
 
+const formatAssigneeNames = (assignees: ProjectDetail['assignee_procurement']) => {
+  const names = assignees.map((assignee) => assignee.full_name).filter(Boolean);
+
+  return names.length > 0 ? names.join(', ') : 'ยังไม่มีผู้รับผิดชอบ';
+};
+
 export function ProjectDetailTabs({ project, workflowConfigs }: ProjectDetailTabsProps) {
   const [workflowTab, setWorkflowTab] = useState<'PROCUREMENT' | 'CONTRACT'>('PROCUREMENT');
   const { data: workflowSubmissions } = useWorkflowSubmissions(project.id);
@@ -56,9 +62,9 @@ export function ProjectDetailTabs({ project, workflowConfigs }: ProjectDetailTab
 
   const getResponsiblePerson = () => {
     if (workflowTab === 'PROCUREMENT') {
-      return project.assignee_procurement?.full_name ?? 'ยังไม่มีผู้รับผิดชอบ';
+      return formatAssigneeNames(project.assignee_procurement);
     } else {
-      return project.assignee_contract?.full_name ?? 'ยังไม่มีผู้รับผิดชอบ';
+      return formatAssigneeNames(project.assignee_contract);
     }
   };
 

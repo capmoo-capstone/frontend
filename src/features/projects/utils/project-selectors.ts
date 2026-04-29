@@ -40,9 +40,7 @@ export const canManageAssigneeByRole = (viewAsRole: Role) => {
   return ManageUnitRoles.includes(viewAsRole) || ManageSelfRoles.includes(viewAsRole);
 };
 
-type AssigneeSource = { id?: string | null } | null | undefined;
-
-type ProjectAssigneeSource = AssigneeSource | AssigneeSource[];
+type ProjectAssigneeSource = Array<{ id?: string | null }>;
 
 export type ProjectAddAssigneePermissionSource = {
   responsible_unit_id?: string;
@@ -54,10 +52,10 @@ export type ProjectAddAssigneePermissionSource = {
   assignee_contract_ids?: string[];
 };
 
-const getAssigneeIds = (assignees: ProjectAssigneeSource): string[] => {
-  const assigneeList = Array.isArray(assignees) ? assignees : [assignees];
-
-  return assigneeList.map((assignee) => assignee?.id).filter((id): id is string => Boolean(id));
+const getAssigneeIds = (assignees?: ProjectAssigneeSource): string[] => {
+  return (assignees ?? [])
+    .map((assignee) => assignee.id)
+    .filter((id): id is string => Boolean(id));
 };
 
 export const getActiveProjectAssigneeIds = (project: ProjectAddAssigneePermissionSource) => {

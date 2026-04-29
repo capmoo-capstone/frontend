@@ -63,20 +63,8 @@ export const ProjectDetailSchema = z.object({
     dept_name: z.string().nullable().optional(),
     dept_id: z.string().nullable().optional(),
   }),
-  assignee_procurement: z.object({
-    id: z.string().nullable(),
-    full_name: z.string().nullable(),
-    role: RoleEnum.nullable().optional(),
-    unit_name: z.string().nullable().optional(),
-    unit_id: z.string().nullable().optional(),
-  }),
-  assignee_contract: z.object({
-    id: z.string().nullable(),
-    full_name: z.string().nullable(),
-    role: RoleEnum.nullable().optional(),
-    unit_name: z.string().nullable().optional(),
-    unit_id: z.string().nullable().optional(),
-  }),
+  assignee_procurement: z.array(ProjectPersonSchema).default([]),
+  assignee_contract: z.array(ProjectPersonSchema).default([]),
   assignee_procurement_ids: z.array(z.string()).default([]),
   assignee_contract_ids: z.array(z.string()).default([]),
   current_step: z.object({

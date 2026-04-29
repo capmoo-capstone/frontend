@@ -39,6 +39,10 @@ export function ProjectWorkflowSteps({
 
   const sortedSteps = [...steps].sort((a, b) => a.order - b.order);
   const lastStepOrder = sortedSteps.at(-1)?.order;
+  const contractAssigneeNames = project.assignee_contract
+    .map((assignee) => assignee.full_name)
+    .filter(Boolean)
+    .join(', ');
   const handoffs = useWorkflowHandoffs({
     project,
     sortedSteps,
@@ -74,9 +78,9 @@ export function ProjectWorkflowSteps({
               <p className="text-muted-foreground normal">
                 ส่งต่องานไปยังงานบริหารสัญญาเรียบร้อยแล้ว
               </p>
-              {project.assignee_contract.full_name && (
+              {contractAssigneeNames && (
                 <p className="caption text-muted-foreground">
-                  ผู้รับผิดชอบงานบริหารสัญญา: {project.assignee_contract.full_name}
+                  ผู้รับผิดชอบงานบริหารสัญญา: {contractAssigneeNames}
                 </p>
               )}
             </div>

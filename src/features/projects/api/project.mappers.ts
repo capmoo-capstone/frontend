@@ -190,14 +190,8 @@ export const mapProjectDetail = (parsed: ProjectDetailApi): ProjectDetail => ({
     id: parsed.creator.id,
     full_name: parsed.creator.full_name,
   },
-  assignee_procurement: {
-    id: parsed.assignee_procurement[0]?.id ?? null,
-    full_name: parsed.assignee_procurement[0]?.full_name ?? null,
-  },
-  assignee_contract: {
-    id: parsed.assignee_contract[0]?.id ?? null,
-    full_name: parsed.assignee_contract[0]?.full_name ?? null,
-  },
+  assignee_procurement: parsed.assignee_procurement,
+  assignee_contract: parsed.assignee_contract,
   assignee_procurement_ids: parsed.assignee_procurement.map((assignee) => assignee.id),
   assignee_contract_ids: parsed.assignee_contract.map((assignee) => assignee.id),
   current_step: {

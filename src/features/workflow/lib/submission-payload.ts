@@ -1,15 +1,10 @@
-import type { ProjectUpdateFieldKey, WorkflowStepConfig } from '../types';
+import {
+  PROJECT_UPDATE_FIELD_KEYS,
+  type ProjectUpdateFieldKey,
+  type WorkflowStepConfig,
+} from '../types';
 
-const PROJECT_UPDATE_FIELD_KEYS = new Set<ProjectUpdateFieldKey>([
-  'pr_no',
-  'po_no',
-  'less_no',
-  'contract_no',
-  'migo_no',
-  'asset_code',
-  'vendor_name',
-  'vendor_email',
-]);
+const PROJECT_UPDATE_FIELD_KEY_SET = new Set<ProjectUpdateFieldKey>(PROJECT_UPDATE_FIELD_KEYS);
 
 type SubmissionMetaValue = string | number | boolean;
 
@@ -43,14 +38,14 @@ export function hasProjectUpdateMetaData(metaData: unknown): boolean {
       const fieldKey = (item as { field_key?: unknown }).field_key;
       return (
         typeof fieldKey === 'string' &&
-        PROJECT_UPDATE_FIELD_KEYS.has(fieldKey as ProjectUpdateFieldKey)
+        PROJECT_UPDATE_FIELD_KEY_SET.has(fieldKey as ProjectUpdateFieldKey)
       );
     });
   }
 
   if (metaData && typeof metaData === 'object') {
     return Object.keys(metaData).some((fieldKey) =>
-      PROJECT_UPDATE_FIELD_KEYS.has(fieldKey as ProjectUpdateFieldKey)
+      PROJECT_UPDATE_FIELD_KEY_SET.has(fieldKey as ProjectUpdateFieldKey)
     );
   }
 

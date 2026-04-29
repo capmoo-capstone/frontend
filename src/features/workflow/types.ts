@@ -55,7 +55,7 @@ export type StepStatus = z.infer<typeof StepStatusSchema>;
 export type UiOnlyStepStatus = z.infer<typeof UiOnlyStepStatusSchema>;
 export type BackendSubmissionStatus = z.infer<typeof WorkflowSubmissionBackendStatusSchema>;
 
-export const ProjectUpdateFieldKeySchema = z.enum([
+export const PROJECT_UPDATE_FIELD_KEYS = [
   'pr_no',
   'po_no',
   'less_no',
@@ -64,7 +64,9 @@ export const ProjectUpdateFieldKeySchema = z.enum([
   'asset_code',
   'vendor_name',
   'vendor_email',
-]);
+] as const;
+
+export const ProjectUpdateFieldKeySchema = z.enum(PROJECT_UPDATE_FIELD_KEYS);
 
 export type ProjectUpdateFieldKey = z.infer<typeof ProjectUpdateFieldKeySchema>;
 

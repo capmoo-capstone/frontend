@@ -41,8 +41,9 @@ import {
 import { useSidebar } from '@/components/ui/sidebar-context';
 import { useAuth } from '@/context/useAuth';
 import { useLogout } from '@/features/auth';
-import { type Role } from '@/features/auth';
+import { type Role, type User } from '@/features/auth';
 import { isProductionApp } from '@/lib/environment';
+import { hasAnyRole } from '@/lib/permissions';
 import { cn } from '@/lib/utils';
 
 type MenuItem = {
@@ -115,6 +116,7 @@ const menuGroups: MenuGroup[] = [
         title: 'การตอบกลับจากคู่ค้า',
         url: '/app/vendor-response',
         icon: Truck,
+        allowedRoles: ['FINANCE_STAFF', 'ADMIN', 'SUPER_ADMIN'],
       },
     ],
   },
@@ -163,25 +165,23 @@ const menuGroups: MenuGroup[] = [
   },
 ];
 
-const canAccessMenuItem = (item: MenuItem, userRole?: Role): boolean => {
+const canAccessMenuItem = (item: MenuItem, user?: User | null): boolean => {
   if (!item.allowedRoles) return true;
-  if (!userRole) return false;
-  return item.allowedRoles.includes(userRole);
+  return hasAnyRole(user, item.allowedRoles);
 };
 
-const canAccessGroup = (group: MenuGroup, userRole?: Role): boolean => {
+const canAccessGroup = (group: MenuGroup, user?: User | null): boolean => {
   if (!group.allowedRoles) return true;
-  if (!userRole) return false;
-  return group.allowedRoles.includes(userRole);
+  return hasAnyRole(user, group.allowedRoles);
 };
 
-const getFilteredGroups = (groups: MenuGroup[], userRole?: Role): MenuGroup[] => {
+const getFilteredGroups = (groups: MenuGroup[], user?: User | null): MenuGroup[] => {
   return groups
-    .filter((group) => canAccessGroup(group, userRole))
+    .filter((group) => canAccessGroup(group, user))
     .map((group) => ({
       ...group,
       items: group.items.filter(
-        (item) => canAccessMenuItem(item, userRole) && (!isProductionApp || !item.hideInProduction)
+        (item) => canAccessMenuItem(item, user) && (!isProductionApp || !item.hideInProduction)
       ),
     }))
     .filter((group) => group.items.length > 0);
@@ -194,7 +194,7 @@ export function AppSidebar() {
   const { toggleSidebar, state } = useSidebar();
 
   const isHomeActive = location.pathname === '/app/home';
-  const filteredGroups = getFilteredGroups(menuGroups, user?.role);
+  const filteredGroups = getFilteredGroups(menuGroups, user);
 
   return (
     <Sidebar collapsible="icon" className="border-r-0 bg-gray-50/50">

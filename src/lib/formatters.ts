@@ -30,8 +30,11 @@ interface FormatParams {
   contractStatus?: ProjectStatusByType | null;
   contractStep?: number | null;
   isProcurementStaff: boolean;
-  role?: UserRole;
+  roles?: readonly UserRole[];
 }
+
+const hasRole = (roles: readonly UserRole[] | undefined, role: UserRole) =>
+  roles?.includes(role) ?? false;
 
 const getPhaseLabel = (status: ProjectStatusByType, step?: number | null) => {
   switch (status) {
@@ -61,7 +64,7 @@ const getPhaseFormat = (
   overallStatus: ProjectStatus,
   currentWorkflowType: UnitResponsibleType,
   isProcurementStaff: boolean,
-  role?: UserRole
+  roles?: readonly UserRole[]
 ): StatusFormat => {
   if (!status) return { label: '-', variant: 'secondary' };
 
@@ -86,7 +89,7 @@ const getPhaseFormat = (
   if (overallStatus === 'CANCELLED') return { label: 'ยกเลิก', variant: 'destructive' };
 
   if (overallStatus === 'WAITING_CANCEL') {
-    const isHead = role === 'HEAD_OF_UNIT' || role === 'HEAD_OF_DEPARTMENT';
+    const isHead = hasRole(roles, 'HEAD_OF_UNIT') || hasRole(roles, 'HEAD_OF_DEPARTMENT');
     return { label: 'รออนุมัติยกเลิก', variant: isHead ? 'warning' : 'info' };
   }
 
@@ -102,14 +105,18 @@ const getPhaseFormat = (
       (phaseType === 'PROCUREMENT' && !isContractWorkflow) ||
       (isContractPhase && isContractWorkflow);
     if (isActivePhase) {
-      return { label: 'รอการตอบรับ', variant: role === 'GENERAL_STAFF' ? 'warning' : 'info' };
+      return {
+        label: 'รอการตอบรับ',
+        variant: hasRole(roles, 'GENERAL_STAFF') ? 'warning' : 'info',
+      };
     }
   }
 
   if (overallStatus === 'REQUEST_EDIT' && isContractPhase) {
     return {
       label: 'การเงินส่งคืนแก้ไข',
-      variant: role === 'GENERAL_STAFF' || role === 'FINANCE_STAFF' ? 'destructive' : 'info',
+      variant:
+        hasRole(roles, 'GENERAL_STAFF') || hasRole(roles, 'FINANCE_STAFF') ? 'destructive' : 'info',
     };
   }
 
@@ -118,25 +125,31 @@ const getPhaseFormat = (
 
   if (status === 'COMPLETED') {
     if (!isContractPhase) return { label: 'เสร็จสิ้น', variant: 'success' };
-    return { label: 'ส่งเบิกการเงินแล้ว', variant: role === 'FINANCE_STAFF' ? 'warning' : 'info' };
+    return {
+      label: 'ส่งเบิกการเงินแล้ว',
+      variant: hasRole(roles, 'FINANCE_STAFF') ? 'warning' : 'info',
+    };
   }
 
   if (status === 'NOT_EXPORTED' && isContractPhase) {
-    return { label: 'รอส่งเบิกการเงิน', variant: role === 'FINANCE_STAFF' ? 'warning' : 'info' };
+    return {
+      label: 'รอส่งเบิกการเงิน',
+      variant: hasRole(roles, 'FINANCE_STAFF') ? 'warning' : 'info',
+    };
   }
 
   const label = getPhaseLabel(status, step);
 
   switch (status) {
     case 'IN_PROGRESS':
-      return { label, variant: role === 'GENERAL_STAFF' ? 'warning' : 'info' };
+      return { label, variant: hasRole(roles, 'GENERAL_STAFF') ? 'warning' : 'info' };
     case 'WAITING_APPROVAL':
-      return { label, variant: role === 'HEAD_OF_UNIT' ? 'warning' : 'info' };
+      return { label, variant: hasRole(roles, 'HEAD_OF_UNIT') ? 'warning' : 'info' };
     case 'WAITING_PROPOSAL':
     case 'WAITING_SIGNATURE':
-      return { label, variant: role === 'DOCUMENT_STAFF' ? 'warning' : 'info' };
+      return { label, variant: hasRole(roles, 'DOCUMENT_STAFF') ? 'warning' : 'info' };
     case 'REJECTED':
-      return { label, variant: role === 'GENERAL_STAFF' ? 'destructive' : 'info' };
+      return { label, variant: hasRole(roles, 'GENERAL_STAFF') ? 'destructive' : 'info' };
     default:
       return { label, variant: 'secondary' };
   }
@@ -150,10 +163,8 @@ export const getProjectStatusesFormat = ({
   contractStep,
   currentWorkflowType,
   isProcurementStaff,
-  role,
+  roles,
 }: FormatParams): ProjectStatusesResult => {
-  const resolvedRole = role ?? undefined;
-
   return {
     procurement: getPhaseFormat(
       'PROCUREMENT',
@@ -162,7 +173,7 @@ export const getProjectStatusesFormat = ({
       overallStatus,
       currentWorkflowType,
       isProcurementStaff,
-      resolvedRole
+      roles
     ),
     contract: getPhaseFormat(
       'CONTRACT',
@@ -171,7 +182,7 @@ export const getProjectStatusesFormat = ({
       overallStatus,
       currentWorkflowType,
       isProcurementStaff,
-      resolvedRole
+      roles
     ),
   };
 };

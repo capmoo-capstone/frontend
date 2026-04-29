@@ -9,6 +9,7 @@ import {
   useCompleteProjectProcurement,
   useRequestProjectEdit,
 } from '@/features/projects';
+import { hasRoleInScopes } from '@/lib/permissions';
 
 import type { StepStatus, WorkflowStepConfig } from '../types';
 
@@ -55,6 +56,10 @@ export function useWorkflowHandoffs({
   const isProcurementWorkflow = activeWorkflowType !== 'CONTRACT';
   const isContractWorkflow = activeWorkflowType === 'CONTRACT';
   const hasFinanceRole = user?.roles.some((role) => role.role === 'FINANCE_STAFF') ?? false;
+  const canCompleteProcurementTransfer =
+    !!user &&
+    hasRoleInScopes(user, ['HEAD_OF_UNIT'], { unitId: project.responsible_unit_id }) &&
+    allStepsCompleted;
 
   const isProcurementHandoffBusy =
     completeProcurementMutation.isPending || assignProjectsMutation.isPending;
@@ -72,7 +77,7 @@ export function useWorkflowHandoffs({
   const canRequestEdit = project.status === 'CLOSED' && contractHandoffCompleted;
 
   const handleCompleteProcurementTransfer = async () => {
-    if (!user || user.role !== 'HEAD_OF_UNIT' || !allStepsCompleted) return;
+    if (!canCompleteProcurementTransfer) return;
 
     await completeProcurementMutation.mutateAsync(project.id);
 
@@ -113,6 +118,7 @@ export function useWorkflowHandoffs({
 
   return {
     allStepsCompleted,
+    canCompleteProcurementTransfer,
     canCloseProject,
     canCompleteContract,
     canRequestEdit,

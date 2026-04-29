@@ -25,6 +25,9 @@ const DepartmentAllowedRoles: Role[] = ['SUPER_ADMIN', 'ADMIN', 'HEAD_OF_DEPARTM
 /** Roles permitted to access global application settings */
 const SettingsAllowedRoles: Role[] = ['SUPER_ADMIN', 'ADMIN'];
 
+/** Roles permitted to view vendor submissions */
+const VendorSubmissionAllowedRoles: Role[] = ['SUPER_ADMIN', 'ADMIN', 'FINANCE_STAFF'];
+
 /** Roles that bypass standard unit-level restrictions (Global access) */
 const UnitBypassRoles: Role[] = ['SUPER_ADMIN', 'ADMIN'];
 
@@ -54,6 +57,18 @@ export const ManageSelfRoles: Role[] = ['GENERAL_STAFF'];
  * @returns Array of all active role scopes for the user
  */
 const getAllScopes = (user: User) => user.roles;
+
+export const getUserRoleNames = (user: User | null | undefined): Role[] => {
+  if (!user) return [];
+
+  return Array.from(new Set(user.roles.map((scope) => scope.role)));
+};
+
+export const hasAnyRole = (user: User | null | undefined, allowedRoles: Role[]): boolean => {
+  const roles = getUserRoleNames(user);
+
+  return allowedRoles.some((role) => roles.includes(role));
+};
 
 /**
  * Core engine to check if a user possesses any of the allowed roles,
@@ -88,7 +103,7 @@ export const hasRoleInScopes = (
  * @param bypassRoles Array of roles that grant bypass access
  */
 export const hasBypassRole = (user: User, bypassRoles: Role[]) => {
-  return hasRoleInScopes(user, bypassRoles) || (!!user.role && bypassRoles.includes(user.role));
+  return hasRoleInScopes(user, bypassRoles);
 };
 
 // ============================================================================
@@ -104,10 +119,7 @@ export const hasProcurementPermission = (user: User, targetDepartmentId?: string
     return hasRoleInScopes(user, ProcurementAllowedRoles, { departmentId: targetDepartmentId });
   }
 
-  return (
-    hasRoleInScopes(user, ProcurementAllowedRoles) ||
-    (!!user.role && ProcurementAllowedRoles.includes(user.role))
-  );
+  return hasRoleInScopes(user, ProcurementAllowedRoles);
 };
 
 /**
@@ -116,10 +128,7 @@ export const hasProcurementPermission = (user: User, targetDepartmentId?: string
  */
 export const hasUnitPermission = (user: User, targetUnitId?: string) => {
   if (!targetUnitId) {
-    return (
-      hasRoleInScopes(user, UnitAllowedRoles) ||
-      (!!user.role && UnitAllowedRoles.includes(user.role))
-    );
+    return hasRoleInScopes(user, UnitAllowedRoles);
   }
 
   if (hasBypassRole(user, UnitBypassRoles)) {
@@ -135,10 +144,7 @@ export const hasUnitPermission = (user: User, targetUnitId?: string) => {
  */
 export const hasDepartmentPermission = (user: User, targetDepartmentId?: string) => {
   if (!targetDepartmentId) {
-    return (
-      hasRoleInScopes(user, DepartmentAllowedRoles) ||
-      (!!user.role && DepartmentAllowedRoles.includes(user.role))
-    );
+    return hasRoleInScopes(user, DepartmentAllowedRoles);
   }
 
   if (hasBypassRole(user, DepartmentBypassRoles)) {
@@ -152,10 +158,14 @@ export const hasDepartmentPermission = (user: User, targetDepartmentId?: string)
  * Checks if a user has access to global system settings.
  */
 export const hasSettingsPermission = (user: User) => {
-  return (
-    hasRoleInScopes(user, SettingsAllowedRoles) ||
-    (!!user.role && SettingsAllowedRoles.includes(user.role))
-  );
+  return hasRoleInScopes(user, SettingsAllowedRoles);
+};
+
+/**
+ * Checks if a user can access vendor submission responses.
+ */
+export const hasVendorSubmissionPermission = (user: User) => {
+  return hasRoleInScopes(user, VendorSubmissionAllowedRoles);
 };
 
 /**

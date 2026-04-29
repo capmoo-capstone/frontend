@@ -1,26 +1,6 @@
 import type { UnitResponsibleType } from '@/features/projects';
 
-
-
 import type { WorkflowStepConfig } from '../types';
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 type WorkflowConfig = {
   type: UnitResponsibleType;
@@ -123,6 +103,7 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
         require_approval: true,
         required_signature: true,
         required_documents: [
+          // todo: generate contract number and save to project after complete this step
           {
             type: 'GEN_CONT_NO',
             label: 'เลขที่สัญญา',
@@ -150,6 +131,13 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
         require_approval: false,
         required_signature: false,
         required_documents: [
+          // todo: send notification to vendor email after complete this step
+          {
+            type: 'TEXT',
+            label: 'ชื่อบริษัทผู้ค้า',
+            field_key: 'mt500k_vendor_name',
+            mark_as_done: false,
+          },
           {
             type: 'VENDOR_EMAIL',
             label: 'อีเมลผู้ค้า',
@@ -162,7 +150,7 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
         name: 'ส่งไปยังฝ่ายตรวจรับ',
         order: 6,
         required_step: [1, 2, 3, 4, 5],
-        require_approval: true,
+        require_approval: false,
         required_signature: false,
         required_documents: [
           {
@@ -187,6 +175,19 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
             type: 'DATE',
             label: 'วันสิ้นสุดสัญญา',
             field_key: 'mt500k_contract_end_date',
+            mark_as_done: false,
+          },
+          {
+            type: 'BOOLEAN',
+            label: 'มีรหัสสินทรัพย์หรือไม่',
+            field_key: 'mt500k_contract_asset_code',
+            mark_as_done: false,
+          },
+          {
+            // todo: if have asset code, then show this field and save selected budget plan to project
+            type: 'SELECT_BUDGET_PLAN',
+            label: 'แผนงบประมาณ',
+            field_key: 'mt500k_asset_budget_plan',
             mark_as_done: false,
           },
         ],
@@ -387,6 +388,7 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
             mark_as_done: false,
           },
           {
+            // todo: generate contract number and save to project after complete this step
             type: 'GEN_CONT_NO',
             label: 'เลขที่สัญญา',
             field_key: 'ebid_contract_number',
@@ -422,6 +424,13 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
         require_approval: false,
         required_signature: false,
         required_documents: [
+          // todo: send notification to vendor email after complete this step
+          {
+            type: 'TEXT',
+            label: 'ชื่อบริษัทผู้ค้า',
+            field_key: 'ebid_vendor_name',
+            mark_as_done: false,
+          },
           {
             type: 'VENDOR_EMAIL',
             label: 'อีเมลผู้ค้า',
@@ -434,7 +443,7 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
         name: 'ส่งไปยังฝ่ายตรวจรับ',
         order: 10,
         required_step: [1, 2, 3, 4, 5, 6, 7, 8, 9],
-        require_approval: true,
+        require_approval: false,
         required_signature: false,
         required_documents: [
           {
@@ -454,6 +463,19 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
             type: 'DATE',
             label: 'วันสิ้นสุดสัญญา',
             field_key: 'ebid_contract_end_date',
+            mark_as_done: false,
+          },
+          {
+            type: 'BOOLEAN',
+            label: 'มีรหัสสินทรัพย์หรือไม่',
+            field_key: 'ebid_contract_asset_code',
+            mark_as_done: false,
+          },
+          {
+            // todo: if have asset code, then show this field and save selected budget plan to project
+            type: 'SELECT_BUDGET_PLAN',
+            label: 'แผนงบประมาณ',
+            field_key: 'ebid_asset_budget_plan',
             mark_as_done: false,
           },
         ],
@@ -572,6 +594,7 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
             mark_as_done: false,
           },
           {
+            // todo: generate contract number and save to project after complete this step
             type: 'GEN_CONT_NO',
             label: 'เลขที่สัญญา',
             field_key: 'select_contract_number',
@@ -607,6 +630,13 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
         require_approval: false,
         required_signature: false,
         required_documents: [
+          // todo: send notification to vendor email after complete this step
+          {
+            type: 'TEXT',
+            label: 'ชื่อบริษัทผู้ค้า',
+            field_key: 'select_vendor_name',
+            mark_as_done: false,
+          },
           {
             type: 'VENDOR_EMAIL',
             label: 'อีเมลผู้ค้า',
@@ -619,7 +649,7 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
         name: 'ส่งไปยังฝ่ายตรวจรับ',
         order: 7,
         required_step: [1, 2, 3, 4, 5, 6],
-        require_approval: true,
+        require_approval: false,
         required_signature: false,
         required_documents: [
           {
@@ -644,6 +674,19 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
             type: 'DATE',
             label: 'วันสิ้นสุดสัญญา',
             field_key: 'select_contract_end_date',
+            mark_as_done: false,
+          },
+          {
+            type: 'BOOLEAN',
+            label: 'มีรหัสสินทรัพย์หรือไม่',
+            field_key: 'select_contract_asset_code',
+            mark_as_done: false,
+          },
+          {
+            // todo: if have asset code, then show this field and save selected budget plan to project
+            type: 'SELECT_BUDGET_PLAN',
+            label: 'แผนงบประมาณ',
+            field_key: 'select_asset_budget_plan',
             mark_as_done: false,
           },
         ],
@@ -695,6 +738,7 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
         require_approval: true,
         required_signature: true,
         required_documents: [
+          // todo: generate contract number and save to project after complete this step
           {
             type: 'GEN_CONT_NO',
             label: 'เลขที่สัญญา',
@@ -722,6 +766,13 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
         require_approval: false,
         required_signature: false,
         required_documents: [
+          // todo: send notification to vendor email after complete this step
+          {
+            type: 'TEXT',
+            label: 'ชื่อบริษัทผู้ค้า',
+            field_key: 'lt500k_vendor_name',
+            mark_as_done: false,
+          },
           {
             type: 'VENDOR_EMAIL',
             label: 'อีเมลผู้ค้า',
@@ -734,9 +785,10 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
         name: 'ส่งไปยังฝ่ายตรวจรับ',
         order: 4,
         required_step: [1, 2, 3],
-        require_approval: true,
+        require_approval: false,
         required_signature: false,
         required_documents: [
+          // todo: if number of delivery date < 30 days and installment_count = 1, then procurement staff do until complete all contract step.
           {
             type: 'NUMBER',
             label: 'จำนวนงวด',
@@ -759,6 +811,19 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
             type: 'DATE',
             label: 'วันสิ้นสุดสัญญา',
             field_key: 'lt500k_contract_end_date',
+            mark_as_done: false,
+          },
+          {
+            type: 'BOOLEAN',
+            label: 'มีรหัสสินทรัพย์หรือไม่',
+            field_key: 'lt500k_contract_asset_code',
+            mark_as_done: false,
+          },
+          {
+            // todo: if have asset code, then show this field and save selected budget plan to project
+            type: 'SELECT_BUDGET_PLAN',
+            label: 'แผนงบประมาณ',
+            field_key: 'lt500k_asset_budget_plan',
             mark_as_done: false,
           },
         ],
@@ -819,6 +884,13 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
         require_approval: false,
         required_signature: false,
         required_documents: [
+          // todo: send notification to vendor email after complete this step
+          {
+            type: 'TEXT',
+            label: 'ชื่อบริษัทผู้ค้า',
+            field_key: 'lt100k_vendor_name',
+            mark_as_done: false,
+          },
           {
             type: 'VENDOR_EMAIL',
             label: 'อีเมลผู้ค้า',
@@ -831,9 +903,10 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
         name: 'ส่งไปยังฝ่ายตรวจรับ',
         order: 4,
         required_step: [1, 2, 3],
-        require_approval: true,
+        require_approval: false,
         required_signature: false,
         required_documents: [
+          // todo: if number of delivery date < 30 days and installment_count = 1, then procurement staff do until complete all contract step.
           {
             type: 'NUMBER',
             label: 'จำนวนงวด',
@@ -856,6 +929,19 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
             type: 'DATE',
             label: 'วันสิ้นสุดสัญญา',
             field_key: 'lt100k_contract_end_date',
+            mark_as_done: false,
+          },
+          {
+            type: 'BOOLEAN',
+            label: 'มีรหัสสินทรัพย์หรือไม่',
+            field_key: 'lt100k_contract_asset_code',
+            mark_as_done: false,
+          },
+          {
+            // todo: if have asset code, then show this field and save selected budget plan to project
+            type: 'SELECT_BUDGET_PLAN',
+            label: 'แผนงบประมาณ',
+            field_key: 'lt100k_asset_budget_plan',
             mark_as_done: false,
           },
         ],
@@ -928,6 +1014,7 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
         require_approval: false,
         required_signature: false,
         required_documents: [
+          // todo: send notification to vendor email after complete this step
           {
             type: 'TEXT',
             label: 'ชื่อบริษัทผู้ค้า',
@@ -946,7 +1033,7 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
         name: 'ส่งไปยังฝ่ายตรวจรับ',
         order: 4,
         required_step: [1, 2, 3],
-        require_approval: true,
+        require_approval: false,
         required_signature: false,
         required_documents: [
           {
@@ -980,15 +1067,10 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
             mark_as_done: false,
           },
           {
+            // todo: if have asset code, then show this field and save selected budget plan to project
             type: 'SELECT_BUDGET_PLAN',
-            label: '(ถ้ามีรหัสสินทรัพย์) แผนงบประมาณ',
+            label: 'แผนงบประมาณ',
             field_key: 'reg18_asset_budget_plan',
-            mark_as_done: false,
-          },
-          {
-            type: 'TEXT',
-            label: 'เจ้าหน้าที่บริหารสัญญา',
-            field_key: 'reg18_contract_assignee',
             mark_as_done: false,
           },
         ],
@@ -1020,12 +1102,16 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
             mark_as_done: false,
           },
           {
+            // todo: if contract_enable_notification is true, then show this field
+            // todo: send notification to contract staff, vendor email and committee email when due date is coming
             type: 'DUE_DATE_SELECT',
-            label: 'แจ้งเตือนก่อนวันครบกำหนดมอบงาน(3/5/7/15 วัน)',
+            label: 'แจ้งเตือนก่อนวันครบกำหนดมอบงาน (3/5/7/15 วัน)',
             field_key: 'contract_notification_days',
             mark_as_done: false,
           },
           {
+            // todo: if contract_enable_notification is true, then show this field
+            // todo: send notification to this email when due date is coming
             type: 'COMMITTEE_EMAIL',
             label: 'อีเมลกรรมการตรวจรับ',
             field_key: 'contract_committee_email',
@@ -1040,17 +1126,12 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
         require_approval: false,
         required_signature: false,
         required_documents: [
-          {
-            type: 'TEXT',
-            label: 'เลขที่ใบสั่งซื้อ (PO)',
-            field_key: 'contract_billing_po_number',
-            mark_as_done: false,
-          },
+          // todo: from vendor billing form
           {
             type: 'FILE',
             label: 'อัปโหลดไฟล์ใบแจ้งหนี้/ใบส่งของ/ใบวางบิล',
             field_key: 'contract_billing_doc',
-            mark_as_done: true,
+            mark_as_done: false,
           },
         ],
       },
@@ -1058,7 +1139,7 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
         name: 'ตรวจสอบและบันทึกข้อมูลการส่งมอบงาน',
         order: 3,
         required_step: [1],
-        require_approval: true,
+        require_approval: false,
         required_signature: false,
         required_documents: [
           {
@@ -1074,13 +1155,19 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
         name: 'บันทึกข้อมูลการตรวจรับ',
         order: 4,
         required_step: [3],
-        require_approval: true,
+        require_approval: false,
         required_signature: false,
         required_documents: [
           {
             type: 'TEXT',
-            label: 'เลข MIGO',
-            field_key: 'contract_migo_number',
+            label: 'เลข MIGO (103)',
+            field_key: 'contract_migo_103',
+            mark_as_done: false,
+          },
+          {
+            type: 'TEXT',
+            label: 'เลข MIGO (105)',
+            field_key: 'contract_migo_105',
             mark_as_done: false,
           },
         ],
@@ -1089,8 +1176,8 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
         name: 'บันทึกรายงานผลการตรวจรับพัสดุเสนอผู้บริหาร',
         order: 5,
         required_step: [4],
-        require_approval: true,
-        required_signature: false,
+        require_approval: true, // todo: if don't have asset code, then require approval: true
+        required_signature: false, // todo: if have asset code, then require signature: true
         required_documents: [
           {
             type: 'SELECT_DELIVERY_STATUS',
@@ -1105,12 +1192,7 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
             mark_as_done: true,
           },
           {
-            type: 'BOOLEAN',
-            label: 'มีรหัสสินทรัพย์หรือไม่',
-            field_key: 'contract_asset_code',
-            mark_as_done: false,
-          },
-          {
+            // todo: if have asset code, then show this field
             type: 'FILE',
             label: 'ไฟล์ลงนามอนุมัติ',
             field_key: 'contract_signed_approval_document',

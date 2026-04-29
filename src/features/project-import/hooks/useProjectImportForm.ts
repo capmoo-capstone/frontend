@@ -26,6 +26,7 @@ interface UseProjectImportFormOptions {
 export function useProjectImportForm({ onSuccess }: UseProjectImportFormOptions) {
   const { user } = useAuth();
   const canSelectEveryUnits = user && hasProcurementPermission(user);
+  const defaultRequestScope = user?.roles.find((scope) => scope.role !== 'GUEST');
 
   const [showConfirmationDialog, setShowConfirmationDialog] = useState(false);
   const [warningConfirmed, setWarningConfirmed] = useState(false);
@@ -43,8 +44,8 @@ export function useProjectImportForm({ onSuccess }: UseProjectImportFormOptions)
       description: '',
       procurement_type: '',
       fiscal_year: currentYear.toString(),
-      department_id: canSelectEveryUnits ? '' : user?.department?.id || '',
-      unit_id: canSelectEveryUnits ? '' : user?.unit?.id || '',
+      department_id: canSelectEveryUnits ? '' : defaultRequestScope?.dept_id || '',
+      unit_id: canSelectEveryUnits ? '' : defaultRequestScope?.unit_id || '',
       budget_plan_ids: [],
       budget: '',
     },

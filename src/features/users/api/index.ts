@@ -11,7 +11,6 @@ import {
   BackendUserDelegationDetailResponseSchema,
   type BackendUserDelegationResponse,
   BackendUserDelegationResponseSchema,
-  type BackendUserDetailResponse,
   BackendUserDetailResponseSchema,
   BackendUserSelectionResponseSchema,
   type GetUsersParams,
@@ -22,6 +21,8 @@ import {
   UpdateUserRoleSchema,
   type UpdateUsersToUnitRequest,
   UpdateUsersToUnitSchema,
+  type UserDetailResponse,
+  UserDetailResponseSchema,
   type UserListResponse,
   UserListResponseSchema,
   type UserSelectionResponse,
@@ -39,7 +40,19 @@ export const getUsers = async ({
     },
   });
 
-  return UserListResponseSchema.parse(data);
+  const parsed = BackendUserSelectionResponseSchema.parse(data);
+
+  return UserListResponseSchema.parse({
+    id: parsed.id,
+    name: parsed.name,
+    entity_type: parsed.entity_type,
+    total: parsed.total,
+    data: parsed.data.map((user) => ({
+      id: user.id,
+      full_name: user.full_name,
+      roles: Array.from(new Set(user.roles.length > 0 ? user.roles : ['GUEST'])),
+    })),
+  });
 };
 
 export const getUsersForSelection = async (
@@ -55,20 +68,35 @@ export const getUsersForSelection = async (
     id: parsed.id,
     name: parsed.name,
     entity_type: parsed.entity_type === 'all' ? 'department' : parsed.entity_type,
-    data: parsed.data.map((user) => ({
-      id: user.id,
-      full_name: user.full_name,
-      role: user.roles[0] ?? 'GUEST',
-    })),
+    total: parsed.total,
+    data: parsed.data.map((user) => {
+      const roles = Array.from(new Set(user.roles.length > 0 ? user.roles : ['GUEST']));
+
+      return {
+        id: user.id,
+        full_name: user.full_name,
+        roles,
+      };
+    }),
   };
 
   return UserSelectionResponseSchema.parse(normalized);
 };
 
-export const getUserById = async (userId: string): Promise<BackendUserDetailResponse> => {
+export const getUserById = async (userId: string): Promise<UserDetailResponse> => {
   const { data } = await api.get(`/users/${userId}`);
   const parsed = BackendUserDetailResponseSchema.parse(data);
-  return parsed;
+
+  return UserDetailResponseSchema.parse({
+    ...parsed,
+    roles: parsed.roles.map((role) => ({
+      role: role.role,
+      dept_id: role.department.id,
+      dept_name: role.department.name,
+      unit_id: role.unit?.id ?? null,
+      unit_name: role.unit?.name ?? null,
+    })),
+  });
 };
 
 export const updateUsersInUnit = async (

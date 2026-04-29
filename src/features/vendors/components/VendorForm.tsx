@@ -1,5 +1,6 @@
 import { useState } from 'react';
 
+import axios from 'axios';
 import { Check, FileText, Loader2, Upload, X } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -7,20 +8,41 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
 
-import type { VendorFormData } from '../types';
+import { useCreateVendorSubmission } from '../hooks/useVendorSubmissions';
+import type { CreateVendorSubmissionPayload, VendorFormData } from '../types';
 
 interface VendorFormProps {
   onSubmit?: (data: VendorFormData) => Promise<void>;
 }
 
+const VENDOR_BILLING_FIELD_KEY = 'contract_billing_doc';
+
+const getSubmissionErrorMessage = (error: unknown) => {
+  if (axios.isAxiosError(error)) {
+    const message = error.response?.data?.message;
+    if (typeof message === 'string' && message.trim()) {
+      return message;
+    }
+  }
+
+  return 'ไม่สามารถส่งข้อมูลได้ กรุณาลองใหม่อีกครั้ง';
+};
+
 export function VendorForm({ onSubmit }: VendorFormProps) {
+  const createVendorSubmission = useCreateVendorSubmission();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [files, setFiles] = useState<File[]>([]);
-  const [errors, setErrors] = useState<{ po?: string; files?: string }>({});
+  const [errors, setErrors] = useState<{
+    po?: string;
+    installment?: string;
+    files?: string;
+    submit?: string;
+  }>({});
 
   const [formData, setFormData] = useState<VendorFormData>({
     po: '',
+    installment: '',
   });
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -47,13 +69,18 @@ export function VendorForm({ onSubmit }: VendorFormProps) {
   };
 
   const validateForm = (): boolean => {
-    const newErrors: { po?: string; files?: string } = {};
+    const newErrors: { po?: string; installment?: string; files?: string } = {};
+    const installmentValue = formData.installment?.trim();
 
-    // Validate PO number (must be exactly 10 digits)
     if (!formData.po.trim()) {
       newErrors.po = 'กรุณาระบุเลขที่ใบสั่งซื้อ';
-    } else if (!/^\d{10}$/.test(formData.po.trim())) {
-      newErrors.po = 'เลขที่ใบสั่งซื้อต้องเป็นตัวเลข 10 หลัก';
+    }
+
+    if (installmentValue) {
+      const installmentNumber = Number(installmentValue);
+      if (!Number.isInteger(installmentNumber) || installmentNumber <= 0) {
+        newErrors.installment = 'งวดที่ต้องเป็นตัวเลขจำนวนเต็มมากกว่า 0';
+      }
     }
 
     // Validate files
@@ -65,23 +92,40 @@ export function VendorForm({ onSubmit }: VendorFormProps) {
     return Object.keys(newErrors).length === 0;
   };
 
+  const buildSubmissionPayload = (): CreateVendorSubmissionPayload => {
+    const installmentValue = formData.installment?.trim();
+
+    return {
+      type: 'VENDOR',
+      workflow_type: 'CONTRACT',
+      step_order: 2,
+      po_no: formData.po.trim(),
+      ...(installmentValue ? { installment: Number(installmentValue) } : {}),
+      files: files.map((file) => ({
+        field_key: VENDOR_BILLING_FIELD_KEY,
+        file_name: file.name,
+        file_path: file.name,
+      })),
+    };
+  };
+
   const handleSubmit = async () => {
     if (!validateForm()) {
       return;
     }
 
     setIsSubmitting(true);
+    setErrors((prev) => ({ ...prev, submit: undefined }));
     try {
       if (onSubmit) {
         await onSubmit({ ...formData, files });
       } else {
-        // Default mock behavior
-        await new Promise((resolve) => setTimeout(resolve, 2000));
-        console.log('Submitting:', { ...formData, files });
+        await createVendorSubmission.mutateAsync(buildSubmissionPayload());
       }
       setIsSuccess(true);
     } catch (error) {
       console.error('Submission error:', error);
+      setErrors((prev) => ({ ...prev, submit: getSubmissionErrorMessage(error) }));
     } finally {
       setIsSubmitting(false);
     }
@@ -89,7 +133,7 @@ export function VendorForm({ onSubmit }: VendorFormProps) {
 
   const handleReset = () => {
     setIsSuccess(false);
-    setFormData({ po: '' });
+    setFormData({ po: '', installment: '' });
     setFiles([]);
     setErrors({});
   };
@@ -128,6 +172,23 @@ export function VendorForm({ onSubmit }: VendorFormProps) {
                 className={errors.po ? 'h-11 border-red-500 bg-white' : 'h-11 bg-white'}
               />
               {errors.po && <p className="text-sm text-red-500">{errors.po}</p>}
+            </div>
+
+            <div className="space-y-2">
+              <Label className="normal-b text-foreground">งวดที่</Label>
+              <Input
+                type="number"
+                min={1}
+                step={1}
+                value={formData.installment ?? ''}
+                onChange={(e) => {
+                  setFormData({ ...formData, installment: e.target.value });
+                  setErrors((prev) => ({ ...prev, installment: undefined, submit: undefined }));
+                }}
+                placeholder="กรุณากรอกงวดที่ (ถ้ามี)"
+                className={errors.installment ? 'h-11 border-red-500 bg-white' : 'h-11 bg-white'}
+              />
+              {errors.installment && <p className="text-sm text-red-500">{errors.installment}</p>}
             </div>
           </div>
 
@@ -190,6 +251,10 @@ export function VendorForm({ onSubmit }: VendorFormProps) {
             </div>
             {errors.files && <p className="text-sm text-red-500">{errors.files}</p>}
           </div>
+
+          {errors.submit && (
+            <p className="pt-4 text-center text-sm text-red-500">{errors.submit}</p>
+          )}
 
           {/* Submit Button */}
           <div className="pt-6">

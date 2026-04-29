@@ -6,7 +6,7 @@ import { useAuth } from '@/context/useAuth';
 import { useBudgetImportPermissions, useProjectImportPermissions } from '@/features/project-import';
 import AppLayout from '@/layouts/AppLayout';
 import { isProductionApp } from '@/lib/environment';
-import { hasSettingsPermission } from '@/lib/permissions';
+import { hasSettingsPermission, hasVendorSubmissionPermission } from '@/lib/permissions';
 
 // --- Lazy Load Pages ---
 const Home = lazy(() => import('@/pages/home/Home'));
@@ -47,6 +47,7 @@ export const PrivateRoutes = () => {
   const { canImportProject } = useProjectImportPermissions();
   const { canImportBudget } = useBudgetImportPermissions();
   const canManageSettings = user ? hasSettingsPermission(user) : false;
+  const canViewVendorSubmissions = user ? hasVendorSubmissionPermission(user) : false;
   const landingPath = isProductionApp ? '/app/projects' : '/app/home';
 
   return (
@@ -94,7 +95,16 @@ export const PrivateRoutes = () => {
                 <Route path="/app/budget-import/success" element={<BudgetImportSuccess />} />
               </Route>
               {/* --- Vendor Management --- */}
-              <Route path="/app/vendor-response" element={<VendorSubmission />} />
+              <Route
+                element={
+                  <PermissionGuard
+                    isAllowed={canViewVendorSubmissions}
+                    redirectPath={landingPath}
+                  />
+                }
+              >
+                <Route path="/app/vendor-response" element={<VendorSubmission />} />
+              </Route>
               <Route path="/app/vendor-form" element={<VendorForm />} />
               <Route path="/vendor-form" element={<Navigate to="/app/vendor-form" replace />} />
               {/* --- Management / Admin --- */}

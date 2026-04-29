@@ -4,9 +4,10 @@ import { Check, X } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { UserSelect } from '@/features/users';
+import { UserSelect, hasUserSelectionRole } from '@/features/users';
 import { cn } from '@/lib/utils';
 
+import { DIRECTOR_ROLE_ID } from '../../constants';
 import { useCreateGroupForm } from '../../hooks/useCreateGroupForm';
 import { type SettingsUserOption, type WorkGroupSetting } from '../../types';
 
@@ -107,7 +108,9 @@ export function CreateGroupPanel({
               <UserSelect
                 value={field.value}
                 deptId="procurement"
-                options={procurementUsers.filter((person) => person.role !== 'DIRECTOR')}
+                options={procurementUsers.filter(
+                  (person) => !hasUserSelectionRole(person, DIRECTOR_ROLE_ID)
+                )}
                 onChange={field.onChange}
                 hasClearButton={false}
                 placeholder="กรุณาเลือกหัวหน้ากลุ่มงาน"

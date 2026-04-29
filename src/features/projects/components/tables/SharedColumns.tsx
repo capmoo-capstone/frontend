@@ -10,7 +10,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { type User, isProcurementStaffRole } from '@/features/auth';
-import { hasUnitPermission } from '@/lib/permissions';
+import { getUserRoleNames, hasUnitPermission } from '@/lib/permissions';
 
 import type { Project } from '../../types/index';
 import {
@@ -41,7 +41,7 @@ const getProjectStatuses = (project: Project, user?: User) =>
     contractStatus: project.contract_status,
     contractStep: project.contract_step ?? null,
     isProcurementStaff: isProcurementStaffRole(user),
-    role: user?.role,
+    roles: getUserRoleNames(user),
   });
 
 export const baseColumns = ({

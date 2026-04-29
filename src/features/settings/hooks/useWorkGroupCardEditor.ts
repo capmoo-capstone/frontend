@@ -4,8 +4,10 @@ import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 
 import { RESPONSIBLE_SELECT_OPTIONS } from '@/features/projects';
+import { hasUserSelectionRole } from '@/features/users';
 
 import { getFormErrorMessages } from '../components/work-group/workGroupFormUtils';
+import { DIRECTOR_ROLE_ID } from '../constants';
 import {
   type DelegationPayload,
   type SettingsUserOption,
@@ -103,7 +105,9 @@ export function useWorkGroupCardEditor({
     );
 
     return procurementUsers.filter((person) => {
-      if (person.role === 'DIRECTOR' || person.id === directorUserId) return false;
+      if (hasUserSelectionRole(person, DIRECTOR_ROLE_ID) || person.id === directorUserId) {
+        return false;
+      }
       if (assignedElsewhereIds.has(person.id)) return false;
       return true;
     });

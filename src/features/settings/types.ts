@@ -211,7 +211,7 @@ export const createProcurementRoleSchema = (context: ProcurementRoleValidationCo
 export interface SettingsUserOption {
   id: string;
   full_name: string;
-  role?: string;
+  roles?: string[];
 }
 
 export interface SettingsPerson {

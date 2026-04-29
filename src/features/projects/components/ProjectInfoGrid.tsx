@@ -145,8 +145,8 @@ export const ProjectInfoGrid = ({
 
   const detailRowTwo = [
     { label: 'วิธีการจัดหา', value: project.procurement_type },
-    { label: 'หน่วยงาน', value: project.requester.unit_name || '-' },
-    { label: 'ฝ่าย', value: project.requester.dept_name || '-' },
+    { label: 'ฝ่าย', value: project.requester.unit_name || '-' },
+    { label: 'หน่วยงาน', value: project.requester.dept_name || '-' },
     { label: 'วงเงินงบประมาณ (บาท)', value: formatNumberThai(project.budget) },
     {
       label: 'วันครบกำหนดส่งมอบ',

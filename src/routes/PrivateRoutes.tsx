@@ -31,6 +31,7 @@ const BudgetImportSuccess = lazy(() => import('@/pages/projects/BudgetImportSucc
 const FinanceExportPage = lazy(() => import('@/pages/projects/FinanceExport'));
 
 // Admin & Others
+const AuditLogPage = lazy(() => import('@/pages/admin/AuditLogPage'));
 const OrganizationManagement = lazy(() => import('@/pages/admin/OrganizationManagement'));
 const DepartmentRepsPage = lazy(() => import('@/pages/settings/DepartmentRepsPage'));
 const WorkGroupsPage = lazy(() => import('@/pages/settings/WorkGroupsPage'));
@@ -47,6 +48,7 @@ export const PrivateRoutes = () => {
   const { canImportProject } = useProjectImportPermissions();
   const { canImportBudget } = useBudgetImportPermissions();
   const canManageSettings = user ? hasSettingsPermission(user) : false;
+  const canViewAuditLogs = !!user?.roles.some((scope) => scope.role === 'SUPER_ADMIN');
   const landingPath = isProductionApp ? '/app/projects' : '/app/home';
 
   return (
@@ -103,6 +105,13 @@ export const PrivateRoutes = () => {
                 element={isProductionApp ? <Navigate to={landingPath} replace /> : <StaffKpi />}
               />
               <Route path="/app/management/organization" element={<OrganizationManagement />} />
+              <Route
+                element={
+                  <PermissionGuard isAllowed={canViewAuditLogs} redirectPath={landingPath} />
+                }
+              >
+                <Route path="/app/admin/audit-logs" element={<AuditLogPage />} />
+              </Route>
               <Route path="/app/dev/api-probe" element={<ApiProbe />} />
               <Route
                 element={

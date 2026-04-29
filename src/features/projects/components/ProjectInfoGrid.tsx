@@ -1,7 +1,11 @@
 import { useMemo, useState } from 'react';
 
+
+
 import { Check, ChevronDown, Copy, Pencil, X } from 'lucide-react';
 import { toast } from 'sonner';
+
+
 
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -12,7 +16,29 @@ import { useBudgetPlans } from '@/features/budgets';
 import { formatDateThai, getFiscalYear } from '@/lib/date-formatters';
 import { cn } from '@/lib/utils';
 
+
+
 import type { ProjectDetail } from '../types/index';
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 interface ProjectInfoGridProps {
   project: ProjectDetail;
@@ -145,8 +171,8 @@ export const ProjectInfoGrid = ({
 
   const detailRowTwo = [
     { label: 'วิธีการจัดหา', value: project.procurement_type },
-    { label: 'หน่วยงาน', value: project.requester.unit_name || '-' },
-    { label: 'ฝ่าย', value: project.requester.dept_name || '-' },
+    { label: 'ฝ่าย', value: project.requester.unit_name || '-' },
+    { label: 'หน่วยงาน', value: project.requester.dept_name || '-' },
     { label: 'วงเงินงบประมาณ (บาท)', value: formatNumberThai(project.budget) },
     {
       label: 'วันครบกำหนดส่งมอบ',

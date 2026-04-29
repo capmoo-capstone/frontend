@@ -37,6 +37,7 @@ const getUrgentLabel = (value: ProjectUrgentStatus) => {
 interface ProjectHeaderProps {
   project: ProjectDetail;
   canCancelProjects: boolean;
+  canAddAssignees?: boolean;
   canEditProjectDetails?: boolean;
   onSaveProjectHeader?: (data: { title: string; description: string | null }) => Promise<void>;
   onCancelProject?: () => void;
@@ -48,6 +49,7 @@ interface ProjectHeaderProps {
 export const ProjectHeader = ({
   project,
   canCancelProjects,
+  canAddAssignees = false,
   canEditProjectDetails = false,
   onSaveProjectHeader,
   onCancelProject,
@@ -161,10 +163,12 @@ export const ProjectHeader = ({
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={onAddAssignee}>
-              <Users className="h-4 w-4" />
-              เพิ่มผู้รับผิดชอบ
-            </DropdownMenuItem>
+            {canAddAssignees && onAddAssignee && (
+              <DropdownMenuItem onClick={onAddAssignee}>
+                <Users className="h-4 w-4" />
+                เพิ่มผู้รับผิดชอบ
+              </DropdownMenuItem>
+            )}
             <DropdownMenuItem onClick={onCancelProject} variant="destructive">
               <Trash2 className="h-4 w-4" />
               {getCancelProjectActionLabel(canCancelProjects)}

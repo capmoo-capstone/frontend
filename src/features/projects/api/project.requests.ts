@@ -20,8 +20,8 @@ import type { OwnProjectQueryParams, ProjectFilterParams } from './types';
 type ProjectsQueryParams = {
   page: number;
   limit: number;
-  sortBy: string;
-  sortOrder: 'asc' | 'desc';
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
   search?: string;
   title?: string;
   fiscalYear?: string | number;
@@ -42,8 +42,6 @@ const toProjectsQueryParams = (params?: ProjectFilterParams): ProjectsQueryParam
   const query: ProjectsQueryParams = {
     page: 1,
     limit: 50,
-    sortBy: 'receive_no',
-    sortOrder: 'desc',
   };
 
   if (!params) return query;
@@ -51,7 +49,11 @@ const toProjectsQueryParams = (params?: ProjectFilterParams): ProjectsQueryParam
   if (params.search) query.search = params.search;
   if (params.title) query.title = params.title;
   if (params.fiscalYear) query.fiscalYear = params.fiscalYear;
-  if (params.myTasks !== undefined) query.myTasks = params.myTasks;
+  if (params.myTasks) query.myTasks = true;
+  if (params.sortBy && params.sortOrder) {
+    query.sortBy = params.sortBy;
+    query.sortOrder = params.sortOrder;
+  }
 
   if (params.dateRange?.from) query.dateFrom = params.dateRange.from.toISOString();
   if (params.dateRange?.to) query.dateTo = params.dateRange.to.toISOString();

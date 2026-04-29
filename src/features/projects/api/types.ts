@@ -5,6 +5,8 @@ export interface ProjectFilterParams {
   title?: string;
   dateRange?: DateRange;
   fiscalYear?: string;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
   procurementType?: string[];
   status?: string[];
   procurementStatus?: string[];

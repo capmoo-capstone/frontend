@@ -1,5 +1,5 @@
-import type { Role } from '@/features/auth';
-import { ManageSelfRoles, ManageUnitRoles } from '@/lib/permissions';
+import type { Role, User } from '@/features/auth';
+import { ManageSelfRoles, ManageUnitRoles, hasRoleInScopes } from '@/lib/permissions';
 
 import type { Project } from '../types/index';
 
@@ -38,6 +38,57 @@ export const canReturnProject = (
 
 export const canManageAssigneeByRole = (viewAsRole: Role) => {
   return ManageUnitRoles.includes(viewAsRole) || ManageSelfRoles.includes(viewAsRole);
+};
+
+type AssigneeSource = { id?: string | null } | null | undefined;
+
+type ProjectAssigneeSource = AssigneeSource | AssigneeSource[];
+
+export type ProjectAddAssigneePermissionSource = {
+  responsible_unit_id?: string;
+  current_workflow_type?: string;
+  current_template_type?: string;
+  assignee_procurement?: ProjectAssigneeSource;
+  assignee_contract?: ProjectAssigneeSource;
+  assignee_procurement_ids?: string[];
+  assignee_contract_ids?: string[];
+};
+
+const getAssigneeIds = (assignees: ProjectAssigneeSource): string[] => {
+  const assigneeList = Array.isArray(assignees) ? assignees : [assignees];
+
+  return assigneeList.map((assignee) => assignee?.id).filter((id): id is string => Boolean(id));
+};
+
+export const getActiveProjectAssigneeIds = (project: ProjectAddAssigneePermissionSource) => {
+  const activeWorkflowType = project.current_workflow_type ?? project.current_template_type;
+  const activeAssigneeIds =
+    activeWorkflowType === 'CONTRACT'
+      ? project.assignee_contract_ids
+      : project.assignee_procurement_ids;
+
+  if (activeAssigneeIds?.length) {
+    return activeAssigneeIds.filter(Boolean);
+  }
+
+  return getAssigneeIds(
+    activeWorkflowType === 'CONTRACT' ? project.assignee_contract : project.assignee_procurement
+  );
+};
+
+export const canUserAddProjectAssignees = (
+  user: User | null | undefined,
+  project: ProjectAddAssigneePermissionSource | null | undefined
+) => {
+  if (!user || !project?.responsible_unit_id) return false;
+
+  const unitId = project.responsible_unit_id;
+  const canManageUnit = hasRoleInScopes(user, ['HEAD_OF_UNIT', 'ADMIN'], { unitId });
+  const canManageOwnProject =
+    hasRoleInScopes(user, ['GENERAL_STAFF'], { unitId }) &&
+    getActiveProjectAssigneeIds(project).includes(user.id);
+
+  return canManageUnit || canManageOwnProject;
 };
 
 export const getCancelProjectActionLabel = (canCancelProjects?: boolean) => {

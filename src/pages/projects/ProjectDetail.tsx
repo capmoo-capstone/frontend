@@ -8,6 +8,7 @@ import { toast } from 'sonner';
 import { useAuth } from '@/context/useAuth';
 import { useLinkBudgetPlanToProject } from '@/features/budgets';
 import {
+  AddAssigneeDialog,
   ApproveCancelDialog,
   CancelProjectDialog,
   CancellationRequestBanner,
@@ -31,6 +32,7 @@ export default function ProjectDetail() {
 
   // View States
   const [isCancelDialogOpen, setIsCancelDialogOpen] = useState(false);
+  const [isAddAssigneeDialogOpen, setIsAddAssigneeDialogOpen] = useState(false);
   const [isApproveCancelDialogOpen, setIsApproveCancelDialogOpen] = useState(false);
   const [isSavingHeader, setIsSavingHeader] = useState(false);
   const [isSavingProjectInfo, setIsSavingProjectInfo] = useState(false);
@@ -41,13 +43,8 @@ export default function ProjectDetail() {
   const { mutateAsync: linkBudgetPlanMutation } = useLinkBudgetPlanToProject();
   const { mutateAsync: approveCancellationMutation } = useApproveProjectCancellation();
   const { mutateAsync: rejectCancellationMutation } = useRejectProjectCancellation();
-  const { canCancelProjects, canEditProjectDetails } = useProjectPermissions({
-    project: project
-      ? {
-          current_template_type: project.current_template_type,
-          procurement_type: project.procurement_type,
-        }
-      : undefined,
+  const { canAddAssignees, canCancelProjects, canEditProjectDetails } = useProjectPermissions({
+    project: project ?? undefined,
   });
 
   if (!id || !user) return null;
@@ -159,10 +156,6 @@ export default function ProjectDetail() {
     }
   };
 
-  const handleAddAssignee = () => {
-    toast.info('กำลังเตรียมฟีเจอร์เพิ่มผู้รับผิดชอบ');
-  };
-
   return (
     <>
       {/* --- Project Alerts --- */}
@@ -191,7 +184,8 @@ export default function ProjectDetail() {
         onSaveProjectHeader={handleSaveProjectHeader}
         isSaving={isSavingHeader}
         onCancelProject={() => setIsCancelDialogOpen(true)}
-        onAddAssignee={handleAddAssignee}
+        onAddAssignee={() => setIsAddAssigneeDialogOpen(true)}
+        canAddAssignees={canAddAssignees}
         canCancelProjects={canCancelProjects}
       />
 
@@ -220,6 +214,14 @@ export default function ProjectDetail() {
         onClose={() => setIsCancelDialogOpen(false)}
         project={{ id, title: project.title }}
       />
+
+      {isAddAssigneeDialogOpen && (
+        <AddAssigneeDialog
+          isOpen={isAddAssigneeDialogOpen}
+          onClose={() => setIsAddAssigneeDialogOpen(false)}
+          project={project}
+        />
+      )}
     </>
   );
 }

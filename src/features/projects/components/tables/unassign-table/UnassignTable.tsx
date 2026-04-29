@@ -29,7 +29,9 @@ interface UnassignTableProps {
 }
 
 export function UnassignTable({ unitId, pendingChanges, setPendingChanges }: UnassignTableProps) {
-  const { canAssignProjects, canClaimProjects, canCancelProjects } = useProjectPermissions(unitId);
+  const { canAssignProjects, canClaimProjects, canCancelProjects } = useProjectPermissions({
+    unitId,
+  });
 
   const { data: projects, isLoading, isError } = useUnassignedProjects(unitId);
   const { mutateAsync: assignProjectsMutation } = useAssignProjects();

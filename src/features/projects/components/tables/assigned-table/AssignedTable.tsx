@@ -25,8 +25,9 @@ import { ProjectDataTable } from '../DataTable';
 import { getColumns } from './columns';
 
 export function AssignedTable({ unitId }: { unitId?: string }) {
-  const { canClaimProjects, canChangeProjectAssignee, canCancelProjects } =
-    useProjectPermissions(unitId);
+  const { canClaimProjects, canChangeProjectAssignee, canCancelProjects } = useProjectPermissions({
+    unitId,
+  });
 
   const [date, setDate] = useState<Date | undefined>(new Date());
 

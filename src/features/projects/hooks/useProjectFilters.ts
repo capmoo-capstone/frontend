@@ -1,6 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
 import type { DateRange } from 'react-day-picker';
 
+import { useAuth } from '@/context/useAuth';
+import { usePermissions } from '@/features/auth';
+
 import type { ProjectFilterParams } from '../api';
 import { useTableQueryState } from './useTableQueryState';
 
@@ -35,6 +38,9 @@ const FILTER_PARAM_KEYS = [
   ...ARRAY_FILTER_KEYS,
 ] as const;
 
+const SORT_FIELD_PARAM = 'sortField';
+const SORT_TYPE_PARAM = 'sortType';
+
 const parseDateRange = (searchParams: URLSearchParams): DateRange | undefined => {
   const dateFrom = searchParams.get('dateFrom');
   const dateTo = searchParams.get('dateTo');
@@ -47,17 +53,30 @@ const parseDateRange = (searchParams: URLSearchParams): DateRange | undefined =>
   };
 };
 
-const parseProjectFilters = (searchParams: URLSearchParams): ProjectFilterParams => {
+const parseProjectFilters = (
+  searchParams: URLSearchParams,
+  isProcurementStaff: boolean
+): ProjectFilterParams => {
+  const sortField = searchParams.get(SORT_FIELD_PARAM);
+  const sortType = searchParams.get(SORT_TYPE_PARAM);
+
   const nextFilters: ProjectFilterParams = {
     search: searchParams.get('search') ?? '',
     title: searchParams.get('title') ?? '',
     dateRange: parseDateRange(searchParams),
     fiscalYear: searchParams.get('fiscalYear') ?? '',
+    sortBy: sortField || undefined,
+    sortOrder:
+      sortField && sortType === 'ASC'
+        ? 'asc'
+        : sortField && sortType === 'DESC'
+          ? 'desc'
+          : undefined,
     procurementType: searchParams.getAll('procurementType'),
     status: searchParams.getAll('status'),
     urgentStatus: searchParams.getAll('urgentStatus'),
     assignees: searchParams.getAll('assignees'),
-    departments: searchParams.getAll('departments'),
+    departments: isProcurementStaff ? searchParams.getAll('departments') : [],
     units: searchParams.getAll('units'),
     myTasks: searchParams.get('myTasks') === 'true',
   };
@@ -65,7 +84,7 @@ const parseProjectFilters = (searchParams: URLSearchParams): ProjectFilterParams
   return nextFilters;
 };
 
-const serializeProjectFilters = (filters: ProjectFilterParams) => {
+const serializeProjectFilters = (filters: ProjectFilterParams, isProcurementStaff: boolean) => {
   const serialized: Record<string, string | string[] | boolean | null> = {
     search: filters.search || null,
     title: filters.title || null,
@@ -74,7 +93,7 @@ const serializeProjectFilters = (filters: ProjectFilterParams) => {
     status: filters.status?.length ? filters.status : null,
     urgentStatus: filters.urgentStatus?.length ? filters.urgentStatus : null,
     assignees: filters.assignees?.length ? filters.assignees : null,
-    departments: filters.departments?.length ? filters.departments : null,
+    departments: isProcurementStaff && filters.departments?.length ? filters.departments : null,
     units: filters.units?.length ? filters.units : null,
     myTasks: filters.myTasks || null,
     dateFrom: filters.dateRange?.from ? filters.dateRange.from.toISOString() : null,
@@ -86,8 +105,13 @@ const serializeProjectFilters = (filters: ProjectFilterParams) => {
 
 export function useProjectFilters() {
   const { searchParams, updateQueryParams } = useTableQueryState();
+  const { user } = useAuth();
+  const { isProcurementStaff } = usePermissions();
 
-  const appliedFilters = useMemo(() => parseProjectFilters(searchParams), [searchParams]);
+  const appliedFilters = useMemo(
+    () => parseProjectFilters(searchParams, isProcurementStaff),
+    [isProcurementStaff, searchParams]
+  );
 
   const [tempFilters, setTempFilters] = useState<ProjectFilterParams>(appliedFilters);
 
@@ -102,6 +126,12 @@ export function useProjectFilters() {
     setSearchQuery(appliedFilters.search ?? '');
   }, [appliedFilters.search]);
 
+  useEffect(() => {
+    if (user && !isProcurementStaff && searchParams.has('departments')) {
+      updateQueryParams({ departments: null }, { replace: true });
+    }
+  }, [isProcurementStaff, searchParams, updateQueryParams, user]);
+
   const handleGlobalSearch = () => {
     updateQueryParams(
       {
@@ -112,7 +142,9 @@ export function useProjectFilters() {
   };
 
   const handleApplyFilter = () => {
-    updateQueryParams(serializeProjectFilters(tempFilters), { resetPage: true });
+    updateQueryParams(serializeProjectFilters(tempFilters, isProcurementStaff), {
+      resetPage: true,
+    });
     setIsFilterOpen(false);
   };
 

@@ -126,15 +126,13 @@ Always ask:
 - Which list/detail queries are affected?
 - Which query keys need invalidation?
 
-### 3.3 Mock mode vs real API mode confusion
-
-`VITE_USE_PROJECTS_MOCK` controls whether project APIs use local mock data.
+### 3.3 API configuration confusion
 
 If behavior seems wrong, verify:
 
 - `.env` values
 - API base URL
-- Expected mode (mock or real)
+- Expected backend environment
 
 ### 3.4 Missing `enabled` guards in queries
 

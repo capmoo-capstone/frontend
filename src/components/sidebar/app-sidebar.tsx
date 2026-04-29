@@ -42,6 +42,7 @@ import { useSidebar } from '@/components/ui/sidebar-context';
 import { useAuth } from '@/context/useAuth';
 import { useLogout } from '@/features/auth';
 import { type Role } from '@/features/auth';
+import { isProductionApp } from '@/lib/environment';
 import { cn } from '@/lib/utils';
 
 type MenuItem = {
@@ -49,6 +50,7 @@ type MenuItem = {
   url: string;
   icon: LucideIcon;
   allowedRoles?: Role[];
+  hideInProduction?: boolean;
 };
 
 type MenuGroup = {
@@ -65,11 +67,13 @@ const menuGroups: MenuGroup[] = [
         title: 'แดชบอร์ด',
         url: '/app/dashboards/overview',
         icon: ChartPie,
+        hideInProduction: true,
       },
       {
         title: 'รายงานรายบุคคล',
         url: '/app/management/employees/kpi',
         icon: ChartPie,
+        hideInProduction: true,
       },
       {
         title: 'โครงการทั้งหมด',
@@ -176,7 +180,9 @@ const getFilteredGroups = (groups: MenuGroup[], userRole?: Role): MenuGroup[] =>
     .filter((group) => canAccessGroup(group, userRole))
     .map((group) => ({
       ...group,
-      items: group.items.filter((item) => canAccessMenuItem(item, userRole)),
+      items: group.items.filter(
+        (item) => canAccessMenuItem(item, userRole) && (!isProductionApp || !item.hideInProduction)
+      ),
     }))
     .filter((group) => group.items.length > 0);
 };
@@ -203,24 +209,25 @@ export function AppSidebar() {
       </SidebarHeader>
 
       <SidebarContent className="px-3 group-data-[collapsible=icon]:px-0">
-        {/* --- Home Button --- */}
-        <SidebarGroup>
-          <SidebarMenu>
-            <SidebarMenuItem>
-              <SidebarMenuButton
-                asChild
-                isActive={isHomeActive}
-                tooltip="หน้าหลัก"
-                className={`text-primary normal hover:text-brand-9 transition-colors ${isHomeActive ? 'font-medium' : ''} `}
-              >
-                <Link to="/app/home">
-                  <Home className={isHomeActive ? 'text-pink-600' : 'text-gray-500'} />
-                  <span>หน้าหลัก</span>
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          </SidebarMenu>
-        </SidebarGroup>
+        {!isProductionApp && (
+          <SidebarGroup>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  asChild
+                  isActive={isHomeActive}
+                  tooltip="หน้าหลัก"
+                  className={`text-primary normal hover:text-brand-9 transition-colors ${isHomeActive ? 'font-medium' : ''} `}
+                >
+                  <Link to="/app/home">
+                    <Home className={isHomeActive ? 'text-pink-600' : 'text-gray-500'} />
+                    <span>หน้าหลัก</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroup>
+        )}
 
         {/* --- Menu Groups --- */}
         {filteredGroups.map((group) => (

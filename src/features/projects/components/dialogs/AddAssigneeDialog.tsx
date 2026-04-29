@@ -11,7 +11,6 @@ import { CustomContentDialog } from '@/components/shared-dialog';
 import { UserSelect } from '@/features/users';
 
 import { useAddProjectAssignee } from '../../hooks/useProjectMutations';
-import type { Project } from '../../types/index';
 
 const AddAssigneeFormSchema = z.object({
   userId: z.string().min(1, 'กรุณาเลือกเจ้าหน้าที่'),
@@ -22,7 +21,10 @@ type AddAssigneeFormValues = z.infer<typeof AddAssigneeFormSchema>;
 interface AddAssigneeDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  project: Project;
+  project: {
+    id: string;
+    responsible_unit_id: string;
+  };
 }
 
 export function AddAssigneeDialog({ isOpen, onClose, project }: AddAssigneeDialogProps) {

@@ -30,7 +30,7 @@ type PendingCancellationAction = {
 } | null;
 
 export function WaitingCancelTable({ unitId }: { unitId?: string }) {
-  const { canCancelProjects } = useProjectPermissions(unitId);
+  const { canCancelProjects } = useProjectPermissions({ unitId });
 
   const { data: projects, isLoading, isError } = useWaitingCancelProjects(unitId);
   const { mutateAsync: approveMutation } = useApproveProjectCancellation();

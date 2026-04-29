@@ -1,6 +1,5 @@
 import type {
   AssignedProjectItem,
-  Project,
   ProjectAssignmentsPayload,
   ProjectDetail,
   SummaryResponse,
@@ -42,13 +41,16 @@ import {
   returnProjectRequest,
   updateProjectRequest,
 } from './project.requests';
-import type { OwnProjectQueryParams, ProjectFilterParams } from './types';
+import type { OwnProjectQueryParams, ProjectFilterParams, ProjectsQueryOptions } from './types';
 
-export type { OwnProjectQueryParams, ProjectFilterParams } from './types';
+export type { OwnProjectQueryParams, ProjectFilterParams, ProjectsQueryOptions } from './types';
 
-export const getProjects = async (params?: ProjectFilterParams): Promise<Project[]> => {
-  const parsed = await fetchProjectsPage(params);
-  return parsed.data.map(mapProjectListItem);
+export const getProjects = async (params?: ProjectFilterParams, options?: ProjectsQueryOptions) => {
+  const parsed = await fetchProjectsPage(params, options);
+  return {
+    ...parsed,
+    data: parsed.data.map(mapProjectListItem),
+  };
 };
 
 export const getProjectDetail = async (id: string): Promise<ProjectDetail> => {
@@ -56,8 +58,11 @@ export const getProjectDetail = async (id: string): Promise<ProjectDetail> => {
   return mapProjectDetail(parsed);
 };
 
-export const getAssignedProjects = async (date: Date): Promise<AssignedProjectItem[]> => {
-  const parsed = await fetchAssignedProjects(date);
+export const getAssignedProjects = async (
+  date: Date,
+  unitId?: string
+): Promise<AssignedProjectItem[]> => {
+  const parsed = await fetchAssignedProjects(date, unitId);
   return parsed.data.map(mapAssignedProjectItem);
 };
 

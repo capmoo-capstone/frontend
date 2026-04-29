@@ -4,36 +4,33 @@ import { useProjectImportPermissions } from '@/features/project-import';
 import { OPS_DEPT_ID } from '@/lib/constants';
 import { hasRoleInScopes } from '@/lib/permissions';
 
-import { getResponsibleUnitId } from '../utils/responsible-unit';
+import {
+  type ProjectAddAssigneePermissionSource,
+  canUserAddProjectAssignees,
+} from '../utils/project-selectors';
 
-type ProjectPermissionSource = {
-  current_workflow_type?: string;
-  current_template_type?: string;
-  procurement_type?: string;
+type ProjectPermissionSource = ProjectAddAssigneePermissionSource;
+
+type UseProjectPermissionsInput = {
+  unitId?: string;
+  project?: ProjectPermissionSource;
 };
-
-type UseProjectPermissionsInput =
-  | string
-  | {
-      unitId?: string;
-      project?: ProjectPermissionSource;
-    }
-  | undefined;
 
 export const useProjectPermissions = (input?: UseProjectPermissionsInput) => {
   const { user } = useAuth();
   const { isProcurementStaff } = usePermissions();
   const { canImportProject, canImportOptions } = useProjectImportPermissions();
 
-  const resolvedUnitId =
-    typeof input === 'string'
-      ? input
-      : input?.project
-        ? getResponsibleUnitId(
-            input.project.current_workflow_type ?? input.project.current_template_type,
-            input.project.procurement_type
-          )
-        : input?.unitId;
+  const inputProject = input?.project;
+  const resolvedUnitId = inputProject ? inputProject.responsible_unit_id : input?.unitId;
+  const addAssigneePermissionProject: ProjectAddAssigneePermissionSource | undefined = inputProject
+    ? {
+        ...inputProject,
+        responsible_unit_id: resolvedUnitId,
+      }
+    : resolvedUnitId
+      ? { responsible_unit_id: resolvedUnitId }
+      : undefined;
 
   return {
     isProcurementStaff,
@@ -59,6 +56,7 @@ export const useProjectPermissions = (input?: UseProjectPermissionsInput) => {
     canChangeProjectAssignee: !!(
       user && hasRoleInScopes(user, ['HEAD_OF_UNIT'], { unitId: resolvedUnitId })
     ),
+    canAddAssignees: !!(user && canUserAddProjectAssignees(user, addAssigneePermissionProject)),
     canCancelProjects: !!(
       user &&
       hasRoleInScopes(user, ['HEAD_OF_UNIT', 'HEAD_OF_DEPARTMENT'], {

@@ -15,13 +15,13 @@ import {
   UpdateProjectPayloadSchema,
   WorkloadStatsResponseSchema,
 } from '../types/index';
-import type { OwnProjectQueryParams, ProjectFilterParams } from './types';
+import type { OwnProjectQueryParams, ProjectFilterParams, ProjectsQueryOptions } from './types';
 
 type ProjectsQueryParams = {
   page: number;
   limit: number;
-  sortBy: string;
-  sortOrder: 'asc' | 'desc';
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
   search?: string;
   title?: string;
   fiscalYear?: string | number;
@@ -38,12 +38,13 @@ type ProjectsQueryParams = {
   departments?: ProjectFilterParams['departments'];
 };
 
-const toProjectsQueryParams = (params?: ProjectFilterParams): ProjectsQueryParams => {
+const toProjectsQueryParams = (
+  params?: ProjectFilterParams,
+  options?: ProjectsQueryOptions
+): ProjectsQueryParams => {
   const query: ProjectsQueryParams = {
-    page: 1,
-    limit: 50,
-    sortBy: 'receive_no',
-    sortOrder: 'desc',
+    page: options?.page ?? 1,
+    limit: options?.limit ?? 25,
   };
 
   if (!params) return query;
@@ -51,7 +52,11 @@ const toProjectsQueryParams = (params?: ProjectFilterParams): ProjectsQueryParam
   if (params.search) query.search = params.search;
   if (params.title) query.title = params.title;
   if (params.fiscalYear) query.fiscalYear = params.fiscalYear;
-  if (params.myTasks !== undefined) query.myTasks = params.myTasks;
+  if (params.myTasks) query.myTasks = true;
+  if (options?.sortBy && options.sortOrder) {
+    query.sortBy = options.sortBy;
+    query.sortOrder = options.sortOrder;
+  }
 
   if (params.dateRange?.from) query.dateFrom = params.dateRange.from.toISOString();
   if (params.dateRange?.to) query.dateTo = params.dateRange.to.toISOString();
@@ -67,9 +72,12 @@ const toProjectsQueryParams = (params?: ProjectFilterParams): ProjectsQueryParam
   return query;
 };
 
-export const fetchProjectsPage = async (params?: ProjectFilterParams) => {
-  const queryParams = toProjectsQueryParams(params);
-  const { page = 1, limit = 50, ...filter } = queryParams;
+export const fetchProjectsPage = async (
+  params?: ProjectFilterParams,
+  options?: ProjectsQueryOptions
+) => {
+  const queryParams = toProjectsQueryParams(params, options);
+  const { page, limit, ...filter } = queryParams;
 
   const { data } = await api.post(
     '/projects',
@@ -90,10 +98,11 @@ export const fetchProjectDetail = async (id: string) => {
   return ProjectDetailApiSchema.parse(data);
 };
 
-export const fetchAssignedProjects = async (date: Date) => {
+export const fetchAssignedProjects = async (date: Date, unitId?: string) => {
   const { data } = await api.get('/projects/assigned', {
     params: {
       date: date.toISOString(),
+      ...(unitId ? { unitId } : {}),
     },
   });
 

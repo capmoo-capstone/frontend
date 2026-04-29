@@ -29,6 +29,75 @@ interface ProjectFilterCardProps {
   setFilters: React.Dispatch<React.SetStateAction<ProjectFilterParams>>;
 }
 
+const PROCUREMENT_STATUS_FILTERS: Array<{
+  id: string;
+  label: string;
+  values: ProjectStatus[];
+}> = [
+  {
+    id: 'UNASSIGNED',
+    label: 'ยังไม่ได้มอบหมาย',
+    values: ['UNASSIGNED'],
+  },
+  {
+    id: 'WAITING_ACCEPT',
+    label: 'รอการตอบรับ',
+    values: ['WAITING_ACCEPT'],
+  },
+  {
+    id: 'IN_PROGRESS',
+    label: 'กำลังดำเนินการ',
+    values: ['IN_PROGRESS'],
+  },
+  {
+    id: 'WAITING_CANCEL',
+    label: 'รออนุมัติยกเลิก',
+    values: ['WAITING_CANCEL'],
+  },
+  {
+    id: 'CANCELLED',
+    label: 'ยกเลิก',
+    values: ['CANCELLED'],
+  },
+  {
+    id: 'CLOSED',
+    label: 'เสร็จสิ้น',
+    values: ['CLOSED'],
+  },
+  {
+    id: 'REQUEST_EDIT',
+    label: 'การเงินส่งคืนแก้ไข',
+    values: ['REQUEST_EDIT'],
+  },
+];
+
+const NON_PROCUREMENT_STATUS_FILTERS: Array<{
+  id: string;
+  label: string;
+  values: ProjectStatus[];
+}> = [
+  {
+    id: 'NOT_STARTED_GROUP',
+    label: 'ยังไม่เริ่ม',
+    values: ['UNASSIGNED', 'WAITING_ACCEPT'],
+  },
+  {
+    id: 'IN_PROGRESS_GROUP',
+    label: 'กำลังดำเนินการ',
+    values: ['IN_PROGRESS', 'WAITING_CANCEL', 'REQUEST_EDIT'],
+  },
+  {
+    id: 'CANCELLED',
+    label: 'ยกเลิก',
+    values: ['CANCELLED'],
+  },
+  {
+    id: 'CLOSED',
+    label: 'เสร็จสิ้น',
+    values: ['CLOSED'],
+  },
+];
+
 export function ProjectFilterCard({ filters, setFilters }: ProjectFilterCardProps) {
   const { isProcurementStaff } = useProjectPermissions();
 
@@ -44,37 +113,9 @@ export function ProjectFilterCard({ filters, setFilters }: ProjectFilterCardProp
 
   const procurementTypes = ProcurementTypeEnum.options;
   const urgentStatuses = ProjectUrgentStatusEnum.options;
-  const projectStatusFilters: Array<{
-    id: string;
-    label: string;
-    values: ProjectStatus[];
-  }> = [
-    {
-      id: 'UNASSIGNED',
-      label: 'ยังไม่ได้มอบหมาย',
-      values: ['UNASSIGNED'],
-    },
-    {
-      id: 'WAITING_ACCEPT',
-      label: 'รอการตอบรับ',
-      values: ['WAITING_ACCEPT'],
-    },
-    {
-      id: 'IN_PROGRESS_GROUP',
-      label: 'กำลังดำเนินการ',
-      values: ['IN_PROGRESS', 'WAITING_CANCEL', 'REQUEST_EDIT'],
-    },
-    {
-      id: 'CLOSED',
-      label: 'ปิดโครงการ',
-      values: ['CLOSED'],
-    },
-    {
-      id: 'CANCELLED',
-      label: 'ยกเลิก',
-      values: ['CANCELLED'],
-    },
-  ] as const;
+  const projectStatusFilters = isProcurementStaff
+    ? PROCUREMENT_STATUS_FILTERS
+    : NON_PROCUREMENT_STATUS_FILTERS;
 
   const { data: departments } = useDepartments();
   const { data: users } = useUsersForSelection({ deptId: OPS_DEPT_ID });

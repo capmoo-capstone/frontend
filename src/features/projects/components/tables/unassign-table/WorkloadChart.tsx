@@ -35,7 +35,7 @@ interface WorkloadChartProps {
 }
 
 export function WorkloadChart({ pendingChanges, unitId }: WorkloadChartProps) {
-  const { canViewWorkloadChart } = useProjectPermissions(unitId);
+  const { canViewWorkloadChart } = useProjectPermissions({ unitId });
   const { data, isLoading, isError } = useWorkloadStats(unitId);
 
   const chartData = useMemo(() => {

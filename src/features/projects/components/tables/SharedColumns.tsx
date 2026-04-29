@@ -17,6 +17,7 @@ import {
   canCancelProject,
   canEditProjectAssignee,
   canReturnProject,
+  canUserAddProjectAssignees,
   getActiveResponsibleUsers,
   getCancelProjectActionLabel,
 } from '../../utils/project-selectors';
@@ -147,7 +148,8 @@ export const baseColumns = ({
         (user && hasUnitPermission(user, project.responsible_unit_id)) ||
         assigneeIds.includes(user?.id ?? '');
 
-      const canAddAssignee = canEditProjectAssignee(project.status) && canManage;
+      const canAddAssignee =
+        canEditProjectAssignee(project.status) && canUserAddProjectAssignees(user, project);
       const canReturnProjectAction =
         canReturnProject(
           project.status,

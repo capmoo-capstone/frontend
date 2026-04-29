@@ -30,7 +30,8 @@ import {
 } from '@/components/ui/table';
 import { Textarea } from '@/components/ui/textarea';
 import { ImportBudgetPlanItemSchema } from '@/features/budgets';
-import { RESPONSIBLE_SELECT_OPTIONS } from '@/features/projects';
+import { ProcurementTypeEnum } from '@/features/projects/types/enums';
+import { getResponsibleTypeFormat } from '@/features/projects/utils/projectFormatters';
 import { formatDateThai, parseThaiDateString } from '@/lib/date-formatters';
 import { cn } from '@/lib/utils';
 
@@ -76,6 +77,11 @@ type PendingDelete = {
 };
 
 const buildErrorKey = (rowIndex: number, field: string) => `${rowIndex}:${field}`;
+
+const PROJECT_PROCUREMENT_OPTIONS = ProcurementTypeEnum.options.map((value) => ({
+  value,
+  label: getResponsibleTypeFormat(value).label,
+}));
 
 // Editable Cell Component
 const EditableCell = ({
@@ -153,7 +159,7 @@ const EditableCell = ({
             <SelectValue placeholder="กรุณาเลือกวิธีการจัดหา" />
           </SelectTrigger>
           <SelectContent>
-            {RESPONSIBLE_SELECT_OPTIONS.map((option) => (
+            {PROJECT_PROCUREMENT_OPTIONS.map((option) => (
               <SelectItem key={option.value} value={option.value}>
                 {option.label}
               </SelectItem>

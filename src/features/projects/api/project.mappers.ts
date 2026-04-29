@@ -161,6 +161,7 @@ export const mapProjectDetail = (parsed: ProjectDetailApi): ProjectDetail => ({
   id: parsed.id,
   procurement_type: parsed.procurement_type,
   current_template_type: parsed.current_workflow_type,
+  responsible_unit_id: parsed.responsible_unit_id,
   is_urgent: parsed.is_urgent,
   title: parsed.title,
   description: parsed.description,
@@ -194,6 +195,8 @@ export const mapProjectDetail = (parsed: ProjectDetailApi): ProjectDetail => ({
     id: parsed.assignee_contract[0]?.id ?? null,
     full_name: parsed.assignee_contract[0]?.full_name ?? null,
   },
+  assignee_procurement_ids: parsed.assignee_procurement.map((assignee) => assignee.id),
+  assignee_contract_ids: parsed.assignee_contract.map((assignee) => assignee.id),
   current_step: {
     name:
       parsed.current_workflow_type === 'CONTRACT'

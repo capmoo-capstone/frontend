@@ -25,7 +25,7 @@ export function ProjectToolbar({
       <div className="bg-background relative rounded-lg">
         <Input
           className="normal pr-10"
-          placeholder="ค้นหา"
+          placeholder="ค้นหาโครงการ / ผู้รับผิดชอบ"
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && onSearch()}

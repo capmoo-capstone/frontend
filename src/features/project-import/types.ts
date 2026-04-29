@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
 import type { ImportBudgetPlanItem } from '@/features/budgets';
+import { ProcurementTypeEnum } from '@/features/projects/types/enums';
 
 export type ImportMode = 'none' | 'lesspaper' | 'fiori' | 'manual' | 'budget';
 
@@ -20,7 +21,12 @@ export const ProjectImportSchema = z.object({
     .optional(),
   title: z.string().min(1, 'กรุณาระบุชื่อโครงการ'),
   description: z.string().min(1, 'กรุณาระบุรายละเอียดโครงการ'),
-  procurement_type: z.string().min(1, 'กรุณาเลือกวิธีการจัดหา'),
+  procurement_type: z
+    .string()
+    .min(1, 'กรุณาเลือกวิธีการจัดหา')
+    .refine((value) => (ProcurementTypeEnum.options as readonly string[]).includes(value), {
+      message: 'กรุณาเลือกวิธีการจัดหาที่ถูกต้อง',
+    }),
   delivery_date: z
     .date({ message: 'กรุณาเลือกวันที่ส่งมอบ' })
     .refine((date) => date > new Date(), { message: 'กรุณาระบุวันที่ในอนาคต' })

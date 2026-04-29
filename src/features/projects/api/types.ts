@@ -16,6 +16,13 @@ export interface ProjectFilterParams {
   myTasks?: boolean;
 }
 
+export interface ProjectsQueryOptions {
+  page?: number;
+  limit?: number;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
+}
+
 export interface OwnProjectQueryParams {
   page?: number;
   limit?: number;

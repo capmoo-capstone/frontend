@@ -6,7 +6,6 @@ import {
   MyTasksTable,
   NotificationList,
 } from '@/features/dashboard';
-import { ProjectStats } from '@/features/projects';
 
 export default function MyToDoDashboard() {
   const { user } = useAuth();
@@ -21,9 +20,6 @@ export default function MyToDoDashboard() {
         <NotificationList notifications={MOCK_NOTIFICATIONS} />
         <CalendarWidget upcomingEvents={MOCK_UPCOMING_SCHEDULE} />
       </div>
-
-      {/* Middle Section: Stats */}
-      <ProjectStats />
 
       {/* Bottom Section: Jobs Table */}
       <MyTasksTable user={user ?? undefined} />

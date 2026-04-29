@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import {
   type OwnProjectQueryParams,
   type ProjectFilterParams,
+  type ProjectsQueryOptions,
   getAssignedProjects,
   getOwnProjects,
   getProjectDetail,
@@ -17,11 +18,12 @@ import { projectKeys } from './queryKeys';
 
 export type { ProjectFilterParams } from '../api';
 export type { OwnProjectQueryParams } from '../api';
+export type { ProjectsQueryOptions } from '../api';
 
-export const useProjects = (filters?: ProjectFilterParams) => {
+export const useProjects = (filters?: ProjectFilterParams, options?: ProjectsQueryOptions) => {
   return useQuery({
-    queryKey: projectKeys.list(filters),
-    queryFn: () => getProjects(filters),
+    queryKey: projectKeys.list(filters, options),
+    queryFn: () => getProjects(filters, options),
   });
 };
 
@@ -60,10 +62,10 @@ export const useProjectDetail = (id: string | undefined) => {
   });
 };
 
-export const useAssignedProjects = (date: Date | undefined) => {
+export const useAssignedProjects = (date: Date | undefined, unitId?: string) => {
   return useQuery({
-    queryKey: projectKeys.assigned(date),
-    queryFn: () => getAssignedProjects(date!),
+    queryKey: projectKeys.assigned(date, unitId),
+    queryFn: () => getAssignedProjects(date!, unitId),
     enabled: !!date,
   });
 };

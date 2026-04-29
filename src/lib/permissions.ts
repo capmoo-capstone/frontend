@@ -25,6 +25,9 @@ const DepartmentAllowedRoles: Role[] = ['SUPER_ADMIN', 'ADMIN', 'HEAD_OF_DEPARTM
 /** Roles permitted to access global application settings */
 const SettingsAllowedRoles: Role[] = ['SUPER_ADMIN', 'ADMIN'];
 
+/** Roles permitted to view vendor submissions */
+const VendorSubmissionAllowedRoles: Role[] = ['SUPER_ADMIN', 'ADMIN', 'FINANCE_STAFF'];
+
 /** Roles that bypass standard unit-level restrictions (Global access) */
 const UnitBypassRoles: Role[] = ['SUPER_ADMIN', 'ADMIN'];
 
@@ -156,6 +159,16 @@ export const hasDepartmentPermission = (user: User, targetDepartmentId?: string)
  */
 export const hasSettingsPermission = (user: User) => {
   return hasRoleInScopes(user, SettingsAllowedRoles);
+};
+
+/**
+ * Checks if a user can access vendor submission responses.
+ */
+export const hasVendorSubmissionPermission = (user: User) => {
+  return (
+    hasRoleInScopes(user, VendorSubmissionAllowedRoles) ||
+    (!!user.role && VendorSubmissionAllowedRoles.includes(user.role))
+  );
 };
 
 /**

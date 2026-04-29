@@ -116,6 +116,7 @@ const menuGroups: MenuGroup[] = [
         title: 'การตอบกลับจากคู่ค้า',
         url: '/app/vendor-response',
         icon: Truck,
+        allowedRoles: ['FINANCE_STAFF', 'ADMIN', 'SUPER_ADMIN'],
       },
     ],
   },

@@ -1128,12 +1128,6 @@ export const ProcurementWorkflows: WorkflowConfig[] = [
         required_documents: [
           // todo: from vendor billing form
           {
-            type: 'TEXT',
-            label: 'เลขที่ใบสั่งซื้อ (PO)',
-            field_key: 'contract_billing_po_number',
-            mark_as_done: false,
-          },
-          {
             type: 'FILE',
             label: 'อัปโหลดไฟล์ใบแจ้งหนี้/ใบส่งของ/ใบวางบิล',
             field_key: 'contract_billing_doc',

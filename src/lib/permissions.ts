@@ -165,10 +165,7 @@ export const hasSettingsPermission = (user: User) => {
  * Checks if a user can access vendor submission responses.
  */
 export const hasVendorSubmissionPermission = (user: User) => {
-  return (
-    hasRoleInScopes(user, VendorSubmissionAllowedRoles) ||
-    (!!user.role && VendorSubmissionAllowedRoles.includes(user.role))
-  );
+  return hasRoleInScopes(user, VendorSubmissionAllowedRoles);
 };
 
 /**
